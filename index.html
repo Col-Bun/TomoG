@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Buddy Creature</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+JP:wght@400;700&family=Nunito:wght@400;700;900&display=swap');
+
+  :root {
+    --bg: #1a1a2e;
+    --panel: #16213e;
+    --accent: #e94560;
+    --accent2: #0f3460;
+    --text: #eee;
+    --soft: #aab;
+    --green: #53d769;
+    --gold: #ffd700;
+    --blue: #4fc3f7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== PASSWORD SCREEN ===== */
+  #password-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    gap: 20px;
+  }
+
+  #password-screen h1 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1.4rem;
+    color: var(--accent);
+    text-align: center;
+    line-height: 1.8;
+  }
+
+  .pw-creature {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: var(--panel);
+    border: 3px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    animation: bounce 1s infinite alternate;
+  }
+
+  /* Sprite image version - uncomment when using real sprites */
+  /* .pw-creature img { width: 100%; height: 100%; object-fit: contain; } */
+
+  @keyframes bounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-10px); }
+  }
+
+  #password-screen input {
+    background: var(--panel);
+    border: 2px solid var(--accent2);
+    color: var(--text);
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    text-align: center;
+    width: 220px;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  #password-screen input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .pw-hint {
+    font-size: 0.8rem;
+    color: var(--soft);
+  }
+
+  .pw-error {
+    color: var(--accent);
+    font-size: 0.85rem;
+    min-height: 1.2em;
+  }
+
+  /* ===== MAIN APP ===== */
+  #app {
+    display: none;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+  }
+
+  /* Top bar */
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .top-bar h2 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+  }
+
+  .date-display {
+    font-size: 0.85rem;
+    color: var(--soft);
+  }
+
+  /* Tab navigation */
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .tab-btn {
+    background: var(--panel);
+    border: 2px solid var(--accent2);
+    color: var(--soft);
+    padding: 8px 16px;
+    border-radius: 10px 10px 0 0;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+
+  .tab-btn.active {
+    background: var(--accent2);
+    color: var(--text);
+    border-color: var(--accent);
+  }
+
+  .tab-btn:hover { color: var(--text); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Creature area */
+  .creature-area {
+    background: var(--panel);
+    border-radius: 20px;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 16px;
+    border: 2px solid var(--accent2);
+    position: relative;
+  }
+
+  .creature-sprite {
+    width: 160px;
+    height: 160px;
+    margin: 0 auto 16px;
+    position: relative;
+    image-rendering: pixelated;
+  }
+
+  /* Placeholder creature (remove when using real sprites) */
+  .creature-placeholder {
+    width: 160px;
+    height: 160px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    animation: creatureBob 2s ease-in-out infinite;
+  }
+
+  /* Real sprite img style */
+  .creature-sprite img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    animation: creatureBob 2s ease-in-out infinite;
+  }
+
+  @keyframes creatureBob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  @keyframes creatureHappy {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-12px) rotate(-5deg); }
+    75% { transform: translateY(-12px) rotate(5deg); }
+  }
+
+  .creature-sprite.happy img,
+  .creature-placeholder.happy {
+    animation: creatureHappy 0.6s ease-in-out 3;
+  }
+
+  /* Speech bubble */
+  .speech-bubble {
+    background: #232946;
+    border: 2px solid var(--accent);
+    border-radius: 16px;
+    padding: 16px;
+    margin: 16px auto 0;
+    max-width: 500px;
+    position: relative;
+    text-align: left;
+  }
+
+  .speech-bubble::before {
+    content: '';
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-bottom: 12px solid var(--accent);
+  }
+
+  .speech-line {
+    display: flex;
+    gap: 10px;
+    padding: 4px 0;
+    font-size: 0.9rem;
+    align-items: flex-start;
+  }
+
+  .lang-tag {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.5rem;
+    padding: 3px 6px;
+    border-radius: 4px;
+    min-width: 32px;
+    text-align: center;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  .lang-en { background: #2d4a7a; color: #8bb8ff; }
+  .lang-jp { background: #7a2d4a; color: #ff8bb8; }
+  .lang-es { background: #4a7a2d; color: #b8ff8b; }
+
+  /* Mood bar */
+  .mood-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    justify-content: center;
+  }
+
+  .mood-label {
+    font-size: 0.75rem;
+    color: var(--soft);
+  }
+
+  .mood-track {
+    width: 140px;
+    height: 10px;
+    background: #111;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+
+  .mood-fill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.5s, background 0.5s;
+  }
+
+  /* Tasks panel */
+  .tasks-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .task-card {
+    background: var(--panel);
+    border: 2px solid var(--accent2);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .task-card.done {
+    border-color: var(--green);
+    opacity: 0.75;
+  }
+
+  .task-card h3 {
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    color: var(--gold);
+  }
+
+  .task-card .tri-label {
+    font-size: 0.7rem;
+    color: var(--soft);
+    margin-bottom: 12px;
+  }
+
+  .task-input-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .task-input-row input {
+    background: #111;
+    border: 2px solid var(--accent2);
+    color: var(--text);
+    padding: 8px 10px;
+    border-radius: 8px;
+    width: 80px;
+    text-align: center;
+    font-size: 1rem;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  .task-input-row input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .task-input-row span {
+    font-size: 0.8rem;
+    color: var(--soft);
+  }
+
+  .log-btn {
+    background: var(--accent);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    margin-top: 10px;
+    transition: all 0.2s;
+  }
+
+  .log-btn:hover { transform: scale(1.05); }
+  .log-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+
+  .task-done-check {
+    color: var(--green);
+    font-size: 1.4rem;
+    margin-top: 8px;
+  }
+
+  /* Stats strip */
+  .stats-strip {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .stat-box {
+    flex: 1;
+    background: var(--panel);
+    border: 2px solid var(--accent2);
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .stat-box .num {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--gold);
+  }
+
+  .stat-box .label {
+    font-size: 0.7rem;
+    color: var(--soft);
+    margin-top: 2px;
+  }
+
+  /* Dictionary */
+  .dict-section {
+    background: var(--panel);
+    border: 2px solid var(--accent2);
+    border-radius: 16px;
+    padding: 20px;
+  }
+
+  .dict-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .dict-header h3 {
+    font-size: 1rem;
+    color: var(--gold);
+  }
+
+  .dict-count {
+    font-size: 0.8rem;
+    color: var(--soft);
+    background: var(--accent2);
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  .dict-add-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .dict-add-form input {
+    background: #111;
+    border: 2px solid var(--accent2);
+    color: var(--text);
+    padding: 10px;
+    border-radius: 8px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem;
+  }
+
+  .dict-add-form input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .dict-add-form input::placeholder {
+    color: #555;
+  }
+
+  .add-word-btn {
+    background: var(--green);
+    border: none;
+    color: #111;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 900;
+    font-size: 1.1rem;
+  }
+
+  .add-word-btn:hover { transform: scale(1.05); }
+
+  .dict-filter {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .dict-filter input {
+    flex: 1;
+    background: #111;
+    border: 2px solid var(--accent2);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  .dict-filter input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .dict-list {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .dict-list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .dict-list::-webkit-scrollbar-thumb {
+    background: var(--accent2);
+    border-radius: 3px;
+  }
+
+  .dict-entry {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 10px;
+    padding: 10px 8px;
+    border-bottom: 1px solid #1a1a3a;
+    align-items: center;
+    font-size: 0.85rem;
+  }
+
+  .dict-entry:hover { background: rgba(255,255,255,0.03); }
+
+  .dict-entry .en { color: #8bb8ff; }
+  .dict-entry .jp { color: #ff8bb8; font-family: 'Noto Sans JP', sans-serif; }
+  .dict-entry .es { color: #b8ff8b; }
+
+  .del-word {
+    background: none;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 1rem;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+  }
+
+  .del-word:hover { opacity: 1; }
+
+  /* History */
+  .history-section {
+    background: var(--panel);
+    border: 2px solid var(--accent2);
+    border-radius: 16px;
+    padding: 20px;
+  }
+
+  .history-section h3 {
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  .history-grid {
+    display: grid;
+    gap: 8px;
+  }
+
+  .history-day {
+    display: grid;
+    grid-template-columns: 100px 1fr 1fr 60px;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    align-items: center;
+  }
+
+  .history-day .day-date { color: var(--soft); }
+  .history-day .day-stat { color: var(--blue); }
+  .history-day .day-streak { color: var(--gold); font-weight: 900; }
+
+  /* Streak animation */
+  .streak-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: linear-gradient(135deg, #ff6b35, #ffd700);
+    color: #111;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 900;
+    font-size: 0.8rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .tasks-panel { grid-template-columns: 1fr; }
+    .dict-add-form { grid-template-columns: 1fr; }
+    .dict-entry { grid-template-columns: 1fr 1fr 1fr auto; font-size: 0.75rem; }
+    .stats-strip { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== PASSWORD SCREEN ===== -->
+<div id="password-screen">
+  <div class="pw-creature" id="pw-creature">
+    <!-- Replace emoji with: <img src="sprites/sleep.png" alt="creature sleeping"> -->
+    🥚
+  </div>
+  <h1>STUDY BUDDY<br>is sleeping...</h1>
+  <p class="pw-hint">whisper the secret word to wake them up</p>
+  <input type="password" id="pw-input" placeholder="• • • •" autofocus>
+  <p class="pw-error" id="pw-error"></p>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+<div id="app">
+  <div class="top-bar">
+    <h2>STUDY BUDDY</h2>
+    <div>
+      <span class="streak-badge" id="streak-badge">🔥 0 day streak</span>
+      <span class="date-display" id="date-display"></span>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="home">🏠 Home</button>
+    <button class="tab-btn" data-tab="dictionary">📖 Dictionary <span id="dict-tab-count"></span></button>
+    <button class="tab-btn" data-tab="history">📊 History</button>
+  </div>
+
+  <!-- HOME TAB -->
+  <div class="tab-content active" id="tab-home">
+    <!-- Creature -->
+    <div class="creature-area">
+      <div class="creature-sprite" id="creature-sprite">
+        <!-- Replace with: <img src="sprites/idle.png" id="sprite-img" alt="creature"> -->
+        <div class="creature-placeholder" id="creature-emoji">🐣</div>
+      </div>
+      <div class="speech-bubble" id="speech-bubble">
+        <div class="speech-line">
+          <span class="lang-tag lang-en">EN</span>
+          <span id="speech-en">Hello! Let's study today!</span>
+        </div>
+        <div class="speech-line">
+          <span class="lang-tag lang-jp">JP</span>
+          <span id="speech-jp" style="font-family:'Noto Sans JP',sans-serif">こんにちは！今日も勉強しよう！</span>
+        </div>
+        <div class="speech-line">
+          <span class="lang-tag lang-es">ES</span>
+          <span id="speech-es">¡Hola! ¡Estudiemos hoy!</span>
+        </div>
+      </div>
+      <div class="mood-bar">
+        <span class="mood-label">Mood:</span>
+        <div class="mood-track">
+          <div class="mood-fill" id="mood-fill" style="width:50%;background:var(--gold)"></div>
+        </div>
+        <span class="mood-label" id="mood-text">Neutral</span>
+      </div>
+    </div>
+
+    <!-- Tasks -->
+    <div class="tasks-panel">
+      <!-- Flashcards -->
+      <div class="task-card" id="card-flash">
+        <h3>📇 Flashcards</h3>
+        <div class="tri-label">
+          Study flashcards! / フラッシュカード！ / ¡Tarjetas!
+        </div>
+        <div id="flash-input-area">
+          <div class="task-input-row">
+            <input type="number" id="flash-minutes" min="1" max="999" placeholder="0">
+            <span>min</span>
+          </div>
+          <button class="log-btn" onclick="logFlashcards()">Log Study Time</button>
+        </div>
+        <div id="flash-done" style="display:none">
+          <div class="task-done-check">✅</div>
+          <p style="font-size:0.8rem;color:var(--green);margin-top:4px" id="flash-done-text"></p>
+        </div>
+      </div>
+
+      <!-- Reading -->
+      <div class="task-card" id="card-read">
+        <h3>📚 Reading</h3>
+        <div class="tri-label">
+          Reading time! / 読書タイム！ / ¡Hora de leer!
+        </div>
+        <div id="read-input-area">
+          <div class="task-input-row">
+            <input type="number" id="read-hours" min="0.25" max="24" step="0.25" placeholder="0">
+            <span>hrs</span>
+          </div>
+          <button class="log-btn" onclick="logReading()">Log Reading Time</button>
+        </div>
+        <div id="read-done" style="display:none">
+          <div class="task-done-check">✅</div>
+          <p style="font-size:0.8rem;color:var(--green);margin-top:4px" id="read-done-text"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-strip">
+      <div class="stat-box">
+        <div class="num" id="stat-total-flash">0</div>
+        <div class="label">Total Flashcard Min</div>
+      </div>
+      <div class="stat-box">
+        <div class="num" id="stat-total-read">0</div>
+        <div class="label">Total Reading Hrs</div>
+      </div>
+      <div class="stat-box">
+        <div class="num" id="stat-words">0</div>
+        <div class="label">Dictionary Words</div>
+      </div>
+      <div class="stat-box">
+        <div class="num" id="stat-days">0</div>
+        <div class="label">Days Tracked</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DICTIONARY TAB -->
+  <div class="tab-content" id="tab-dictionary">
+    <div class="dict-section">
+      <div class="dict-header">
+        <h3>📖 My Dictionary / 辞書 / Diccionario</h3>
+        <span class="dict-count" id="dict-count">0 words</span>
+      </div>
+      <div class="dict-add-form">
+        <input type="text" id="dict-en" placeholder="English">
+        <input type="text" id="dict-jp" placeholder="日本語">
+        <input type="text" id="dict-es" placeholder="Español">
+        <button class="add-word-btn" onclick="addWord()">+</button>
+      </div>
+      <div class="dict-filter">
+        <input type="text" id="dict-search" placeholder="Search words..." oninput="renderDictionary()">
+      </div>
+      <div class="dict-list" id="dict-list"></div>
+    </div>
+  </div>
+
+  <!-- HISTORY TAB -->
+  <div class="tab-content" id="tab-history">
+    <div class="history-section">
+      <h3>📊 Study History / 学習履歴 / Historial</h3>
+      <div class="history-grid" id="history-grid"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== DATA STORE =====
+const STORAGE_KEY = 'studyBuddyData';
+
+function getDefaultData() {
+  return {
+    days: {},       // { "2026-03-27": { flash: 30, read: 2 } }
+    dictionary: [], // [ { en, jp, es, addedDate } ]
+    streak: 0,
+    lastActiveDate: null
+  };
+}
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return getDefaultData();
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+let data = loadData();
+
+// ===== DATE HELPERS =====
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function yesterdayStr() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function formatDate(str) {
+  const [y,m,d] = str.split('-');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return months[parseInt(m)-1] + ' ' + parseInt(d) + ', ' + y;
+}
+
+// ===== STREAK CALC =====
+function calcStreak() {
+  const today = todayStr();
+  const sortedDays = Object.keys(data.days).sort().reverse();
+  if (sortedDays.length === 0) { data.streak = 0; return; }
+
+  let streak = 0;
+  let checkDate = new Date();
+
+  // If no entry today, start from yesterday
+  if (!data.days[today]) {
+    checkDate.setDate(checkDate.getDate() - 1);
+  }
+
+  while (true) {
+    const ds = checkDate.getFullYear() + '-' + String(checkDate.getMonth()+1).padStart(2,'0') + '-' + String(checkDate.getDate()).padStart(2,'0');
+    const day = data.days[ds];
+    if (day && (day.flash > 0 || day.read > 0)) {
+      streak++;
+      checkDate.setDate(checkDate.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  data.streak = streak;
+}
+
+// ===== CREATURE SPEECHES =====
+const speeches = {
+  greeting: {
+    en: "Hello! Let's study today!",
+    jp: "こんにちは！今日も勉強しよう！",
+    es: "¡Hola! ¡Estudiemos hoy!"
+  },
+  needFlash: {
+    en: "Study your flashcards! How many minutes?",
+    jp: "フラッシュカードを勉強しよう！何分やった？",
+    es: "¡Estudia tus tarjetas! ¿Cuántos minutos?"
+  },
+  needRead: {
+    en: "Time to read! How many hours?",
+    jp: "読書の時間だよ！何時間読んだ？",
+    es: "¡Hora de leer! ¿Cuántas horas?"
+  },
+  bothDone: {
+    en: "Amazing work today! You're a star!",
+    jp: "今日はすごい！スターだよ！",
+    es: "¡Increíble hoy! ¡Eres una estrella!"
+  },
+  flashDone: {
+    en: "Great flashcard session! Now try reading!",
+    jp: "フラッシュカードお疲れ！次は読書だよ！",
+    es: "¡Bien con las tarjetas! ¡Ahora a leer!"
+  },
+  readDone: {
+    en: "Nice reading! Don't forget flashcards!",
+    jp: "読書お疲れ！フラッシュカードも忘れずに！",
+    es: "¡Buena lectura! ¡No olvides las tarjetas!"
+  },
+  streakHigh: {
+    en: "🔥 Incredible streak! Keep it going!",
+    jp: "🔥 すごい連続記録！続けよう！",
+    es: "🔥 ¡Racha increíble! ¡Sigue así!"
+  },
+  newWord: {
+    en: "New word learned! Your dictionary grows!",
+    jp: "新しい単語を覚えた！辞書が大きくなったよ！",
+    es: "¡Nueva palabra! ¡Tu diccionario crece!"
+  }
+};
+
+function setSpeech(key) {
+  const s = speeches[key];
+  if (!s) return;
+  document.getElementById('speech-en').textContent = s.en;
+  document.getElementById('speech-jp').textContent = s.jp;
+  document.getElementById('speech-es').textContent = s.es;
+}
+
+// ===== MOOD =====
+function updateMood() {
+  const today = data.days[todayStr()] || {};
+  let mood = 30; // base
+  if (today.flash > 0) mood += 30;
+  if (today.read > 0) mood += 30;
+  if (data.streak >= 3) mood += 10;
+  mood = Math.min(100, mood);
+
+  const fill = document.getElementById('mood-fill');
+  const text = document.getElementById('mood-text');
+  fill.style.width = mood + '%';
+
+  if (mood >= 90) { fill.style.background = 'var(--green)'; text.textContent = 'Ecstatic!'; setCreatureState('happy'); }
+  else if (mood >= 60) { fill.style.background = 'var(--gold)'; text.textContent = 'Happy'; setCreatureState('idle'); }
+  else if (mood >= 40) { fill.style.background = '#ff9800'; text.textContent = 'Neutral'; setCreatureState('idle'); }
+  else { fill.style.background = 'var(--accent)'; text.textContent = 'Needs attention'; setCreatureState('sad'); }
+}
+
+// ===== CREATURE STATE =====
+// Sprite mapping - update these paths when you add your sprites
+const spriteMap = {
+  idle: '😊',      // Replace with: 'sprites/idle.png'
+  happy: '🥳',     // Replace with: 'sprites/happy.png'
+  sad: '😢',       // Replace with: 'sprites/sad.png'
+  sleep: '😴',     // Replace with: 'sprites/sleep.png'
+  study: '🤓',     // Replace with: 'sprites/study.png'
+  read: '📖',      // Replace with: 'sprites/read.png'
+  celebrate: '🎉', // Replace with: 'sprites/celebrate.png'
+};
+
+function setCreatureState(state) {
+  const el = document.getElementById('creature-emoji');
+  if (!el) return;
+
+  // Using emoji placeholders - swap to img src when using sprites
+  el.textContent = spriteMap[state] || spriteMap.idle;
+
+  // For real sprites, uncomment this and comment out the emoji line:
+  // document.getElementById('sprite-img').src = spriteMap[state];
+
+  if (state === 'happy' || state === 'celebrate') {
+    el.classList.add('happy');
+    setTimeout(() => el.classList.remove('happy'), 1800);
+  }
+}
+
+// ===== PASSWORD =====
+document.getElementById('pw-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    if (this.value.toLowerCase().trim() === 'cake') {
+      document.getElementById('password-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      initApp();
+    } else {
+      document.getElementById('pw-error').textContent = 'Wrong password... try again!';
+      this.value = '';
+      document.getElementById('pw-creature').style.animation = 'none';
+      setTimeout(() => document.getElementById('pw-creature').style.animation = '', 10);
+    }
+  }
+});
+
+// ===== TABS =====
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ===== LOG FLASHCARDS =====
+function logFlashcards() {
+  const val = parseInt(document.getElementById('flash-minutes').value);
+  if (!val || val <= 0) return;
+
+  const today = todayStr();
+  if (!data.days[today]) data.days[today] = { flash: 0, read: 0 };
+  data.days[today].flash += val;
+
+  document.getElementById('flash-input-area').style.display = 'none';
+  document.getElementById('flash-done').style.display = 'block';
+  document.getElementById('flash-done-text').textContent = data.days[today].flash + ' min today!';
+  document.getElementById('card-flash').classList.add('done');
+
+  setCreatureState('study');
+  const readDone = (data.days[today].read || 0) > 0;
+  setSpeech(readDone ? 'bothDone' : 'flashDone');
+
+  calcStreak();
+  saveData();
+  updateStats();
+  updateMood();
+
+  if (readDone) {
+    setTimeout(() => setCreatureState('celebrate'), 300);
+  }
+}
+
+// ===== LOG READING =====
+function logReading() {
+  const val = parseFloat(document.getElementById('read-hours').value);
+  if (!val || val <= 0) return;
+
+  const today = todayStr();
+  if (!data.days[today]) data.days[today] = { flash: 0, read: 0 };
+  data.days[today].read += val;
+
+  document.getElementById('read-input-area').style.display = 'none';
+  document.getElementById('read-done').style.display = 'block';
+  document.getElementById('read-done-text').textContent = data.days[today].read + ' hrs today!';
+  document.getElementById('card-read').classList.add('done');
+
+  setCreatureState('read');
+  const flashDone = (data.days[today].flash || 0) > 0;
+  setSpeech(flashDone ? 'bothDone' : 'readDone');
+
+  calcStreak();
+  saveData();
+  updateStats();
+  updateMood();
+
+  if (flashDone) {
+    setTimeout(() => setCreatureState('celebrate'), 300);
+  }
+}
+
+// ===== DICTIONARY =====
+function addWord() {
+  const en = document.getElementById('dict-en').value.trim();
+  const jp = document.getElementById('dict-jp').value.trim();
+  const es = document.getElementById('dict-es').value.trim();
+
+  if (!en && !jp && !es) return;
+
+  data.dictionary.push({
+    en: en || '—',
+    jp: jp || '—',
+    es: es || '—',
+    addedDate: todayStr()
+  });
+
+  document.getElementById('dict-en').value = '';
+  document.getElementById('dict-jp').value = '';
+  document.getElementById('dict-es').value = '';
+
+  saveData();
+  renderDictionary();
+  updateStats();
+  setSpeech('newWord');
+  setCreatureState('happy');
+}
+
+// Enter key support for dictionary
+['dict-en', 'dict-jp', 'dict-es'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => {
+    if (e.key === 'Enter') addWord();
+  });
+});
+
+function deleteWord(index) {
+  data.dictionary.splice(index, 1);
+  saveData();
+  renderDictionary();
+  updateStats();
+}
+
+function renderDictionary() {
+  const search = (document.getElementById('dict-search').value || '').toLowerCase();
+  const list = document.getElementById('dict-list');
+  list.innerHTML = '';
+
+  const filtered = data.dictionary.filter((w, i) => {
+    if (!search) return true;
+    return w.en.toLowerCase().includes(search) ||
+           w.jp.toLowerCase().includes(search) ||
+           w.es.toLowerCase().includes(search);
+  });
+
+  // Show newest first
+  filtered.slice().reverse().forEach((w, ri) => {
+    const realIndex = data.dictionary.length - 1 - data.dictionary.slice().reverse().findIndex(
+      x => x.en === w.en && x.jp === w.jp && x.es === w.es
+    );
+
+    const row = document.createElement('div');
+    row.className = 'dict-entry';
+    row.innerHTML = `
+      <span class="en">${escHtml(w.en)}</span>
+      <span class="jp">${escHtml(w.jp)}</span>
+      <span class="es">${escHtml(w.es)}</span>
+      <button class="del-word" onclick="deleteWord(${realIndex})">×</button>
+    `;
+    list.appendChild(row);
+  });
+
+  document.getElementById('dict-count').textContent = data.dictionary.length + ' word' + (data.dictionary.length !== 1 ? 's' : '');
+  document.getElementById('dict-tab-count').textContent = '(' + data.dictionary.length + ')';
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ===== HISTORY =====
+function renderHistory() {
+  const grid = document.getElementById('history-grid');
+  grid.innerHTML = '';
+  const sortedDays = Object.keys(data.days).sort().reverse();
+
+  if (sortedDays.length === 0) {
+    grid.innerHTML = '<p style="color:var(--soft);text-align:center;padding:20px">No study days yet! Start today!</p>';
+    return;
+  }
+
+  sortedDays.forEach(day => {
+    const d = data.days[day];
+    const row = document.createElement('div');
+    row.className = 'history-day';
+    row.innerHTML = `
+      <span class="day-date">${formatDate(day)}</span>
+      <span class="day-stat">📇 ${d.flash || 0} min</span>
+      <span class="day-stat">📚 ${d.read || 0} hrs</span>
+      <span class="day-streak">${(d.flash > 0 || d.read > 0) ? '✓' : '—'}</span>
+    `;
+    grid.appendChild(row);
+  });
+}
+
+// ===== STATS =====
+function updateStats() {
+  let totalFlash = 0, totalRead = 0;
+  Object.values(data.days).forEach(d => {
+    totalFlash += d.flash || 0;
+    totalRead += d.read || 0;
+  });
+
+  document.getElementById('stat-total-flash').textContent = totalFlash;
+  document.getElementById('stat-total-read').textContent = totalRead;
+  document.getElementById('stat-words').textContent = data.dictionary.length;
+  document.getElementById('stat-days').textContent = Object.keys(data.days).length;
+  document.getElementById('streak-badge').textContent = '🔥 ' + data.streak + ' day streak';
+
+  renderHistory();
+}
+
+// ===== INIT =====
+function initApp() {
+  const today = todayStr();
+  document.getElementById('date-display').textContent = formatDate(today);
+
+  calcStreak();
+
+  // Check if already logged today
+  const todayData = data.days[today];
+  if (todayData) {
+    if (todayData.flash > 0) {
+      document.getElementById('flash-input-area').style.display = 'none';
+      document.getElementById('flash-done').style.display = 'block';
+      document.getElementById('flash-done-text').textContent = todayData.flash + ' min today!';
+      document.getElementById('card-flash').classList.add('done');
+    }
+    if (todayData.read > 0) {
+      document.getElementById('read-input-area').style.display = 'none';
+      document.getElementById('read-done').style.display = 'block';
+      document.getElementById('read-done-text').textContent = todayData.read + ' hrs today!';
+      document.getElementById('card-read').classList.add('done');
+    }
+
+    if (todayData.flash > 0 && todayData.read > 0) {
+      setSpeech('bothDone');
+    } else if (todayData.flash > 0) {
+      setSpeech('flashDone');
+    } else if (todayData.read > 0) {
+      setSpeech('readDone');
+    } else {
+      setSpeech('greeting');
+    }
+  } else {
+    setSpeech('greeting');
+  }
+
+  if (data.streak >= 5) setSpeech('streakHigh');
+
+  renderDictionary();
+  updateStats();
+  updateMood();
+  saveData();
+}
+</script>
+</body>
+</html>
