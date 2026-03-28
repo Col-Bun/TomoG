@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Moe-Chan & The Numogram</title>
+<title>Moe-Chan</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Nunito:wght@400;700;900&family=Baloo+2:wght@700;800&family=Press+Start+2P&display=swap');
 
@@ -143,7 +143,7 @@
   }
   body.dark-mode .speech-line { color: #fff; }
 
-  /* ===== BUTTONS ===== */
+  /* ===== GLOSSY BUTTON ===== */
   .btn-glossy {
     border: none;
     padding: 10px 24px;
@@ -184,6 +184,67 @@
   body.dark-mode .btn-theme { background: rgba(255,255,255,0.1); }
   body.dark-mode .btn-theme:hover { background: rgba(255,255,255,0.2); }
 
+  /* ===== PASSWORD SCREEN ===== */
+  #password-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    gap: 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .pw-creature {
+    width: 200px;
+    height: 300px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    filter: drop-shadow(0 12px 24px rgba(0,0,0,0.15));
+  }
+
+  .pw-creature img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: contain; 
+  }
+
+  #password-screen h1 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 2.2rem;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0,60,120,0.3);
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  .pw-hint {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.7);
+  }
+
+  #password-screen input {
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(12px);
+    border: 2px solid rgba(255,255,255,0.4);
+    color: #fff;
+    padding: 14px 24px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    text-align: center;
+    width: 240px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  #password-screen input::placeholder { color: rgba(255,255,255,0.5); }
+  #password-screen input:focus { outline: none; border-color: #fff; background: rgba(255,255,255,0.35); }
+
+  .pw-error { color: #ffcc00; font-size: 0.85rem; font-weight: 700; min-height: 1.2em; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+
   /* ===== MAIN APP ===== */
   #app {
     display: none;
@@ -195,7 +256,6 @@
     z-index: 1;
   }
 
-  /* Top bar */
   .top-bar {
     display: flex;
     justify-content: space-between;
@@ -232,10 +292,7 @@
     box-shadow: 0 3px 10px rgba(255,138,0,0.3);
   }
 
-  .date-display {
-    font-size: 0.8rem;
-    color: rgba(255,255,255,0.7);
-  }
+  .date-display { font-size: 0.8rem; color: rgba(255,255,255,0.7); }
 
   /* Tabs */
   .tabs {
@@ -274,6 +331,157 @@
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 
+  /* ===== CREATURE AREA ===== */
+  .creature-area {
+    padding: 28px;
+    text-align: center;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 720px;
+  }
+
+  .creature-area::before {
+    content: ''; position: absolute; top: -60px; right: -60px; width: 200px; height: 200px;
+    border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%); pointer-events: none;
+  }
+  .creature-area::after {
+    content: ''; position: absolute; bottom: -40px; left: -40px; width: 160px; height: 160px;
+    border-radius: 50%; background: radial-gradient(circle, rgba(126,200,50,0.1) 0%, transparent 70%); pointer-events: none;
+  }
+
+  .creature-sprite {
+    width: 400px; height: 600px; margin: 0 auto 20px; position: relative;
+    display: flex; align-items: flex-end; justify-content: center; flex-shrink: 0; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .creature-sprite img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15)); }
+
+  @keyframes bounce-up {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-30px); }
+    100% { transform: translateY(0); }
+  }
+  .animate-bounce { animation: bounce-up 0.4s cubic-bezier(0.28, 0.84, 0.42, 1); }
+
+  .heart-particle {
+    position: absolute; font-size: 2rem; pointer-events: none;
+    animation: float-heart 0.8s ease-out forwards; z-index: 10; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+  }
+  @keyframes float-heart {
+    0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(1.2); opacity: 0; }
+  }
+
+  .speech-bubble {
+    background: rgba(255,255,255,0.5); backdrop-filter: blur(16px);
+    border: 1.5px solid rgba(255,255,255,0.6); border-radius: 20px;
+    padding: 18px; margin: 0 auto; width: 100%; max-width: 520px;
+    position: relative; text-align: left; box-shadow: 0 6px 24px rgba(0,60,120,0.1); z-index: 2;
+    transition: background 0.4s, border-color 0.4s;
+  }
+  .speech-bubble::before {
+    content: ''; position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    border-left: 14px solid transparent; border-right: 14px solid transparent;
+    border-bottom: 14px solid rgba(255,255,255,0.5); transition: border-color 0.4s;
+  }
+
+  .speech-line { display: flex; gap: 10px; padding: 5px 0; font-size: 0.9rem; align-items: flex-start; color: var(--text); }
+
+  .lang-tag {
+    font-size: 0.55rem; font-weight: 900; padding: 3px 8px; border-radius: 50px;
+    min-width: 32px; text-align: center; flex-shrink: 0; margin-top: 3px;
+    color: #fff; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .lang-en { background: linear-gradient(135deg, #0099ff, #0066cc); }
+  .lang-jp { background: linear-gradient(135deg, #ff3c8e, #cc2060); }
+  .lang-es { background: linear-gradient(135deg, #7ec832, #5ea020); }
+
+  .mood-bar { display: flex; align-items: center; gap: 10px; margin-top: 16px; justify-content: center; z-index: 2; }
+  .mood-label { font-size: 0.75rem; color: rgba(255,255,255,0.7); font-weight: 700; }
+  .mood-track { width: 160px; height: 12px; background: rgba(0,0,0,0.15); border-radius: 50px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+  .mood-fill { height: 100%; border-radius: 50px; transition: width 0.5s, background 0.5s; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.4); }
+
+  .tasks-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  .task-card { padding: 22px; text-align: center; transition: all 0.3s; position: relative; overflow: hidden; }
+  .task-card::before { content: ''; position: absolute; top: -30px; right: -30px; width: 80px; height: 80px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); pointer-events: none; }
+  .task-card.done { border-color: rgba(126,200,50,0.5); background: rgba(126,200,50,0.15); }
+  .task-card h3 { font-family: 'Baloo 2', cursive; font-size: 1.1rem; margin-bottom: 4px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+  .task-card .tri-label { font-size: 0.65rem; color: rgba(255,255,255,0.65); margin-bottom: 14px; }
+  .task-input-row { display: flex; gap: 8px; align-items: center; justify-content: center; }
+  .task-input-row input { background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.3); color: #fff; padding: 10px 12px; border-radius: 14px; width: 80px; text-align: center; font-size: 1rem; font-family: 'Nunito', sans-serif; font-weight: 800; }
+  .task-input-row input::placeholder { color: rgba(255,255,255,0.4); }
+  .task-input-row input:focus { outline: none; border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.3); }
+  .task-input-row span { font-size: 0.8rem; color: rgba(255,255,255,0.7); font-weight: 700; }
+  .log-btn { margin-top: 12px; }
+  .task-done-check { font-size: 1.6rem; margin-top: 8px; }
+  .task-done-text { color: rgba(255,255,255,0.9) !important; }
+
+  .stats-strip { display: flex; gap: 10px; margin-bottom: 16px; }
+  .stat-box { flex: 1; padding: 14px; text-align: center; position: relative; overflow: hidden; }
+  .stat-box::after { content: ''; position: absolute; top: -20px; right: -20px; width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.08); pointer-events: none; }
+  .stat-box .num { font-family: 'Baloo 2', cursive; font-size: 1.8rem; color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,0.15); line-height: 1; }
+  .stat-box .label { font-size: 0.65rem; color: rgba(255,255,255,0.65); margin-top: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ===== DICTIONARY ===== */
+  .dict-section { padding: 22px; }
+  .dict-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+  .dict-header h3 { font-family: 'Baloo 2', cursive; font-size: 1.2rem; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+  .dict-count { font-size: 0.75rem; color: #fff; background: linear-gradient(135deg, var(--purple), #6d3fd6); padding: 4px 12px; border-radius: 50px; font-weight: 800; box-shadow: 0 2px 8px rgba(139,92,246,0.3); }
+  .dict-add-form { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; margin-bottom: 16px; }
+  .dict-add-form input { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.25); color: #fff; padding: 10px 12px; border-radius: 14px; font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700; }
+  .dict-add-form input::placeholder { color: rgba(255,255,255,0.4); }
+  .dict-add-form input:focus { outline: none; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.25); }
+  .add-word-btn { background: linear-gradient(180deg, #7ec832, #5ea020); border: none; color: #fff; padding: 10px 18px; border-radius: 14px; cursor: pointer; font-weight: 900; font-size: 1.2rem; box-shadow: 0 3px 10px rgba(126,200,50,0.3), inset 0 1px 0 rgba(255,255,255,0.3); transition: all 0.2s; }
+  .add-word-btn:hover { transform: translateY(-2px); }
+  .dict-filter { display: flex; gap: 6px; margin-bottom: 14px; }
+  .dict-filter input { flex: 1; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.2); color: #fff; padding: 10px 14px; border-radius: 50px; font-family: 'Nunito', sans-serif; font-weight: 700; }
+  .dict-filter input::placeholder { color: rgba(255,255,255,0.4); }
+  .dict-filter input:focus { outline: none; border-color: rgba(255,255,255,0.4); }
+  .dict-list { max-height: 400px; overflow-y: auto; }
+  .dict-list::-webkit-scrollbar { width: 6px; }
+  .dict-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+  .dict-entry { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); align-items: center; font-size: 0.85rem; font-weight: 700; }
+  .dict-entry:hover { background: rgba(255,255,255,0.05); border-radius: 10px; }
+  .dict-entry .en { color: #88ccff; }
+  .dict-entry .jp { color: #ff88bb; font-family: 'Noto Sans JP', sans-serif; }
+  .dict-entry .es { color: #b8ff8b; }
+  .del-word { background: none; border: none; color: rgba(255,255,255,0.3); cursor: pointer; font-size: 1rem; transition: color 0.2s; }
+  .del-word:hover { color: #ff3c8e; }
+
+  /* ===== HISTORY ===== */
+  .history-section { padding: 22px; }
+  .history-section h3 { font-family: 'Baloo 2', cursive; color: #fff; font-size: 1.2rem; margin-bottom: 16px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+  .history-grid { display: grid; gap: 8px; }
+  .history-day { display: grid; grid-template-columns: 110px 1fr 1fr 60px; gap: 10px; padding: 12px 14px; background: rgba(255,255,255,0.06); border-radius: 14px; font-size: 0.8rem; font-weight: 700; align-items: center; }
+  .history-day .day-date { color: rgba(255,255,255,0.6); }
+  .history-day .day-stat { color: #88ccff; }
+  .history-day .day-streak { color: #ffcc00; font-weight: 900; }
+
+  /* ===== NES PASSWORD SYSTEM ===== */
+  .nes-container { background-color: #000; color: #fff; font-family: 'Press Start 2P', monospace; padding: 20px; border: 4px solid #fff; box-shadow: 4px 4px 0px rgba(0,0,0,0.5), inset -4px -4px 0px #333; margin-top: 24px; text-align: center; }
+  .nes-container h3 { color: #e52521; font-size: 0.85rem; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0 #000; }
+  .nes-container p { font-size: 0.55rem; line-height: 1.6; color: #aaa; margin-bottom: 16px; }
+  .nes-textarea { width: 100%; height: 120px; background: #111; color: #33ff33; border: 2px solid #fff; font-family: 'Press Start 2P', monospace; font-size: 0.65rem; line-height: 1.4; padding: 12px; margin-bottom: 16px; resize: none; word-wrap: break-word; }
+  .nes-textarea:focus { outline: none; border-color: #e52521; background: #222; }
+  .nes-btn { background: #e52521; color: #fff; border: 2px solid #fff; font-family: 'Press Start 2P', monospace; font-size: 0.6rem; padding: 12px 16px; cursor: pointer; text-transform: uppercase; margin: 4px; transition: all 0.1s; }
+  .nes-btn:hover { background: #ff3c8e; }
+  .nes-btn:active { box-shadow: inset 4px 4px 0px rgba(0,0,0,0.5); transform: translateY(2px); }
+
+  /* ===== RANDOM PHRASE BUBBLE ===== */
+  .random-bubble { margin: 18px auto 0; max-width: 420px; padding: 12px 18px; text-align: center; font-size: 0.95rem; font-weight: 700; color: var(--text); position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; transition: opacity 0.4s; z-index: 2; }
+  .random-bubble::before { content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 10px solid rgba(255,255,255,0.30); }
+  .random-lang-tag { font-size: 0.55rem; font-weight: 900; padding: 2px 8px; border-radius: 50px; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
+  .random-lang-tag.rolo { background: linear-gradient(135deg, #ff8a00, #e06500); }
+  .random-lang-tag.nihongo { background: linear-gradient(135deg, #ff3c8e, #cc2060); }
+
+  /* ===== IFRAME CONTAINER ===== */
+  .iframe-container { width: 100%; height: 75vh; border-radius: 16px; overflow: hidden; position: relative; }
+  .iframe-container iframe { width: 100%; height: 100%; border: none; background: transparent; }
+
   /* ===== NUMOGRAM TAB ===== */
   .numogram-wrapper {
     display: grid;
@@ -287,7 +495,7 @@
   }
 
   .numo-map-container {
-    background: #cc0000; /* Deep red base from image */
+    background: #cc0000;
     border-radius: 20px;
     padding: 20px;
     position: relative;
@@ -297,130 +505,63 @@
     overflow: hidden;
   }
 
-  body.dark-mode .numo-map-container {
-    background: #4a0000;
-  }
+  body.dark-mode .numo-map-container { background: #4a0000; }
 
   .numo-region-label {
-    position: absolute;
-    right: 15px;
-    color: rgba(255,255,255,0.7);
-    text-align: right;
-    font-size: 0.8rem;
-    line-height: 1.2;
-    pointer-events: none;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    position: absolute; right: 15px; color: rgba(255,255,255,0.7); text-align: right;
+    font-size: 0.8rem; line-height: 1.2; pointer-events: none; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
   }
-  .numo-region-label strong {
-    font-size: 1.1rem;
-    color: #fff;
-    display: block;
-  }
+  .numo-region-label strong { font-size: 1.1rem; color: #fff; display: block; }
 
   .label-warp { top: 40px; }
   .label-chronic { top: 260px; }
   .label-plex { bottom: 40px; }
 
-  .numo-divider {
-    position: absolute;
-    left: 20px; right: 20px;
-    height: 2px;
-    background: rgba(255,255,255,0.3);
-  }
+  .numo-divider { position: absolute; left: 20px; right: 20px; height: 2px; background: rgba(255,255,255,0.3); }
   .div-1 { top: 150px; }
   .div-2 { bottom: 150px; }
 
   .numo-node {
-    position: absolute;
-    width: 44px; height: 44px;
-    background: #000;
-    border: 3px solid #ff3333;
-    border-radius: 50%;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Baloo 2', cursive;
-    font-size: 1.4rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    z-index: 10;
+    position: absolute; width: 44px; height: 44px; background: #000; border: 3px solid #ff3333;
+    border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center;
+    font-family: 'Baloo 2', cursive; font-size: 1.4rem; font-weight: bold; cursor: pointer;
+    transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 10;
   }
-  .numo-node:hover {
-    transform: scale(1.15);
-    border-color: #fff;
-    box-shadow: 0 0 15px rgba(255,255,255,0.8);
-  }
-  .numo-node.active {
-    background: #fff;
-    color: #000;
-    border-color: #000;
-    box-shadow: 0 0 20px rgba(255,255,255,1);
-  }
+  .numo-node:hover { transform: scale(1.15); border-color: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.8); }
+  .numo-node.active { background: #fff; color: #000; border-color: #000; box-shadow: 0 0 20px rgba(255,255,255,1); }
 
-  /* Node Placements (Roughly matching the diagram) */
-  /* Warp */
   .node-3 { top: 60px; left: 30%; }
   .node-6 { top: 40px; left: 55%; }
-  
-  /* Time Circuit */
   .node-5 { top: 190px; left: 35%; }
   .node-2 { top: 180px; left: 65%; }
   .node-4 { top: 280px; left: 15%; }
   .node-7 { top: 280px; left: 80%; }
   .node-1 { top: 350px; left: 50%; transform: translateX(-50%); }
   .node-8 { top: 410px; left: 50%; transform: translateX(-50%); }
-  
-  /* Plex */
   .node-9 { bottom: 80px; left: 50%; transform: translateX(-50%); }
   .node-0 { bottom: 20px; left: 50%; transform: translateX(-50%); }
 
-  .numo-info-panel {
-    padding: 24px;
-    max-height: 600px;
-    overflow-y: auto;
-  }
+  .numo-info-panel { padding: 24px; max-height: 600px; overflow-y: auto; }
   .numo-info-panel::-webkit-scrollbar { width: 6px; }
   .numo-info-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
-
-  .numo-info-panel h3 {
-    font-family: 'Baloo 2', cursive;
-    font-size: 1.8rem;
-    margin-bottom: 10px;
-    color: #ff3c8e;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  }
-  .numo-info-panel h4 {
-    margin-top: 20px;
-    margin-bottom: 8px;
-    font-size: 1.1rem;
-    color: #00d4ff;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
-    padding-bottom: 4px;
-  }
-  .numo-info-panel p {
-    font-size: 0.9rem;
-    line-height: 1.5;
-    margin-bottom: 12px;
-    color: rgba(255,255,255,0.9);
-  }
-  .numo-info-panel ul {
-    margin-left: 20px;
-    margin-bottom: 12px;
-    font-size: 0.9rem;
-    color: rgba(255,255,255,0.9);
-  }
+  .numo-info-panel h3 { font-family: 'Baloo 2', cursive; font-size: 1.8rem; margin-bottom: 10px; color: #ff3c8e; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  .numo-info-panel h4 { margin-top: 20px; margin-bottom: 8px; font-size: 1.1rem; color: #00d4ff; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px; }
+  .numo-info-panel p { font-size: 0.9rem; line-height: 1.5; margin-bottom: 12px; color: rgba(255,255,255,0.9); }
+  .numo-info-panel ul { margin-left: 20px; margin-bottom: 12px; font-size: 0.9rem; color: rgba(255,255,255,0.9); }
   .numo-info-panel li { margin-bottom: 4px; }
 
-  /* Hide raw data divs */
   #numo-data-store { display: none; }
 
-  /* ===== REMAINDER OF APP STYLES HIDDEN FOR BREVITY (Kept identical to original) ===== */
-  /* Includes password screen, history, calc, pet area, tasks, dict */
-  /* ... */
-
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 700px) {
+    .creature-sprite { width: 280px; height: 420px; }
+    .pw-creature { width: 180px; height: 270px; }
+    .creature-area { min-height: 520px; }
+    .tasks-panel { grid-template-columns: 1fr; }
+    .dict-add-form { grid-template-columns: 1fr; }
+    .stats-strip { flex-wrap: wrap; }
+    .top-bar h2 { font-size: 1.2rem; }
+  }
 </style>
 </head>
 <body>
@@ -436,11 +577,43 @@
 <div class="metro-bg">
   <div class="metro-sunburst"></div>
   <div class="metro-halftone"></div>
-  <!-- Vectors excluded for brevity, assuming they remain exactly as in your source -->
+  <div class="metro-vectors">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <path d="M-100 700 Q 400 400, 900 800 T 1600 500 L 1600 1000 L -100 1000 Z" fill="#000" fill-opacity="0.15" />
+      <path d="M-100 750 Q 500 300, 1000 750 T 1600 400 L 1600 1000 L -100 1000 Z" fill="#fff" fill-opacity="0.25" />
+      <rect x="0" y="120" width="100%" height="40" fill="#fff" fill-opacity="0.15" />
+      <rect x="0" y="140" width="100%" height="8" fill="#000" fill-opacity="0.2" />
+      <circle cx="1200" cy="750" r="180" fill="none" stroke="#fff" stroke-width="40" stroke-opacity="0.15" />
+      <circle cx="1200" cy="750" r="60" fill="#000" fill-opacity="0.1" />
+      <g class="y2k-flower" transform="translate(150, 200) scale(1.5)" fill="#fff" fill-opacity="0.3">
+        <circle cx="0" cy="-20" r="15"/><circle cx="19" cy="-6" r="15"/><circle cx="12" cy="16" r="15"/><circle cx="-12" cy="16" r="15"/><circle cx="-19" cy="-6" r="15"/>
+        <circle cx="0" cy="0" r="12" fill="var(--metro-bg1)" fill-opacity="1"/>
+      </g>
+      <g class="y2k-flower" transform="translate(1300, 250) scale(2)" fill="#000" fill-opacity="0.15">
+        <circle cx="0" cy="-20" r="15"/><circle cx="19" cy="-6" r="15"/><circle cx="12" cy="16" r="15"/><circle cx="-12" cy="16" r="15"/><circle cx="-19" cy="-6" r="15"/>
+        <circle cx="0" cy="0" r="12" fill="#fff" fill-opacity="0.3"/>
+      </g>
+      <g class="y2k-flower" transform="translate(250, 750) scale(1.2)" fill="#fff" fill-opacity="0.4">
+        <circle cx="0" cy="-20" r="15"/><circle cx="19" cy="-6" r="15"/><circle cx="12" cy="16" r="15"/><circle cx="-12" cy="16" r="15"/><circle cx="-19" cy="-6" r="15"/>
+        <circle cx="0" cy="0" r="12" fill="var(--metro-bg1)" fill-opacity="1"/>
+      </g>
+    </svg>
+  </div>
+</div>
+
+<!-- ===== PASSWORD SCREEN ===== -->
+<div id="password-screen">
+  <div class="pw-creature" id="pw-creature">
+    <img src="./sleep.png" alt="sleeping">
+  </div>
+  <h1>Moe-Chan<br>is sleeping...</h1>
+  <p class="pw-hint">whisper the secret word to wake her up</p>
+  <input type="password" id="pw-input" placeholder="• • • •" autofocus>
+  <p class="pw-error" id="pw-error"></p>
 </div>
 
 <!-- ===== MAIN APP ===== -->
-<div id="app" style="display:block;"> <!-- Assuming bypassed password for debugging, normal behavior restored in your actual copy -->
+<div id="app">
   <div class="top-bar glass">
     <h2>Moe-Chan</h2>
     <div class="top-controls">
@@ -458,8 +631,129 @@
     <button class="tab-btn" data-tab="numogram">🌀 Numogram</button>
   </div>
 
-  <!-- REMAINDER OF TABS (HOME, DICTIONARY, HISTORY, CALC) ASSUMED PRESERVED -->
-  
+  <!-- HOME TAB -->
+  <div class="tab-content active" id="tab-home">
+    <div class="creature-area glass">
+      <div class="creature-sprite" id="creature-sprite">
+        <img src="./idle.png" id="sprite-img" alt="creature">
+      </div>
+      <div class="speech-bubble">
+        <div class="speech-line">
+          <span class="lang-tag lang-en">EN</span>
+          <span id="speech-en">Hello! Let's study today!</span>
+        </div>
+        <div class="speech-line">
+          <span class="lang-tag lang-jp">JP</span>
+          <span id="speech-jp" style="font-family:'Noto Sans JP',sans-serif">こんにちは！今日も勉強しよう！</span>
+        </div>
+        <div class="speech-line">
+          <span class="lang-tag lang-es">ES</span>
+          <span id="speech-es">¡Hola! ¡Estudiemos hoy!</span>
+        </div>
+      </div>
+      <div class="mood-bar">
+        <span class="mood-label">Mood:</span>
+        <div class="mood-track">
+          <div class="mood-fill" id="mood-fill" style="width:50%;background:linear-gradient(90deg,#ffcc00,#ff8a00)"></div>
+        </div>
+        <span class="mood-label" id="mood-text">Neutral</span>
+      </div>
+      <!-- Random phrase chat bubble -->
+      <div class="random-bubble glass-strong" id="random-bubble">
+        <span id="random-phrase"></span>
+        <span class="random-lang-tag" id="random-lang-tag"></span>
+      </div>
+    </div>
+
+    <div class="tasks-panel">
+      <div class="task-card glass-dark" id="card-flash">
+        <h3>📇 Flashcards</h3>
+        <div class="tri-label">Study flashcards! / フラッシュカード！ / ¡Tarjetas!</div>
+        <div id="flash-input-area">
+          <div class="task-input-row">
+            <input type="number" id="flash-minutes" min="1" max="999" placeholder="0">
+            <span>min</span>
+          </div>
+          <button class="btn-glossy log-btn" onclick="logFlashcards()">Log Study Time</button>
+        </div>
+        <div id="flash-done" style="display:none">
+          <div class="task-done-check">✅</div>
+          <p class="task-done-text" style="font-size:0.8rem;margin-top:4px" id="flash-done-text"></p>
+        </div>
+      </div>
+      <div class="task-card glass-dark" id="card-read">
+        <h3>📚 Reading</h3>
+        <div class="tri-label">Reading time! / 読書タイム！ / ¡Hora de leer!</div>
+        <div id="read-input-area">
+          <div class="task-input-row">
+            <input type="number" id="read-hours" min="0.25" max="24" step="0.25" placeholder="0">
+            <span>hrs</span>
+          </div>
+          <button class="btn-glossy btn-pink log-btn" onclick="logReading()">Log Reading Time</button>
+        </div>
+        <div id="read-done" style="display:none">
+          <div class="task-done-check">✅</div>
+          <p class="task-done-text" style="font-size:0.8rem;margin-top:4px" id="read-done-text"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-strip">
+      <div class="stat-box glass"><div class="num" id="stat-total-flash">0</div><div class="label">Flashcard Min</div></div>
+      <div class="stat-box glass"><div class="num" id="stat-total-read">0</div><div class="label">Reading Hrs</div></div>
+      <div class="stat-box glass"><div class="num" id="stat-words">0</div><div class="label">Dict Words</div></div>
+      <div class="stat-box glass"><div class="num" id="stat-days">0</div><div class="label">Days Tracked</div></div>
+    </div>
+  </div>
+
+  <!-- DICTIONARY TAB -->
+  <div class="tab-content" id="tab-dictionary">
+    <div class="dict-section glass-dark">
+      <div class="dict-header">
+        <h3>📖 My Dictionary</h3>
+        <span class="dict-count" id="dict-count">0 words</span>
+      </div>
+      <div class="dict-add-form">
+        <input type="text" id="dict-en" placeholder="English">
+        <input type="text" id="dict-jp" placeholder="日本語">
+        <input type="text" id="dict-es" placeholder="Español">
+        <button class="add-word-btn" onclick="addWord()">+</button>
+      </div>
+      <div class="dict-filter">
+        <input type="text" id="dict-search" placeholder="🔍 Search words..." oninput="renderDictionary()">
+      </div>
+      <div class="dict-list" id="dict-list"></div>
+    </div>
+  </div>
+
+  <!-- HISTORY TAB -->
+  <div class="tab-content" id="tab-history">
+    <div class="history-section glass-dark">
+      <h3>📊 Study History / 学習履歴 / Historial</h3>
+      <div class="history-grid" id="history-grid"></div>
+    </div>
+    <!-- NES PASSWORD DATA MANAGEMENT -->
+    <div class="nes-container">
+      <h3>PASSWORD SYSTEM</h3>
+      <p>GENERATE A PASSWORD TO BACK UP YOUR PROGRESS, OR PASTE A PASSWORD BELOW TO RESTORE DATA.</p>
+      <textarea id="nes-password-box" class="nes-textarea" placeholder="[ ENTER PASSWORD HERE ]" spellcheck="false"></textarea>
+      <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+        <button class="nes-btn" onclick="generatePassword()">GENERATE</button>
+        <button class="nes-btn" onclick="loadPassword()">RESTORE</button>
+        <button class="nes-btn" onclick="copyPassword()">COPY</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALC TAB -->
+  <div class="tab-content" id="tab-calc">
+    <div class="glass-dark" style="padding: 10px; height: 75vh;">
+      <div class="iframe-container">
+        <iframe src="https://col-bun.github.io/COLcalc.github.io/" title="COLcalc"></iframe>
+      </div>
+    </div>
+  </div>
+
   <!-- NUMOGRAM TAB -->
   <div class="tab-content" id="tab-numogram">
     <div class="numogram-wrapper">
@@ -508,7 +802,6 @@
 
 <!-- DATA STORE FOR NUMOGRAM TEXT -->
 <div id="numo-data-store">
-  
   <div id="data-zone-0">
     <h3>Zone Zero</h3>
     <h4>The Numeral 0</h4>
@@ -518,10 +811,8 @@
       <li><strong>Numeric Keypad Direction:</strong> Anomalous.</li>
     </ul>
     <p>With no other number does arithmetical function cross so imperceptibly into religious and philosophical abstraction. There is a mathematico-cosmic continuum connecting the numeral zero to concepts of nullity, nihility, nothingness, absence, emptiness, void, vacuum, and neutrality.</p>
-    
     <h4>The Zeroth Planet: Sol</h4>
     <p>The Sun (Sol-0) is by far the largest body in the Solar-system. It is approximately 4.5 billion years old, roughly half-way through its normal existence. After the completion of this phase it is destined to expand into a Red Giant.</p>
-    
     <h4>System Notes</h4>
     <p>Zone-0 is the first of two zones mutually composing the Plex-region of the Numogram. Its Syzygetic-twin is Zone-9. This 9+0 Syzygy is carried by the demon Uttunul.</p>
     <ul>
@@ -529,11 +820,9 @@
       <li><strong>Mesh-Tag:</strong> 0000.</li>
       <li><strong>Subcultures:</strong> Lemurian subcultures associate Zone-0 with the dense void of the cosmic hypermatrix.</li>
     </ul>
-    
     <h4>Phase-0 Lemurs</h4>
     <p><em>Phase-0 tolerates no populations of any kind.</em></p>
   </div>
-
   <div id="data-zone-1">
     <h3>Zone One</h3>
     <h4>The Numeral 1</h4>
@@ -543,10 +832,8 @@
       <li><strong>Numeric Keypad Direction:</strong> South-West.</li>
     </ul>
     <p>Within monotheistic cultures One attains a supreme dignity, identifying God directly with 'the One'.</p>
-
     <h4>The First Planet: Mercury</h4>
     <p>Mercury is the innermost planet of the Solar-system. The mercurian year is also the swiftest. Due to its long day Mercury has semi-permanent light and dark sides. In Roman mythology Mercury is known as the messenger of the gods.</p>
-
     <h4>System Notes</h4>
     <p>Zone-1 is the first of the six Torque-region Zones of the Numogram, and Tractor-Zone of the 5-4 (or 'Sink') Current. Its Syzygetic-twin is Zone-8. The First Door - or 'Door of Doors'- is attributed by Muvian sorcery to the amphidemon Lurgo.</p>
     <ul>
@@ -554,11 +841,9 @@
       <li><strong>Mesh-Tag:</strong> 0001.</li>
       <li><strong>Totems:</strong> Coral atolls, shallow seas. Armored fish creatures.</li>
     </ul>
-
     <h4>Phase-1 Lemurs</h4>
     <p>[M#00] 1::0 Lurgo</p>
   </div>
-
   <div id="data-zone-2">
     <h3>Zone Two</h3>
     <h4>The Numeral 2</h4>
@@ -568,10 +853,8 @@
       <li><strong>Numeric Keypad Direction:</strong> South.</li>
     </ul>
     <p>Duality is particularly widespread within biological order, from the ‘base-pairs' of DNA code, to the bilateral symmetry of the typical vertebrate organism.</p>
-
     <h4>The Second Planet: Venus</h4>
     <p>Venus (or Sol-2) has a mean orbital distance from sun of 108.2 million km. In recent times Venus has become the exemplary victim of a ‘runaway greenhouse effect' which has rendered it infernal. It has been historically identified as the morning star (Lucifer) and the evening star (Hesperus).</p>
-
     <h4>System Notes</h4>
     <p>Zone-2 is the second of the six Torque-region Zones. Its Syzygetic-twin is Zone-7. The Second Gate connects Zone-2 to Zone-3, drawing an intense line of escape from the Torque to the Warp.</p>
     <ul>
@@ -579,11 +862,9 @@
       <li><strong>Subcultures:</strong> Associated with crypt-navigation, occulted cyberspace and the spectral / liminal populations of hallucination and time fragmentation.</li>
       <li><strong>Totems:</strong> Interior marshlands. Metamorphic insects (moths, butterflies).</li>
     </ul>
-
     <h4>Phase-2 Lemurs</h4>
     <p>[M#01] 2::0 Duoddod<br>[M#02] 2::1 Doogu</p>
   </div>
-
   <div id="data-zone-3">
     <h3>Zone Three</h3>
     <h4>The Numeral 3</h4>
@@ -593,10 +874,8 @@
       <li><strong>Numeric Keypad Direction:</strong> South-East.</li>
     </ul>
     <p>The number three is unique for both the intensity and diversity of its cross-cutting hyperstitious investments (three dimensions of space, Hindu trimurty, alchemical elements, Christian trinity, oedipal triangle).</p>
-
     <h4>The Third Planet: Earth</h4>
     <p>Earth (or Sol-3) has a mean orbital distance from the sun of approx. 149 600 000 km, defining the standard Astronomical Unit (AU). The Earth is the densest major body in the Solar-system. Alone amongst the Planets, the Earth is not named after a Greek or Roman deity.</p>
-
     <h4>System Notes</h4>
     <p>Zone-3 is the first of the two Warp-region Zones of the Numogram, and Tractor-Zone of the 6-3 (or 'Warp') Current. Its Syzygetic-twin is Zone-6. The Third Door opens onto the Swirl, and is attributed by Muvian sorcery to the chaotic xenodemon Ixix.</p>
     <ul>
@@ -604,24 +883,20 @@
       <li><strong>Mesh-Tag:</strong> 0007.</li>
       <li><strong>Subcultures:</strong> Associated with swirling nebulae (cosmic dust clouds) and alien pattern.</li>
     </ul>
-
     <h4>Phase-3 Lemurs</h4>
     <p>[M#-03] 3::0 Ixix<br>[M#-04] 3::1 Ixigool<br>[M#-05] 3::2 Ixidod</p>
   </div>
-
   <div id="data-zone-4">
     <h3>Zone Four</h3>
     <h4>The Numeral 4</h4>
     <p>The figure ‘4' designates the number four, the second even number, and first non-prime (or complex) natural number, with prime factors of 2 x 2. Due to the internal redundancy of its dual symmetry, four is commonly conceived as the model outcome of calculation.</p>
     <ul>
-      <li><strong>Digital Cumulation:</strong> Four cumulates to ten (numerologically identified with a superior power of unity).</li>
+      <li><strong>Digital Cumulation:</strong> Four cumulates to ten.</li>
       <li><strong>Numeric Keypad Direction:</strong> West.</li>
     </ul>
     <p>The dominant associations of the number four are balance and stability (four elements, four cardinal directions, four DNA bases, four seasons).</p>
-
     <h4>The Fourth Planet: Mars</h4>
     <p>Mars (or Sol-4) has a mean orbital distance from the sun of approx. 228 000 000 km. The Martian year is roughly twice as long as that of Earth. In popular legend Mars has long been envisaged as the home of intelligent alien life.</p>
-
     <h4>System Notes</h4>
     <p>Zone-4 is the third of the six Torque-region Zones. Its Syzygetic-twin is Zone-5. In its initiatory aspect Zone-4 functions as the Fourth Door (or 'Time-Delta,' familiar from variations of the Kurtz-mythos as 'the worst place in the world').</p>
     <ul>
@@ -629,11 +904,9 @@
       <li><strong>Subcultures:</strong> Associated with ‘delta-phase’ or terminal deliria, geoconvulsions, continental subsidence, and ‘red-out.’</li>
       <li><strong>Totems:</strong> Volcanic jungles, riverine flow. Cats and dogs in predatory mode.</li>
     </ul>
-
     <h4>Phase-4 Lemurs</h4>
     <p>[M#06] 4::0 Krako<br>[M#07] 4::1 Sukugool<br>[M#08] 4::2 Skoodu<br>[M#09] 4::3 Skarkix</p>
   </div>
-
   <div id="data-zone-5">
     <h3>Zone Five</h3>
     <h4>The Numeral 5</h4>
@@ -643,10 +916,8 @@
       <li><strong>Numeric Keypad Direction:</strong> Centre.</li>
     </ul>
     <p>The number five has particularly strong anthropomorphic associations (five digits per limb, five senses, five spinal-levels). In monotheistic traditions the number five is associated with doctrinal authority.</p>
-
     <h4>The Fifth Planet: Jupiter</h4>
     <p>Jupiter (or Sol-5) is the innermost gas-giant, and by far the largest planet in the Solar-system. The most distinctive feature on the Jovian surface is the Great Red Spot, a vast self-sustaining storm.</p>
-
     <h4>System Notes</h4>
     <p>Zone-5 is the sixth of the six Torque-region Zones, and Tractor-Zone of the 7-2 (or 'Hold') Current. Its Syzygetic-twin is Zone-4. In its initiatory aspect Zone-5 functions as the Fifth (or Hyperborean) Door.</p>
     <ul>
@@ -654,11 +925,9 @@
       <li><strong>Subcultures:</strong> Associated with Hyperborean or Wendigo mythology.</li>
       <li><strong>Totems:</strong> Upland rain forests, the monsoon. Hybrid bird-reptile forms.</li>
     </ul>
-
     <h4>Phase-5 Lemurs</h4>
     <p>[M#10] 5::0 Tokhatto<br>[M#11] 5::1 Tukkamu<br>[M#12] 5::2 Kuttadid<br>[M#13] 5::3 Tikkitix<br>[M#14] 5::4 Katak</p>
   </div>
-
   <div id="data-zone-6">
     <h3>Zone Six</h3>
     <h4>The Numeral 6</h4>
@@ -668,10 +937,8 @@
       <li><strong>Numeric Keypad Direction:</strong> East.</li>
     </ul>
     <p>Despite its ‘perfection,' six is perhaps the darkest of the elementary decimal numbers, due to its association with chance, ill-omen, and occult intuition. In the Christian world the number six is ominously coloured by its triplicate reiteration - 666.</p>
-
     <h4>The Sixth Planet: Saturn</h4>
     <p>Saturn (or Sol-6) has a mean orbital distance from the sun of approx. 1 429 400 000 km. The Saturnian ring-system is divided into seven major bands. The Roman god Saturn is identified with the Greek Cronos, god of time.</p>
-
     <h4>System Notes</h4>
     <p>Zone-6 is the second of the two Warp-region Zones. Its Warp-complement and Syzygetic-twin is Zone-3. It is this 6+3 Syzygy which draws the 'Ulterior Vortex' of Outer-Time.</p>
     <ul>
@@ -679,11 +946,9 @@
       <li><strong>Mesh-Tag:</strong> 0063.</li>
       <li><strong>Subcultures:</strong> Associated with the occulted dimensions of Undu, turbular erosion and the dead eye of the cyclone.</li>
     </ul>
-
     <h4>Phase-6 Lemurs</h4>
     <p>[M#-15] 6::0 Tchu<br>[M#-16] 6::1 Djungo<br>[M#-17] 6::2 Djuddha<br>[M#-18] 6::3 Djynxx<br>[M#-19] 6::4 Tchakki<br>[M#-20] 6::5 Tchattuk</p>
   </div>
-
   <div id="data-zone-7">
     <h3>Zone Seven</h3>
     <h4>The Numeral 7</h4>
@@ -693,10 +958,8 @@
       <li><strong>Numeric Keypad Direction:</strong> North-West.</li>
     </ul>
     <p>The biblical importance of the number seven is established at the beginning of Genesis, with the religious derivation of the seven-day week. The number seven is also notably prominent in Revelation.</p>
-
     <h4>The Seventh Planet: Uranus</h4>
     <p>Uranus (or Sol-7) has a mean orbital distance from the sun of approx. 2 870 990 000 km. The rotation of Uranus is abnormally tilted, and is almost perpendicular to the ecliptic, warping its magnetic field. In Greek mythology Uranus was the god of the heavens.</p>
-
     <h4>System Notes</h4>
     <p>Zone-7 is the fifth of the six Torque-region Zones, and Tractor-Zone of the 8-1 (or 'Surge') Current. Its Syzygetic-twin is Zone-2. Zone-7 opens onto the cosmic swamp-labyrinths or 'Tracts of Dobo.'</p>
     <ul>
@@ -704,11 +967,9 @@
       <li><strong>Subcultures:</strong> Associated with emergence from the depths (hyper-sea water-carriers and amphibious colonization).</li>
       <li><strong>Totems:</strong> Coastal swamps, salt-water marshes. Chubby batrachians.</li>
     </ul>
-
     <h4>Phase-7 Lemurs</h4>
     <p>[M#21] 7::0 Puppo<br>[M#22] 7::1 Bubbamu<br>[M#23] 7::2 Oddubb<br>[M#24] 7::3 Pabbakis<br>[M#25] 7::4 Ababbatok<br>[M#26] 7::5 Papatakoo<br>[M#27] 7::6 Bobobja</p>
   </div>
-
   <div id="data-zone-8">
     <h3>Zone Eight</h3>
     <h4>The Numeral 8</h4>
@@ -718,10 +979,8 @@
       <li><strong>Numeric Keypad Direction:</strong> North.</li>
     </ul>
     <p>Eight is the third power of two, and constitutes a crucial grouping in digital electronics (eight bits equalling one byte). Both numerically and figurally, eight is associated with perfection (macrocosmic completion and return).</p>
-
     <h4>The Eighth Planet: Neptune</h4>
     <p>Neptune (or Sol-8) is the outermost gas-giant. Due to eccentricities in the orbit of Pluto it is periodically the outermost (ninth) planet. The prediction of Neptune's existence in 1846 was a crucial moment for mathematical celestial mechanics.</p>
-
     <h4>System Notes</h4>
     <p>Zone-8 is the fourth of the six Torque-region Zones. Its Syzygetic-twin is Zone-1. The Eighth Gate connects Zone-8 to Zone-9, and is the sole path of escape from the Torque into the Plex.</p>
     <ul>
@@ -730,11 +989,9 @@
       <li><strong>Subcultures:</strong> Associated with limbic drift, dreams, trance-states and foetal sentience.</li>
       <li><strong>Totems:</strong> Submarine cities, the deep sea. Polytendrilled abominations.</li>
     </ul>
-
     <h4>Phase-8 Lemurs</h4>
     <p>[M#28] 8::0 Minommo<br>[M#29] 8::1 Murrumur<br>[M#30] 8::2 Nammamad<br>[M#31] 8::3 Mummumix<br>[M#32] 8::4 Numko<br>[M#33] 8::5 Muntuk<br>[M#34] 8::6 Mommoljo<br>[M#35] 8::7 Mombbo</p>
   </div>
-
   <div id="data-zone-9">
     <h3>Zone Nine</h3>
     <h4>The Numeral 9</h4>
@@ -744,10 +1001,8 @@
       <li><strong>Numeric Keypad Direction:</strong> North-East.</li>
     </ul>
     <p>The number nine is the last numeral of the decimal system, and its associations with death and fatality are primarily based on this purely numerical function of termination.</p>
-
     <h4>The Ninth Planet: Pluto</h4>
     <p>Pluto (or Sol-9) has the most highly elliptical orbital trajectory of any planet in the Solar-system. Pluto was not discovered until 1930. In Roman mythology Pluto is the god of the underworld.</p>
-
     <h4>System Notes</h4>
     <p>Zone-9 is the second of the two zones mutually composing the Plex-region of the Numogram. Its Plex-complement and Syzygetic-twin is Zone-0. Zone-9 provides the terminus for two channels, one each from the Torque (the 8th), and the Plex (the 9th).</p>
     <ul>
@@ -755,17 +1010,300 @@
       <li><strong>Mesh-Tag:</strong> 0511.</li>
       <li><strong>Subcultures:</strong> Associated with the Cthellloid metallic ocean of the earth’s iron core.</li>
     </ul>
-
     <h4>Phase-9 Lemurs</h4>
     <p>[M#36] 9::0 Uttunul<br>[M#37] 9::1 Tuttagool<br>[M#38] 9::2 Unnunddo<br>[M#39] 9::3 Ununuttix<br>[M#40] 9::4 Unnunaka<br>[M#41] 9::5 Tukutu<br>[M#42] 9::6 Unnutchi<br>[M#43] 9::7 Nuttubab<br>[M#44] 9::8 Ummnu</p>
   </div>
-
 </div>
 
 <script>
-// Keep all your previous javascript here (Theme, Calc, History, Tabs, Password, etc.)
+// ===== UTILS =====
+function todayStr() { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function formatDate(s) { const [y,m,d]=s.split('-'); const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return mo[parseInt(m)-1]+' '+parseInt(d)+', '+y; }
 
-// Tab logic
+// ===== THEME TOGGLE =====
+function updateThemeIcon() {
+  const isDark = document.body.classList.contains('dark-mode');
+  document.getElementById('theme-btn').textContent = isDark ? '☀️' : '🌙';
+}
+updateThemeIcon();
+
+function toggleTheme() {
+  document.body.classList.toggle('dark-mode');
+  const isDark = document.body.classList.contains('dark-mode');
+  localStorage.setItem('studyBuddyTheme', isDark ? 'dark' : 'light');
+  updateThemeIcon();
+}
+
+// ===== STARTER DECK =====
+const starterDeck = [
+  { en: "To read, recite, chant", jp: "読む", es: "—" },
+  { en: "Open field, empty lot", jp: "原っぱ", es: "—" },
+  { en: "To throw, hurl, fling; give up", jp: "投げる", es: "—" },
+  { en: "To commute, frequent, go back and forth", jp: "通う", es: "—" },
+  { en: "Through / via a place", jp: "を通って", es: "—" },
+  { en: "To learn, study", jp: "学ぶ", es: "—" },
+  { en: "The beginning, first", jp: "最初", es: "—" },
+  { en: "That, the / um...", jp: "其の (その)", es: "—" },
+  { en: "Street, road; traffic", jp: "通り", es: "—" },
+  { en: "At/in, by/with (particle)", jp: "で", es: "—" },
+  { en: "Scenery, landscape", jp: "景色", es: "—" },
+  { en: "To seize, catch, grasp", jp: "掴む", es: "—" },
+  { en: "To take, pick up", jp: "取る", es: "—" },
+  { en: "Distance, journey, path", jp: "道のり", es: "—" },
+  { en: "Road, path, street", jp: "道", es: "—" },
+  { en: "Throat, singing voice", jp: "喉", es: "—" },
+  { en: "Thirst, craving", jp: "渇き", es: "—" },
+  { en: "Craving, longing", jp: "渇望", es: "—" },
+  { en: "Desire, want, urge", jp: "欲求", es: "—" },
+  { en: "Highly priced, expensive", jp: "高価", es: "—" },
+  { en: "High, tall; expensive", jp: "高い", es: "—" },
+  { en: "Comparatively high/expensive", jp: "割高", es: "—" },
+  { en: "Cheap, inexpensive", jp: "安い", es: "—" },
+  { en: "Very cheap, bargain", jp: "格安", es: "—" },
+  { en: "Bargain, good-value", jp: "お得", es: "—" },
+  { en: "Leasing (out), renting out", jp: "賃貸", es: "—" },
+  { en: "Rental", jp: "レンタル", es: "—" },
+  { en: "Rented house", jp: "借家", es: "—" },
+  { en: "Renting, leasing (from)", jp: "賃借", es: "—" },
+  { en: "Pasture, grassland", jp: "牧草地", es: "—" },
+  { en: "To remain, stay, stop", jp: "止まる", es: "—" },
+  { en: "To go by, pass through", jp: "通る", es: "—" },
+  { en: "To flutter down", jp: "舞い散る", es: "—" },
+  { en: "Cherry tree/blossom", jp: "桜", es: "—" },
+  { en: "Only, just", jp: "只 (ただ)", es: "—" },
+  { en: "Scenery, scene", jp: "風景", es: "—" },
+  { en: "Sadness, sorrow", jp: "悲しさ", es: "—" },
+  { en: "Pain, ache, soreness", jp: "痛み", es: "—" },
+  { en: "Footpath, sidewalk", jp: "歩道", es: "—" },
+  { en: "Pasture, empty lot", jp: "—", es: "Potrero" },
+  { en: "Colombian folk music", jp: "—", es: "Vallenato" },
+  { en: "Shop, store", jp: "—", es: "Tienda" },
+  { en: "Of, from", jp: "—", es: "De" },
+  { en: "Beauty", jp: "—", es: "Belleza" },
+  { en: "A, one", jp: "—", es: "Un" },
+  { en: "But", jp: "—", es: "Pero" },
+  { en: "First", jp: "—", es: "Primero" },
+  { en: "To, at", jp: "—", es: "A" },
+  { en: "To pass, happen", jp: "—", es: "Pasar" },
+  { en: "Park", jp: "—", es: "Parque" },
+  { en: "For, by, through", jp: "—", es: "Por" },
+  { en: "The (masculine)", jp: "—", es: "El" },
+  { en: "To throw, launch", jp: "—", es: "Lanzar" },
+  { en: "To know (facts)", jp: "—", es: "Saber" },
+  { en: "Streets", jp: "—", es: "Calles" },
+  { en: "To learn", jp: "—", es: "Aprender" },
+  { en: "Cool, awesome (Col. slang)", jp: "—", es: "Bacano" },
+  { en: "I want", jp: "—", es: "Quiero" },
+  { en: "Sure, safe", jp: "—", es: "Seguro" },
+  { en: "Stay (command)", jp: "—", es: "Quédate" },
+  { en: "Sells, sell! (command)", jp: "—", es: "Vende" },
+  { en: "Trees", jp: "—", es: "Árboles" },
+  { en: "Something", jp: "—", es: "Algo" },
+  { en: "Grass, pasture", jp: "—", es: "Pasto" },
+  { en: "To crave, tempt", jp: "—", es: "Antojar" },
+  { en: "To grab, take a bus", jp: "—", es: "Coger" },
+  { en: "View, sight", jp: "—", es: "Vista" },
+  { en: "Path, road, way", jp: "—", es: "Camino" },
+  { en: "Sidewalk (Col.)", jp: "—", es: "Andén" },
+  { en: "This; east", jp: "—", es: "Este" },
+  { en: "Neighbor (Col. slang)", jp: "—", es: "Veci" },
+  { en: "Butt; hurry up (slang)", jp: "—", es: "Culo" },
+  { en: "Thirst, craving", jp: "—", es: "Sed" },
+  { en: "Expensive", jp: "—", es: "Caro" },
+  { en: "Cheap, affordable", jp: "—", es: "Barato" },
+  { en: "Rent, lease", jp: "—", es: "Arriende" },
+  { en: "Food, provisions", jp: "—", es: "Provenda" },
+  { en: "How's it going, what's up", jp: "—", es: "Que tal" },
+  { en: "How, like, as", jp: "—", es: "Como" },
+  { en: "Cool, alright (Col. slang)", jp: "—", es: "Firme" },
+  { en: "Marimba, xylophone", jp: "—", es: "Marimba" },
+  { en: "Junk, cheap stuff", jp: "—", es: "Mariacachafa" }
+];
+
+// ===== DATA STORE =====
+const STORAGE_KEY = 'studyBuddyData';
+function getDefaultData() { return { days: {}, dictionary: [], streak: 0, lastActiveDate: null, starterLoaded: false }; }
+
+function loadData() { 
+  try { 
+    const r = localStorage.getItem(STORAGE_KEY); 
+    if (r) return JSON.parse(r); 
+  } catch(e) {} 
+  return getDefaultData(); 
+}
+
+function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
+let data = loadData();
+
+// Initialize the starter deck if it hasn't been loaded before
+if (!data.starterLoaded) {
+  starterDeck.forEach(word => {
+    const exists = data.dictionary.some(w => w.en === word.en && w.jp === word.jp && w.es === word.es);
+    if (!exists) {
+      data.dictionary.push({ en: word.en, jp: word.jp, es: word.es, addedDate: todayStr() });
+    }
+  });
+  data.starterLoaded = true;
+  saveData();
+}
+
+// ===== NES PASSWORD SYNC =====
+function generatePassword() {
+  try {
+    const jsonStr = JSON.stringify(data);
+    let encoded = btoa(encodeURIComponent(jsonStr));
+    let retroPass = encoded.match(/.{1,8}/g).join('-');
+    document.getElementById('nes-password-box').value = retroPass;
+  } catch(e) {
+    alert("ERROR GENERATING PASSWORD.");
+  }
+}
+
+function loadPassword() {
+  const input = document.getElementById('nes-password-box').value.trim();
+  if (!input) {
+    alert("PLEASE ENTER A PASSWORD.");
+    return;
+  }
+  
+  try {
+    let cleaned = input.replace(/[-\s]/g, '');
+    let decoded = decodeURIComponent(atob(cleaned));
+    let importedData = JSON.parse(decoded);
+    
+    if (importedData.days && importedData.dictionary) {
+      data = importedData;
+      saveData();
+      initApp();
+      alert("PROGRESS RESTORED!");
+      document.getElementById('nes-password-box').value = '';
+    } else {
+      alert("INVALID PASSWORD DATA.");
+    }
+  } catch (err) {
+    alert("INVALID PASSWORD FORMAT.");
+  }
+}
+
+function copyPassword() {
+  const pwBox = document.getElementById('nes-password-box');
+  if (!pwBox.value) return;
+  pwBox.select();
+  document.execCommand('copy');
+  alert("PASSWORD COPIED TO CLIPBOARD!");
+}
+
+function calcStreak() {
+  const sortedDays=Object.keys(data.days).sort().reverse();
+  if(!sortedDays.length){data.streak=0;return;}
+  let streak=0, cd=new Date();
+  if(!data.days[todayStr()])cd.setDate(cd.getDate()-1);
+  while(true){
+    const ds=cd.getFullYear()+'-'+String(cd.getMonth()+1).padStart(2,'0')+'-'+String(cd.getDate()).padStart(2,'0');
+    const day=data.days[ds];
+    if(day&&(day.flash>0||day.read>0)){streak++;cd.setDate(cd.getDate()-1);}else break;
+  }
+  data.streak=streak;
+}
+
+const speeches={
+  greeting:{en:"Hello! Let's study today!",jp:"こんにちは！今日も勉強しよう！",es:"¡Hola! ¡Estudiemos hoy!"},
+  needFlash:{en:"Study your flashcards! How many minutes?",jp:"フラッシュカードを勉強しよう！何分やった？",es:"¡Estudia tus tarjetas! ¿Cuántos minutos?"},
+  needRead:{en:"Time to read! How many hours?",jp:"読書の時間だよ！何時間読んだ？",es:"¡Hora de leer! ¿Cuántas horas?"},
+  bothDone:{en:"Amazing work today! You're a star!",jp:"今日はすごい！スターだよ！",es:"¡Increíble hoy! ¡Eres una estrella!"},
+  flashDone:{en:"Great flashcard session! Now try reading!",jp:"フラッシュカードお疲れ！次は読書だよ！",es:"¡Bien con las tarjetas! ¡Ahora a leer!"},
+  readDone:{en:"Nice reading! Don't forget flashcards!",jp:"読書お疲れ！フラッシュカードも忘れずに！",es:"¡Buena lectura! ¡No olvides las tarjetas!"},
+  streakHigh:{en:"🔥 Incredible streak! Keep it going!",jp:"🔥 すごい連続記録！続けよう！",es:"🔥 ¡Racha increíble! ¡Sigue así!"},
+  newWord:{en:"New word learned! Your dictionary grows!",jp:"新しい単語を覚えた！辞書が大きくなったよ！",es:"¡Nueva palabra! ¡Tu diccionario crece!"}
+};
+
+function setSpeech(k){const s=speeches[k];if(!s)return;document.getElementById('speech-en').textContent=s.en;document.getElementById('speech-jp').textContent=s.jp;document.getElementById('speech-es').textContent=s.es;}
+
+function updateMood(){
+  const today=data.days[todayStr()]||{};let mood=30;
+  if(today.flash>0)mood+=30;if(today.read>0)mood+=30;if(data.streak>=3)mood+=10;
+  mood=Math.min(100,mood);
+  const fill=document.getElementById('mood-fill'),text=document.getElementById('mood-text');
+  fill.style.width=mood+'%';
+  if(mood>=90){fill.style.background='linear-gradient(90deg,#7ec832,#a8e84c)';text.textContent='Ecstatic!';setCreatureState('happy');}
+  else if(mood>=60){fill.style.background='linear-gradient(90deg,#ffcc00,#ff8a00)';text.textContent='Happy';setCreatureState('idle');}
+  else if(mood>=40){fill.style.background='linear-gradient(90deg,#ff8a00,#e06500)';text.textContent='Neutral';setCreatureState('idle');}
+  else{fill.style.background='linear-gradient(90deg,#ff3c8e,#d42070)';text.textContent='Needs attention';setCreatureState('sad');}
+}
+
+const spriteMap={
+  idle:'./idle.png',
+  happy:'./happy.png',
+  sad:'./sad.png',
+  sleep:'./sleep.png',
+  study:'./study.png',
+  read:'./read.png',
+  celebrate:'./celebrate.png'
+};
+
+function setCreatureState(state){
+  const el=document.getElementById('sprite-img');if(!el)return;
+  el.src=spriteMap[state]||spriteMap.idle;
+}
+
+// ===== PET INTERACTION =====
+let isBouncing = false;
+document.getElementById('creature-sprite').addEventListener('click', function(e) {
+  if(isBouncing) return;
+  isBouncing = true;
+  
+  const img = document.getElementById('sprite-img');
+  const prevSrc = img.src;
+  img.src = spriteMap.happy;
+  
+  this.classList.add('animate-bounce');
+  
+  const numHearts = Math.floor(Math.random() * 3) + 3;
+  for(let i = 0; i < numHearts; i++) {
+    const heart = document.createElement('div');
+    heart.textContent = ['💖', '✨', '💕', '💗'][Math.floor(Math.random()*4)];
+    heart.className = 'heart-particle';
+    
+    const tx = (Math.random() - 0.5) * 120 + 'px';
+    const ty = -(Math.random() * 120 + 60) + 'px';
+    heart.style.setProperty('--tx', tx);
+    heart.style.setProperty('--ty', ty);
+    
+    heart.style.left = '45%';
+    heart.style.top = '45%';
+    
+    this.appendChild(heart);
+    
+    setTimeout(() => heart.remove(), 800);
+  }
+  
+  setTimeout(() => {
+    this.classList.remove('animate-bounce');
+    if(img.src.includes('happy.png')) {
+       img.src = prevSrc;
+    }
+    isBouncing = false;
+  }, 400);
+});
+
+// ===== OBFUSCATED PASSWORD CHECK =====
+document.getElementById('pw-input').addEventListener('keydown',function(e){
+  if(e.key==='Enter'){
+    // Uses Base64 encoding to hide the word "cake"
+    // btoa("cake") results in "Y2FrZQ=="
+    if(btoa(this.value.toLowerCase().trim()) === 'Y2FrZQ=='){
+      document.getElementById('password-screen').style.display='none';
+      document.getElementById('app').style.display='block';
+      initApp();
+    }else{
+      document.getElementById('pw-error').textContent='Wrong password... try again!';
+      this.value='';
+    }
+  }
+});
+
+// Tabs Logic
 document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -775,18 +1313,165 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
   });
 });
 
-// Numogram Logic
+// Logic functions
+function logFlashcards(){
+  const val=parseInt(document.getElementById('flash-minutes').value);if(!val||val<=0)return;
+  const today=todayStr();if(!data.days[today])data.days[today]={flash:0,read:0};
+  data.days[today].flash+=val;
+  document.getElementById('flash-input-area').style.display='none';
+  document.getElementById('flash-done').style.display='block';
+  document.getElementById('flash-done-text').textContent=data.days[today].flash+' min today!';
+  document.getElementById('card-flash').classList.add('done');
+  setCreatureState('study');
+  const readDone=(data.days[today].read||0)>0;setSpeech(readDone?'bothDone':'flashDone');
+  calcStreak();saveData();updateStats();updateMood();
+  if(readDone)setTimeout(()=>setCreatureState('celebrate'),300);
+}
+
+function logReading(){
+  const val=parseFloat(document.getElementById('read-hours').value);if(!val||val<=0)return;
+  const today=todayStr();if(!data.days[today])data.days[today]={flash:0,read:0};
+  data.days[today].read+=val;
+  document.getElementById('read-input-area').style.display='none';
+  document.getElementById('read-done').style.display='block';
+  document.getElementById('read-done-text').textContent=data.days[today].read+' hrs today!';
+  document.getElementById('card-read').classList.add('done');
+  setCreatureState('read');
+  const flashDone=(data.days[today].flash||0)>0;setSpeech(flashDone?'bothDone':'readDone');
+  calcStreak();saveData();updateStats();updateMood();
+  if(flashDone)setTimeout(()=>setCreatureState('celebrate'),300);
+}
+
+function addWord(){
+  const en=document.getElementById('dict-en').value.trim(),jp=document.getElementById('dict-jp').value.trim(),es=document.getElementById('dict-es').value.trim();
+  if(!en&&!jp&&!es)return;
+  data.dictionary.push({en:en||'—',jp:jp||'—',es:es||'—',addedDate:todayStr()});
+  document.getElementById('dict-en').value='';document.getElementById('dict-jp').value='';document.getElementById('dict-es').value='';
+  saveData();renderDictionary();updateStats();setSpeech('newWord');setCreatureState('happy');
+}
+
+['dict-en','dict-jp','dict-es'].forEach(id=>{document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')addWord();});});
+
+function deleteWord(i){data.dictionary.splice(i,1);saveData();renderDictionary();updateStats();}
+
+function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+function renderDictionary(){
+  const search=(document.getElementById('dict-search').value||'').toLowerCase();
+  const list=document.getElementById('dict-list');list.innerHTML='';
+  const filtered=data.dictionary.filter(w=>{if(!search)return true;return w.en.toLowerCase().includes(search)||w.jp.toLowerCase().includes(search)||w.es.toLowerCase().includes(search);});
+  filtered.slice().reverse().forEach((w)=>{
+    const realIndex=data.dictionary.lastIndexOf(w);
+    const row=document.createElement('div');row.className='dict-entry';
+    row.innerHTML=`<span class="en">${escHtml(w.en)}</span><span class="jp">${escHtml(w.jp)}</span><span class="es">${escHtml(w.es)}</span><button class="del-word" onclick="deleteWord(${realIndex})">×</button>`;
+    list.appendChild(row);
+  });
+  document.getElementById('dict-count').textContent=data.dictionary.length+' word'+(data.dictionary.length!==1?'s':'');
+  document.getElementById('dict-tab-count').textContent='('+data.dictionary.length+')';
+}
+
+function renderHistory(){
+  const grid=document.getElementById('history-grid');grid.innerHTML='';
+  const sortedDays=Object.keys(data.days).sort().reverse();
+  if(!sortedDays.length){grid.innerHTML='<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px">No study days yet! Start today!</p>';return;}
+  sortedDays.forEach(day=>{const d=data.days[day];const row=document.createElement('div');row.className='history-day';
+    row.innerHTML=`<span class="day-date">${formatDate(day)}</span><span class="day-stat">📇 ${d.flash||0} min</span><span class="day-stat">📚 ${d.read||0} hrs</span><span class="day-streak">${(d.flash>0||d.read>0)?'✓':'—'}</span>`;
+    grid.appendChild(row);
+  });
+}
+
+function updateStats(){
+  let tf=0,tr=0;Object.values(data.days).forEach(d=>{tf+=d.flash||0;tr+=d.read||0;});
+  document.getElementById('stat-total-flash').textContent=tf;
+  document.getElementById('stat-total-read').textContent=tr;
+  document.getElementById('stat-words').textContent=data.dictionary.length;
+  document.getElementById('stat-days').textContent=Object.keys(data.days).length;
+  document.getElementById('streak-badge').textContent='🔥 '+data.streak+' day streak';
+  renderHistory();
+}
+
+// ===== RANDOM PHRASES (Bogotá rolo dialect + Japanese) =====
+const randomPhrases = [
+  { text: "¡Qué nota, parcero! ¡A estudiar se dijo!", lang: "rolo", label: "ROLO" },
+  { text: "No sea tan ñero, póngase las pilas.", lang: "rolo", label: "ROLO" },
+  { text: "¡Uy, hermano, qué chimba de racha!", lang: "rolo", label: "ROLO" },
+  { text: "Mijo, no joda, estudie que le conviene.", lang: "rolo", label: "ROLO" },
+  { text: "¿Qué más pues? ¡Dele, dele, a las tarjetas!", lang: "rolo", label: "ROLO" },
+  { text: "¡Qué boleta si no estudia hoy!", lang: "rolo", label: "ROLO" },
+  { text: "Hágale pues, que no le va a doler.", lang: "rolo", label: "ROLO" },
+  { text: "¡Pilas, parcero! No sea gallina.", lang: "rolo", label: "ROLO" },
+  { text: "Juepucha, ¡qué berraco es usted!", lang: "rolo", label: "ROLO" },
+  { text: "A lo bien, hoy toca duro. ¡Ánimo!", lang: "rolo", label: "ROLO" },
+  { text: "No me copie, estudie sus propias notas.", lang: "rolo", label: "ROLO" },
+  { text: "¡Qué pereza! Pero bueno, hágale.", lang: "rolo", label: "ROLO" },
+  { text: "Fresco, parcero, un pasito a la vez.", lang: "rolo", label: "ROLO" },
+  { text: "¡Mono! ¿Ya leyó hoy o qué?", lang: "rolo", label: "ROLO" },
+  { text: "Bien pueda, abra ese libro ya.", lang: "rolo", label: "ROLO" },
+  { text: "よっしゃ！今日もがんばろう！", lang: "nihongo", label: "日本語" },
+  { text: "ちょっと休憩してもいいよ〜", lang: "nihongo", label: "日本語" },
+  { text: "すごいじゃん！その調子！", lang: "nihongo", label: "日本語" },
+  { text: "勉強は大事だよ、ファイト！", lang: "nihongo", label: "日本語" },
+  { text: "えらい！ちゃんとやってるね！", lang: "nihongo", label: "日本語" },
+  { text: "まだまだいけるっしょ！", lang: "nihongo", label: "日本語" },
+  { text: "お疲れさま〜、でももうちょい！", lang: "nihongo", label: "日本語" },
+  { text: "今日のノルマ、終わった？", lang: "nihongo", label: "日本語" },
+  { text: "やばい、もうこんな時間！", lang: "nihongo", label: "日本語" },
+  { text: "読書の時間だよ〜📚", lang: "nihongo", label: "日本語" },
+  { text: "ぼちぼちやっていこう！", lang: "nihongo", label: "日本語" },
+  { text: "おなか空いた… でも先に勉強！", lang: "nihongo", label: "日本語" },
+  { text: "天才じゃん、もしかして！", lang: "nihongo", label: "日本語" },
+  { text: "マジでかっこいい、継続は力なり！", lang: "nihongo", label: "日本語" },
+  { text: "ねぇねぇ、新しい単語覚えた？", lang: "nihongo", label: "日本語" }
+];
+
+let lastPhraseIndex = -1;
+function showRandomPhrase() {
+  const bubble = document.getElementById('random-bubble');
+  const phraseEl = document.getElementById('random-phrase');
+  const tagEl = document.getElementById('random-lang-tag');
+  if (!bubble) return;
+
+  let idx;
+  do { idx = Math.floor(Math.random() * randomPhrases.length); } while (idx === lastPhraseIndex && randomPhrases.length > 1);
+  lastPhraseIndex = idx;
+
+  const p = randomPhrases[idx];
+  bubble.style.opacity = '0';
+  setTimeout(() => {
+    phraseEl.textContent = p.text;
+    tagEl.textContent = p.label;
+    tagEl.className = 'random-lang-tag ' + p.lang;
+    bubble.style.opacity = '1';
+  }, 400);
+}
+
+let phraseInterval;
+function startPhraseCycle() {
+  showRandomPhrase();
+  phraseInterval = setInterval(showRandomPhrase, 8000);
+}
+
+function initApp(){
+  document.getElementById('date-display').textContent=formatDate(todayStr());
+  calcStreak();
+  const td=data.days[todayStr()];
+  if(td){
+    if(td.flash>0){document.getElementById('flash-input-area').style.display='none';document.getElementById('flash-done').style.display='block';document.getElementById('flash-done-text').textContent=td.flash+' min today!';document.getElementById('card-flash').classList.add('done');}
+    if(td.read>0){document.getElementById('read-input-area').style.display='none';document.getElementById('read-done').style.display='block';document.getElementById('read-done-text').textContent=td.read+' hrs today!';document.getElementById('card-read').classList.add('done');}
+    if(td.flash>0&&td.read>0)setSpeech('bothDone');else if(td.flash>0)setSpeech('flashDone');else if(td.read>0)setSpeech('readDone');else setSpeech('greeting');
+  }else setSpeech('greeting');
+  if(data.streak>=5)setSpeech('streakHigh');
+  renderDictionary();updateStats();updateMood();saveData();
+  startPhraseCycle();
+}
+
+// ===== NUMOGRAM LOGIC =====
 function selectZone(zoneNum) {
-  // Update visual nodes
   document.querySelectorAll('.numo-node').forEach(n => n.classList.remove('active'));
   document.getElementById('btn-zone-' + zoneNum).classList.add('active');
-  
-  // Inject specific data
   const dataHtml = document.getElementById('data-zone-' + zoneNum).innerHTML;
   document.getElementById('numo-display').innerHTML = dataHtml;
 }
-
-// Ensure your previous functions (logFlashcards, loadPassword, addWord, etc.) remain intact below.
 </script>
 </body>
 </html>
