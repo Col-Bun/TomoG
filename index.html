@@ -482,170 +482,88 @@
   .iframe-container { width: 100%; height: 75vh; border-radius: 16px; overflow: hidden; position: relative; }
   .iframe-container iframe { width: 100%; height: 100%; border: none; background: transparent; }
 
-  /* ===== NUMOGRAM TAB ===== */
+  /* ===== NUMOGRAM ENHANCEMENTS ===== */
   .numogram-wrapper {
     display: grid;
-    grid-template-columns: 350px 1fr;
+    grid-template-columns: 400px 1fr;
     gap: 20px;
     align-items: start;
   }
-
-  @media (max-width: 768px) {
-    .numogram-wrapper { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 768px) { .numogram-wrapper { grid-template-columns: 1fr; } }
 
   .numo-map-container {
-    background: #cc0000;
+    background: radial-gradient(circle at center, #3a0000 0%, #150000 100%);
     border-radius: 20px;
-    padding: 20px;
     position: relative;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 0 20px rgba(0,0,0,0.5);
-    border: 2px solid rgba(255,255,255,0.2);
-    height: 600px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.8);
+    border: 2px solid rgba(255,50,50,0.3);
+    height: 700px;
     overflow: hidden;
   }
 
-  body.dark-mode .numo-map-container { background: #4a0000; }
-
   .numo-region-label {
-    position: absolute; right: 15px; color: rgba(255,255,255,0.7); text-align: right;
+    position: absolute; right: 15px; color: rgba(255,255,255,0.6); text-align: right;
     font-size: 0.8rem; line-height: 1.2; pointer-events: none; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    z-index: 5;
   }
-  .numo-region-label strong { font-size: 1.1rem; color: #fff; display: block; }
+  .numo-region-label strong { font-size: 1.2rem; color: #fff; display: block; font-weight: 900; }
 
-  .label-warp { top: 40px; }
-  .label-chronic { top: 260px; }
-  .label-plex { bottom: 40px; }
+  .label-warp { top: 7%; }
+  .label-chronic { top: 45%; }
+  .label-plex { top: 85%; }
 
-  .numo-divider { position: absolute; left: 20px; right: 20px; height: 2px; background: rgba(255,255,255,0.3); }
-  .div-1 { top: 150px; }
-  .div-2 { bottom: 150px; }
+  .numo-divider { position: absolute; left: 10%; right: 10%; height: 1px; background: rgba(255,255,255,0.15); z-index: 2; }
+  .div-1 { top: 25%; }
+  .div-2 { top: 78%; }
 
   .numo-node {
-    position: absolute; width: 44px; height: 44px; background: #000; border: 3px solid #ff3333;
+    position: absolute; width: 36px; height: 36px; background: #000; border: 3px solid #ff1111;
     border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center;
-    font-family: 'Baloo 2', cursive; font-size: 1.4rem; font-weight: bold; cursor: pointer;
+    font-family: 'Nunito', sans-serif; font-size: 1.2rem; font-weight: 900; cursor: pointer;
     transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 10;
   }
   .numo-node:hover { transform: scale(1.15); border-color: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.8); }
-  .numo-node.active { background: #fff; color: #000; border-color: #000; box-shadow: 0 0 20px rgba(255,255,255,1); }
+  .numo-node.active { background: #fff; color: #000; border-color: #fff; box-shadow: 0 0 20px rgba(255,255,255,1); }
 
-  .node-3 { top: 60px; left: 30%; }
-  .node-6 { top: 40px; left: 55%; }
-  .node-5 { top: 190px; left: 35%; }
-  .node-2 { top: 180px; left: 65%; }
-  .node-4 { top: 280px; left: 15%; }
-  .node-7 { top: 280px; left: 80%; }
-  .node-1 { top: 350px; left: 50%; transform: translateX(-50%); }
-  .node-8 { top: 410px; left: 50%; transform: translateX(-50%); }
-  .node-9 { bottom: 80px; left: 50%; transform: translateX(-50%); }
-  .node-0 { bottom: 20px; left: 50%; transform: translateX(-50%); }
+  /* Precise coordinates matching the CCRU visual layout provided */
+  .node-3 { top: calc(12% - 18px); left: calc(35% - 18px); }
+  .node-6 { top: calc(8% - 18px); left: calc(60% - 18px); }
+  .node-5 { top: calc(35% - 18px); left: calc(40% - 18px); }
+  .node-2 { top: calc(32% - 18px); left: calc(70% - 18px); }
+  .node-4 { top: calc(50% - 18px); left: calc(25% - 18px); }
+  .node-7 { top: calc(50% - 18px); left: calc(85% - 18px); }
+  .node-1 { top: calc(62% - 18px); left: calc(50% - 18px); background: #fff; color: #000; border: none; box-shadow: 0 0 25px 8px rgba(255,255,255,0.6); }
+  .node-8 { top: calc(74% - 18px); left: calc(50% - 18px); }
+  .node-9 { top: calc(86% - 18px); left: calc(50% - 18px); }
+  .node-0 { top: calc(96% - 18px); left: calc(50% - 18px); }
 
-  .numo-info-panel { padding: 24px; max-height: 400px; overflow-y: auto; }
+  #numo-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+  
+  .numo-line.red-solid { stroke: #d92626; stroke-width: 3; filter: drop-shadow(0 0 4px rgba(217, 38, 38, 0.8)); }
+  .numo-line.cyan-dash { stroke: #00e5ff; stroke-width: 3; stroke-dasharray: 6 6; filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.8)); }
+
+  /* Interactive Numogram Panels */
+  .numo-tools-col { display: flex; flex-direction: column; gap: 16px; }
+  .numo-calc { background: rgba(20, 0, 0, 0.6); border: 2px solid #ff3333; border-radius: 16px; padding: 16px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
+  .numo-calc h4 { font-family: 'Baloo 2', cursive; color: #ff3c8e; margin-bottom: 6px; font-size: 1.2rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+  .numo-calc p { font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-bottom: 12px; line-height: 1.4; }
+  
+  .numo-input-row { display: flex; gap: 10px; margin-bottom: 8px; }
+  .numo-input-row input { flex: 1; background: #000; color: #00e5ff; border: 1px solid rgba(255,255,255,0.3); padding: 10px 14px; font-family: 'Press Start 2P', monospace; font-size: 0.7rem; border-radius: 8px; width: 100%; }
+  .numo-input-row input:focus { outline: none; border-color: #00e5ff; box-shadow: 0 0 10px rgba(0,229,255,0.3); }
+  .numo-input-row button { background: #d92626; color: #fff; border: none; font-weight: 800; padding: 0 16px; border-radius: 8px; cursor: pointer; font-family: 'Nunito', sans-serif; transition: background 0.2s; }
+  .numo-input-row button:hover { background: #ff1111; box-shadow: 0 0 10px rgba(255,17,17,0.5); }
+
+  .numo-info-panel { padding: 20px; max-height: 300px; overflow-y: auto; }
   .numo-info-panel::-webkit-scrollbar { width: 6px; }
   .numo-info-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
-  .numo-info-panel h3 { font-family: 'Baloo 2', cursive; font-size: 1.8rem; margin-bottom: 10px; color: #ff3c8e; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-  .numo-info-panel h4 { margin-top: 20px; margin-bottom: 8px; font-size: 1.1rem; color: #00d4ff; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px; }
-  .numo-info-panel p { font-size: 0.9rem; line-height: 1.5; margin-bottom: 12px; color: rgba(255,255,255,0.9); }
-  .numo-info-panel ul { margin-left: 20px; margin-bottom: 12px; font-size: 0.9rem; color: rgba(255,255,255,0.9); }
-  .numo-info-panel li { margin-bottom: 4px; }
-
+  .numo-info-panel h3 { font-family: 'Baloo 2', cursive; font-size: 1.6rem; margin-bottom: 10px; color: #ff3c8e; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  .numo-info-panel h4 { margin-top: 16px; margin-bottom: 8px; font-size: 1.1rem; color: #00e5ff; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px; }
+  .numo-info-panel p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 12px; color: rgba(255,255,255,0.9); }
+  .numo-info-panel ul { margin-left: 20px; margin-bottom: 12px; font-size: 0.85rem; color: rgba(255,255,255,0.9); }
+  
   #numo-data-store { display: none; }
-
-  /* ===== NUMOGRAM ENHANCEMENTS ===== */
-  #numo-svg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    pointer-events: none;
-  }
   
-  .numo-line {
-    stroke: rgba(255, 51, 51, 0.5);
-    stroke-width: 3;
-    transition: all 0.3s;
-    filter: drop-shadow(0 0 4px rgba(255,51,51,0.8));
-  }
-
-  .numo-line.syzygy {
-    stroke: #00d4ff;
-    stroke-dasharray: 8 6;
-    stroke-width: 4;
-    filter: drop-shadow(0 0 6px rgba(0,212,255,0.8));
-  }
-
-  /* Interactive Numogram Calculator */
-  .numo-calc {
-    background: rgba(20, 0, 0, 0.6);
-    border: 2px solid #ff3333;
-    border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 20px;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-  }
-
-  .numo-calc h4 {
-    font-family: 'Baloo 2', cursive;
-    color: #ff3c8e;
-    margin-bottom: 10px;
-    font-size: 1.2rem;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-  }
-
-  .numo-calc p {
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.7);
-    margin-bottom: 12px;
-    line-height: 1.4;
-  }
-
-  .numo-input-row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-
-  .numo-input-row input {
-    flex: 1;
-    background: #000;
-    color: #00d4ff;
-    border: 1px solid rgba(255,255,255,0.3);
-    padding: 10px 14px;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.7rem;
-    border-radius: 8px;
-  }
-  
-  .numo-input-row input:focus {
-    outline: none;
-    border-color: #00d4ff;
-    box-shadow: 0 0 10px rgba(0,212,255,0.3);
-  }
-
-  .numo-input-row button {
-    background: #ff3333;
-    color: #fff;
-    border: none;
-    font-weight: 800;
-    padding: 0 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-family: 'Nunito', sans-serif;
-    transition: background 0.2s;
-  }
-
-  .numo-input-row button:hover { background: #ff0000; }
-
-  #numo-result-display {
-    font-family: 'Baloo 2', cursive;
-    font-size: 1.1rem;
-    color: #a8e84c;
-    min-height: 28px;
-  }
-
   /* ===== RESPONSIVE ===== */
   @media (max-width: 700px) {
     .creature-sprite { width: 280px; height: 420px; }
@@ -852,7 +770,7 @@
   <div class="tab-content" id="tab-numogram">
     <div class="numogram-wrapper">
       
-      <!-- Interactive Map -->
+      <!-- Interactive Map matching the CCRU schema -->
       <div class="numo-map-container" id="numo-map-container">
         <!-- Dynamic Lines SVG -->
         <svg id="numo-svg"></svg>
@@ -866,7 +784,7 @@
         <div class="numo-divider div-2"></div>
         <div class="numo-region-label label-plex"><strong>Outside Time</strong>The Plex</div>
 
-        <!-- Nodes -->
+        <!-- Nodes exactly mapped to reference image -->
         <div class="numo-node node-3" onclick="selectZone(3)" id="btn-zone-3">3</div>
         <div class="numo-node node-6" onclick="selectZone(6)" id="btn-zone-6">6</div>
         
@@ -881,30 +799,53 @@
         <div class="numo-node node-0" onclick="selectZone(0)" id="btn-zone-0">0</div>
       </div>
 
-      <!-- Info & Calc Display Panel -->
-      <div>
+      <!-- Tools & Data Column -->
+      <div class="numo-tools-col">
+        
         <!-- Gematria / Sorcery Input -->
         <div class="numo-calc">
-          <h4>Barkerian Time-Sorcery</h4>
-          <p>Enter a word, concept, or string of numbers to calculate its Digital Root and isolate its Numogram Zone.</p>
+          <h4>Gematria Time-Sorcery</h4>
+          <p>Evaluate a concept or year's Digital Root to isolate its ruling Numogram Zone.</p>
           <div class="numo-input-row">
-            <input type="text" id="numo-gematria-input" placeholder="e.g. CYBERNETICS or 1999" autocomplete="off">
-            <button onclick="calculateNumogram()">SUMMON</button>
+            <input type="text" id="numo-gematria-input" placeholder="e.g. CYBERNETICS" autocomplete="off">
+            <button onclick="calculateNumogram()">EVAL</button>
           </div>
-          <div id="numo-result-display">Awaiting input...</div>
+          <div id="numo-result-display" style="font-size: 0.85rem; color: #a8e84c; font-family: 'Baloo 2', cursive;"></div>
         </div>
 
-        <!-- Zone Information -->
+        <!-- Net-Span Demon Finder Input -->
+        <div class="numo-calc">
+          <h4>Net-Span Demon Finder</h4>
+          <p>Input two connected Zones to locate the presiding Lemur/Demon.</p>
+          <div class="numo-input-row">
+            <input type="number" id="demon-z1" min="0" max="9" placeholder="Z1">
+            <input type="number" id="demon-z2" min="0" max="9" placeholder="Z2">
+            <button onclick="findDemon()">FIND</button>
+          </div>
+          <div id="demon-result" style="font-size: 0.85rem; color: #fff; margin-top: 10px; line-height: 1.4;"></div>
+        </div>
+
+        <!-- CCRU Encyclopedia -->
+        <div class="numo-calc">
+          <h4>CCRU Encyclopedia</h4>
+          <p>Search the archive for cybernetic, hyperstitional, and occult terminology.</p>
+          <div class="numo-input-row" style="margin-bottom: 0;">
+            <input type="text" id="lexicon-search" placeholder="Search archives..." oninput="searchLexicon()">
+          </div>
+          <div id="lexicon-results" style="max-height: 200px; overflow-y: auto; margin-top: 10px; font-size: 0.8rem;"></div>
+        </div>
+
+        <!-- Zone Information Display -->
         <div class="glass-dark numo-info-panel">
           <div id="numo-display">
             <h3>The Numogram</h3>
             <p>Pandemonium is the complete system of Lemurian demonism and time sorcery. It consists of two principal components: <strong>Numogram</strong> (time-map) and <strong>Matrix</strong> (listing the names, numbers, and attributes of the demons).</p>
-            <p>The system is constructed according to immanent criteria latent in decimal numeracy. The Syzygies (blue dashed lines) represent pairs summing to 9. The Tracts (red lines) map the flow of Chronos.</p>
-            <p><em>Click on any of the Zones in the map, or use the Calculator above, to reveal its esoteric and planetary data.</em></p>
+            <p>The system is constructed according to immanent criteria latent in decimal numeracy. The Syzygies (cyan dashed lines) represent pairs summing to 9. The Channels/Tracts (red lines) knit the Maze together.</p>
+            <p><em>Click on any Zone in the map above to reveal its esoteric and planetary data.</em></p>
           </div>
         </div>
-      </div>
 
+      </div>
     </div>
   </div>
 
@@ -1400,13 +1341,11 @@ document.getElementById('creature-sprite').addEventListener('click', function(e)
 // ===== OBFUSCATED PASSWORD CHECK =====
 document.getElementById('pw-input').addEventListener('keydown',function(e){
   if(e.key==='Enter'){
-    // Uses Base64 encoding to hide the word "cake"
-    // btoa("cake") results in "Y2FrZQ=="
     if(btoa(this.value.toLowerCase().trim()) === 'Y2FrZQ=='){
       document.getElementById('password-screen').style.display='none';
       document.getElementById('app').style.display='block';
       initApp();
-      // Draw lines if starting on Numogram tab or user navigates there later
+      // Draw lines if starting on Numogram tab
       setTimeout(drawNumogramLines, 100);
     }else{
       document.getElementById('pw-error').textContent='Wrong password... try again!';
@@ -1591,28 +1530,26 @@ function selectZone(zoneNum) {
   document.getElementById('numo-display').innerHTML = dataHtml;
 }
 
-// Connections based on CCRU Lore
-// Syzygies (sum to 9): 9-0, 8-1, 7-2, 6-3, 5-4
-// Tracts/Gates (descending currents): 2-3, 4-5, 7-8, 1-9
+// Connections EXACTLY mimicking the visual layout requested
 const numogramPaths = [
-  { from: 9, to: 0, type: 'syzygy' },
-  { from: 8, to: 1, type: 'syzygy' },
-  { from: 7, to: 2, type: 'syzygy' },
-  { from: 6, to: 3, type: 'syzygy' },
-  { from: 5, to: 4, type: 'syzygy' },
-  { from: 2, to: 3, type: 'tract' },
-  { from: 4, to: 5, type: 'tract' },
-  { from: 7, to: 8, type: 'tract' },
-  { from: 1, to: 9, type: 'tract' }
+  // Syzygies (Cyan dashed)
+  { from: 3, to: 6, cls: 'cyan-dash' },
+  { from: 5, to: 4, cls: 'cyan-dash' },
+  { from: 2, to: 7, cls: 'cyan-dash' },
+  { from: 1, to: 8, cls: 'cyan-dash' },
+  { from: 9, to: 0, cls: 'cyan-dash' },
+  // Tracts/Channels (Red solid)
+  { from: 3, to: 2, cls: 'red-solid' },
+  { from: 7, to: 8, cls: 'red-solid' },
+  { from: 8, to: 9, cls: 'red-solid' }
 ];
 
 function drawNumogramLines() {
   const svg = document.getElementById('numo-svg');
   if(!svg) return;
-  svg.innerHTML = ''; // clear existing
+  svg.innerHTML = ''; 
   
   const container = document.getElementById('numo-map-container');
-  // Need to ensure the container is visible to get offset coordinates
   if (container.offsetWidth === 0) return;
 
   numogramPaths.forEach(path => {
@@ -1620,7 +1557,7 @@ function drawNumogramLines() {
     const node2 = document.getElementById('btn-zone-' + path.to);
     
     if(node1 && node2) {
-      // Get positions relative to the container
+      // offsetLeft/Top are reliable since we avoid CSS transform translate
       const x1 = node1.offsetLeft + (node1.offsetWidth / 2);
       const y1 = node1.offsetTop + (node1.offsetHeight / 2);
       const x2 = node2.offsetLeft + (node2.offsetWidth / 2);
@@ -1631,16 +1568,15 @@ function drawNumogramLines() {
       line.setAttribute('y1', y1);
       line.setAttribute('x2', x2);
       line.setAttribute('y2', y2);
-      line.setAttribute('class', `numo-line ${path.type}`);
+      line.setAttribute('class', `numo-line ${path.cls}`);
       svg.appendChild(line);
     }
   });
 }
 
-// Draw lines on resize to maintain correct positions
 window.addEventListener('resize', drawNumogramLines);
 
-// Gematria & Digital Root Calculator
+// --- TOOLS: Gematria Calculator ---
 function calculateNumogram() {
   const input = document.getElementById('numo-gematria-input').value.trim().toUpperCase();
   const display = document.getElementById('numo-result-display');
@@ -1651,41 +1587,97 @@ function calculateNumogram() {
   }
 
   let totalSum = 0;
-  let calculationSteps = [];
-
-  // Alphanumeric evaluation (A=1...Z=26) + numbers
   for (let i = 0; i < input.length; i++) {
     const char = input[i];
-    if (/[A-Z]/.test(char)) {
-      const val = char.charCodeAt(0) - 64; // A is 65
-      totalSum += val;
-      calculationSteps.push(`${char}(${val})`);
-    } else if (/[0-9]/.test(char)) {
-      const val = parseInt(char);
-      totalSum += val;
-      calculationSteps.push(val);
-    }
+    if (/[A-Z]/.test(char)) totalSum += char.charCodeAt(0) - 64; 
+    else if (/[0-9]/.test(char)) totalSum += parseInt(char);
   }
 
-  if (totalSum === 0) {
-    display.textContent = "No valid numeric or alphanumeric characters found.";
-    return;
-  }
+  if (totalSum === 0) { display.textContent = "Invalid entry."; return; }
 
-  // Digital Root calculation (modulo 9 logic, but 9 remains 9 instead of 0)
   let digitalRoot = totalSum % 9;
   if (digitalRoot === 0 && totalSum > 0) digitalRoot = 9;
   
   display.innerHTML = `Sum: <span style="color:#fff">${totalSum}</span> ➔ Digital Root: <span style="color:#fff; font-size:1.5rem">${digitalRoot}</span>`;
-  
-  // Trigger the map node
   selectZone(digitalRoot);
 }
 
-// Allow pressing enter in the input box
 document.getElementById('numo-gematria-input').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') calculateNumogram();
 });
+
+// --- TOOLS: Demon Finder ---
+function findDemon() {
+   const z1Str = document.getElementById('demon-z1').value;
+   const z2Str = document.getElementById('demon-z2').value;
+   if(z1Str === "" || z2Str === "") return;
+   
+   const z1 = parseInt(z1Str);
+   const z2 = parseInt(z2Str);
+   
+   const max = Math.max(z1, z2);
+   const min = Math.min(z1, z2);
+   
+   const warpPlex = [0, 3, 6, 9];
+   const torque = [1, 2, 4, 5, 7, 8];
+   
+   let classification = "";
+   if (warpPlex.includes(max) && warpPlex.includes(min)) {
+       classification = "Xenodemon (Stays within Outside Time)";
+   } else if (torque.includes(max) && torque.includes(min)) {
+       classification = "Chronodemon (Stays within Chronic Time)";
+   } else {
+       classification = "Amphidemon (Crosses between Chronic and Outside Time)";
+   }
+   
+   const planets = ["Sol", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"];
+   
+   document.getElementById('demon-result').innerHTML = `
+      <strong>Net-Span [${max}::${min}]</strong><br>
+      Class: <span style="color:#00e5ff">${classification}</span><br>
+      Planetary Bridge: ${planets[max]} ↔ ${planets[min]}
+   `;
+}
+
+// --- TOOLS: Lexicon Search ---
+const ccruLexicon = [
+  { term: "Hyperstition", def: "A fictional quantity functional as a time-traveling device. An element of effective culture that makes itself real by amplifying coincidences." },
+  { term: "Numogram", def: "The Decimal Labyrinth. A non-conductive diagram of time-sorcery consisting of ten zones and their interconnections, autonomous from pro-creationist models like the Qabbalistic Tree of Life." },
+  { term: "Syzygy", def: "A nine-sum twinning of zones (e.g., 9+0, 8+1, 7+2, 6+3, 5+4). Represents intense pairings and the primary pathways of demons." },
+  { term: "Lemuria", def: "A hyperstitional continent and spectral time-zone associated with the Nma culture and decimal sorcery." },
+  { term: "Pandemonium Matrix", def: "The complete system of Lemurian demonism, listing the names, numbers, and attributes of the 45 demons (Lemurs) mapped to the Numogram's net-spans." },
+  { term: "Warp", def: "The upper autonomous loop of the Numogram, consisting of Zones 3 and 6. Constitutes 'Outside-Time'." },
+  { term: "Plex", def: "The lower autonomous loop of the Numogram, consisting of Zones 9 and 0. Constitutes 'Outside-Time'." },
+  { term: "Torque (Time-Circuit)", def: "The central cycle of the Numogram, encompassing zones 1, 2, 4, 5, 7, 8. Known as 'Chronic Time'." },
+  { term: "Xenodemon", def: "A demon whose net-span stays entirely within 'Outside Time' (the Warp or Plex)." },
+  { term: "Chronodemon", def: "A demon whose net-span stays entirely within 'Chronic Time' (the Time Circuit)." },
+  { term: "Amphidemon", def: "An amphibious demon that crosses between Chronic and Outside time." },
+  { term: "Digital Reduction", def: "The mathematical process of adding digits until a single number remains (e.g., 14 -> 1+4 = 5). Used to isolate the zone of a word or concept." },
+  { term: "Barkerian Arithmetic", def: "A numbering system fundamental to CCRU theory that views numbers as active forces rather than passive quantities." }
+];
+
+function searchLexicon() {
+   const q = document.getElementById('lexicon-search').value.toLowerCase();
+   const resDiv = document.getElementById('lexicon-results');
+   resDiv.innerHTML = '';
+   if(!q) return;
+   
+   const matches = ccruLexicon.filter(item => item.term.toLowerCase().includes(q) || item.def.toLowerCase().includes(q));
+   
+   if(matches.length === 0) {
+       resDiv.innerHTML = '<p style="color:rgba(255,255,255,0.5)">No archives found.</p>';
+       return;
+   }
+   
+   matches.forEach(m => {
+       resDiv.innerHTML += `
+         <div style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1)">
+           <strong style="color: #ff3c8e; font-size:0.95rem;">${m.term}</strong>
+           <p style="margin-top: 4px;">${m.def}</p>
+         </div>
+       `;
+   });
+}
 </script>
 </body>
 </html>
