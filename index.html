@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Study Buddy</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Nunito:wght@400;700;900&family=Baloo+2:wght@700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Nunito:wght@400;700;900&family=Baloo+2:wght@700;800&family=Press+Start+2P&display=swap');
 
   :root {
     --sky1: #0099ff;
@@ -727,6 +727,71 @@
   .history-day .day-stat { color: #88ccff; }
   .history-day .day-streak { color: #ffcc00; font-weight: 900; }
 
+  /* ===== NES PASSWORD SYSTEM ===== */
+  .nes-container {
+    background-color: #000;
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    padding: 20px;
+    border: 4px solid #fff;
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.5), inset -4px -4px 0px #333;
+    margin-top: 24px;
+    text-align: center;
+  }
+
+  .nes-container h3 {
+    color: #e52521; /* Classic NES Red */
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 0 #000;
+  }
+
+  .nes-container p {
+    font-size: 0.55rem;
+    line-height: 1.6;
+    color: #aaa;
+    margin-bottom: 16px;
+  }
+
+  .nes-textarea {
+    width: 100%;
+    height: 120px;
+    background: #111;
+    color: #33ff33; /* Terminal green */
+    border: 2px solid #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.65rem;
+    line-height: 1.4;
+    padding: 12px;
+    margin-bottom: 16px;
+    resize: none;
+    word-wrap: break-word;
+  }
+
+  .nes-textarea:focus {
+    outline: none;
+    border-color: #e52521;
+    background: #222;
+  }
+
+  .nes-btn {
+    background: #e52521;
+    color: #fff;
+    border: 2px solid #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    padding: 12px 16px;
+    cursor: pointer;
+    text-transform: uppercase;
+    margin: 4px;
+    transition: all 0.1s;
+  }
+
+  .nes-btn:hover { background: #ff3c8e; }
+  .nes-btn:active { box-shadow: inset 4px 4px 0px rgba(0,0,0,0.5); transform: translateY(2px); }
+
   /* ===== RANDOM PHRASE BUBBLE ===== */
   .random-bubble {
     margin: 18px auto 0;
@@ -967,14 +1032,17 @@
       <div class="history-grid" id="history-grid"></div>
     </div>
 
-    <!-- NEW SYNC / DATA MANAGEMENT AREA -->
-    <div class="history-section glass-dark" style="margin-top: 16px;">
-      <h3>💾 Data Management</h3>
-      <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 12px;">Export your data to move it to your phone/computer, or import a previous backup.</p>
-      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <button class="btn-glossy" style="background: linear-gradient(180deg, #0099ff, #0066cc); box-shadow: 0 4px 14px rgba(0,153,255,0.35);" onclick="exportData()">⬇️ Export Backup</button>
-        <button class="btn-glossy" style="background: linear-gradient(180deg, #8b5cf6, #6d3fd6); box-shadow: 0 4px 14px rgba(139,92,246,0.35);" onclick="document.getElementById('import-file').click()">⬆️ Import Backup</button>
-        <input type="file" id="import-file" style="display: none;" accept=".json" onchange="importData(event)">
+    <!-- NES PASSWORD DATA MANAGEMENT -->
+    <div class="nes-container">
+      <h3>PASSWORD SYSTEM</h3>
+      <p>GENERATE A PASSWORD TO BACK UP YOUR PROGRESS, OR PASTE A PASSWORD BELOW TO RESTORE DATA.</p>
+      
+      <textarea id="nes-password-box" class="nes-textarea" placeholder="[ ENTER PASSWORD HERE ]" spellcheck="false"></textarea>
+      
+      <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+        <button class="nes-btn" onclick="generatePassword()">GENERATE</button>
+        <button class="nes-btn" onclick="loadPassword()">RESTORE</button>
+        <button class="nes-btn" onclick="copyPassword()">COPY</button>
       </div>
     </div>
   </div>
@@ -1002,41 +1070,54 @@ function loadData() { try { const r = localStorage.getItem(STORAGE_KEY); if (r) 
 function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 let data = loadData();
 
-// ===== IMPORT / EXPORT SYNC =====
-function exportData() {
-  const dataStr = JSON.stringify(data, null, 2);
-  const blob = new Blob([dataStr], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `studybuddy_backup_${todayStr()}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+// ===== NES PASSWORD SYNC =====
+function generatePassword() {
+  try {
+    const jsonStr = JSON.stringify(data);
+    // encodeURIComponent handles unicode (like Japanese characters) safely for btoa
+    let encoded = btoa(encodeURIComponent(jsonStr));
+    
+    // Add dashes every 8 characters for that classic retro look
+    let retroPass = encoded.match(/.{1,8}/g).join('-');
+    document.getElementById('nes-password-box').value = retroPass;
+  } catch(e) {
+    alert("ERROR GENERATING PASSWORD.");
+  }
 }
 
-function importData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const importedData = JSON.parse(e.target.result);
-      if (importedData.days && importedData.dictionary) {
-        data = importedData;
-        saveData();
-        initApp(); // Refresh the app to show imported data
-        alert("Backup imported successfully! 🎉");
-      } else {
-        alert("Invalid backup file format.");
-      }
-    } catch (err) {
-      alert("Error reading backup file.");
+function loadPassword() {
+  const input = document.getElementById('nes-password-box').value.trim();
+  if (!input) {
+    alert("PLEASE ENTER A PASSWORD.");
+    return;
+  }
+  
+  try {
+    // Remove all dashes and whitespace
+    let cleaned = input.replace(/[-\s]/g, '');
+    let decoded = decodeURIComponent(atob(cleaned));
+    let importedData = JSON.parse(decoded);
+    
+    if (importedData.days && importedData.dictionary) {
+      data = importedData;
+      saveData();
+      initApp(); // Refresh the app to show imported data
+      alert("PROGRESS RESTORED!");
+      document.getElementById('nes-password-box').value = '';
+    } else {
+      alert("INVALID PASSWORD DATA.");
     }
-    event.target.value = ''; // Reset input
-  };
-  reader.readAsText(file);
+  } catch (err) {
+    alert("INVALID PASSWORD FORMAT.");
+  }
+}
+
+function copyPassword() {
+  const pwBox = document.getElementById('nes-password-box');
+  if (!pwBox.value) return;
+  pwBox.select();
+  document.execCommand('copy');
+  alert("PASSWORD COPIED TO CLIPBOARD!");
 }
 
 function todayStr() { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
