@@ -1,93 +1,112 @@
-/* ===== NUMOGRAM ENHANCEMENTS ===== */
-  #numo-svg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    pointer-events: none;
-  }
+// ===== NUMOGRAM LOGIC & TIME SORCERY =====
+
+function selectZone(zoneNum) {
+  document.querySelectorAll('.numo-node').forEach(n => n.classList.remove('active'));
+  const btn = document.getElementById('btn-zone-' + zoneNum);
+  if(btn) btn.classList.add('active');
+  const dataHtml = document.getElementById('data-zone-' + zoneNum).innerHTML;
+  document.getElementById('numo-display').innerHTML = dataHtml;
+}
+
+// Connections based on CCRU Lore
+// Syzygies (sum to 9): 9-0, 8-1, 7-2, 6-3, 5-4
+// Tracts/Gates (descending currents): 2-3, 4-5, 7-8, 1-9
+const numogramPaths = [
+  { from: 9, to: 0, type: 'syzygy' },
+  { from: 8, to: 1, type: 'syzygy' },
+  { from: 7, to: 2, type: 'syzygy' },
+  { from: 6, to: 3, type: 'syzygy' },
+  { from: 5, to: 4, type: 'syzygy' },
+  { from: 2, to: 3, type: 'tract' },
+  { from: 4, to: 5, type: 'tract' },
+  { from: 7, to: 8, type: 'tract' },
+  { from: 1, to: 9, type: 'tract' }
+];
+
+function drawNumogramLines() {
+  const svg = document.getElementById('numo-svg');
+  if(!svg) return;
+  svg.innerHTML = ''; // clear existing
   
-  .numo-line {
-    stroke: rgba(255, 51, 51, 0.5);
-    stroke-width: 3;
-    transition: all 0.3s;
-    filter: drop-shadow(0 0 4px rgba(255,51,51,0.8));
-  }
+  const container = document.getElementById('numo-map-container');
+  const rect = container.getBoundingClientRect();
 
-  .numo-line.syzygy {
-    stroke: #00d4ff;
-    stroke-dasharray: 8 6;
-    stroke-width: 4;
-    filter: drop-shadow(0 0 6px rgba(0,212,255,0.8));
-  }
+  numogramPaths.forEach(path => {
+    const node1 = document.getElementById('btn-zone-' + path.from);
+    const node2 = document.getElementById('btn-zone-' + path.to);
+    
+    if(node1 && node2) {
+      // Get positions relative to the container
+      const x1 = node1.offsetLeft + (node1.offsetWidth / 2);
+      const y1 = node1.offsetTop + (node1.offsetHeight / 2);
+      const x2 = node2.offsetLeft + (node2.offsetWidth / 2);
+      const y2 = node2.offsetTop + (node2.offsetHeight / 2);
 
-  /* Interactive Numogram Calculator */
-  .numo-calc {
-    background: rgba(20, 0, 0, 0.6);
-    border: 2px solid #ff3333;
-    border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 20px;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-  }
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', x1);
+      line.setAttribute('y1', y1);
+      line.setAttribute('x2', x2);
+      line.setAttribute('y2', y2);
+      line.setAttribute('class', `numo-line ${path.type}`);
+      svg.appendChild(line);
+    }
+  });
+}
 
-  .numo-calc h4 {
-    font-family: 'Baloo 2', cursive;
-    color: #ff3c8e;
-    margin-bottom: 10px;
-    font-size: 1.2rem;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-  }
+// Draw lines on load, resize, and when the Numogram tab is clicked
+window.addEventListener('resize', drawNumogramLines);
+document.querySelector('[data-tab="numogram"]').addEventListener('click', () => {
+  setTimeout(drawNumogramLines, 50); // slight delay to allow display:block to render
+});
 
-  .numo-calc p {
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.7);
-    margin-bottom: 12px;
-    line-height: 1.4;
-  }
-
-  .numo-input-row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-
-  .numo-input-row input {
-    flex: 1;
-    background: #000;
-    color: #00d4ff;
-    border: 1px solid rgba(255,255,255,0.3);
-    padding: 10px 14px;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.7rem;
-    border-radius: 8px;
-  }
+// Gematria & Digital Root Calculator
+function calculateNumogram() {
+  const input = document.getElementById('numo-gematria-input').value.trim().toUpperCase();
+  const display = document.getElementById('numo-result-display');
   
-  .numo-input-row input:focus {
-    outline: none;
-    border-color: #00d4ff;
-    box-shadow: 0 0 10px rgba(0,212,255,0.3);
+  if (!input) {
+    display.textContent = "Please enter data.";
+    return;
   }
 
-  .numo-input-row button {
-    background: #ff3333;
-    color: #fff;
-    border: none;
-    font-weight: 800;
-    padding: 0 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-family: 'Nunito', sans-serif;
-    transition: background 0.2s;
+  let totalSum = 0;
+  let calculationSteps = [];
+
+  // Alphanumeric evaluation (A=1...Z=26) + numbers
+  for (let i = 0; i < input.length; i++) {
+    const char = input[i];
+    if (/[A-Z]/.test(char)) {
+      const val = char.charCodeAt(0) - 64; // A is 65
+      totalSum += val;
+      calculationSteps.push(`${char}(${val})`);
+    } else if (/[0-9]/.test(char)) {
+      const val = parseInt(char);
+      totalSum += val;
+      calculationSteps.push(val);
+    }
   }
 
-  .numo-input-row button:hover { background: #ff0000; }
-
-  #numo-result-display {
-    font-family: 'Baloo 2', cursive;
-    font-size: 1.1rem;
-    color: #a8e84c;
-    min-height: 28px;
+  if (totalSum === 0) {
+    display.textContent = "No valid numeric or alphanumeric characters found.";
+    return;
   }
+
+  // Digital Root calculation (modulo 9 logic, but 9 remains 9 instead of 0)
+  let digitalRoot = totalSum % 9;
+  if (digitalRoot === 0 && totalSum > 0) digitalRoot = 9;
+
+  // CCRU specific: sometimes 9 collapses to 0. We'll leave it as mathematical digital root for now.
+  
+  display.innerHTML = `Sum: <span style="color:#fff">${totalSum}</span> ➔ Digital Root: <span style="color:#fff; font-size:1.5rem">${digitalRoot}</span>`;
+  
+  // Trigger the map node
+  selectZone(digitalRoot);
+}
+
+// Allow pressing enter in the input box
+document.getElementById('numo-gematria-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') calculateNumogram();
+});
+
+// Initialize lines on first load just in case
+setTimeout(drawNumogramLines, 500);
