@@ -380,6 +380,8 @@
     align-items: flex-end;
     justify-content: center;
     flex-shrink: 0;
+    cursor: pointer; /* Indicates it's tappable */
+    -webkit-tap-highlight-color: transparent;
   }
 
   .creature-sprite img {
@@ -387,6 +389,31 @@
     height: 100%;
     object-fit: contain; 
     filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15));
+  }
+
+  /* ===== INTERACTION ANIMATIONS ===== */
+  @keyframes bounce-up {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-30px); }
+    100% { transform: translateY(0); }
+  }
+  
+  .animate-bounce {
+    animation: bounce-up 0.4s cubic-bezier(0.28, 0.84, 0.42, 1);
+  }
+
+  .heart-particle {
+    position: absolute;
+    font-size: 2rem;
+    pointer-events: none;
+    animation: float-heart 0.8s ease-out forwards;
+    z-index: 10;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+  }
+
+  @keyframes float-heart {
+    0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(1.2); opacity: 0; }
   }
 
   /* Speech bubble */
@@ -1074,10 +1101,7 @@ let data = loadData();
 function generatePassword() {
   try {
     const jsonStr = JSON.stringify(data);
-    // encodeURIComponent handles unicode (like Japanese characters) safely for btoa
     let encoded = btoa(encodeURIComponent(jsonStr));
-    
-    // Add dashes every 8 characters for that classic retro look
     let retroPass = encoded.match(/.{1,8}/g).join('-');
     document.getElementById('nes-password-box').value = retroPass;
   } catch(e) {
@@ -1093,7 +1117,6 @@ function loadPassword() {
   }
   
   try {
-    // Remove all dashes and whitespace
     let cleaned = input.replace(/[-\s]/g, '');
     let decoded = decodeURIComponent(atob(cleaned));
     let importedData = JSON.parse(decoded);
@@ -1101,7 +1124,7 @@ function loadPassword() {
     if (importedData.days && importedData.dictionary) {
       data = importedData;
       saveData();
-      initApp(); // Refresh the app to show imported data
+      initApp();
       alert("PROGRESS RESTORED!");
       document.getElementById('nes-password-box').value = '';
     } else {
@@ -1175,6 +1198,50 @@ function setCreatureState(state){
   const el=document.getElementById('sprite-img');if(!el)return;
   el.src=spriteMap[state]||spriteMap.idle;
 }
+
+// ===== PET INTERACTION =====
+let isBouncing = false;
+document.getElementById('creature-sprite').addEventListener('click', function(e) {
+  if(isBouncing) return;
+  isBouncing = true;
+  
+  const img = document.getElementById('sprite-img');
+  const prevSrc = img.src;
+  img.src = spriteMap.happy;
+  
+  this.classList.add('animate-bounce');
+  
+  // Spawn 3-5 random hearts/sparkles
+  const numHearts = Math.floor(Math.random() * 3) + 3;
+  for(let i = 0; i < numHearts; i++) {
+    const heart = document.createElement('div');
+    heart.textContent = ['💖', '✨', '💕', '💗'][Math.floor(Math.random()*4)];
+    heart.className = 'heart-particle';
+    
+    // Random float trajectory
+    const tx = (Math.random() - 0.5) * 120 + 'px';
+    const ty = -(Math.random() * 120 + 60) + 'px';
+    heart.style.setProperty('--tx', tx);
+    heart.style.setProperty('--ty', ty);
+    
+    // Start roughly in the middle of the container
+    heart.style.left = '45%';
+    heart.style.top = '45%';
+    
+    this.appendChild(heart);
+    
+    setTimeout(() => heart.remove(), 800);
+  }
+  
+  setTimeout(() => {
+    this.classList.remove('animate-bounce');
+    // Revert back to what it was, unless something else changed the sprite
+    if(img.src.includes('happy.png')) {
+       img.src = prevSrc;
+    }
+    isBouncing = false;
+  }, 400);
+});
 
 // Password
 document.getElementById('pw-input').addEventListener('keydown',function(e){
