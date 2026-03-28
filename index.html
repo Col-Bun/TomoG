@@ -181,6 +181,9 @@
     box-shadow: none;
     padding: 6px 14px;
     font-size: 1rem;
+    cursor: pointer;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.3);
   }
   .btn-theme:hover { background: rgba(0,0,0,0.4); box-shadow: none; }
   body.dark-mode .btn-theme { background: rgba(255,255,255,0.1); }
@@ -623,6 +626,8 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
   .dict-header h3 {
@@ -630,6 +635,8 @@
     font-size: 1.2rem;
     color: #fff;
     text-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    display: inline-block;
+    margin-right: 10px;
   }
 
   .dict-count {
@@ -908,38 +915,24 @@
   <div class="metro-halftone"></div>
   <div class="metro-vectors">
     <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-      
-      <!-- Thick solid Frutiger Metro ribbons -->
       <path d="M-100 700 Q 400 400, 900 800 T 1600 500 L 1600 1000 L -100 1000 Z" fill="#000" fill-opacity="0.15" />
       <path d="M-100 750 Q 500 300, 1000 750 T 1600 400 L 1600 1000 L -100 1000 Z" fill="#fff" fill-opacity="0.25" />
-      
-      <!-- Stark horizontal banding -->
       <rect x="0" y="120" width="100%" height="40" fill="#fff" fill-opacity="0.15" />
       <rect x="0" y="140" width="100%" height="8" fill="#000" fill-opacity="0.2" />
-
-      <!-- Giant abstract target circle -->
       <circle cx="1200" cy="750" r="180" fill="none" stroke="#fff" stroke-width="40" stroke-opacity="0.15" />
       <circle cx="1200" cy="750" r="60" fill="#000" fill-opacity="0.1" />
-
-      <!-- Y2K Flat Silhouette Flowers (Static) -->
-      <!-- White Flower Top Left -->
       <g class="y2k-flower" transform="translate(150, 200) scale(1.5)" fill="#fff" fill-opacity="0.3">
         <circle cx="0" cy="-20" r="15"/><circle cx="19" cy="-6" r="15"/><circle cx="12" cy="16" r="15"/><circle cx="-12" cy="16" r="15"/><circle cx="-19" cy="-6" r="15"/>
         <circle cx="0" cy="0" r="12" fill="var(--metro-bg1)" fill-opacity="1"/>
       </g>
-
-      <!-- Black Silhouette Flower Right -->
       <g class="y2k-flower" transform="translate(1300, 250) scale(2)" fill="#000" fill-opacity="0.15">
         <circle cx="0" cy="-20" r="15"/><circle cx="19" cy="-6" r="15"/><circle cx="12" cy="16" r="15"/><circle cx="-12" cy="16" r="15"/><circle cx="-19" cy="-6" r="15"/>
         <circle cx="0" cy="0" r="12" fill="#fff" fill-opacity="0.3"/>
       </g>
-
-      <!-- Small White Flower Bottom Left -->
       <g class="y2k-flower" transform="translate(250, 750) scale(1.2)" fill="#fff" fill-opacity="0.4">
         <circle cx="0" cy="-20" r="15"/><circle cx="19" cy="-6" r="15"/><circle cx="12" cy="16" r="15"/><circle cx="-12" cy="16" r="15"/><circle cx="-19" cy="-6" r="15"/>
         <circle cx="0" cy="0" r="12" fill="var(--metro-bg1)" fill-opacity="1"/>
       </g>
-
     </svg>
   </div>
 </div>
@@ -960,7 +953,7 @@
   <div class="top-bar glass">
     <h2>Moe-Chan</h2>
     <div class="top-controls">
-      <button class="btn-glossy btn-theme" id="theme-btn" onclick="toggleTheme()" title="Toggle Dark Mode">🌙</button>
+      <button class="btn-theme" style="padding: 8px 14px; border-radius: 50px;" id="theme-btn" onclick="toggleTheme()" title="Toggle Dark Mode">🌙</button>
       <span class="streak-badge" id="streak-badge">🔥 0 day streak</span>
       <span class="date-display" id="date-display"></span>
     </div>
@@ -1054,7 +1047,7 @@
   <div class="tab-content" id="tab-dictionary">
     <div class="dict-section glass-dark">
       <div class="dict-header">
-        <h3>📖 My Dictionary / 辞書 / Diccionario</h3>
+        <h3>📖 My Dictionary</h3>
         <span class="dict-count" id="dict-count">0 words</span>
       </div>
       <div class="dict-add-form">
@@ -1103,6 +1096,10 @@
 </div>
 
 <script>
+// ===== UTILS =====
+function todayStr() { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function formatDate(s) { const [y,m,d]=s.split('-'); const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return mo[parseInt(m)-1]+' '+parseInt(d)+', '+y; }
+
 // ===== THEME TOGGLE =====
 function updateThemeIcon() {
   const isDark = document.body.classList.contains('dark-mode');
@@ -1117,12 +1114,120 @@ function toggleTheme() {
   updateThemeIcon();
 }
 
+// ===== STARTER DECK =====
+const starterDeck = [
+  { en: "To read, recite, chant", jp: "読む", es: "—" },
+  { en: "Open field, empty lot", jp: "原っぱ", es: "—" },
+  { en: "To throw, hurl, fling; give up", jp: "投げる", es: "—" },
+  { en: "To commute, frequent, go back and forth", jp: "通う", es: "—" },
+  { en: "Through / via a place", jp: "を通って", es: "—" },
+  { en: "To learn, study", jp: "学ぶ", es: "—" },
+  { en: "The beginning, first", jp: "最初", es: "—" },
+  { en: "That, the / um...", jp: "其の (その)", es: "—" },
+  { en: "Street, road; traffic", jp: "通り", es: "—" },
+  { en: "At/in, by/with (particle)", jp: "で", es: "—" },
+  { en: "Scenery, landscape", jp: "景色", es: "—" },
+  { en: "To seize, catch, grasp", jp: "掴む", es: "—" },
+  { en: "To take, pick up", jp: "取る", es: "—" },
+  { en: "Distance, journey, path", jp: "道のり", es: "—" },
+  { en: "Road, path, street", jp: "道", es: "—" },
+  { en: "Throat, singing voice", jp: "喉", es: "—" },
+  { en: "Thirst, craving", jp: "渇き", es: "—" },
+  { en: "Craving, longing", jp: "渇望", es: "—" },
+  { en: "Desire, want, urge", jp: "欲求", es: "—" },
+  { en: "Highly priced, expensive", jp: "高価", es: "—" },
+  { en: "High, tall; expensive", jp: "高い", es: "—" },
+  { en: "Comparatively high/expensive", jp: "割高", es: "—" },
+  { en: "Cheap, inexpensive", jp: "安い", es: "—" },
+  { en: "Very cheap, bargain", jp: "格安", es: "—" },
+  { en: "Bargain, good-value", jp: "お得", es: "—" },
+  { en: "Leasing (out), renting out", jp: "賃貸", es: "—" },
+  { en: "Rental", jp: "レンタル", es: "—" },
+  { en: "Rented house", jp: "借家", es: "—" },
+  { en: "Renting, leasing (from)", jp: "賃借", es: "—" },
+  { en: "Pasture, grassland", jp: "牧草地", es: "—" },
+  { en: "To remain, stay, stop", jp: "止まる", es: "—" },
+  { en: "To go by, pass through", jp: "通る", es: "—" },
+  { en: "To flutter down", jp: "舞い散る", es: "—" },
+  { en: "Cherry tree/blossom", jp: "桜", es: "—" },
+  { en: "Only, just", jp: "只 (ただ)", es: "—" },
+  { en: "Scenery, scene", jp: "風景", es: "—" },
+  { en: "Sadness, sorrow", jp: "悲しさ", es: "—" },
+  { en: "Pain, ache, soreness", jp: "痛み", es: "—" },
+  { en: "Footpath, sidewalk", jp: "歩道", es: "—" },
+  { en: "Pasture, empty lot", jp: "—", es: "Potrero" },
+  { en: "Colombian folk music", jp: "—", es: "Vallenato" },
+  { en: "Shop, store", jp: "—", es: "Tienda" },
+  { en: "Of, from", jp: "—", es: "De" },
+  { en: "Beauty", jp: "—", es: "Belleza" },
+  { en: "A, one", jp: "—", es: "Un" },
+  { en: "But", jp: "—", es: "Pero" },
+  { en: "First", jp: "—", es: "Primero" },
+  { en: "To, at", jp: "—", es: "A" },
+  { en: "To pass, happen", jp: "—", es: "Pasar" },
+  { en: "Park", jp: "—", es: "Parque" },
+  { en: "For, by, through", jp: "—", es: "Por" },
+  { en: "The (masculine)", jp: "—", es: "El" },
+  { en: "To throw, launch", jp: "—", es: "Lanzar" },
+  { en: "To know (facts)", jp: "—", es: "Saber" },
+  { en: "Streets", jp: "—", es: "Calles" },
+  { en: "To learn", jp: "—", es: "Aprender" },
+  { en: "Cool, awesome (Col. slang)", jp: "—", es: "Bacano" },
+  { en: "I want", jp: "—", es: "Quiero" },
+  { en: "Sure, safe", jp: "—", es: "Seguro" },
+  { en: "Stay (command)", jp: "—", es: "Quédate" },
+  { en: "Sells, sell! (command)", jp: "—", es: "Vende" },
+  { en: "Trees", jp: "—", es: "Árboles" },
+  { en: "Something", jp: "—", es: "Algo" },
+  { en: "Grass, pasture", jp: "—", es: "Pasto" },
+  { en: "To crave, tempt", jp: "—", es: "Antojar" },
+  { en: "To grab, take a bus", jp: "—", es: "Coger" },
+  { en: "View, sight", jp: "—", es: "Vista" },
+  { en: "Path, road, way", jp: "—", es: "Camino" },
+  { en: "Sidewalk (Col.)", jp: "—", es: "Andén" },
+  { en: "This; east", jp: "—", es: "Este" },
+  { en: "Neighbor (Col. slang)", jp: "—", es: "Veci" },
+  { en: "Butt; hurry up (slang)", jp: "—", es: "Culo" },
+  { en: "Thirst, craving", jp: "—", es: "Sed" },
+  { en: "Expensive", jp: "—", es: "Caro" },
+  { en: "Cheap, affordable", jp: "—", es: "Barato" },
+  { en: "Rent, lease", jp: "—", es: "Arriende" },
+  { en: "Food, provisions", jp: "—", es: "Provenda" },
+  { en: "How's it going, what's up", jp: "—", es: "Que tal" },
+  { en: "How, like, as", jp: "—", es: "Como" },
+  { en: "Cool, alright (Col. slang)", jp: "—", es: "Firme" },
+  { en: "Marimba, xylophone", jp: "—", es: "Marimba" },
+  { en: "Junk, cheap stuff", jp: "—", es: "Mariacachafa" }
+];
+
 // ===== DATA STORE =====
 const STORAGE_KEY = 'studyBuddyData';
-function getDefaultData() { return { days: {}, dictionary: [], streak: 0, lastActiveDate: null }; }
-function loadData() { try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch(e) {} return getDefaultData(); }
+function getDefaultData() { return { days: {}, dictionary: [], streak: 0, lastActiveDate: null, starterLoaded: false }; }
+
+function loadData() { 
+  try { 
+    const r = localStorage.getItem(STORAGE_KEY); 
+    if (r) return JSON.parse(r); 
+  } catch(e) {} 
+  return getDefaultData(); 
+}
+
 function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
 let data = loadData();
+
+// Initialize the starter deck if it hasn't been loaded before
+if (!data.starterLoaded) {
+  starterDeck.forEach(word => {
+    // Double-check just in case
+    const exists = data.dictionary.some(w => w.en === word.en && w.jp === word.jp && w.es === word.es);
+    if (!exists) {
+      data.dictionary.push({ en: word.en, jp: word.jp, es: word.es, addedDate: todayStr() });
+    }
+  });
+  data.starterLoaded = true;
+  saveData();
+}
 
 // ===== NES PASSWORD SYNC =====
 function generatePassword() {
@@ -1169,9 +1274,6 @@ function copyPassword() {
   document.execCommand('copy');
   alert("PASSWORD COPIED TO CLIPBOARD!");
 }
-
-function todayStr() { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-function formatDate(s) { const [y,m,d]=s.split('-'); const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return mo[parseInt(m)-1]+' '+parseInt(d)+', '+y; }
 
 function calcStreak() {
   const sortedDays=Object.keys(data.days).sort().reverse();
