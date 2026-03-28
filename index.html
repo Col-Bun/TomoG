@@ -37,8 +37,8 @@
 
   /* ===== GLASS PANEL STYLE ===== */
   .glass { background: var(--glass); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1.5px solid var(--glass-border); border-radius: 24px; box-shadow: 0 8px 32px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.25); transition: background 0.4s, border-color 0.4s; }
-  .glass-strong { background: rgba(255,255,255,0.30); backdrop-filter: blur(24px); border: 1.5px solid rgba(255,255,255,0.45); border-radius: 24px; box-shadow: 0 8px 32px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.4); }
-  .glass-dark { background: rgba(0,40,80,0.35); backdrop-filter: blur(18px); border: 1.5px solid rgba(255,255,255,0.15); border-radius: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); color: #fff; }
+  .glass-strong { background: rgba(255,255,255,0.30); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1.5px solid rgba(255,255,255,0.45); border-radius: 24px; box-shadow: 0 8px 32px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.4); }
+  .glass-dark { background: rgba(0,40,80,0.35); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1.5px solid rgba(255,255,255,0.15); border-radius: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); color: #fff; }
   body.dark-mode .glass { background: rgba(20, 20, 30, 0.45); border-color: rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05); }
   body.dark-mode .glass-strong { background: rgba(20, 20, 30, 0.65); border-color: rgba(255,255,255,0.1); }
   body.dark-mode .glass-dark { background: rgba(0, 0, 0, 0.5); border-color: rgba(255,255,255,0.1); }
@@ -69,7 +69,7 @@
   .pw-error { color: #ffcc00; font-size: 0.85rem; font-weight: 700; min-height: 1.2em; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
 
   /* ===== MAIN APP ===== */
-  #app { display: none; max-width: 960px; margin: 0 auto; padding: 20px; min-height: 100vh; position: relative; z-index: 1; }
+  #app { display: none; max-width: 900px; margin: 0 auto; padding: 20px; min-height: 100vh; position: relative; z-index: 1; }
   .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding: 12px 20px; flex-wrap: wrap; gap: 10px; }
   .top-bar h2 { font-family: 'Baloo 2', cursive; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 6px rgba(0,40,100,0.3); }
   .top-controls { display: flex; align-items: center; gap: 10px; }
@@ -198,6 +198,46 @@
   .iframe-container { width: 100%; height: 75vh; border-radius: 16px; overflow: hidden; position: relative; }
   .iframe-container iframe { width: 100%; height: 100%; border: none; background: transparent; }
 
+  /* ===== NUMOGRAM ===== */
+  .numogram-wrapper { display: grid; grid-template-columns: 400px 1fr; gap: 20px; align-items: start; }
+  @media (max-width: 768px) { .numogram-wrapper { grid-template-columns: 1fr; } }
+  .numo-map-container { background: radial-gradient(circle at center, #3a0000 0%, #150000 100%); border-radius: 20px; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.8); border: 2px solid rgba(255,50,50,0.3); height: 700px; overflow: hidden; }
+  .numo-region-label { position: absolute; right: 15px; color: rgba(255,255,255,0.6); text-align: right; font-size: 0.8rem; line-height: 1.2; pointer-events: none; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); z-index: 5; }
+  .numo-region-label strong { font-size: 1.2rem; color: #fff; display: block; font-weight: 900; }
+  .label-warp { top: 7%; } .label-chronic { top: 45%; } .label-plex { top: 85%; }
+  .numo-divider { position: absolute; left: 10%; right: 10%; height: 1px; background: rgba(255,255,255,0.15); z-index: 2; }
+  .div-1 { top: 25%; } .div-2 { top: 78%; }
+  .numo-node { position: absolute; width: 36px; height: 36px; background: #000; border: 3px solid #ff1111; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Nunito', sans-serif; font-size: 1.2rem; font-weight: 900; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 10; }
+  .numo-node:hover { transform: scale(1.15); border-color: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.8); }
+  .numo-node.active { background: #fff; color: #000; border-color: #fff; box-shadow: 0 0 20px rgba(255,255,255,1); }
+  .node-3 { top: calc(12% - 18px); left: calc(35% - 18px); } .node-6 { top: calc(8% - 18px); left: calc(60% - 18px); }
+  .node-5 { top: calc(35% - 18px); left: calc(40% - 18px); } .node-2 { top: calc(32% - 18px); left: calc(70% - 18px); }
+  .node-4 { top: calc(50% - 18px); left: calc(25% - 18px); } .node-7 { top: calc(50% - 18px); left: calc(85% - 18px); }
+  .node-1 { top: calc(62% - 18px); left: calc(50% - 18px); background: #fff; color: #000; border: none; box-shadow: 0 0 25px 8px rgba(255,255,255,0.6); }
+  .node-8 { top: calc(74% - 18px); left: calc(50% - 18px); } .node-9 { top: calc(86% - 18px); left: calc(50% - 18px); }
+  .node-0 { top: calc(96% - 18px); left: calc(50% - 18px); }
+  #numo-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+  .numo-line.red-solid { stroke: #d92626; stroke-width: 3; filter: drop-shadow(0 0 4px rgba(217, 38, 38, 0.8)); }
+  .numo-line.cyan-dash { stroke: #00e5ff; stroke-width: 3; stroke-dasharray: 6 6; filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.8)); }
+
+  .numo-tools-col { display: flex; flex-direction: column; gap: 16px; }
+  .numo-calc { background: rgba(20, 0, 0, 0.6); border: 2px solid #ff3333; border-radius: 16px; padding: 16px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
+  .numo-calc h4 { font-family: 'Baloo 2', cursive; color: #ff3c8e; margin-bottom: 6px; font-size: 1.2rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+  .numo-calc p { font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-bottom: 12px; line-height: 1.4; }
+  .numo-calc-explanation { font-size: 0.7rem; color: #a8e84c; font-style: italic; border-left: 2px solid #a8e84c; padding-left: 8px; margin-bottom: 12px; background: rgba(168,232,76,0.1); padding: 8px; border-radius: 0 8px 8px 0; }
+  .numo-input-row { display: flex; gap: 10px; margin-bottom: 8px; }
+  .numo-input-row input { flex: 1; background: #000; color: #00e5ff; border: 1px solid rgba(255,255,255,0.3); padding: 10px 14px; font-family: 'Press Start 2P', monospace; font-size: 0.7rem; border-radius: 8px; width: 100%; }
+  .numo-input-row input:focus { outline: none; border-color: #00e5ff; box-shadow: 0 0 10px rgba(0,229,255,0.3); }
+  .numo-input-row button { background: #d92626; color: #fff; border: none; font-weight: 800; padding: 0 16px; border-radius: 8px; cursor: pointer; font-family: 'Nunito', sans-serif; transition: background 0.2s; }
+  .numo-input-row button:hover { background: #ff1111; box-shadow: 0 0 10px rgba(255,17,17,0.5); }
+  .numo-info-panel { padding: 20px; max-height: 300px; overflow-y: auto; }
+  .numo-info-panel::-webkit-scrollbar { width: 6px; } .numo-info-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+  .numo-info-panel h3 { font-family: 'Baloo 2', cursive; font-size: 1.6rem; margin-bottom: 10px; color: #ff3c8e; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  .numo-info-panel h4 { margin-top: 16px; margin-bottom: 8px; font-size: 1.1rem; color: #00e5ff; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px; }
+  .numo-info-panel p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 12px; color: rgba(255,255,255,0.9); }
+  .numo-info-panel ul { margin-left: 20px; margin-bottom: 12px; font-size: 0.85rem; color: rgba(255,255,255,0.9); }
+  #numo-data-store { display: none; }
+
   /* ===== I-CHING ===== */
   .iching-section { padding: 22px; display: flex; flex-direction: column; align-items: center; }
   .iching-header { font-family: 'Baloo 2', cursive; font-size: 1.8rem; color: #fff; margin-bottom: 10px; text-shadow: 0 2px 6px rgba(0,0,0,0.3); }
@@ -205,7 +245,7 @@
   .hexagram-container { display: flex; gap: 40px; justify-content: center; margin-bottom: 30px; min-height: 180px; flex-wrap: wrap; }
   .hexagram-box { display: flex; flex-direction: column; align-items: center; }
   .hexagram-title { font-weight: 800; color: #a8e84c; margin-bottom: 12px; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
-  .hexagram-visual { display: flex; flex-direction: column-reverse; gap: 8px; }
+  .hexagram-visual { display: flex; flex-direction: column-reverse; gap: 8px; } /* column-reverse to build from bottom up */
   .hex-line { width: 120px; height: 16px; display: flex; justify-content: space-between; align-items: center; }
   .hex-line.yang .seg { width: 100%; height: 100%; background: #fff; border-radius: 4px; box-shadow: 0 0 8px rgba(255,255,255,0.5); }
   .hex-line.yin .seg { width: 45%; height: 100%; background: #fff; border-radius: 4px; box-shadow: 0 0 8px rgba(255,255,255,0.5); }
@@ -214,90 +254,15 @@
   .iching-result-box h3 { color: #ffcc00; font-family: 'Baloo 2', cursive; font-size: 1.4rem; margin-bottom: 8px; }
   .iching-result-box p { font-size: 0.95rem; color: #fff; line-height: 1.6; margin-bottom: 10px; }
 
-  /* ===== NUMOGRAM SYSTEM (CCRU COMPLIANT) ===== */
-  .numogram-wrapper { display: grid; grid-template-columns: 500px 1fr; gap: 20px; align-items: start; }
-  @media (max-width: 900px) { .numogram-wrapper { grid-template-columns: 1fr; } }
-  
-  .numo-map-container { 
-    background: #000; border-radius: 20px; position: relative; 
-    box-shadow: 0 8px 32px rgba(0,0,0,0.6), inset 0 0 40px rgba(0,0,0,0.9); 
-    border: 2px solid rgba(100,100,100,0.3); height: 780px; overflow: hidden; 
-    font-family: 'Nunito', sans-serif;
+  @media (max-width: 700px) {
+    .creature-sprite { width: 280px; height: 420px; }
+    .pw-creature { width: 180px; height: 270px; }
+    .creature-area { min-height: 520px; }
+    .tasks-panel { grid-template-columns: 1fr; }
+    .dict-add-form { grid-template-columns: 1fr; }
+    .stats-strip { flex-wrap: wrap; }
+    .top-bar h2 { font-size: 1.2rem; }
   }
-
-  /* Region Text (Left side) */
-  .reg-text { position: absolute; left: 10px; color: rgba(255,255,255,0.6); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; pointer-events: none; border-bottom: 1px solid rgba(255,255,255,0.2); width: 140px; padding-bottom: 2px;}
-  .reg-vortex { top: 18%; } .reg-surface { top: 40%; } .reg-undivided { top: 55%; } 
-  .reg-limbo { top: 68%; } .reg-iron { top: 85%; } .reg-continuum { top: 96%; }
-
-  /* Spinal Levels (Right side) */
-  .spine-text { position: absolute; right: 10px; color: rgba(100,150,255,0.6); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; pointer-events: none; }
-  .spine-cerv { top: 35%; } .spine-dors { top: 65%; } .spine-lumb { top: 75%; } 
-  .spine-sacr { top: 85%; } .spine-cocc { top: 96%; }
-
-  /* Currents (Text Overlays) */
-  .curr-text { position: absolute; font-size: 1.2rem; font-weight: 900; color: rgba(255,255,255,0.7); text-shadow: 0 0 10px #000; pointer-events: none; }
-  .curr-sink { top: 45%; left: 32%; }
-  .curr-rise { top: 50%; left: 65%; }
-  .curr-hold { top: 38%; left: 45%; font-size: 0.9rem;}
-
-  /* Base Node Styling */
-  .numo-node {
-    position: absolute; width: 38px; height: 38px; background: #000; border: 3px solid #fff;
-    border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center;
-    font-size: 1.1rem; font-weight: 900; cursor: pointer; transition: all 0.2s; z-index: 10;
-    box-shadow: inset 0 0 8px rgba(255,255,255,0.5);
-  }
-  .numo-node:hover { transform: scale(1.15); box-shadow: 0 0 15px rgba(255,255,255,0.8), inset 0 0 10px #fff; }
-  .numo-node.active { background: #fff; color: #000; }
-  
-  /* Node Labels (Vortex, Psyclone, etc) */
-  .node-name { position: absolute; font-size: 0.65rem; color: #fff; top: -18px; text-transform: capitalize; white-space: nowrap; text-shadow: 0 0 4px #000; }
-  /* Sub-labels for aspects (zx, tch, etc) */
-  .node-sub { position: absolute; font-size: 0.7rem; font-weight: 800; pointer-events: none; text-shadow: 0 0 4px #000; }
-  
-  /* Exact Proportional Coordinates */
-  .node-3 { top: 15%; left: 30%; } 
-  .node-3 .node-name { left: -15px; } .node-3 .node-sub { top: 10px; left: -25px; color: #a8e84c; } /* zx */
-  
-  .node-6 { top: 15%; left: 60%; }
-  .node-6 .node-name { right: -25px; } .node-6 .node-sub { bottom: -15px; right: -20px; color: #ffcc00; } /* tch */
-
-  .node-2 { top: 35%; left: 70%; }
-  .node-2 .node-name { right: -30px; top: -15px;} .node-2 .node-sub { top: -15px; right: 5px; color: #66e0ff; } /* dt */
-
-  .node-5 { top: 40%; left: 30%; }
-  .node-5 .node-name { left: -35px; top: 10px;} .node-5 .node-sub { bottom: -15px; right: -25px; color: #ff8a00; } /* ktt */
-
-  .node-4 { top: 55%; left: 20%; }
-  .node-4 .node-name { left: -25px; top: 15px;} .node-4 .node-sub { bottom: -15px; left: -15px; color: #ff3333; } /* skr */
-
-  .node-7 { top: 55%; left: 75%; }
-  .node-7 .node-name { right: -25px; top: 10px;} .node-7 .node-sub { top: -20px; right: -15px; color: #8b5cf6; } /* pb */
-
-  .node-1 { top: 68%; left: 50%; margin-left: -19px; width: 44px; height: 44px; }
-  .node-1 .node-name { left: -25px; top: 15px;} .node-1 .node-sub { bottom: -15px; left: -20px; color: #ff3c8e; } /* gl */
-
-  .node-8 { top: 80%; left: 50%; margin-left: -19px;}
-  .node-8 .node-name { left: -45px; top: 10px;} .node-8 .node-sub { top: -10px; left: -35px; color: #d63fd6; } /* mnm */
-
-  .node-9 { top: 90%; left: 50%; margin-left: -19px;}
-  .node-9 .node-name { right: -60px; top: 10px;} .node-9 .node-sub { top: -10px; right: -25px; color: #aaaaaa; } /* tn */
-
-  .node-0 { top: 97%; left: 50%; margin-left: -19px;}
-  .node-0 .node-name { right: -40px; top: 10px;} .node-0 .node-sub { top: -10px; right: -60px; color: #ffffff; } /* eiaoung */
-
-  #numo-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
-  .numo-line.red-solid { stroke: #fff; stroke-width: 2.5; filter: drop-shadow(0 0 3px rgba(255,255,255, 0.9)); stroke-linecap: round; }
-  .numo-line.cyan-dash { stroke: #00e5ff; stroke-width: 2.5; stroke-dasharray: 5 7; filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.8)); stroke-linecap: round; }
-
-  .numo-tools-col { display: flex; flex-direction: column; gap: 16px; }
-  .numo-calc { background: rgba(20, 0, 0, 0.6); border: 2px solid #ff3333; border-radius: 16px; padding: 16px; }
-  .numo-calc h4 { font-family: 'Baloo 2', cursive; color: #ff3c8e; margin-bottom: 6px; font-size: 1.2rem; }
-  .numo-input-row { display: flex; gap: 10px; margin-bottom: 8px; }
-  .numo-input-row input { flex: 1; background: #000; color: #00e5ff; border: 1px solid rgba(255,255,255,0.3); padding: 10px; font-family: 'Press Start 2P', monospace; font-size: 0.6rem; border-radius: 8px; }
-  .numo-input-row button { background: #d92626; color: #fff; border: none; font-weight: 800; padding: 0 16px; border-radius: 8px; cursor: pointer; }
-  .numo-info-panel { padding: 20px; max-height: 340px; overflow-y: auto; }
 </style>
 </head>
 <body>
@@ -339,13 +304,13 @@
   </div>
 
   <div class="tabs">
-    <button class="tab-btn active" data-tab="home" onclick="switchTab('home')">🏠 Home</button>
-    <button class="tab-btn" data-tab="dictionary" onclick="switchTab('dictionary')">📖 Dict <span id="dict-tab-count"></span></button>
-    <button class="tab-btn" data-tab="diary" onclick="switchTab('diary')">📓 Diary</button>
-    <button class="tab-btn" data-tab="history" onclick="switchTab('history')">📊 History</button>
-    <button class="tab-btn" data-tab="calc" onclick="switchTab('calc')">🧮 COLcalc</button>
-    <button class="tab-btn" data-tab="numogram" onclick="switchTab('numogram')">🌀 Numogram</button>
-    <button class="tab-btn" data-tab="iching" onclick="switchTab('iching')">☯️ I-Ching</button>
+    <button class="tab-btn active" data-tab="home">🏠 Home</button>
+    <button class="tab-btn" data-tab="dictionary">📖 Dictionary <span id="dict-tab-count"></span></button>
+    <button class="tab-btn" data-tab="diary">📓 Diary</button>
+    <button class="tab-btn" data-tab="history">📊 History</button>
+    <button class="tab-btn" data-tab="calc">🧮 COLcalc</button>
+    <button class="tab-btn" data-tab="numogram">🌀 Numogram</button>
+    <button class="tab-btn" data-tab="iching">☯️ I-Ching</button>
   </div>
 
   <!-- HOME TAB -->
@@ -364,6 +329,7 @@
       </div>
       <div class="random-bubble glass-strong" id="random-bubble"><span id="random-phrase"></span><span class="random-lang-tag" id="random-lang-tag"></span></div>
     </div>
+
     <div class="tasks-panel">
       <div class="task-card glass-dark" id="card-flash">
         <h3>📇 Flashcards</h3>
@@ -378,6 +344,7 @@
         <div id="read-done" style="display:none"><div class="task-done-check">✅</div><p class="task-done-text" style="font-size:0.8rem;margin-top:4px" id="read-done-text"></p></div>
       </div>
     </div>
+
     <div class="stats-strip">
       <div class="stat-box glass"><div class="num" id="stat-total-flash">0</div><div class="label">Flashcard Min</div></div>
       <div class="stat-box glass"><div class="num" id="stat-total-read">0</div><div class="label">Reading Hrs</div></div>
@@ -400,7 +367,10 @@
   <div class="tab-content" id="tab-diary">
     <div class="diary-section glass-dark">
       <h3>📓 Personal Diary</h3>
-      <div class="diary-input-area"><textarea id="diary-input" class="diary-textarea" placeholder="Write your thoughts here..."></textarea><div class="diary-controls"><button class="diary-btn" onclick="addDiaryEntry()">Save Entry</button></div></div>
+      <div class="diary-input-area">
+        <textarea id="diary-input" class="diary-textarea" placeholder="Write your thoughts here..."></textarea>
+        <div class="diary-controls"><button class="diary-btn" onclick="addDiaryEntry()">Save Entry</button></div>
+      </div>
       <div class="diary-list" id="diary-list"></div>
     </div>
   </div>
@@ -413,6 +383,7 @@
     </div>
     <div class="nes-container">
       <h3>PASSWORD SYSTEM</h3>
+      <p>GENERATE A PASSWORD TO BACK UP YOUR PROGRESS, OR PASTE A PASSWORD BELOW TO RESTORE DATA.</p>
       <textarea id="nes-password-box" class="nes-textarea" placeholder="[ ENTER PASSWORD HERE ]" spellcheck="false"></textarea>
       <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
         <button class="nes-btn" onclick="generatePassword()">GENERATE</button>
@@ -432,55 +403,41 @@
   <!-- NUMOGRAM TAB -->
   <div class="tab-content" id="tab-numogram">
     <div class="numogram-wrapper">
-      
-      <!-- EXACT CCRU TOPOLOGY GRAPH -->
       <div class="numo-map-container" id="numo-map-container">
         <svg id="numo-svg"></svg>
-        
-        <!-- Region Labels (Left) -->
-        <div class="reg-text reg-vortex">Vortex</div>
-        <div class="reg-text reg-surface">Surface</div>
-        <div class="reg-text reg-undivided">Undivided Waters</div>
-        <div class="reg-text reg-limbo">Limbo</div>
-        <div class="reg-text reg-iron">Iron Ocean</div>
-        <div class="reg-text reg-continuum">Continuum</div>
-
-        <!-- Spinal Levels (Right) -->
-        <div class="spine-text spine-cerv">Cervical</div>
-        <div class="spine-text spine-dors">Dorsal</div>
-        <div class="spine-text spine-lumb">Lumbar</div>
-        <div class="spine-text spine-sacr">Sacrum</div>
-        <div class="spine-text spine-cocc">Coccyx</div>
-
-        <!-- Current Labels -->
-        <div class="curr-text curr-hold">Hold</div>
-        <div class="curr-text curr-sink">Sink</div>
-        <div class="curr-text curr-rise">Rise</div>
-
-        <!-- Nodes with Names and Aspects -->
-        <div class="numo-node node-3" onclick="selectZone(3)" id="btn-zone-3">3+<span class="node-name">Vortex</span><span class="node-sub">"zx"</span></div>
-        <div class="numo-node node-6" onclick="selectZone(6)" id="btn-zone-6">6-<span class="node-name">Psyclone</span><span class="node-sub">"tch"</span></div>
-        <div class="numo-node node-5" onclick="selectZone(5)" id="btn-zone-5">5+<span class="node-name">Pressure</span><span class="node-sub">"ktt"</span></div>
-        <div class="numo-node node-2" onclick="selectZone(2)" id="btn-zone-2">2-<span class="node-name">Transcience</span><span class="node-sub">"dt"</span></div>
-        <div class="numo-node node-4" onclick="selectZone(4)" id="btn-zone-4">4-<span class="node-name">Melt</span><span class="node-sub">"skr"</span></div>
-        <div class="numo-node node-7" onclick="selectZone(7)" id="btn-zone-7">7+<span class="node-name">Lure</span><span class="node-sub">"pb"</span></div>
-        <div class="numo-node node-1" onclick="selectZone(1)" id="btn-zone-1">1+<span class="node-name">Deep</span><span class="node-sub">"gl"</span></div>
-        <div class="numo-node node-8" onclick="selectZone(8)" id="btn-zone-8">8-<span class="node-name">Comatose</span><span class="node-sub">"mnm"</span></div>
-        <div class="numo-node node-9" onclick="selectZone(9)" id="btn-zone-9">9+<span class="node-name">Black mirror</span><span class="node-sub">"tn"</span></div>
-        <div class="numo-node node-0" onclick="selectZone(0)" id="btn-zone-0">0-<span class="node-name">Flatline</span><span class="node-sub">"eiaoung"</span></div>
+        <div class="numo-region-label label-warp"><strong>Outside Time</strong>The Warp</div>
+        <div class="numo-divider div-1"></div>
+        <div class="numo-region-label label-chronic"><strong>Chronic Time</strong>The Torque</div>
+        <div class="numo-divider div-2"></div>
+        <div class="numo-region-label label-plex"><strong>Outside Time</strong>The Plex</div>
+        <div class="numo-node node-3" onclick="selectZone(3)" id="btn-zone-3">3</div>
+        <div class="numo-node node-6" onclick="selectZone(6)" id="btn-zone-6">6</div>
+        <div class="numo-node node-5" onclick="selectZone(5)" id="btn-zone-5">5</div>
+        <div class="numo-node node-2" onclick="selectZone(2)" id="btn-zone-2">2</div>
+        <div class="numo-node node-4" onclick="selectZone(4)" id="btn-zone-4">4</div>
+        <div class="numo-node node-7" onclick="selectZone(7)" id="btn-zone-7">7</div>
+        <div class="numo-node node-1" onclick="selectZone(1)" id="btn-zone-1">1</div>
+        <div class="numo-node node-8" onclick="selectZone(8)" id="btn-zone-8">8</div>
+        <div class="numo-node node-9" onclick="selectZone(9)" id="btn-zone-9">9</div>
+        <div class="numo-node node-0" onclick="selectZone(0)" id="btn-zone-0">0</div>
       </div>
-
-      <!-- Tools Sidebar -->
       <div class="numo-tools-col">
         <div class="numo-calc">
           <h4>Gematria Time-Sorcery</h4>
+          <div class="numo-calc-explanation"><strong>In CCRU Theory:</strong> Converts words to base-9 roots.</div>
           <div class="numo-input-row"><input type="text" id="numo-gematria-input" placeholder="e.g. CYBERNETICS"><button onclick="calculateNumogram()">EVAL</button></div>
           <div id="numo-result-display" style="font-size: 0.85rem; color: #a8e84c; font-family: 'Baloo 2', cursive;"></div>
         </div>
         <div class="numo-calc">
           <h4>Net-Span Demon Finder</h4>
+          <div class="numo-calc-explanation"><strong>In CCRU Theory:</strong> Locates entities bridging zones.</div>
           <div class="numo-input-row"><input type="number" id="demon-z1" min="0" max="9" placeholder="Z1"><input type="number" id="demon-z2" min="0" max="9" placeholder="Z2"><button onclick="findDemon()">FIND</button></div>
           <div id="demon-result" style="font-size: 0.85rem; color: #fff; margin-top: 10px; line-height: 1.4;"></div>
+        </div>
+        <div class="numo-calc">
+          <h4>CCRU Encyclopedia</h4>
+          <div class="numo-input-row" style="margin-bottom: 0;"><input type="text" id="lexicon-search" placeholder="Search archives..." oninput="searchLexicon()"></div>
+          <div id="lexicon-results" style="max-height: 200px; overflow-y: auto; margin-top: 10px; font-size: 0.8rem;"></div>
         </div>
         <div class="glass-dark numo-info-panel"><div id="numo-display"><h3>The Numogram</h3><p>Click a Zone to reveal its esoteric data.</p></div></div>
       </div>
@@ -491,11 +448,21 @@
   <div class="tab-content" id="tab-iching">
     <div class="iching-section glass-dark">
       <h2 class="iching-header">☯️ The I-Ching Oracle</h2>
-      <button class="btn-glossy btn-purple" style="background: linear-gradient(180deg, #8b5cf6 0%, #6d3fd6 100%); margin-bottom: 30px; padding: 14px 32px;" onclick="castOracle()">Cast Coins</button>
+      <p class="iching-desc">Concentrate on your question and cast the coins. The Oracle will generate a hexagram based on the ancient Book of Changes.</p>
+      
+      <button class="btn-glossy btn-purple" style="background: linear-gradient(180deg, #8b5cf6 0%, #6d3fd6 100%); margin-bottom: 30px; font-size: 1.1rem; padding: 14px 32px;" onclick="castOracle()">Cast Coins (Generate Hexagram)</button>
+      
       <div class="hexagram-container" id="iching-hex-container" style="display:none;">
-        <div class="hexagram-box"><div class="hexagram-title">Primary</div><div class="hexagram-visual" id="iching-primary-vis"></div></div>
-        <div class="hexagram-box" id="iching-secondary-box" style="display:none;"><div class="hexagram-title">Changing</div><div class="hexagram-visual" id="iching-secondary-vis"></div></div>
+        <div class="hexagram-box">
+          <div class="hexagram-title">Primary Hexagram</div>
+          <div class="hexagram-visual" id="iching-primary-vis"></div>
+        </div>
+        <div class="hexagram-box" id="iching-secondary-box" style="display:none;">
+          <div class="hexagram-title">Changing Hexagram</div>
+          <div class="hexagram-visual" id="iching-secondary-vis"></div>
+        </div>
       </div>
+
       <div class="iching-result-box" id="iching-primary-result"></div>
       <div class="iching-result-box" id="iching-secondary-result" style="border-color: #ff3c8e;"></div>
     </div>
@@ -504,17 +471,17 @@
 </div>
 
 <!-- DATA STORE FOR NUMOGRAM TEXT -->
-<div id="numo-data-store" style="display:none;">
-  <div id="data-zone-0"><h3>Zone Zero (0-) : Flatline</h3><h4>The Numeral 0</h4><p>The figure ‘0' designates the number zero, anterior to the distinction odd/even.</p><h4>The Zeroth Planet: Sol</h4><p>The Sun (Sol-0) is by far the largest body in the Solar-system.</p><h4>System Notes</h4><p>Zone-0 is the first of two zones mutually composing the Plex-region.</p></div>
-  <div id="data-zone-1"><h3>Zone One (1+) : Deep</h3><h4>The Numeral 1</h4><p>The figure ‘1' designates the number one, first odd number, and the zeroth prime.</p><h4>The First Planet: Mercury</h4><p>Mercury is the innermost planet of the Solar-system.</p><h4>System Notes</h4><p>Zone-1 is the first of the six Torque-region Zones.</p></div>
-  <div id="data-zone-2"><h3>Zone Two (2-) : Transcience</h3><h4>The Numeral 2</h4><p>The figure ‘2' designates the number two, the first and definitive even number.</p><h4>The Second Planet: Venus</h4><p>Venus (or Sol-2) has a mean orbital distance from sun of 108.2 million km.</p><h4>System Notes</h4><p>Zone-2 is the second of the six Torque-region Zones.</p></div>
-  <div id="data-zone-3"><h3>Zone Three (3+) : Vortex</h3><h4>The Numeral 3</h4><p>The figure ‘3' designates the number three, the second odd number.</p><h4>The Third Planet: Earth</h4><p>Earth (or Sol-3) defines the standard Astronomical Unit (AU).</p><h4>System Notes</h4><p>Zone-3 is the first of the two Warp-region Zones.</p></div>
-  <div id="data-zone-4"><h3>Zone Four (4-) : Melt</h3><h4>The Numeral 4</h4><p>The figure ‘4' designates the number four, the second even number.</p><h4>The Fourth Planet: Mars</h4><p>Mars (or Sol-4) has a mean orbital distance from the sun of approx. 228 000 000 km.</p><h4>System Notes</h4><p>Zone-4 is the third of the six Torque-region Zones.</p></div>
-  <div id="data-zone-5"><h3>Zone Five (5+) : Pressure</h3><h4>The Numeral 5</h4><p>The figure ‘5' designates the number five, the third odd number.</p><h4>The Fifth Planet: Jupiter</h4><p>Jupiter (or Sol-5) is the innermost gas-giant.</p><h4>System Notes</h4><p>Zone-5 is the sixth of the six Torque-region Zones.</p></div>
-  <div id="data-zone-6"><h3>Zone Six (6-) : Psyclone</h3><h4>The Numeral 6</h4><p>The figure ‘6' designates the number six, third even number.</p><h4>The Sixth Planet: Saturn</h4><p>Saturn (or Sol-6) has a mean orbital distance from the sun of approx. 1 429 400 000 km.</p><h4>System Notes</h4><p>Zone-6 is the second of the two Warp-region Zones.</p></div>
-  <div id="data-zone-7"><h3>Zone Seven (7+) : Lure</h3><h4>The Numeral 7</h4><p>The figure ‘7' designates the number seven, the fourth odd number.</p><h4>The Seventh Planet: Uranus</h4><p>Uranus (or Sol-7) rotation is abnormally tilted.</p><h4>System Notes</h4><p>Zone-7 is the fifth of the six Torque-region Zones.</p></div>
-  <div id="data-zone-8"><h3>Zone Eight (8-) : Comatose</h3><h4>The Numeral 8</h4><p>The figure eight (8) is a partially rotated glyph of infinity.</p><h4>The Eighth Planet: Neptune</h4><p>Neptune (or Sol-8) is the outermost gas-giant.</p><h4>System Notes</h4><p>Zone-8 is the fourth of the six Torque-region Zones.</p></div>
-  <div id="data-zone-9"><h3>Zone Nine (9+) : Black mirror</h3><h4>The Numeral 9</h4><p>The figure nine (9) is zygospirally related to the figure six.</p><h4>The Ninth Planet: Pluto</h4><p>Pluto (or Sol-9) has the most highly elliptical orbital trajectory.</p><h4>System Notes</h4><p>Zone-9 is the second of the two zones mutually composing the Plex-region.</p></div>
+<div id="numo-data-store">
+  <div id="data-zone-0"><h3>Zone Zero</h3><h4>The Numeral 0</h4><p>The figure ‘0' designates the number zero, anterior to the distinction odd/even.</p><h4>The Zeroth Planet: Sol</h4><p>The Sun (Sol-0) is by far the largest body in the Solar-system.</p><h4>System Notes</h4><p>Zone-0 is the first of two zones mutually composing the Plex-region.</p></div>
+  <div id="data-zone-1"><h3>Zone One</h3><h4>The Numeral 1</h4><p>The figure ‘1' designates the number one, first odd number, and the zeroth prime.</p><h4>The First Planet: Mercury</h4><p>Mercury is the innermost planet of the Solar-system.</p><h4>System Notes</h4><p>Zone-1 is the first of the six Torque-region Zones.</p></div>
+  <div id="data-zone-2"><h3>Zone Two</h3><h4>The Numeral 2</h4><p>The figure ‘2' designates the number two, the first and definitive even number.</p><h4>The Second Planet: Venus</h4><p>Venus (or Sol-2) has a mean orbital distance from sun of 108.2 million km.</p><h4>System Notes</h4><p>Zone-2 is the second of the six Torque-region Zones.</p></div>
+  <div id="data-zone-3"><h3>Zone Three</h3><h4>The Numeral 3</h4><p>The figure ‘3' designates the number three, the second odd number.</p><h4>The Third Planet: Earth</h4><p>Earth (or Sol-3) defines the standard Astronomical Unit (AU).</p><h4>System Notes</h4><p>Zone-3 is the first of the two Warp-region Zones.</p></div>
+  <div id="data-zone-4"><h3>Zone Four</h3><h4>The Numeral 4</h4><p>The figure ‘4' designates the number four, the second even number.</p><h4>The Fourth Planet: Mars</h4><p>Mars (or Sol-4) has a mean orbital distance from the sun of approx. 228 000 000 km.</p><h4>System Notes</h4><p>Zone-4 is the third of the six Torque-region Zones.</p></div>
+  <div id="data-zone-5"><h3>Zone Five</h3><h4>The Numeral 5</h4><p>The figure ‘5' designates the number five, the third odd number.</p><h4>The Fifth Planet: Jupiter</h4><p>Jupiter (or Sol-5) is the innermost gas-giant.</p><h4>System Notes</h4><p>Zone-5 is the sixth of the six Torque-region Zones.</p></div>
+  <div id="data-zone-6"><h3>Zone Six</h3><h4>The Numeral 6</h4><p>The figure ‘6' designates the number six, third even number.</p><h4>The Sixth Planet: Saturn</h4><p>Saturn (or Sol-6) has a mean orbital distance from the sun of approx. 1 429 400 000 km.</p><h4>System Notes</h4><p>Zone-6 is the second of the two Warp-region Zones.</p></div>
+  <div id="data-zone-7"><h3>Zone Seven</h3><h4>The Numeral 7</h4><p>The figure ‘7' designates the number seven, the fourth odd number.</p><h4>The Seventh Planet: Uranus</h4><p>Uranus (or Sol-7) rotation is abnormally tilted.</p><h4>System Notes</h4><p>Zone-7 is the fifth of the six Torque-region Zones.</p></div>
+  <div id="data-zone-8"><h3>Zone Eight</h3><h4>The Numeral 8</h4><p>The figure eight (8) is a partially rotated glyph of infinity.</p><h4>The Eighth Planet: Neptune</h4><p>Neptune (or Sol-8) is the outermost gas-giant.</p><h4>System Notes</h4><p>Zone-8 is the fourth of the six Torque-region Zones.</p></div>
+  <div id="data-zone-9"><h3>Zone Nine</h3><h4>The Numeral 9</h4><p>The figure nine (9) is zygospirally related to the figure six.</p><h4>The Ninth Planet: Pluto</h4><p>Pluto (or Sol-9) has the most highly elliptical orbital trajectory.</p><h4>System Notes</h4><p>Zone-9 is the second of the two zones mutually composing the Plex-region.</p></div>
 </div>
 
 <script>
@@ -528,19 +495,14 @@ function updateThemeIcon() { document.getElementById('theme-btn').textContent = 
 updateThemeIcon();
 function toggleTheme() { document.body.classList.toggle('dark-mode'); localStorage.setItem('studyBuddyTheme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); updateThemeIcon(); }
 
-function switchTab(tab) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
-  document.getElementById('tab-' + tab).classList.add('active');
-  if(tab === 'numogram') setTimeout(drawNumogramLines, 50);
-}
+// ===== STARTER DECK =====
+const starterDeck = [
+  { en: "To read", jp: "読む", es: "Leer" }, { en: "Street", jp: "通り", es: "Calle" }, { en: "Store", jp: "店", es: "Tienda" }
+];
 
-// ===== DATA STORAGE =====
-const starterDeck = [ { en: "To read", jp: "読む", es: "Leer" }, { en: "Street", jp: "通り", es: "Calle" }, { en: "Store", jp: "店", es: "Tienda" } ];
 const STORAGE_KEY = 'studyBuddyData';
-function getDefaultData() { return { days: {}, dictionary: [], diary: [], streak: 0, starterLoaded: false }; }
-function loadData() { try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch(e) {} return getDefaultData(); }
+function getDefaultData() { return { days: {}, dictionary: [], diary: [], streak: 0, lastActiveDate: null, starterLoaded: false }; }
+function loadData() { try { const r = localStorage.getItem(STORAGE_KEY); if (r) { let loaded = JSON.parse(r); if (!loaded.diary) loaded.diary = []; return loaded; } } catch(e) {} return getDefaultData(); }
 function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 let data = loadData();
 
@@ -549,16 +511,36 @@ if (!data.starterLoaded) {
   data.starterLoaded = true; saveData();
 }
 
-// ===== LOGIN =====
-document.getElementById('pw-input').addEventListener('keydown',function(e){
-  if(e.key==='Enter'){
-    if(btoa(this.value.toLowerCase().trim()) === 'Y2FrZQ=='){
-      document.getElementById('password-screen').style.display='none'; document.getElementById('app').style.display='block'; initApp(); setTimeout(drawNumogramLines, 100);
-    } else { document.getElementById('pw-error').textContent='Wrong password... try again!'; this.value=''; }
-  }
-});
+// ===== NES PASSWORD =====
+function generatePassword() { document.getElementById('nes-password-box').value = btoa(encodeURIComponent(JSON.stringify(data))).match(/.{1,8}/g).join('-'); }
+function loadPassword() {
+  const input = document.getElementById('nes-password-box').value.trim(); if (!input) return alert("ENTER PASSWORD.");
+  try {
+    let imported = JSON.parse(decodeURIComponent(atob(input.replace(/[-\s]/g, ''))));
+    if (imported.days && imported.dictionary) { if (!imported.diary) imported.diary = []; data = imported; saveData(); initApp(); alert("RESTORED!"); document.getElementById('nes-password-box').value = ''; } else alert("INVALID DATA.");
+  } catch (err) { alert("INVALID FORMAT."); }
+}
+function copyPassword() { const pwBox = document.getElementById('nes-password-box'); if (!pwBox.value) return; pwBox.select(); document.execCommand('copy'); alert("COPIED!"); }
 
-// ===== CREATURE LOGIC =====
+function calcStreak() {
+  const sortedDays=Object.keys(data.days).sort().reverse(); if(!sortedDays.length){data.streak=0;return;}
+  let streak=0, cd=new Date(); if(!data.days[todayStr()])cd.setDate(cd.getDate()-1);
+  while(true){ const ds=cd.getFullYear()+'-'+String(cd.getMonth()+1).padStart(2,'0')+'-'+String(cd.getDate()).padStart(2,'0'); const day=data.days[ds]; if(day&&(day.flash>0||day.read>0)){streak++;cd.setDate(cd.getDate()-1);}else break; }
+  data.streak=streak;
+}
+
+const speeches={ greeting:{en:"Hello! Let's study today!",jp:"こんにちは！今日も勉強しよう！",es:"¡Hola! ¡Estudiemos hoy!"}, bothDone:{en:"Amazing work today!",jp:"今日はすごい！",es:"¡Increíble hoy!"}, flashDone:{en:"Great flashcards! Now read!",jp:"次は読書だよ！",es:"¡Bien! ¡Ahora a leer!"}, readDone:{en:"Nice reading!",jp:"読書お疲れ！",es:"¡Buena lectura!"}, streakHigh:{en:"🔥 Incredible streak!",jp:"🔥 すごい連続記録！",es:"🔥 ¡Racha increíble!"}, newWord:{en:"New word learned!",jp:"新しい単語を覚えた！",es:"¡Nueva palabra!"} };
+function setSpeech(k){const s=speeches[k];if(!s)return;document.getElementById('speech-en').textContent=s.en;document.getElementById('speech-jp').textContent=s.jp;document.getElementById('speech-es').textContent=s.es;}
+
+function updateMood(){
+  const today=data.days[todayStr()]||{};let mood=30; if(today.flash>0)mood+=30;if(today.read>0)mood+=30;if(data.streak>=3)mood+=10; mood=Math.min(100,mood);
+  const fill=document.getElementById('mood-fill'),text=document.getElementById('mood-text'); fill.style.width=mood+'%';
+  if(mood>=90){fill.style.background='linear-gradient(90deg,#7ec832,#a8e84c)';text.textContent='Ecstatic!';setCreatureState('happy');}
+  else if(mood>=60){fill.style.background='linear-gradient(90deg,#ffcc00,#ff8a00)';text.textContent='Happy';setCreatureState('idle');}
+  else if(mood>=40){fill.style.background='linear-gradient(90deg,#ff8a00,#e06500)';text.textContent='Neutral';setCreatureState('idle');}
+  else{fill.style.background='linear-gradient(90deg,#ff3c8e,#d42070)';text.textContent='Needs attention';setCreatureState('sad');}
+}
+
 const spriteMap={ idle:'./idle.png', happy:'./happy.png', sad:'./sad.png', sleep:'./sleep.png', study:'./study.png', read:'./read.png', celebrate:'./celebrate.png' };
 function setCreatureState(state){ const el=document.getElementById('sprite-img');if(!el)return; el.src=spriteMap[state]||spriteMap.idle; }
 
@@ -573,25 +555,21 @@ document.getElementById('creature-sprite').addEventListener('click', function(e)
   setTimeout(() => { this.classList.remove('animate-bounce'); if(img.src.includes('happy.png')) img.src = prevSrc; isBouncing = false; }, 400);
 });
 
-const speeches={ greeting:{en:"Hello! Let's study today!",jp:"こんにちは！今日も勉強しよう！",es:"¡Hola! ¡Estudiemos hoy!"}, bothDone:{en:"Amazing work today!",jp:"今日はすごい！",es:"¡Increíble hoy!"}, flashDone:{en:"Great flashcards! Now read!",jp:"次は読書だよ！",es:"¡Bien! ¡Ahora a leer!"}, readDone:{en:"Nice reading!",jp:"読書お疲れ！",es:"¡Buena lectura!"}, streakHigh:{en:"🔥 Incredible streak!",jp:"🔥 すごい連続記録！",es:"🔥 ¡Racha increíble!"}, newWord:{en:"New word learned!",jp:"新しい単語を覚えた！",es:"¡Nueva palabra!"} };
-function setSpeech(k){const s=speeches[k];if(!s)return;document.getElementById('speech-en').textContent=s.en;document.getElementById('speech-jp').textContent=s.jp;document.getElementById('speech-es').textContent=s.es;}
+document.getElementById('pw-input').addEventListener('keydown',function(e){
+  if(e.key==='Enter'){
+    if(btoa(this.value.toLowerCase().trim()) === 'Y2FrZQ=='){
+      document.getElementById('password-screen').style.display='none'; document.getElementById('app').style.display='block'; initApp(); setTimeout(drawNumogramLines, 100);
+    }else{ document.getElementById('pw-error').textContent='Wrong password... try again!'; this.value=''; }
+  }
+});
 
-function updateMood(){
-  const today=data.days[todayStr()]||{};let mood=30; if(today.flash>0)mood+=30;if(today.read>0)mood+=30;if(data.streak>=3)mood+=10; mood=Math.min(100,mood);
-  const fill=document.getElementById('mood-fill'),text=document.getElementById('mood-text'); fill.style.width=mood+'%';
-  if(mood>=90){fill.style.background='linear-gradient(90deg,#7ec832,#a8e84c)';text.textContent='Ecstatic!';setCreatureState('happy');}
-  else if(mood>=60){fill.style.background='linear-gradient(90deg,#ffcc00,#ff8a00)';text.textContent='Happy';setCreatureState('idle');}
-  else if(mood>=40){fill.style.background='linear-gradient(90deg,#ff8a00,#e06500)';text.textContent='Neutral';setCreatureState('idle');}
-  else{fill.style.background='linear-gradient(90deg,#ff3c8e,#d42070)';text.textContent='Needs attention';setCreatureState('sad');}
-}
-
-// ===== LOGGING TASKS =====
-function calcStreak() {
-  const sortedDays=Object.keys(data.days).sort().reverse(); if(!sortedDays.length){data.streak=0;return;}
-  let streak=0, cd=new Date(); if(!data.days[todayStr()])cd.setDate(cd.getDate()-1);
-  while(true){ const ds=cd.getFullYear()+'-'+String(cd.getMonth()+1).padStart(2,'0')+'-'+String(cd.getDate()).padStart(2,'0'); const day=data.days[ds]; if(day&&(day.flash>0||day.read>0)){streak++;cd.setDate(cd.getDate()-1);}else break; }
-  data.streak=streak;
-}
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active'); document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'numogram') setTimeout(drawNumogramLines, 50);
+  });
+});
 
 function logFlashcards(){
   const val=parseInt(document.getElementById('flash-minutes').value);if(!val||val<=0)return;
@@ -600,7 +578,6 @@ function logFlashcards(){
   document.getElementById('card-flash').classList.add('done'); setCreatureState('study');
   const readDone=(data.days[today].read||0)>0;setSpeech(readDone?'bothDone':'flashDone'); calcStreak();saveData();updateStats();updateMood(); if(readDone)setTimeout(()=>setCreatureState('celebrate'),300);
 }
-
 function logReading(){
   const val=parseFloat(document.getElementById('read-hours').value);if(!val||val<=0)return;
   const today=todayStr();if(!data.days[today])data.days[today]={flash:0,read:0}; data.days[today].read+=val;
@@ -609,7 +586,6 @@ function logReading(){
   const flashDone=(data.days[today].flash||0)>0;setSpeech(flashDone?'bothDone':'readDone'); calcStreak();saveData();updateStats();updateMood(); if(flashDone)setTimeout(()=>setCreatureState('celebrate'),300);
 }
 
-// ===== DICTIONARY =====
 function addWord(){
   const en=document.getElementById('dict-en').value.trim(),jp=document.getElementById('dict-jp').value.trim(),es=document.getElementById('dict-es').value.trim(); if(!en&&!jp&&!es)return;
   data.dictionary.push({en:en||'—',jp:jp||'—',es:es||'—',addedDate:todayStr()});
@@ -626,6 +602,19 @@ function renderDictionary(){
   document.getElementById('dict-count').textContent=data.dictionary.length+' words'; document.getElementById('dict-tab-count').textContent='('+data.dictionary.length+')';
 }
 
+function renderHistory(){
+  const grid=document.getElementById('history-grid');grid.innerHTML=''; const sortedDays=Object.keys(data.days).sort().reverse();
+  if(!sortedDays.length){grid.innerHTML='<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px">No study days yet!</p>';return;}
+  sortedDays.forEach(day=>{const d=data.days[day];const row=document.createElement('div');row.className='history-day'; row.innerHTML=`<span class="day-date">${formatDate(day)}</span><span class="day-stat">📇 ${d.flash||0} min</span><span class="day-stat">📚 ${d.read||0} hrs</span><span class="day-streak">${(d.flash>0||d.read>0)?'✓':'—'}</span>`; grid.appendChild(row);});
+}
+
+function updateStats(){
+  let tf=0,tr=0;Object.values(data.days).forEach(d=>{tf+=d.flash||0;tr+=d.read||0;});
+  document.getElementById('stat-total-flash').textContent=tf; document.getElementById('stat-total-read').textContent=tr;
+  document.getElementById('stat-words').textContent=data.dictionary.length; document.getElementById('stat-days').textContent=Object.keys(data.days).length;
+  document.getElementById('streak-badge').textContent='🔥 '+data.streak+' day streak'; renderHistory();
+}
+
 // ===== DIARY =====
 function addDiaryEntry() { const text = document.getElementById('diary-input').value.trim(); if(!text) return; data.diary.push({ date: formatDateTime(new Date()), text: text }); document.getElementById('diary-input').value = ''; saveData(); renderDiary(); }
 function deleteDiaryEntry(i) { data.diary.splice(i, 1); saveData(); renderDiary(); }
@@ -633,19 +622,6 @@ function renderDiary() {
   const list = document.getElementById('diary-list'); list.innerHTML = '';
   if(!data.diary.length) return list.innerHTML = '<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px">No diary entries yet.</p>';
   data.diary.slice().reverse().forEach(entry => { const realIndex = data.diary.lastIndexOf(entry); const row = document.createElement('div'); row.className = 'diary-entry'; row.innerHTML = `<div class="diary-entry-date">${escHtml(entry.date)}</div><div class="diary-entry-text">${escHtml(entry.text)}</div><button class="diary-del-btn" onclick="deleteDiaryEntry(${realIndex})">×</button>`; list.appendChild(row); });
-}
-
-// ===== HISTORY & STATS =====
-function renderHistory(){
-  const grid=document.getElementById('history-grid');grid.innerHTML=''; const sortedDays=Object.keys(data.days).sort().reverse();
-  if(!sortedDays.length){grid.innerHTML='<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px">No study days yet!</p>';return;}
-  sortedDays.forEach(day=>{const d=data.days[day];const row=document.createElement('div');row.className='history-day'; row.innerHTML=`<span class="day-date">${formatDate(day)}</span><span class="day-stat">📇 ${d.flash||0} min</span><span class="day-stat">📚 ${d.read||0} hrs</span><span class="day-streak">${(d.flash>0||d.read>0)?'✓':'—'}</span>`; grid.appendChild(row);});
-}
-function updateStats(){
-  let tf=0,tr=0;Object.values(data.days).forEach(d=>{tf+=d.flash||0;tr+=d.read||0;});
-  document.getElementById('stat-total-flash').textContent=tf; document.getElementById('stat-total-read').textContent=tr;
-  document.getElementById('stat-words').textContent=data.dictionary.length; document.getElementById('stat-days').textContent=Object.keys(data.days).length;
-  document.getElementById('streak-badge').textContent='🔥 '+data.streak+' day streak'; renderHistory();
 }
 
 // ===== RANDOM PHRASES =====
@@ -657,123 +633,40 @@ function showRandomPhrase() {
 }
 function startPhraseCycle() { showRandomPhrase(); setInterval(showRandomPhrase, 8000); }
 
-// ===== NES PASSWORD =====
-function generatePassword() { document.getElementById('nes-password-box').value = btoa(encodeURIComponent(JSON.stringify(data))).match(/.{1,8}/g).join('-'); }
-function loadPassword() {
-  const input = document.getElementById('nes-password-box').value.trim(); if (!input) return alert("ENTER PASSWORD.");
-  try {
-    let imported = JSON.parse(decodeURIComponent(atob(input.replace(/[-\s]/g, ''))));
-    if (imported.days && imported.dictionary) { if (!imported.diary) imported.diary = []; data = imported; saveData(); initApp(); alert("RESTORED!"); document.getElementById('nes-password-box').value = ''; } else alert("INVALID DATA.");
-  } catch (err) { alert("INVALID FORMAT."); }
-}
-function copyPassword() { const pwBox = document.getElementById('nes-password-box'); if (!pwBox.value) return; pwBox.select(); document.execCommand('copy'); alert("COPIED!"); }
-
-// ===== INIT =====
 function initApp(){
   document.getElementById('date-display').textContent=formatDate(todayStr()); calcStreak();
   const td=data.days[todayStr()]; if(td){ if(td.flash>0){document.getElementById('flash-input-area').style.display='none';document.getElementById('flash-done').style.display='block';document.getElementById('flash-done-text').textContent=td.flash+' min today!';document.getElementById('card-flash').classList.add('done');} if(td.read>0){document.getElementById('read-input-area').style.display='none';document.getElementById('read-done').style.display='block';document.getElementById('read-done-text').textContent=td.read+' hrs today!';document.getElementById('card-read').classList.add('done');} if(td.flash>0&&td.read>0)setSpeech('bothDone');else if(td.flash>0)setSpeech('flashDone');else if(td.read>0)setSpeech('readDone');else setSpeech('greeting'); }else setSpeech('greeting');
   if(data.streak>=5)setSpeech('streakHigh'); renderDictionary(); renderDiary(); updateStats(); updateMood(); saveData(); startPhraseCycle();
 }
 
-// ==== PRECISION BEZIER MAPPING FOR PANDEMONIUM MATRIX ====
-function selectZone(zoneNum) { 
-  document.querySelectorAll('.numo-node').forEach(n => n.classList.remove('active')); 
-  document.getElementById('btn-zone-' + zoneNum).classList.add('active'); 
-  document.getElementById('numo-display').innerHTML = document.getElementById('data-zone-' + zoneNum).innerHTML; 
-}
+// ===== NUMOGRAM =====
+function selectZone(zoneNum) { document.querySelectorAll('.numo-node').forEach(n => n.classList.remove('active')); const btn = document.getElementById('btn-zone-' + zoneNum); if(btn) btn.classList.add('active'); document.getElementById('numo-display').innerHTML = document.getElementById('data-zone-' + zoneNum).innerHTML; }
 
 const numogramPaths = [
-  // Syzygies (Cyan dashed)
-  { from: 3, to: 6, cls: 'cyan-dash' },
-  { from: 5, to: 4, cls: 'cyan-dash' },
-  { from: 2, to: 7, cls: 'cyan-dash' },
-  { from: 1, to: 8, cls: 'cyan-dash' },
-  { from: 9, to: 0, cls: 'cyan-dash' },
-
-  // Channels & Gates (Red solid) with exact Bezier control point offsets (cpx, cpy relative to midpoint)
-  { from: 5, to: 6, cls: 'red-solid', gate: '15', cpx: -40, cpy: -180 }, // Sweeping hyper-curve over the top
-  { from: 3, to: 6, cls: 'red-solid', gate: '6', cpx: 0, cpy: -50 },     // Top of infinity loop
-  { from: 6, to: 3, cls: 'red-solid', gate: '21', cpx: 0, cpy: 50 },     // Bottom of infinity loop
-  { from: 2, to: 3, cls: 'red-solid', gate: '3', cpx: 20, cpy: 40 },     // Curve connecting 2 up to 3
-  
-  // Straight Lines
-  { from: 4, to: 1, cls: 'red-solid', gate: '10' },
-  { from: 7, to: 1, cls: 'red-solid', gate: '28' },
-  { from: 8, to: 9, cls: 'red-solid', gate: '36' }, 
-  
-  // Autonomous Self-Loops
-  { from: 1, to: 1, cls: 'red-solid', gate: '1', isLoop: true, loopDir: -45, radius: 25 },
-  { from: 9, to: 9, cls: 'red-solid', gate: '45', isLoop: true, loopDir: -135, radius: 20 }
+  { from: 3, to: 6, cls: 'cyan-dash' }, { from: 5, to: 4, cls: 'cyan-dash' }, { from: 2, to: 7, cls: 'cyan-dash' }, { from: 1, to: 8, cls: 'cyan-dash' }, { from: 9, to: 0, cls: 'cyan-dash' },
+  { from: 2, to: 3, cls: 'red-solid', gate: '3' }, { from: 3, to: 6, cls: 'red-solid', gate: '6', curve: -60 }, { from: 6, to: 3, cls: 'red-solid', gate: '21', curve: 60 },
+  { from: 4, to: 1, cls: 'red-solid', gate: '10' }, { from: 5, to: 6, cls: 'red-solid', gate: '15' }, { from: 7, to: 1, cls: 'red-solid', gate: '28' }, { from: 8, to: 9, cls: 'red-solid', gate: '36' }
 ];
 
 function drawNumogramLines() {
-  const svg = document.getElementById('numo-svg'); 
-  if(!svg || document.getElementById('numo-map-container').offsetWidth === 0) return; 
-  svg.innerHTML = ''; 
-  
+  const svg = document.getElementById('numo-svg'); if(!svg || document.getElementById('numo-map-container').offsetWidth === 0) return; svg.innerHTML = ''; 
   function drawGate(x, y, num) {
-    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); 
-    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); 
-    circle.setAttribute('cx', x); circle.setAttribute('cy', y); circle.setAttribute('r', '11'); 
-    circle.setAttribute('fill', '#000'); circle.setAttribute('stroke', '#fff'); circle.setAttribute('stroke-width', '1.5');
-    
-    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text'); 
-    text.setAttribute('x', x); text.setAttribute('y', y + 4); text.setAttribute('fill', '#fff'); 
-    text.setAttribute('font-size', '11px'); text.setAttribute('font-family', 'sans-serif'); 
-    text.setAttribute('font-weight', 'bold'); text.setAttribute('text-anchor', 'middle'); text.textContent = num;
-    
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); circle.setAttribute('cx', x); circle.setAttribute('cy', y); circle.setAttribute('r', '13'); circle.setAttribute('fill', '#000'); circle.setAttribute('stroke', '#d92626'); circle.setAttribute('stroke-width', '2');
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text'); text.setAttribute('x', x); text.setAttribute('y', y + 4); text.setAttribute('fill', '#fff'); text.setAttribute('font-size', '11px'); text.setAttribute('font-family', 'sans-serif'); text.setAttribute('font-weight', '900'); text.setAttribute('text-anchor', 'middle'); text.textContent = num;
     g.appendChild(circle); g.appendChild(text); svg.appendChild(g);
   }
-
   numogramPaths.forEach(path => {
-    const node1 = document.getElementById('btn-zone-' + path.from); 
-    const node2 = document.getElementById('btn-zone-' + path.to);
-    
+    const node1 = document.getElementById('btn-zone-' + path.from); const node2 = document.getElementById('btn-zone-' + path.to);
     if(node1 && node2) {
-      let x1 = node1.offsetLeft + (node1.offsetWidth / 2); 
-      let y1 = node1.offsetTop + (node1.offsetHeight / 2); 
-      let x2 = node2.offsetLeft + (node2.offsetWidth / 2); 
-      let y2 = node2.offsetTop + (node2.offsetHeight / 2);
-
-      if (path.isLoop) {
-        // Draw circular loop returning to the same node
-        const rad = path.loopDir * (Math.PI / 180);
-        const cX1 = x1 + Math.cos(rad - 0.8) * path.radius * 3.5;
-        const cY1 = y1 + Math.sin(rad - 0.8) * path.radius * 3.5;
-        const cX2 = x1 + Math.cos(rad + 0.8) * path.radius * 3.5;
-        const cY2 = y1 + Math.sin(rad + 0.8) * path.radius * 3.5;
-        
-        const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); 
-        p.setAttribute('d', `M ${x1} ${y1} C ${cX1} ${cY1}, ${cX2} ${cY2}, ${x1} ${y1}`); 
-        p.setAttribute('class', `numo-line ${path.cls}`); p.setAttribute('fill', 'none'); svg.appendChild(p);
-        
-        // Gate at the apex of the loop
-        const apexX = x1 + Math.cos(rad) * path.radius * 2.6;
-        const apexY = y1 + Math.sin(rad) * path.radius * 2.6;
-        drawGate(apexX, apexY, path.gate);
-
-      } else if (path.cpx !== undefined && path.cpy !== undefined) {
-        // Explicitly defined Bezier Control Point offsets from midpoint
-        const midX = (x1 + x2) / 2; const midY = (y1 + y2) / 2;
-        const cx = midX + path.cpx; 
-        const cy = midY + path.cpy;
-        
-        const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); 
-        p.setAttribute('d', `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`); 
-        p.setAttribute('class', `numo-line ${path.cls}`); p.setAttribute('fill', 'none'); svg.appendChild(p);
-        
-        // Gate placed at exact midpoint of the curve (t=0.5)
-        if(path.gate) {
-           const curveMidX = 0.25*x1 + 0.5*cx + 0.25*x2;
-           const curveMidY = 0.25*y1 + 0.5*cy + 0.25*y2;
-           drawGate(curveMidX, curveMidY, path.gate);
-        }
+      let x1 = node1.offsetLeft + (node1.offsetWidth / 2); let y1 = node1.offsetTop + (node1.offsetHeight / 2); let x2 = node2.offsetLeft + (node2.offsetWidth / 2); let y2 = node2.offsetTop + (node2.offsetHeight / 2);
+      if (path.curve) {
+          const dx = x2 - x1; const dy = y2 - y1; const len = Math.sqrt(dx*dx + dy*dy); const nx = -dy / len; const ny = dx / len;
+          const cx = (x1 + x2)/2 + nx * path.curve; const cy = (y1 + y2)/2 + ny * path.curve;
+          const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`); p.setAttribute('class', `numo-line ${path.cls}`); p.setAttribute('fill', 'none'); svg.appendChild(p);
+          if(path.gate) drawGate((x1 + 2*cx + x2) / 4, (y1 + 2*cy + y2) / 4, path.gate);
       } else {
-        // Straight line
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line'); 
-        line.setAttribute('x1', x1); line.setAttribute('y1', y1); line.setAttribute('x2', x2); line.setAttribute('y2', y2); 
-        line.setAttribute('class', `numo-line ${path.cls}`); svg.appendChild(line);
-        if(path.gate) drawGate((x1 + x2)/2, (y1 + y2)/2, path.gate);
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line'); line.setAttribute('x1', x1); line.setAttribute('y1', y1); line.setAttribute('x2', x2); line.setAttribute('y2', y2); line.setAttribute('class', `numo-line ${path.cls}`); svg.appendChild(line);
+          if(path.gate) drawGate((x1 + x2)/2, (y1 + y2)/2, path.gate);
       }
     }
   });
@@ -781,9 +674,9 @@ function drawNumogramLines() {
 window.addEventListener('resize', drawNumogramLines);
 
 function calculateNumogram() {
-  const input = document.getElementById('numo-gematria-input').value.trim().toUpperCase(); const display = document.getElementById('numo-result-display'); if (!input) return;
+  const input = document.getElementById('numo-gematria-input').value.trim().toUpperCase(); const display = document.getElementById('numo-result-display'); if (!input) return display.textContent = "Please enter data.";
   let totalSum = 0; for (let i = 0; i < input.length; i++) { const char = input[i]; if (/[A-Z]/.test(char)) totalSum += char.charCodeAt(0) - 64; else if (/[0-9]/.test(char)) totalSum += parseInt(char); }
-  if (totalSum === 0) return;
+  if (totalSum === 0) return display.textContent = "Invalid entry.";
   let digitalRoot = totalSum % 9; if (digitalRoot === 0 && totalSum > 0) digitalRoot = 9;
   display.innerHTML = `Sum: <span style="color:#fff">${totalSum}</span> ➔ Digital Root: <span style="color:#fff; font-size:1.5rem">${digitalRoot}</span>`; selectZone(digitalRoot);
 }
@@ -792,8 +685,17 @@ function findDemon() {
    const z1Str = document.getElementById('demon-z1').value; const z2Str = document.getElementById('demon-z2').value; if(z1Str === "" || z2Str === "") return;
    const z1 = parseInt(z1Str); const z2 = parseInt(z2Str); const max = Math.max(z1, z2); const min = Math.min(z1, z2);
    const warpPlex = [0, 3, 6, 9]; const torque = [1, 2, 4, 5, 7, 8];
-   let classification = (warpPlex.includes(max) && warpPlex.includes(min)) ? "Xenodemon" : (torque.includes(max) && torque.includes(min)) ? "Chronodemon" : "Amphidemon";
-   document.getElementById('demon-result').innerHTML = `<strong>Net-Span [${max}::${min}]</strong><br>Class: <span style="color:#00e5ff">${classification}</span>`;
+   let classification = (warpPlex.includes(max) && warpPlex.includes(min)) ? "Xenodemon (Outside Time)" : (torque.includes(max) && torque.includes(min)) ? "Chronodemon (Chronic Time)" : "Amphidemon (Crossing)";
+   const planets = ["Sol", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"];
+   document.getElementById('demon-result').innerHTML = `<strong>Net-Span [${max}::${min}]</strong><br>Class: <span style="color:#00e5ff">${classification}</span><br>Planetary Bridge: ${planets[max]} ↔ ${planets[min]}`;
+}
+
+const ccruLexicon = [ { term: "Hyperstition", def: "A fictional quantity functional as a time-traveling device." }, { term: "Numogram", def: "The Decimal Labyrinth. A diagram of time-sorcery." } ];
+function searchLexicon() {
+   const q = document.getElementById('lexicon-search').value.toLowerCase(); const resDiv = document.getElementById('lexicon-results'); resDiv.innerHTML = ''; if(!q) return;
+   const matches = ccruLexicon.filter(item => item.term.toLowerCase().includes(q) || item.def.toLowerCase().includes(q));
+   if(matches.length === 0) return resDiv.innerHTML = '<p style="color:rgba(255,255,255,0.5)">No archives found.</p>';
+   matches.forEach(m => { resDiv.innerHTML += `<div style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1)"><strong style="color: #ff3c8e; font-size:0.95rem;">${m.term}</strong><p style="margin-top: 4px;">${m.def}</p></div>`; });
 }
 
 // ===== I-CHING ORACLE =====
@@ -810,12 +712,12 @@ const iChingDatabase = {
   "110111": { num: 10, name: "Lu (Treading)", meaning: "Walking cautiously. Proceed with extreme care and respect for those in power." },
   "111000": { num: 11, name: "Tai (Peace)", meaning: "Harmony and prosperity. A perfect balance of energies bringing success." },
   "000111": { num: 12, name: "Pi (Standstill)", meaning: "Stagnation. Energies are disconnected. Retreat into yourself and wait." },
-  "101111": { num: 13, name: "Tong Ren (Fellowship)", meaning: "Community. Success comes through cooperation and shared goals." },
-  "111101": { num: 14, name: "Da You (Great Possession)", meaning: "Abundance. You have the resources and power; use them generously." },
+  "101111": { num: 13, name: "Tong Ren (Fellowship with Men)", meaning: "Community. Success comes through cooperation and shared goals." },
+  "111101": { num: 14, name: "Da You (Possession in Great Measure)", meaning: "Abundance. You have the resources and power; use them generously." },
   "001000": { num: 15, name: "Qian (Modesty)", meaning: "Humility. Balance is achieved by not boasting or overextending." },
   "000100": { num: 16, name: "Yu (Enthusiasm)", meaning: "Inspiration and movement. Channel your excitement into constructive action." },
   "100110": { num: 17, name: "Sui (Following)", meaning: "Adaptation. True leadership requires knowing when to follow and adapt." },
-  "011001": { num: 18, name: "Gu (Spoiled)", meaning: "Decay. It is time to fix past mistakes and clean out the rot." },
+  "011001": { num: 18, name: "Gu (Work on what has been spoiled)", meaning: "Decay. It is time to fix past mistakes and clean out the rot." },
   "110000": { num: 19, name: "Lin (Approach)", meaning: "Advancement. Spring is coming; take advantage of the favorable timing." },
   "000011": { num: 20, name: "Guan (Contemplation)", meaning: "Observation. Step back and look at the big picture before making a move." },
   "100101": { num: 21, name: "Shi He (Biting Through)", meaning: "Overcoming obstacles. Force may be necessary to remove a blockage." },
@@ -823,15 +725,15 @@ const iChingDatabase = {
   "000001": { num: 23, name: "Bo (Splitting Apart)", meaning: "Deterioration. Things are falling apart. Do not act; wait out the collapse." },
   "100000": { num: 24, name: "Fu (Return)", meaning: "Renewal. A turning point. The darkness has passed, and light is returning." },
   "100111": { num: 25, name: "Wu Wang (Innocence)", meaning: "Natural action. Act without ulterior motives; let things flow organically." },
-  "111001": { num: 26, name: "Da Chu (Taming Power of the Great)", meaning: "Accumulation of energy. Hold your power back until the perfect moment." },
-  "100001": { num: 27, name: "Yi (Nourishment)", meaning: "Nourishment. Pay attention to what you consume, both food and words." },
+  "111001": { num: 26, name: "Da Chu (The Taming Power of the Great)", meaning: "Accumulation of energy. Hold your power back until the perfect moment." },
+  "100001": { num: 27, name: "Yi (The Corners of the Mouth)", meaning: "Nourishment. Pay attention to what you consume, both food and words." },
   "011110": { num: 28, name: "Da Guo (Preponderance of the Great)", meaning: "Overload. The structure is buckling under extreme pressure; act decisively." },
   "010010": { num: 29, name: "Kan (The Abysmal/Water)", meaning: "Danger. You are in deep water. Stay calm, keep moving, and be sincere." },
   "101101": { num: 30, name: "Li (The Clinging/Fire)", meaning: "Clarity and dependence. Fire needs fuel; attach yourself to what is good." },
   "001110": { num: 31, name: "Xian (Influence)", meaning: "Mutual attraction. Open yourself to the influence of others and connect." },
   "011100": { num: 32, name: "Heng (Duration)", meaning: "Consistency. Success comes through steady, unchanging persistence." },
   "001111": { num: 33, name: "Dun (Retreat)", meaning: "Strategic withdrawal. Pull back from a losing battle to preserve your strength." },
-  "111100": { num: 34, name: "Da Zhuang (Power of the Great)", meaning: "Immense power. Use your strength justly and avoid reckless aggression." },
+  "111100": { num: 34, name: "Da Zhuang (The Power of the Great)", meaning: "Immense power. Use your strength justly and avoid reckless aggression." },
   "000101": { num: 35, name: "Jin (Progress)", meaning: "Rapid advancement. The sun is rising; step into the light and succeed." },
   "101000": { num: 36, name: "Ming I (Darkening of the Light)", meaning: "Adversity. Hide your light and lay low while surrounded by darkness." },
   "101011": { num: 37, name: "Jia Ren (The Family)", meaning: "Inner structures. Focus on domestic harmony and the roles within a group." },
@@ -850,12 +752,12 @@ const iChingDatabase = {
   "011101": { num: 50, name: "Ding (The Caldron)", meaning: "Transformation. A spiritual and cultural refinement bringing high success." },
   "100100": { num: 51, name: "Zhen (The Arousing/Thunder)", meaning: "Shock. A sudden, terrifying event that brings necessary awakening." },
   "001001": { num: 52, name: "Gen (Keeping Still/Mountain)", meaning: "Stillness. Stop all movement. Quiet your mind and find inner peace." },
-  "001011": { num: 53, name: "Jian (Gradual Progress)", meaning: "Slow progress. Do not rush; let things unfold at natural pace." },
-  "110100": { num: 54, name: "Gui Mei (The Marrying Maiden)", meaning: "Subordination. You are in a disadvantageous position. Accept limits." },
+  "001011": { num: 53, name: "Jian (Development/Gradual Progress)", meaning: "Slow progress. Do not rush; let things unfold at their natural pace." },
+  "110100": { num: 54, name: "Gui Mei (The Marrying Maiden)", meaning: "Subordination. You are in a disadvantageous position. Accept your limits." },
   "101100": { num: 55, name: "Feng (Abundance)", meaning: "Zenith. Peak prosperity, but recognize that peaks are followed by declines." },
   "001101": { num: 56, name: "Lu (The Wanderer)", meaning: "Travel. You are an outsider. Be cautious, adaptable, and respectful." },
   "011011": { num: 57, name: "Xun (The Gentle/Wind)", meaning: "Penetration. Gentle, persistent effort over time yields massive results." },
-  "110110": { num: 58, name: "Dui (The Joyous/Lake)", meaning: "Joy. True happiness comes through open communication and shared pleasure." },
+  "110110": { num: 58, name: "Dui (The Joyous/Lake)",鲜name: "Dui (The Joyous/Lake)", meaning: "Joy. True happiness comes through open communication and shared pleasure." },
   "010011": { num: 59, name: "Huan (Dispersion)", meaning: "Dissolving. Illusions and blockages are clearing. Let things flow apart naturally." },
   "110010": { num: 60, name: "Jie (Limitation)", meaning: "Boundaries. Set healthy limits and stick to a defined budget or structure." },
   "110011": { num: 61, name: "Zhong Fu (Inner Truth)", meaning: "Sincerity. Profound trust and honesty have the power to influence even the hardest hearts." },
@@ -865,36 +767,85 @@ const iChingDatabase = {
 };
 
 function renderHexagram(containerId, lines) {
-  const container = document.getElementById(containerId); container.innerHTML = '';
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  // lines array is [bottom, 2, 3, 4, 5, top]. Render bottom-up using flex column-reverse in CSS.
   lines.forEach((val) => {
-    const isYang = (val === 7 || val === 9); const isChanging = (val === 6 || val === 9);
-    const div = document.createElement('div'); div.className = `hex-line ${isYang ? 'yang' : 'yin'}`;
-    let innerHTML = isYang ? `<div class="seg"></div>` : `<div class="seg"></div><div class="seg"></div>`;
-    if (isChanging) innerHTML += `<span class="hex-line-marker">${val === 9 ? '(O)' : '(X)'}</span>`;
-    div.innerHTML = innerHTML; container.appendChild(div);
+    const isYang = (val === 7 || val === 9);
+    const isChanging = (val === 6 || val === 9);
+    
+    const div = document.createElement('div');
+    div.className = `hex-line ${isYang ? 'yang' : 'yin'}`;
+    
+    let innerHTML = '';
+    if (isYang) {
+      innerHTML = `<div class="seg"></div>`;
+    } else {
+      innerHTML = `<div class="seg"></div><div class="seg"></div>`;
+    }
+    
+    if (isChanging) {
+      innerHTML += `<span class="hex-line-marker">${val === 9 ? '(O)' : '(X)'}</span>`;
+    }
+    
+    div.innerHTML = innerHTML;
+    container.appendChild(div);
   });
 }
-function getBinaryFromLines(lines) { return lines.map(v => (v === 7 || v === 9) ? '1' : '0').join(''); }
+
+function getBinaryFromLines(lines) {
+  // Convert 6,7,8,9 to 0 (yin) or 1 (yang)
+  // lines[0] is bottom, lines[5] is top.
+  // Standard hexagram binary strings map bottom-to-top as left-to-right.
+  return lines.map(v => (v === 7 || v === 9) ? '1' : '0').join('');
+}
 
 function castOracle() {
   document.getElementById('iching-hex-container').style.display = 'flex';
-  const primaryLines = []; const secondaryLines = []; let hasChanging = false;
-  for(let i = 0; i < 6; i++) {
-    const sum = (Math.random() < 0.5 ? 2 : 3) + (Math.random() < 0.5 ? 2 : 3) + (Math.random() < 0.5 ? 2 : 3);
-    primaryLines.push(sum);
-    if (sum === 6) { hasChanging = true; secondaryLines.push(7); } else if (sum === 9) { hasChanging = true; secondaryLines.push(8); } else { secondaryLines.push(sum); }
-  }
-  renderHexagram('iching-primary-vis', primaryLines);
-  const primaryData = iChingDatabase[getBinaryFromLines(primaryLines)];
-  document.getElementById('iching-primary-result').style.display = 'block';
-  document.getElementById('iching-primary-result').innerHTML = `<h3>Hexagram ${primaryData.num}: ${primaryData.name}</h3><p>${primaryData.meaning}</p>`;
   
-  const secBoxUI = document.getElementById('iching-secondary-box'); const secResultBox = document.getElementById('iching-secondary-result');
+  // Cast 6 lines
+  const primaryLines = [];
+  const secondaryLines = [];
+  let hasChanging = false;
+  
+  for(let i = 0; i < 6; i++) {
+    // Cast 3 coins (heads=3, tails=2)
+    const coin1 = Math.random() < 0.5 ? 2 : 3;
+    const coin2 = Math.random() < 0.5 ? 2 : 3;
+    const coin3 = Math.random() < 0.5 ? 2 : 3;
+    const sum = coin1 + coin2 + coin3;
+    
+    primaryLines.push(sum);
+    
+    if (sum === 6) { hasChanging = true; secondaryLines.push(7); } // Old Yin -> Young Yang
+    else if (sum === 9) { hasChanging = true; secondaryLines.push(8); } // Old Yang -> Young Yin
+    else { secondaryLines.push(sum); } // Static
+  }
+  
+  renderHexagram('iching-primary-vis', primaryLines);
+  const primaryBin = getBinaryFromLines(primaryLines);
+  const primaryData = iChingDatabase[primaryBin];
+  
+  const priBox = document.getElementById('iching-primary-result');
+  priBox.style.display = 'block';
+  priBox.innerHTML = `<h3>Hexagram ${primaryData.num}: ${primaryData.name}</h3><p>${primaryData.meaning}</p>`;
+  
+  const secBoxUI = document.getElementById('iching-secondary-box');
+  const secResultBox = document.getElementById('iching-secondary-result');
+  
   if (hasChanging) {
-    secBoxUI.style.display = 'flex'; renderHexagram('iching-secondary-vis', secondaryLines);
-    const secondaryData = iChingDatabase[getBinaryFromLines(secondaryLines)];
-    secResultBox.style.display = 'block'; secResultBox.innerHTML = `<h3>Changes to Hexagram ${secondaryData.num}: ${secondaryData.name}</h3><p>${secondaryData.meaning}</p>`;
-  } else { secBoxUI.style.display = 'none'; secResultBox.style.display = 'none'; }
+    secBoxUI.style.display = 'flex';
+    renderHexagram('iching-secondary-vis', secondaryLines);
+    
+    const secondaryBin = getBinaryFromLines(secondaryLines);
+    const secondaryData = iChingDatabase[secondaryBin];
+    
+    secResultBox.style.display = 'block';
+    secResultBox.innerHTML = `<h3>Changes to Hexagram ${secondaryData.num}: ${secondaryData.name}</h3><p>${secondaryData.meaning}</p>`;
+  } else {
+    secBoxUI.style.display = 'none';
+    secResultBox.style.display = 'none';
+  }
 }
 </script>
 </body>
