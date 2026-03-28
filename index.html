@@ -461,6 +461,25 @@
   .history-day .day-stat { color: #88ccff; }
   .history-day .day-streak { color: #ffcc00; font-weight: 900; }
 
+  /* ===== DIARY ===== */
+  .diary-section { padding: 22px; }
+  .diary-section h3 { font-family: 'Baloo 2', cursive; font-size: 1.4rem; color: #fff; margin-bottom: 16px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+  .diary-input-area { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+  .diary-textarea { width: 100%; height: 120px; background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.25); color: #fff; border-radius: 16px; padding: 16px; font-family: 'Nunito', sans-serif; font-size: 0.95rem; resize: none; box-shadow: inset 0 2px 8px rgba(0,0,0,0.1); }
+  .diary-textarea:focus { outline: none; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.2); }
+  .diary-textarea::placeholder { color: rgba(255,255,255,0.5); }
+  .diary-controls { display: flex; justify-content: flex-end; }
+  .diary-btn { background: linear-gradient(135deg, #8b5cf6, #6d3fd6); color: #fff; border: none; padding: 10px 24px; border-radius: 14px; cursor: pointer; font-weight: 800; font-family: 'Nunito', sans-serif; box-shadow: 0 4px 12px rgba(139,92,246,0.3); transition: all 0.2s; }
+  .diary-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(139,92,246,0.4); }
+  .diary-list { display: flex; flex-direction: column; gap: 16px; max-height: 500px; overflow-y: auto; padding-right: 8px; }
+  .diary-list::-webkit-scrollbar { width: 6px; }
+  .diary-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+  .diary-entry { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 16px; position: relative; }
+  .diary-entry-date { font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-bottom: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+  .diary-entry-text { font-size: 0.95rem; line-height: 1.6; color: rgba(255,255,255,0.9); white-space: pre-wrap; }
+  .diary-del-btn { position: absolute; top: 12px; right: 16px; background: none; border: none; color: rgba(255,255,255,0.3); cursor: pointer; font-size: 1.2rem; transition: color 0.2s; }
+  .diary-del-btn:hover { color: #ff3c8e; }
+
   /* ===== NES PASSWORD SYSTEM ===== */
   .nes-container { background-color: #000; color: #fff; font-family: 'Press Start 2P', monospace; padding: 20px; border: 4px solid #fff; box-shadow: 4px 4px 0px rgba(0,0,0,0.5), inset -4px -4px 0px #333; margin-top: 24px; text-align: center; }
   .nes-container h3 { color: #e52521; font-size: 0.85rem; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0 #000; }
@@ -547,6 +566,7 @@
   .numo-calc { background: rgba(20, 0, 0, 0.6); border: 2px solid #ff3333; border-radius: 16px; padding: 16px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
   .numo-calc h4 { font-family: 'Baloo 2', cursive; color: #ff3c8e; margin-bottom: 6px; font-size: 1.2rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
   .numo-calc p { font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-bottom: 12px; line-height: 1.4; }
+  .numo-calc-explanation { font-size: 0.7rem; color: #a8e84c; font-style: italic; border-left: 2px solid #a8e84c; padding-left: 8px; margin-bottom: 12px; background: rgba(168,232,76,0.1); padding: 8px; border-radius: 0 8px 8px 0; }
   
   .numo-input-row { display: flex; gap: 10px; margin-bottom: 8px; }
   .numo-input-row input { flex: 1; background: #000; color: #00e5ff; border: 1px solid rgba(255,255,255,0.3); padding: 10px 14px; font-family: 'Press Start 2P', monospace; font-size: 0.7rem; border-radius: 8px; width: 100%; }
@@ -638,6 +658,7 @@
   <div class="tabs">
     <button class="tab-btn active" data-tab="home">🏠 Home</button>
     <button class="tab-btn" data-tab="dictionary">📖 Dictionary <span id="dict-tab-count"></span></button>
+    <button class="tab-btn" data-tab="diary">📓 Diary</button>
     <button class="tab-btn" data-tab="history">📊 History</button>
     <button class="tab-btn" data-tab="calc">🧮 COLcalc</button>
     <button class="tab-btn" data-tab="numogram">🌀 Numogram</button>
@@ -738,6 +759,22 @@
     </div>
   </div>
 
+  <!-- DIARY TAB -->
+  <div class="tab-content" id="tab-diary">
+    <div class="diary-section glass-dark">
+      <h3>📓 Personal Diary</h3>
+      <div class="diary-input-area">
+        <textarea id="diary-input" class="diary-textarea" placeholder="Write your thoughts here..."></textarea>
+        <div class="diary-controls">
+          <button class="diary-btn" onclick="addDiaryEntry()">Save Entry</button>
+        </div>
+      </div>
+      <div class="diary-list" id="diary-list">
+        <!-- Entries will render here -->
+      </div>
+    </div>
+  </div>
+
   <!-- HISTORY TAB -->
   <div class="tab-content" id="tab-history">
     <div class="history-section glass-dark">
@@ -806,6 +843,9 @@
         <div class="numo-calc">
           <h4>Gematria Time-Sorcery</h4>
           <p>Evaluate a concept or year's Digital Root to isolate its ruling Numogram Zone.</p>
+          <div class="numo-calc-explanation">
+            <strong>In CCRU Theory:</strong> This process converts words/dates into base-9 roots. This isolates the specific occult zone that "rules" the concept, tracking its current in reality.
+          </div>
           <div class="numo-input-row">
             <input type="text" id="numo-gematria-input" placeholder="e.g. CYBERNETICS" autocomplete="off">
             <button onclick="calculateNumogram()">EVAL</button>
@@ -817,6 +857,9 @@
         <div class="numo-calc">
           <h4>Net-Span Demon Finder</h4>
           <p>Input two connected Zones to locate the presiding Lemur/Demon.</p>
+          <div class="numo-calc-explanation">
+            <strong>In CCRU Theory:</strong> Lemurs act as traffic controllers between zones. Inputting max/min zones determines if the entity is a Chrono- (internal), Xeno- (external), or Amphi- (crossing) demon.
+          </div>
           <div class="numo-input-row">
             <input type="number" id="demon-z1" min="0" max="9" placeholder="Z1">
             <input type="number" id="demon-z2" min="0" max="9" placeholder="Z2">
@@ -829,6 +872,9 @@
         <div class="numo-calc">
           <h4>CCRU Encyclopedia</h4>
           <p>Search the archive for cybernetic, hyperstitional, and occult terminology.</p>
+          <div class="numo-calc-explanation">
+            <strong>In CCRU Theory:</strong> A decryption tool to navigate the dense synthesis of Deleuzian philosophy, 90s cyber-culture, and abstract demonism.
+          </div>
           <div class="numo-input-row" style="margin-bottom: 0;">
             <input type="text" id="lexicon-search" placeholder="Search archives..." oninput="searchLexicon()">
           </div>
@@ -1070,6 +1116,8 @@
 // ===== UTILS =====
 function todayStr() { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function formatDate(s) { const [y,m,d]=s.split('-'); const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return mo[parseInt(m)-1]+' '+parseInt(d)+', '+y; }
+function formatDateTime(d) { return formatDate(todayStr()) + ' at ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); }
+function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
 // ===== THEME TOGGLE =====
 function updateThemeIcon() {
@@ -1173,12 +1221,17 @@ const starterDeck = [
 
 // ===== DATA STORE =====
 const STORAGE_KEY = 'studyBuddyData';
-function getDefaultData() { return { days: {}, dictionary: [], streak: 0, lastActiveDate: null, starterLoaded: false }; }
+function getDefaultData() { return { days: {}, dictionary: [], diary: [], streak: 0, lastActiveDate: null, starterLoaded: false }; }
 
 function loadData() { 
   try { 
     const r = localStorage.getItem(STORAGE_KEY); 
-    if (r) return JSON.parse(r); 
+    if (r) {
+      let loaded = JSON.parse(r);
+      // Backward compatibility for saves without a diary
+      if (!loaded.diary) loaded.diary = [];
+      return loaded;
+    }
   } catch(e) {} 
   return getDefaultData(); 
 }
@@ -1224,6 +1277,9 @@ function loadPassword() {
     let importedData = JSON.parse(decoded);
     
     if (importedData.days && importedData.dictionary) {
+      // Apply backward compatibility just in case
+      if (!importedData.diary) importedData.diary = [];
+      
       data = importedData;
       saveData();
       initApp();
@@ -1409,8 +1465,6 @@ function addWord(){
 
 function deleteWord(i){data.dictionary.splice(i,1);saveData();renderDictionary();updateStats();}
 
-function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
-
 function renderDictionary(){
   const search=(document.getElementById('dict-search').value||'').toLowerCase();
   const list=document.getElementById('dict-list');list.innerHTML='';
@@ -1443,6 +1497,50 @@ function updateStats(){
   document.getElementById('stat-days').textContent=Object.keys(data.days).length;
   document.getElementById('streak-badge').textContent='🔥 '+data.streak+' day streak';
   renderHistory();
+}
+
+// ===== DIARY LOGIC =====
+function addDiaryEntry() {
+  const inputEl = document.getElementById('diary-input');
+  const text = inputEl.value.trim();
+  if(!text) return;
+  
+  const timestamp = formatDateTime(new Date());
+  
+  data.diary.push({ date: timestamp, text: text });
+  inputEl.value = '';
+  
+  saveData();
+  renderDiary();
+}
+
+function deleteDiaryEntry(i) {
+  data.diary.splice(i, 1);
+  saveData();
+  renderDiary();
+}
+
+function renderDiary() {
+  const list = document.getElementById('diary-list');
+  list.innerHTML = '';
+  
+  if(!data.diary || data.diary.length === 0) {
+    list.innerHTML = '<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px">No diary entries yet. Write your first thought!</p>';
+    return;
+  }
+  
+  // Render newest first
+  data.diary.slice().reverse().forEach(entry => {
+    const realIndex = data.diary.lastIndexOf(entry);
+    const row = document.createElement('div');
+    row.className = 'diary-entry';
+    row.innerHTML = `
+      <div class="diary-entry-date">${escHtml(entry.date)}</div>
+      <div class="diary-entry-text">${escHtml(entry.text)}</div>
+      <button class="diary-del-btn" onclick="deleteDiaryEntry(${realIndex})">×</button>
+    `;
+    list.appendChild(row);
+  });
 }
 
 // ===== RANDOM PHRASES (Bogotá rolo dialect + Japanese) =====
@@ -1516,7 +1614,11 @@ function initApp(){
     if(td.flash>0&&td.read>0)setSpeech('bothDone');else if(td.flash>0)setSpeech('flashDone');else if(td.read>0)setSpeech('readDone');else setSpeech('greeting');
   }else setSpeech('greeting');
   if(data.streak>=5)setSpeech('streakHigh');
-  renderDictionary();updateStats();updateMood();saveData();
+  renderDictionary();
+  renderDiary();
+  updateStats();
+  updateMood();
+  saveData();
   startPhraseCycle();
 }
 
