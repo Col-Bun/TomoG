@@ -22,6 +22,16 @@
     --text: #1a2744;
     --text-light: #fff;
     --shadow: rgba(0,60,120,0.18);
+    
+    /* Metro Theme Variables */
+    --metro-bg1: #ff1e78;
+    --metro-bg2: #ff3c8e;
+  }
+
+  body.dark-mode {
+    --metro-bg1: #121215;
+    --metro-bg2: #1e1e24;
+    --text: #f0f0f0;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -31,6 +41,7 @@
     min-height: 100vh;
     overflow-x: hidden;
     color: var(--text);
+    transition: color 0.3s;
   }
 
   /* ===== FRUTIGER METRO / Y2K VECTOR BACKGROUND ===== */
@@ -38,21 +49,22 @@
     position: fixed;
     inset: 0;
     z-index: -1;
-    /* Punchy Apple/Y2K Hot Pink base */
-    background-color: #ff1e78;
+    background-color: var(--metro-bg1);
     overflow: hidden;
+    transition: background-color 0.4s;
   }
 
-  /* Massive rotating sunburst */
+  /* Static sunburst */
   .metro-sunburst {
     position: absolute;
     top: -50%; left: -50%;
     width: 200%; height: 200%;
     background: repeating-conic-gradient(
-      #ff1e78 0 12deg,
-      #ff3c8e 12deg 24deg
+      var(--metro-bg1) 0 12deg,
+      var(--metro-bg2) 12deg 24deg
     );
-    animation: spin-burst 90s linear infinite;
+    transition: background 0.4s;
+    /* Removed spin animation to prevent nausea */
   }
 
   /* Retro halftone dot overlay */
@@ -62,6 +74,10 @@
     background-image: radial-gradient(rgba(255,255,255,0.2) 2.5px, transparent 2.5px);
     background-size: 20px 20px;
     opacity: 0.8;
+  }
+
+  body.dark-mode .metro-halftone {
+    background-image: radial-gradient(rgba(0,0,0,0.4) 2.5px, transparent 2.5px);
   }
 
   /* Vector graphics layer */
@@ -75,23 +91,7 @@
     height: 100%;
   }
 
-  /* Animations for the Y2K flowers */
-  @keyframes spin-burst {
-    100% { transform: rotate(360deg); }
-  }
-
-  @keyframes spin-flower {
-    100% { transform: rotate(360deg); }
-  }
-
-  @keyframes spin-flower-reverse {
-    100% { transform: rotate(-360deg); }
-  }
-
   .y2k-flower { transform-origin: center; transform-box: fill-box; }
-  .spin-f1 { animation: spin-flower 35s linear infinite; }
-  .spin-f2 { animation: spin-flower-reverse 45s linear infinite; }
-  .spin-f3 { animation: spin-flower 25s linear infinite; }
 
   /* ===== GLASS PANEL STYLE ===== */
   .glass {
@@ -101,6 +101,7 @@
     border: 1.5px solid var(--glass-border);
     border-radius: 24px;
     box-shadow: 0 8px 32px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.25);
+    transition: background 0.4s, border-color 0.4s;
   }
 
   .glass-strong {
@@ -110,6 +111,7 @@
     border: 1.5px solid rgba(255,255,255,0.45);
     border-radius: 24px;
     box-shadow: 0 8px 32px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.4);
+    transition: background 0.4s, border-color 0.4s;
   }
 
   .glass-dark {
@@ -120,7 +122,31 @@
     border-radius: 24px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.2);
     color: #fff;
+    transition: background 0.4s;
   }
+
+  /* Dark Mode Glass Overrides */
+  body.dark-mode .glass {
+    background: rgba(20, 20, 30, 0.45);
+    border-color: rgba(255,255,255,0.1);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  body.dark-mode .glass-strong {
+    background: rgba(20, 20, 30, 0.65);
+    border-color: rgba(255,255,255,0.1);
+  }
+  body.dark-mode .glass-dark {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: rgba(255,255,255,0.1);
+  }
+  body.dark-mode .speech-bubble {
+    background: rgba(30, 30, 40, 0.85);
+    border-color: rgba(255,255,255,0.1);
+  }
+  body.dark-mode .speech-bubble::before {
+    border-bottom-color: rgba(30, 30, 40, 0.85);
+  }
+  body.dark-mode .speech-line { color: #fff; }
 
   /* ===== GLOSSY BUTTON ===== */
   .btn-glossy {
@@ -150,6 +176,16 @@
     background: linear-gradient(180deg, #ff3c8e 0%, #d42070 100%);
     box-shadow: 0 4px 14px rgba(255,60,142,0.35), inset 0 1px 0 rgba(255,255,255,0.35);
   }
+
+  .btn-theme {
+    background: rgba(0,0,0,0.2);
+    box-shadow: none;
+    padding: 6px 14px;
+    font-size: 1rem;
+  }
+  .btn-theme:hover { background: rgba(0,0,0,0.4); box-shadow: none; }
+  body.dark-mode .btn-theme { background: rgba(255,255,255,0.1); }
+  body.dark-mode .btn-theme:hover { background: rgba(255,255,255,0.2); }
 
   /* ===== PASSWORD SCREEN ===== */
   #password-screen {
@@ -230,6 +266,8 @@
     align-items: center;
     margin-bottom: 16px;
     padding: 12px 20px;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
   .top-bar h2 {
@@ -237,6 +275,12 @@
     font-size: 1.6rem;
     color: #fff;
     text-shadow: 0 2px 6px rgba(0,40,100,0.3);
+  }
+
+  .top-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
   .streak-badge {
@@ -255,7 +299,6 @@
   .date-display {
     font-size: 0.8rem;
     color: rgba(255,255,255,0.7);
-    margin-left: 10px;
   }
 
   /* Tabs */
@@ -287,6 +330,9 @@
     box-shadow: 0 4px 16px rgba(0,100,200,0.15);
   }
 
+  body.dark-mode .tab-btn { color: rgba(255,255,255,0.6); }
+  body.dark-mode .tab-btn.active { background: rgba(255,255,255,0.15); color: #fff; }
+
   .tab-btn:hover { background: rgba(255,255,255,0.25); color: #fff; }
 
   .tab-content { display: none; }
@@ -302,7 +348,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 720px; /* Provides room for the 600px image + UI elements */
+    min-height: 720px;
   }
 
   /* Decorative arcs inside creature panel */
@@ -341,7 +387,7 @@
   .creature-sprite img {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* Keeps the 2:3 ratio perfectly */
+    object-fit: contain; 
     filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15));
   }
 
@@ -359,6 +405,7 @@
     text-align: left;
     box-shadow: 0 6px 24px rgba(0,60,120,0.1);
     z-index: 2;
+    transition: background 0.4s, border-color 0.4s;
   }
 
   .speech-bubble::before {
@@ -371,6 +418,7 @@
     border-left: 14px solid transparent;
     border-right: 14px solid transparent;
     border-bottom: 14px solid rgba(255,255,255,0.5);
+    transition: border-color 0.4s;
   }
 
   .speech-line {
@@ -728,7 +776,6 @@
 
   /* ===== RESPONSIVE ===== */
   @media (max-width: 700px) {
-    /* Scale down but keep 2:3 ratio */
     .creature-sprite { width: 280px; height: 420px; }
     .pw-creature { width: 180px; height: 270px; }
     .creature-area { min-height: 520px; }
@@ -740,6 +787,13 @@
 </style>
 </head>
 <body>
+
+<!-- Setup Theme On Load (prevents flash) -->
+<script>
+  if (localStorage.getItem('studyBuddyTheme') === 'dark') {
+    document.body.classList.add('dark-mode');
+  }
+</script>
 
 <!-- Frutiger Metro / FSR Style Background -->
 <div class="metro-bg">
@@ -760,23 +814,23 @@
       <circle cx="1200" cy="750" r="180" fill="none" stroke="#fff" stroke-width="40" stroke-opacity="0.15" />
       <circle cx="1200" cy="750" r="60" fill="#000" fill-opacity="0.1" />
 
-      <!-- Y2K Flat Silhouette Flowers -->
+      <!-- Y2K Flat Silhouette Flowers (Static) -->
       <!-- White Flower Top Left -->
-      <g class="y2k-flower spin-f1" transform="translate(150, 200) scale(1.5)" fill="#fff" fill-opacity="0.3">
+      <g class="y2k-flower" transform="translate(150, 200) scale(1.5)" fill="#fff" fill-opacity="0.3">
         <circle cx="0" cy="-20" r="15"/><circle cx="19" cy="-6" r="15"/><circle cx="12" cy="16" r="15"/><circle cx="-12" cy="16" r="15"/><circle cx="-19" cy="-6" r="15"/>
-        <circle cx="0" cy="0" r="12" fill="#ff1e78" fill-opacity="1"/>
+        <circle cx="0" cy="0" r="12" fill="var(--metro-bg1)" fill-opacity="1"/>
       </g>
 
       <!-- Black Silhouette Flower Right -->
-      <g class="y2k-flower spin-f2" transform="translate(1300, 250) scale(2)" fill="#000" fill-opacity="0.15">
+      <g class="y2k-flower" transform="translate(1300, 250) scale(2)" fill="#000" fill-opacity="0.15">
         <circle cx="0" cy="-20" r="15"/><circle cx="19" cy="-6" r="15"/><circle cx="12" cy="16" r="15"/><circle cx="-12" cy="16" r="15"/><circle cx="-19" cy="-6" r="15"/>
         <circle cx="0" cy="0" r="12" fill="#fff" fill-opacity="0.3"/>
       </g>
 
       <!-- Small White Flower Bottom Left -->
-      <g class="y2k-flower spin-f3" transform="translate(250, 750) scale(1.2)" fill="#fff" fill-opacity="0.4">
+      <g class="y2k-flower" transform="translate(250, 750) scale(1.2)" fill="#fff" fill-opacity="0.4">
         <circle cx="0" cy="-20" r="15"/><circle cx="19" cy="-6" r="15"/><circle cx="12" cy="16" r="15"/><circle cx="-12" cy="16" r="15"/><circle cx="-19" cy="-6" r="15"/>
-        <circle cx="0" cy="0" r="12" fill="#ff1e78" fill-opacity="1"/>
+        <circle cx="0" cy="0" r="12" fill="var(--metro-bg1)" fill-opacity="1"/>
       </g>
 
     </svg>
@@ -786,7 +840,6 @@
 <!-- ===== PASSWORD SCREEN ===== -->
 <div id="password-screen">
   <div class="pw-creature" id="pw-creature">
-    <!-- Updated path for GitHub root directory -->
     <img src="./sleep.png" alt="sleeping">
   </div>
   <h1>Study Buddy<br>is sleeping...</h1>
@@ -799,7 +852,8 @@
 <div id="app">
   <div class="top-bar glass">
     <h2>Study Buddy</h2>
-    <div>
+    <div class="top-controls">
+      <button class="btn-glossy btn-theme" id="theme-btn" onclick="toggleTheme()" title="Toggle Dark Mode">🌙</button>
       <span class="streak-badge" id="streak-badge">🔥 0 day streak</span>
       <span class="date-display" id="date-display"></span>
     </div>
@@ -815,7 +869,6 @@
   <div class="tab-content active" id="tab-home">
     <div class="creature-area glass">
       <div class="creature-sprite" id="creature-sprite">
-        <!-- Updated path for GitHub root directory -->
         <img src="./idle.png" id="sprite-img" alt="creature">
       </div>
       <div class="speech-bubble">
@@ -919,6 +972,21 @@
 </div>
 
 <script>
+// ===== THEME TOGGLE =====
+function updateThemeIcon() {
+  const isDark = document.body.classList.contains('dark-mode');
+  document.getElementById('theme-btn').textContent = isDark ? '☀️' : '🌙';
+}
+// Run once right away
+updateThemeIcon();
+
+function toggleTheme() {
+  document.body.classList.toggle('dark-mode');
+  const isDark = document.body.classList.contains('dark-mode');
+  localStorage.setItem('studyBuddyTheme', isDark ? 'dark' : 'light');
+  updateThemeIcon();
+}
+
 // ===== DATA STORE =====
 const STORAGE_KEY = 'studyBuddyData';
 function getDefaultData() { return { days: {}, dictionary: [], streak: 0, lastActiveDate: null }; }
@@ -967,7 +1035,6 @@ function updateMood(){
   else{fill.style.background='linear-gradient(90deg,#ff3c8e,#d42070)';text.textContent='Needs attention';setCreatureState('sad');}
 }
 
-// Updated Map for GitHub root directory
 const spriteMap={
   idle:'./idle.png',
   happy:'./happy.png',
@@ -1121,7 +1188,6 @@ function showRandomPhrase() {
   const tagEl = document.getElementById('random-lang-tag');
   if (!bubble) return;
 
-  // Pick a random phrase different from last
   let idx;
   do { idx = Math.floor(Math.random() * randomPhrases.length); } while (idx === lastPhraseIndex && randomPhrases.length > 1);
   lastPhraseIndex = idx;
@@ -1136,7 +1202,6 @@ function showRandomPhrase() {
   }, 400);
 }
 
-// Cycle every 8 seconds
 let phraseInterval;
 function startPhraseCycle() {
   showRandomPhrase();
