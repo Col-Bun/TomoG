@@ -306,6 +306,7 @@
     gap: 6px;
     margin-bottom: 16px;
     padding: 0 4px;
+    flex-wrap: wrap;
   }
 
   .tab-btn {
@@ -380,7 +381,7 @@
     align-items: flex-end;
     justify-content: center;
     flex-shrink: 0;
-    cursor: pointer; /* Indicates it's tappable */
+    cursor: pointer;
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -864,6 +865,22 @@
   .random-lang-tag.rolo { background: linear-gradient(135deg, #ff8a00, #e06500); }
   .random-lang-tag.nihongo { background: linear-gradient(135deg, #ff3c8e, #cc2060); }
 
+  /* ===== IFRAME CONTAINER ===== */
+  .iframe-container {
+    width: 100%;
+    height: 75vh;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .iframe-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: transparent;
+  }
+
   /* ===== RESPONSIVE ===== */
   @media (max-width: 700px) {
     .creature-sprite { width: 280px; height: 420px; }
@@ -953,6 +970,7 @@
     <button class="tab-btn active" data-tab="home">🏠 Home</button>
     <button class="tab-btn" data-tab="dictionary">📖 Dictionary <span id="dict-tab-count"></span></button>
     <button class="tab-btn" data-tab="history">📊 History</button>
+    <button class="tab-btn" data-tab="calc">🧮 COLcalc</button>
   </div>
 
   <!-- HOME TAB -->
@@ -1070,6 +1088,15 @@
         <button class="nes-btn" onclick="generatePassword()">GENERATE</button>
         <button class="nes-btn" onclick="loadPassword()">RESTORE</button>
         <button class="nes-btn" onclick="copyPassword()">COPY</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALC TAB -->
+  <div class="tab-content" id="tab-calc">
+    <div class="glass-dark" style="padding: 10px; height: 75vh;">
+      <div class="iframe-container">
+        <iframe src="https://col-bun.github.io/COLcalc.github.io/" title="COLcalc"></iframe>
       </div>
     </div>
   </div>
@@ -1211,20 +1238,17 @@ document.getElementById('creature-sprite').addEventListener('click', function(e)
   
   this.classList.add('animate-bounce');
   
-  // Spawn 3-5 random hearts/sparkles
   const numHearts = Math.floor(Math.random() * 3) + 3;
   for(let i = 0; i < numHearts; i++) {
     const heart = document.createElement('div');
     heart.textContent = ['💖', '✨', '💕', '💗'][Math.floor(Math.random()*4)];
     heart.className = 'heart-particle';
     
-    // Random float trajectory
     const tx = (Math.random() - 0.5) * 120 + 'px';
     const ty = -(Math.random() * 120 + 60) + 'px';
     heart.style.setProperty('--tx', tx);
     heart.style.setProperty('--ty', ty);
     
-    // Start roughly in the middle of the container
     heart.style.left = '45%';
     heart.style.top = '45%';
     
@@ -1235,7 +1259,6 @@ document.getElementById('creature-sprite').addEventListener('click', function(e)
   
   setTimeout(() => {
     this.classList.remove('animate-bounce');
-    // Revert back to what it was, unless something else changed the sprite
     if(img.src.includes('happy.png')) {
        img.src = prevSrc;
     }
@@ -1243,13 +1266,18 @@ document.getElementById('creature-sprite').addEventListener('click', function(e)
   }, 400);
 });
 
-// Password
+// ===== OBFUSCATED PASSWORD CHECK =====
 document.getElementById('pw-input').addEventListener('keydown',function(e){
   if(e.key==='Enter'){
-    if(this.value.toLowerCase().trim()==='cake'){
+    // Uses Base64 encoding to hide the word "cake"
+    // btoa("cake") results in "Y2FrZQ=="
+    if(btoa(this.value.toLowerCase().trim()) === 'Y2FrZQ=='){
       document.getElementById('password-screen').style.display='none';
       document.getElementById('app').style.display='block';initApp();
-    }else{document.getElementById('pw-error').textContent='Wrong password... try again!';this.value='';}
+    }else{
+      document.getElementById('pw-error').textContent='Wrong password... try again!';
+      this.value='';
+    }
   }
 });
 
