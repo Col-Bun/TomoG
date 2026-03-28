@@ -804,8 +804,8 @@
 <!-- ===== PASSWORD SCREEN ===== -->
 <div id="password-screen">
   <div class="pw-creature" id="pw-creature">
-    <!-- Updated path for GitHub relative directory -->
-    <img src="./sprites/sleep.png" alt="sleeping">
+    <!-- Updated path for GitHub root directory -->
+    <img src="./sleep.png" alt="sleeping">
   </div>
   <h1>Study Buddy<br>is sleeping...</h1>
   <p class="pw-hint">whisper the secret word to wake them up</p>
@@ -833,8 +833,8 @@
   <div class="tab-content active" id="tab-home">
     <div class="creature-area glass">
       <div class="creature-sprite" id="creature-sprite">
-        <!-- Updated path for GitHub relative directory -->
-        <img src="./sprites/idle.png" id="sprite-img" alt="creature">
+        <!-- Updated path for GitHub root directory -->
+        <img src="./idle.png" id="sprite-img" alt="creature">
       </div>
       <div class="speech-bubble">
         <div class="speech-line">
@@ -985,15 +985,15 @@ function updateMood(){
   else{fill.style.background='linear-gradient(90deg,#ff3c8e,#d42070)';text.textContent='Needs attention';setCreatureState('sad');}
 }
 
-// Updated Map for GitHub relative directories
+// Updated Map for GitHub root directory
 const spriteMap={
-  idle:'./sprites/idle.png',
-  happy:'./sprites/happy.png',
-  sad:'./sprites/sad.png',
-  sleep:'./sprites/sleep.png',
-  study:'./sprites/study.png',
-  read:'./sprites/read.png',
-  celebrate:'./sprites/celebrate.png'
+  idle:'./idle.png',
+  happy:'./happy.png',
+  sad:'./sad.png',
+  sleep:'./sleep.png',
+  study:'./study.png',
+  read:'./read.png',
+  celebrate:'./celebrate.png'
 };
 
 function setCreatureState(state){
