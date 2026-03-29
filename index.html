@@ -293,6 +293,10 @@
   .iching-result-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 20px; max-width: 600px; width: 100%; margin-top: 20px; display: none; }
   .iching-result-box h3 { color: #ffcc00; font-family: 'Baloo 2', cursive; font-size: 1.4rem; margin-bottom: 8px; }
   .iching-result-box p { font-size: 0.95rem; color: #fff; line-height: 1.6; margin-bottom: 10px; }
+  
+  /* Shared custom scrollbar for inner panels */
+  .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
 
   @media (max-width: 700px) {
     .creature-sprite { width: 280px; height: 420px; }
@@ -671,6 +675,26 @@
         </svg>
       </div>
       <div class="numo-tools-col">
+
+        <!-- HOW TO USE THE NUMOGRAM (NEW BOX) -->
+        <div class="numo-calc" style="border-color: #00e5ff;">
+          <h4 style="color: #00e5ff;">📜 How to Use the Numogram</h4>
+          <div style="max-height: 220px; overflow-y: auto; padding-right: 8px; font-size: 0.8rem; color: rgba(255,255,255,0.85); line-height: 1.5;" class="custom-scrollbar">
+            <p style="margin-bottom: 8px;"><strong>The Decimal Labyrinth</strong> is a map of Lemurian time-sorcery driven by <em>Barkerian Arithmetic</em>.</p>
+            <ul style="margin-left: 16px; margin-bottom: 8px;">
+              <li><strong>Syzygies:</strong> Zones pair up to mutually sum to 9 (e.g., 8+1, 7+2).</li>
+              <li><strong>Currents:</strong> The arithmetic difference of a Syzygy twin directs its flow to a Tractor Zone (e.g., 7 - 2 = 5, producing the Hold current).</li>
+            </ul>
+            <p style="margin-bottom: 8px; color: #ff3c8e;"><strong>Using the Dashboard:</strong></p>
+            <ul style="margin-left: 16px; margin-bottom: 8px;">
+              <li style="margin-bottom: 6px;"><strong>Interactive Map:</strong> Click any numbered Zone (0-9) to reveal its esoteric planetary data below.</li>
+              <li style="margin-bottom: 6px;"><strong>Gematria:</strong> Type a word to find its alphanumeric Digital Root, linking it directly to a specific Zone's energy.</li>
+              <li style="margin-bottom: 6px;"><strong>Demon Finder:</strong> Enter any two Zones (the "Net-Span") to classify the class of entity that bridges those two points in the matrix.</li>
+              <li><strong>Encyclopedia:</strong> Search the comprehensive archives below for any term (like "Tic-Systems" or "A-Death").</li>
+            </ul>
+          </div>
+        </div>
+
         <div class="numo-calc">
           <h4>Gematria Time-Sorcery</h4>
           <div class="numo-calc-explanation"><strong>In CCRU Theory:</strong> Converts words to base-9 roots.</div>
@@ -686,9 +710,9 @@
         <div class="numo-calc">
           <h4>CCRU Encyclopedia</h4>
           <div class="numo-input-row" style="margin-bottom: 0;"><input type="text" id="lexicon-search" placeholder="Search archives..." oninput="searchLexicon()"></div>
-          <div id="lexicon-results" style="max-height: 200px; overflow-y: auto; margin-top: 10px; font-size: 0.8rem;"></div>
+          <div id="lexicon-results" style="max-height: 200px; overflow-y: auto; margin-top: 10px; font-size: 0.8rem;" class="custom-scrollbar"></div>
         </div>
-        <div class="glass-dark numo-info-panel"><div id="numo-display"><h3>The Numogram</h3><p>Click a Zone to reveal its esoteric data.</p></div></div>
+        <div class="glass-dark numo-info-panel custom-scrollbar"><div id="numo-display"><h3>The Numogram</h3><p>Click a Zone to reveal its esoteric data.</p></div></div>
       </div>
     </div>
   </div>
