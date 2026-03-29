@@ -209,11 +209,10 @@
       box-shadow: 0 8px 32px rgba(0,0,0,0.8);
       border: 2px solid rgba(255,50,50,0.3);
       overflow: hidden;
-      aspect-ratio: 1;
       width: 100%;
-      max-height: 800px;
+      /* Removed aspect-ratio to prevent bottom cutoff */
   }
-  .svg-numogram-container svg { width: 100%; height: auto; display: block; }
+  .svg-numogram-container svg { width: 100%; height: auto; display: block; max-height: 95vh; }
 
   /* Numogram 1:1 Specifics */
   .label-region { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 28px; fill: #fff; text-decoration: underline; }
@@ -224,7 +223,13 @@
   .zone-text { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 32px; pointer-events: none; }
   .zone-polarity { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 18px; fill: #fff; pointer-events: none; }
   .gate-text { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; fill: #fff; }
-  .current-path { fill: none; stroke: #ffffff; stroke-width: 25; stroke-linecap: round; opacity: 0.35; stroke-dasharray: 2 6; }
+  
+  /* Stippled / Dotted Lines CSS */
+  .dot-base { fill: none; stroke: #ffffff; stroke-linecap: round; }
+  .dot-wide { stroke-width: 40; stroke-dasharray: 0 25; opacity: 0.15; }
+  .dot-mid  { stroke-width: 20; stroke-dasharray: 0 12; opacity: 0.3; }
+  .dot-core { stroke-width: 6; stroke-dasharray: 0 8; opacity: 0.6; }
+
   .glow { filter: drop-shadow(0 0 10px rgba(255,255,255,0.8)); }
 
   /* Zone Interactivity */
@@ -415,11 +420,12 @@
     </div>
   </div>
 
-  <!-- NUMOGRAM TAB (INTEGRATED ACCURATE SVG) -->
+  <!-- NUMOGRAM TAB (INTEGRATED ACCURATE SVG WITH STIPPLED CURRENTS) -->
   <div class="tab-content" id="tab-numogram">
     <div class="numogram-wrapper">
       <div class="svg-numogram-container">
-        <svg viewBox="0 0 1000 1200" xmlns="http://www.w3.org/2000/svg">
+        <!-- Expanded ViewBox height to 1250 to prevent Zone 0 cutoff -->
+        <svg viewBox="0 0 1000 1250" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <marker id="arrow-white" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
                 <path d="M 0 0 L 10 5 L 0 10 z" fill="#fff" />
@@ -429,18 +435,51 @@
               </marker>
             </defs>
 
-            <!-- STIPPLED CURRENTS -->
-            <path d="M 350 320 Q 280 400 300 480" class="current-path" />
-            <path d="M 300 480 Q 380 550 500 620" class="current-path" />
-            <path d="M 700 480 Q 550 400 350 320" class="current-path" />
-            <path d="M 500 620 Q 620 550 700 480" class="current-path" />
-            <path d="M 700 480 Q 680 380 650 300" class="current-path" />
-            <path d="M 600 150 C 500 200 450 180 400 150" class="current-path" stroke-width="40" opacity="0.25" />
-            <path d="M 500 620 L 500 780" class="current-path" />
-            <path d="M 500 780 L 500 920" class="current-path" />
-            <path d="M 500 920 C 550 980 550 1020 500 1060" class="current-path" />
+            <!-- 1:1 STIPPLED CURRENTS (DOTS) -->
+            <g class="dot-base">
+                <!-- Sink 5 -> 4 -->
+                <path d="M 330 350 Q 280 410 290 440" class="dot-wide"/>
+                <path d="M 330 350 Q 280 410 290 440" class="dot-mid"/>
+                <path d="M 330 350 Q 280 410 290 440" class="dot-core"/>
+                <!-- Sink 4 -> 1 -->
+                <path d="M 320 510 Q 380 570 450 600" class="dot-wide"/>
+                <path d="M 320 510 Q 380 570 450 600" class="dot-mid"/>
+                <path d="M 320 510 Q 380 570 450 600" class="dot-core"/>
 
-            <!-- CURRENT ARROWS -->
+                <!-- Hold 7 -> 5 -->
+                <path d="M 660 470 Q 500 400 390 330" class="dot-wide"/>
+                <path d="M 660 470 Q 500 400 390 330" class="dot-mid"/>
+                <path d="M 660 470 Q 500 400 390 330" class="dot-core"/>
+
+                <!-- Rise 1 -> 7 -->
+                <path d="M 550 600 Q 640 550 670 510" class="dot-wide"/>
+                <path d="M 550 600 Q 640 550 670 510" class="dot-mid"/>
+                <path d="M 550 600 Q 640 550 670 510" class="dot-core"/>
+                <!-- Rise 7 -> 2 -->
+                <path d="M 690 440 Q 690 380 660 330" class="dot-wide"/>
+                <path d="M 690 440 Q 690 380 660 330" class="dot-mid"/>
+                <path d="M 690 440 Q 690 380 660 330" class="dot-core"/>
+
+                <!-- Warp 6 <-> 3 -->
+                <path d="M 430 180 C 500 250 650 220 580 180" class="dot-wide"/>
+                <path d="M 430 180 C 500 250 650 220 580 180" class="dot-mid"/>
+                <path d="M 430 180 C 500 250 650 220 580 180" class="dot-core"/>
+
+                <!-- Plex 1 -> 8 -->
+                <path d="M 500 670 L 500 740" class="dot-wide"/>
+                <path d="M 500 670 L 500 740" class="dot-mid"/>
+                <path d="M 500 670 L 500 740" class="dot-core"/>
+                <!-- Plex 8 -> 9 -->
+                <path d="M 500 820 L 500 880" class="dot-wide"/>
+                <path d="M 500 820 L 500 880" class="dot-mid"/>
+                <path d="M 500 820 L 500 880" class="dot-core"/>
+                <!-- Plex 9 -> 0 -->
+                <path d="M 500 960 Q 550 1010 500 1020" class="dot-wide"/>
+                <path d="M 500 960 Q 550 1010 500 1020" class="dot-mid"/>
+                <path d="M 500 960 Q 550 1010 500 1020" class="dot-core"/>
+            </g>
+
+            <!-- CURRENT ARROWS (Matching B&W) -->
             <polygon points="415,150 385,140 385,160" fill="#fff" />
             <polygon points="585,150 615,140 615,160" fill="#fff" />
             <polygon points="635,300 665,290 665,310" fill="#fff" />
