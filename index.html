@@ -1,984 +1,1016 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moe-Chan Study Buddy</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Baloo+2:wght@600;800&family=Press+Start+2P&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moe-Chan & The Oracle</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Nunito:wght@400;700;900&family=Baloo+2:wght@700;800&family=Press+Start+2P&display=swap');
 
-        :root {
-            --bg-top: #1a0b2e;
-            --bg-bottom: #0d0514;
-            --glass: rgba(30, 15, 50, 0.4);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --shadow: rgba(0, 0, 0, 0.3);
-            --text-main: #e0e0e0;
-            --accent: #ff3c8e;
-            --accent-glow: rgba(255, 60, 142, 0.6);
-        }
+  :root {
+    --sky1: #0099ff; --sky2: #00d4ff; --sky3: #66e0ff;
+    --green1: #7ec832; --green2: #a8e84c;
+    --orange: #ff8a00; --pink: #ff3c8e; --purple: #8b5cf6;
+    --glass: rgba(255,255,255,0.18); --glass2: rgba(255,255,255,0.10);
+    --glass-border: rgba(255,255,255,0.30);
+    --text: #1a2744; --text-light: #fff;
+    --shadow: rgba(0,60,120,0.18);
+    --metro-bg1: #ff1e78; --metro-bg2: #ff3c8e;
+  }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: linear-gradient(135deg, var(--bg-top), var(--bg-bottom)); color: var(--text-main); font-family: 'Nunito', sans-serif; min-height: 100vh; overflow-x: hidden; }
-        
-        /* ===== GLASS PANEL STYLE ===== */
-        .glass { background: var(--glass); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1.5px solid var(--glass-border); border-radius: 24px; box-shadow: 0 8px 32px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.25); transition: background 0.4s, border-color 0.4s; }
-        .glass-strong { background: rgba(255,255,255,0.30); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1.5px solid rgba(255,255,255,0.45); border-radius: 24px; box-shadow: 0 8px 32px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.4); }
-        .glass-dark { background: rgba(0,40,80,0.35); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1.5px solid rgba(255,255,255,0.15); border-radius: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); color: #fff; }
-        
-        body.dark-mode .glass { background: rgba(20, 20, 30, 0.45); border-color: rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05); }
-        body.dark-mode .glass-strong { background: rgba(20, 20, 30, 0.65); border-color: rgba(255,255,255,0.1); }
-        body.dark-mode .glass-dark { background: rgba(0, 0, 0, 0.5); border-color: rgba(255,255,255,0.1); }
+  body.dark-mode {
+    --metro-bg1: #121215; --metro-bg2: #1e1e24; --text: #f0f0f0;
+  }
 
-        /* ===== LOGIN ===== */
-        #password-screen { position: fixed; top:0; left:0; width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; z-index: 1000; }
-        .pw-box { padding: 40px; text-align: center; max-width: 400px; width: 90%; }
-        .pw-box h1 { font-family: 'Press Start 2P', cursive; color: #ff3c8e; font-size: 1.5rem; margin-bottom: 20px; line-height: 1.4; text-shadow: 0 0 10px rgba(255,60,142,0.8); }
-        .pw-input { background: #111; border: 2px solid #ff3c8e; color: #fff; padding: 15px; font-family: 'Press Start 2P', monospace; font-size: 1rem; width: 100%; text-align: center; margin-bottom: 15px; outline: none; border-radius: 12px; }
-        .pw-input:focus { box-shadow: 0 0 15px rgba(255,60,142,0.5); }
-        .pw-error { color: #ffcc00; font-size: 0.85rem; font-weight: 700; min-height: 1.2em; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* ===== MAIN APP ===== */
-        #app { display: none; max-width: 960px; margin: 0 auto; padding: 20px; min-height: 100vh; position: relative; z-index: 1; }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding: 12px 20px; flex-wrap: wrap; gap: 10px; }
-        .top-bar h2 { font-family: 'Baloo 2', cursive; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 6px rgba(0,40,100,0.3); }
-        .top-controls { display: flex; align-items: center; gap: 10px; }
+  body { font-family: 'Nunito', sans-serif; min-height: 100vh; overflow-x: hidden; color: var(--text); transition: color 0.3s; }
 
-        .tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
-        .tabs::-webkit-scrollbar { display: none; }
-        .tab-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px 18px; border-radius: 20px; cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem; white-space: nowrap; transition: all 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .tab-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
-        .tab-btn.active { background: #ff3c8e; border-color: #ff3c8e; box-shadow: 0 4px 15px rgba(255,60,142,0.5); }
-        .tab-content { display: none; animation: fadeIn 0.4s ease; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  /* ===== FRUTIGER METRO / Y2K VECTOR BACKGROUND ===== */
+  .metro-bg { position: fixed; inset: 0; z-index: -1; background-color: var(--metro-bg1); overflow: hidden; transition: background-color 0.4s; }
+  .metro-sunburst { position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: repeating-conic-gradient(var(--metro-bg1) 0 12deg, var(--metro-bg2) 12deg 24deg); transition: background 0.4s; }
+  .metro-halftone { position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.2) 2.5px, transparent 2.5px); background-size: 20px 20px; opacity: 0.8; }
+  body.dark-mode .metro-halftone { background-image: radial-gradient(rgba(0,0,0,0.4) 2.5px, transparent 2.5px); }
+  .metro-vectors { position: absolute; inset: 0; }
+  .metro-vectors svg { width: 100%; height: 100%; }
+  .y2k-flower { transform-origin: center; transform-box: fill-box; }
 
-        /* Layout & Cards */
-        .main-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
-        .creature-area { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; position: relative; min-height: 480px; }
-        .creature-sprite { width: 320px; height: 480px; position: relative; display: flex; align-items: flex-end; justify-content: center; z-index: 2; margin-bottom: 20px;}
-        .pw-creature { width: 220px; height: 330px; object-fit: contain; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.4)); transform-origin: bottom center; transition: transform 0.1s; cursor: pointer; }
-        
-        .tasks-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-        .task-card { padding: 20px; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s; }
-        .task-card h3 { font-family: 'Baloo 2', cursive; font-size: 1.3rem; margin-bottom: 5px; color: #a8e84c; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
-        .task-card.done { background: rgba(168, 232, 76, 0.2); border-color: rgba(168, 232, 76, 0.5); }
-        
-        .stats-strip { display: flex; gap: 12px; margin-bottom: 20px; }
-        .stat-box { flex: 1; padding: 15px; text-align: center; }
-        .stat-box .num { font-size: 1.8rem; font-weight: 900; color: #ffcc00; font-family: 'Baloo 2', cursive; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-        .stat-box .label { font-size: 0.8rem; color: rgba(255,255,255,0.8); text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
+  /* ===== GLASS PANEL STYLE ===== */
+  .glass { background: var(--glass); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1.5px solid var(--glass-border); border-radius: 24px; box-shadow: 0 8px 32px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.25); transition: background 0.4s, border-color 0.4s; }
+  .glass-strong { background: rgba(255,255,255,0.30); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1.5px solid rgba(255,255,255,0.45); border-radius: 24px; box-shadow: 0 8px 32px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.4); }
+  .glass-dark { background: rgba(0,40,80,0.35); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1.5px solid rgba(255,255,255,0.15); border-radius: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); color: #fff; }
+  body.dark-mode .glass { background: rgba(20, 20, 30, 0.45); border-color: rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05); }
+  body.dark-mode .glass-strong { background: rgba(20, 20, 30, 0.65); border-color: rgba(255,255,255,0.1); }
+  body.dark-mode .glass-dark { background: rgba(0, 0, 0, 0.5); border-color: rgba(255,255,255,0.1); }
+  body.dark-mode .speech-bubble { background: rgba(30, 30, 40, 0.85); border-color: rgba(255,255,255,0.1); }
+  body.dark-mode .speech-bubble::before { border-bottom-color: rgba(30, 30, 40, 0.85); }
+  body.dark-mode .speech-line { color: #fff; }
 
-        /* Forms & Buttons */
-        .input-group { display: flex; gap: 10px; }
-        .input-basic { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: #fff; padding: 12px 16px; font-family: 'Nunito', sans-serif; font-size: 1rem; outline: none; transition: border-color 0.3s; }
-        .input-basic:focus { border-color: #00e5ff; background: rgba(0,0,0,0.5); }
-        .btn-glossy { background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%); border: 1px solid rgba(255,255,255,0.4); color: #fff; padding: 12px 24px; border-radius: 12px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .btn-glossy:hover { background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.2) 100%); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
-        .btn-glossy:active { transform: translateY(1px); }
-        .btn-cyan { background: linear-gradient(180deg, #00e5ff 0%, #00b3cc 100%); border-color: #4dffff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
-        .btn-cyan:hover { background: linear-gradient(180deg, #33ebff 0%, #00cce6 100%); }
+  /* ===== GLOSSY BUTTON ===== */
+  .btn-glossy { border: none; padding: 10px 24px; border-radius: 50px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.9rem; cursor: pointer; color: #fff; background: linear-gradient(180deg, #ff8a00 0%, #e06500 100%); box-shadow: 0 4px 14px rgba(255,138,0,0.35), inset 0 1px 0 rgba(255,255,255,0.35); transition: all 0.2s; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+  .btn-glossy:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,138,0,0.4); }
+  .btn-glossy:active { transform: translateY(0); }
+  .btn-green { background: linear-gradient(180deg, #7ec832 0%, #5ea020 100%); box-shadow: 0 4px 14px rgba(126,200,50,0.35), inset 0 1px 0 rgba(255,255,255,0.35); }
+  .btn-pink { background: linear-gradient(180deg, #ff3c8e 0%, #d42070 100%); box-shadow: 0 4px 14px rgba(255,60,142,0.35), inset 0 1px 0 rgba(255,255,255,0.35); }
+  .btn-theme { background: rgba(0,0,0,0.2); box-shadow: none; padding: 6px 14px; font-size: 1rem; cursor: pointer; color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+  .btn-theme:hover { background: rgba(0,0,0,0.4); }
+  body.dark-mode .btn-theme { background: rgba(255,255,255,0.1); }
+  body.dark-mode .btn-theme:hover { background: rgba(255,255,255,0.2); }
 
-        /* General elements */
-        .speech-bubble { background: #fff; color: #000; border-radius: 20px; padding: 16px 24px; position: absolute; top: 10px; right: 20px; max-width: 250px; font-weight: 800; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 10; font-size: 0.95rem; line-height: 1.4; border-bottom-left-radius: 4px; }
-        .nes-container { background: #000; border: 4px solid #fff; padding: 20px; color: #fff; font-family: 'Press Start 2P', monospace; margin-bottom: 20px; }
-        .nes-container h3 { color: #ff3c8e; font-size: 1.2rem; margin-bottom: 15px; }
-        .nes-textarea { width: 100%; height: 120px; background: #111; border: 2px solid #fff; color: #a8e84c; padding: 10px; font-family: 'Press Start 2P', monospace; font-size: 0.8rem; margin-bottom: 15px; outline: none; resize: none; word-break: break-all; }
-        .nes-btn { background: #fff; color: #000; border: 4px solid #fff; padding: 10px 20px; font-family: 'Press Start 2P', monospace; font-size: 0.8rem; cursor: pointer; transition: all 0.1s; }
-        .nes-btn:hover { background: #000; color: #fff; }
+  /* ===== PASSWORD SCREEN ===== */
+  #password-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; gap: 20px; position: relative; z-index: 1; }
+  .pw-creature { width: 200px; height: 300px; display: flex; align-items: flex-end; justify-content: center; filter: drop-shadow(0 12px 24px rgba(0,0,0,0.15)); }
+  .pw-creature img { width: 100%; height: 100%; object-fit: contain; }
+  #password-screen h1 { font-family: 'Baloo 2', cursive; font-size: 2.2rem; color: #fff; text-shadow: 0 2px 8px rgba(0,60,120,0.3); text-align: center; line-height: 1.4; }
+  .pw-hint { font-size: 0.9rem; color: rgba(255,255,255,0.7); }
+  #password-screen input { background: rgba(255,255,255,0.25); backdrop-filter: blur(12px); border: 2px solid rgba(255,255,255,0.4); color: #fff; padding: 14px 24px; border-radius: 50px; font-size: 1.1rem; text-align: center; width: 240px; font-family: 'Nunito', sans-serif; font-weight: 700; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+  #password-screen input::placeholder { color: rgba(255,255,255,0.5); }
+  #password-screen input:focus { outline: none; border-color: #fff; background: rgba(255,255,255,0.35); }
+  .pw-error { color: #ffcc00; font-size: 0.85rem; font-weight: 700; min-height: 1.2em; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
 
-        /* ===== DIARY & DICTIONARY ===== */
-        .diary-section { padding: 20px; }
-        .diary-input-area { margin-bottom: 20px; }
-        .diary-textarea { width: 100%; height: 100px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: #fff; padding: 15px; font-family: 'Nunito', sans-serif; font-size: 1rem; outline: none; resize: vertical; margin-bottom: 10px; transition: border-color 0.3s; }
-        .diary-textarea:focus { border-color: #ff3c8e; background: rgba(0,0,0,0.5); }
-        .diary-list { display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; padding-right: 5px; }
-        .diary-entry { background: rgba(255,255,255,0.05); border-left: 4px solid #ff3c8e; padding: 15px; border-radius: 0 12px 12px 0; position: relative; }
-        .diary-entry-date { font-size: 0.75rem; color: #00e5ff; margin-bottom: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-        .diary-entry-text { font-size: 0.95rem; line-height: 1.5; color: #e0e0e0; white-space: pre-wrap; }
-        .diary-del-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; color: rgba(255,255,255,0.3); font-size: 1.2rem; cursor: pointer; transition: color 0.2s; }
-        .diary-del-btn:hover { color: #ff3333; }
+  /* ===== MAIN APP ===== */
+  #app { display: none; max-width: 900px; margin: 0 auto; padding: 20px; min-height: 100vh; position: relative; z-index: 1; }
+  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding: 12px 20px; flex-wrap: wrap; gap: 10px; }
+  .top-bar h2 { font-family: 'Baloo 2', cursive; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 6px rgba(0,40,100,0.3); }
+  .top-controls { display: flex; align-items: center; gap: 10px; }
+  .streak-badge { display: inline-flex; align-items: center; gap: 4px; background: linear-gradient(135deg, #ff8a00, #ffcc00); color: #7a3800; padding: 6px 14px; border-radius: 50px; font-weight: 900; font-size: 0.8rem; box-shadow: 0 3px 10px rgba(255,138,0,0.3); }
+  .date-display { font-size: 0.8rem; color: rgba(255,255,255,0.7); }
 
-        .dict-add-form { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; margin-bottom: 20px; }
-        .dict-list { max-height: 500px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; }
-        .dict-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; background: rgba(255,255,255,0.05); padding: 12px 16px; border-radius: 12px; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s; }
-        .dict-row:hover { background: rgba(255,255,255,0.1); }
-        .dict-cell { font-size: 0.95rem; color: #fff; }
-        .dict-cell.jp { font-weight: 900; color: #ffcc00; font-size: 1.1rem; }
-        .dict-cell.es { color: #a8e84c; }
-        
-        /* ===== I-CHING ===== */
-        .iching-section { padding: 22px; display: flex; flex-direction: column; align-items: center; }
-        .iching-header { font-family: 'Baloo 2', cursive; font-size: 1.8rem; color: #fff; margin-bottom: 10px; text-shadow: 0 2px 6px rgba(0,0,0,0.3); }
-        .iching-desc { font-size: 0.9rem; color: rgba(255,255,255,0.8); text-align: center; max-width: 600px; margin-bottom: 24px; line-height: 1.5; }
-        .hexagram-container { display: flex; gap: 40px; justify-content: center; margin-bottom: 30px; min-height: 180px; flex-wrap: wrap; }
-        .hexagram-box { display: flex; flex-direction: column; align-items: center; }
-        .hexagram-title { font-weight: 800; color: #a8e84c; margin-bottom: 12px; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
-        .hexagram-visual { display: flex; flex-direction: column-reverse; gap: 8px; }
-        .hex-line { width: 120px; height: 16px; display: flex; justify-content: space-between; align-items: center; position: relative; }
-        .hex-line.yang .seg { width: 100%; height: 100%; background: #fff; border-radius: 4px; box-shadow: 0 0 8px rgba(255,255,255,0.5); }
-        .hex-line.yin .seg { width: 45%; height: 100%; background: #fff; border-radius: 4px; box-shadow: 0 0 8px rgba(255,255,255,0.5); }
-        .hex-line-marker { position: absolute; right: -30px; color: #ff3c8e; font-weight: 900; font-size: 0.8rem; }
-        .iching-result-box { background: rgba(0,0,0,0.4); border-radius: 16px; padding: 20px; max-width: 600px; width: 100%; margin-bottom: 16px; border-left: 4px solid #00e5ff; }
-        .iching-result-box h3 { color: #ffcc00; font-family: 'Baloo 2', cursive; font-size: 1.4rem; margin-bottom: 8px; }
-        .iching-result-box p { font-size: 0.95rem; color: #fff; line-height: 1.6; margin-bottom: 10px; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 16px; padding: 0 4px; flex-wrap: wrap; }
+  .tab-btn { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.85); padding: 10px 20px; border-radius: 16px 16px 4px 4px; cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.85rem; transition: all 0.25s; backdrop-filter: blur(8px); }
+  .tab-btn.active { background: rgba(255,255,255,0.35); border-color: rgba(255,255,255,0.5); color: #fff; box-shadow: 0 4px 16px rgba(0,100,200,0.15); }
+  body.dark-mode .tab-btn { color: rgba(255,255,255,0.6); }
+  body.dark-mode .tab-btn.active { background: rgba(255,255,255,0.15); color: #fff; }
+  .tab-btn:hover { background: rgba(255,255,255,0.25); color: #fff; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
 
-        /* ===== NUMOGRAM SYSTEM ===== */
-        .numogram-wrapper { display: grid; grid-template-columns: 500px 1fr; gap: 20px; align-items: start; }
-        @media (max-width: 900px) { .numogram-wrapper { grid-template-columns: 1fr; } }
-        
-        .numo-map-container { 
-            background: #000; border-radius: 20px; position: relative; 
-            box-shadow: 0 8px 32px rgba(0,0,0,0.6), inset 0 0 40px rgba(0,0,0,0.9); 
-            border: 2px solid rgba(100,100,100,0.3); height: 780px; overflow: hidden; 
-            font-family: 'Nunito', sans-serif;
-            aspect-ratio: 1; /* Keep the SVG square */
-        }
+  /* ===== CREATURE AREA ===== */
+  .creature-area { padding: 28px; text-align: center; margin-bottom: 16px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; min-height: 720px; }
+  .creature-area::before { content: ''; position: absolute; top: -60px; right: -60px; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%); pointer-events: none; }
+  .creature-area::after { content: ''; position: absolute; bottom: -40px; left: -40px; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, rgba(126,200,50,0.1) 0%, transparent 70%); pointer-events: none; }
+  .creature-sprite { width: 400px; height: 600px; margin: 0 auto 20px; position: relative; display: flex; align-items: flex-end; justify-content: center; flex-shrink: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .creature-sprite img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15)); }
+  @keyframes bounce-up { 0% { transform: translateY(0); } 50% { transform: translateY(-30px); } 100% { transform: translateY(0); } }
+  .animate-bounce { animation: bounce-up 0.4s cubic-bezier(0.28, 0.84, 0.42, 1); }
+  .heart-particle { position: absolute; font-size: 2rem; pointer-events: none; animation: float-heart 0.8s ease-out forwards; z-index: 10; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
+  @keyframes float-heart { 0% { transform: translate(0, 0) scale(0.5); opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) scale(1.2); opacity: 0; } }
+  .speech-bubble { background: rgba(255,255,255,0.5); backdrop-filter: blur(16px); border: 1.5px solid rgba(255,255,255,0.6); border-radius: 20px; padding: 18px; margin: 0 auto; width: 100%; max-width: 520px; position: relative; text-align: left; box-shadow: 0 6px 24px rgba(0,60,120,0.1); z-index: 2; transition: background 0.4s, border-color 0.4s; }
+  .speech-bubble::before { content: ''; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); border-left: 14px solid transparent; border-right: 14px solid transparent; border-bottom: 14px solid rgba(255,255,255,0.5); transition: border-color 0.4s; }
+  .speech-line { display: flex; gap: 10px; padding: 5px 0; font-size: 0.9rem; align-items: flex-start; color: var(--text); }
+  .lang-tag { font-size: 0.55rem; font-weight: 900; padding: 3px 8px; border-radius: 50px; min-width: 32px; text-align: center; flex-shrink: 0; margin-top: 3px; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
+  .lang-en { background: linear-gradient(135deg, #0099ff, #0066cc); } .lang-jp { background: linear-gradient(135deg, #ff3c8e, #cc2060); } .lang-es { background: linear-gradient(135deg, #7ec832, #5ea020); }
+  .mood-bar { display: flex; align-items: center; gap: 10px; margin-top: 16px; justify-content: center; z-index: 2; }
+  .mood-label { font-size: 0.75rem; color: rgba(255,255,255,0.7); font-weight: 700; }
+  .mood-track { width: 160px; height: 12px; background: rgba(0,0,0,0.15); border-radius: 50px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+  .mood-fill { height: 100%; border-radius: 50px; transition: width 0.5s, background 0.5s; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.4); }
 
-        .zone-group { cursor: pointer; transition: all 0.3s ease; }
-        .zone-group:hover circle:first-child {
-            fill: #1a1a1a;
-            stroke: #ff3c8e;
-            filter: drop-shadow(0 0 15px rgba(255, 60, 142, 0.8));
-        }
+  .tasks-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  .task-card { padding: 22px; text-align: center; transition: all 0.3s; position: relative; overflow: hidden; }
+  .task-card::before { content: ''; position: absolute; top: -30px; right: -30px; width: 80px; height: 80px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); pointer-events: none; }
+  .task-card.done { border-color: rgba(126,200,50,0.5); background: rgba(126,200,50,0.15); }
+  .task-card h3 { font-family: 'Baloo 2', cursive; font-size: 1.1rem; margin-bottom: 4px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+  .task-card .tri-label { font-size: 0.65rem; color: rgba(255,255,255,0.65); margin-bottom: 14px; }
+  .task-input-row { display: flex; gap: 8px; align-items: center; justify-content: center; }
+  .task-input-row input { background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.3); color: #fff; padding: 10px 12px; border-radius: 14px; width: 80px; text-align: center; font-size: 1rem; font-family: 'Nunito', sans-serif; font-weight: 800; }
+  .task-input-row input::placeholder { color: rgba(255,255,255,0.4); }
+  .task-input-row input:focus { outline: none; border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.3); }
+  .task-input-row span { font-size: 0.8rem; color: rgba(255,255,255,0.7); font-weight: 700; }
+  .log-btn { margin-top: 12px; }
+  .task-done-check { font-size: 1.6rem; margin-top: 8px; }
+  .task-done-text { color: rgba(255,255,255,0.9) !important; }
 
-        .numo-tools-col { display: flex; flex-direction: column; gap: 16px; }
-        .numo-calc { background: rgba(20, 0, 0, 0.6); border: 2px solid #ff3333; border-radius: 16px; padding: 16px; }
-        .numo-calc h4 { font-family: 'Baloo 2', cursive; color: #ff3c8e; margin-bottom: 6px; font-size: 1.2rem; }
-        .numo-input-row { display: flex; gap: 10px; margin-bottom: 8px; }
-        .numo-input-row input { flex: 1; background: #000; color: #00e5ff; border: 1px solid rgba(255,255,255,0.3); padding: 10px; font-family: 'Press Start 2P', monospace; font-size: 0.6rem; border-radius: 8px; }
-        .numo-input-row button { background: #d92626; color: #fff; border: none; font-weight: 800; padding: 0 16px; border-radius: 8px; cursor: pointer; }
-        
-        .numo-info-panel { padding: 20px; max-height: 340px; overflow-y: auto; }
-        .numo-info-panel h3 { color: #ff3c8e; margin-bottom: 12px; font-size: 1.5rem; text-transform: uppercase; }
-        .numo-info-panel h4 { color: #a8e84c; margin-top: 15px; margin-bottom: 8px; font-size: 1.1rem; border-bottom: 1px solid rgba(168,232,76,0.3); padding-bottom: 4px; }
-        .numo-info-panel p { font-size: 0.9rem; color: rgba(255,255,255,0.85); margin-bottom: 10px; line-height: 1.5; }
+  .stats-strip { display: flex; gap: 10px; margin-bottom: 16px; }
+  .stat-box { flex: 1; padding: 14px; text-align: center; position: relative; overflow: hidden; }
+  .stat-box::after { content: ''; position: absolute; top: -20px; right: -20px; width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.08); pointer-events: none; }
+  .stat-box .num { font-family: 'Baloo 2', cursive; font-size: 1.8rem; color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,0.15); line-height: 1; }
+  .stat-box .label { font-size: 0.65rem; color: rgba(255,255,255,0.65); margin-top: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* Scrollbars */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
-    </style>
+  /* ===== DICTIONARY ===== */
+  .dict-section { padding: 22px; }
+  .dict-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+  .dict-header h3 { font-family: 'Baloo 2', cursive; font-size: 1.2rem; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+  .dict-count { font-size: 0.75rem; color: #fff; background: linear-gradient(135deg, var(--purple), #6d3fd6); padding: 4px 12px; border-radius: 50px; font-weight: 800; box-shadow: 0 2px 8px rgba(139,92,246,0.3); }
+  .dict-add-form { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; margin-bottom: 16px; }
+  .dict-add-form input { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.25); color: #fff; padding: 10px 12px; border-radius: 14px; font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700; }
+  .dict-add-form input::placeholder { color: rgba(255,255,255,0.4); }
+  .dict-add-form input:focus { outline: none; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.25); }
+  .add-word-btn { background: linear-gradient(180deg, #7ec832, #5ea020); border: none; color: #fff; padding: 10px 18px; border-radius: 14px; cursor: pointer; font-weight: 900; font-size: 1.2rem; box-shadow: 0 3px 10px rgba(126,200,50,0.3), inset 0 1px 0 rgba(255,255,255,0.3); transition: all 0.2s; }
+  .add-word-btn:hover { transform: translateY(-2px); }
+  .dict-filter { display: flex; gap: 6px; margin-bottom: 14px; }
+  .dict-filter input { flex: 1; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.2); color: #fff; padding: 10px 14px; border-radius: 50px; font-family: 'Nunito', sans-serif; font-weight: 700; }
+  .dict-filter input::placeholder { color: rgba(255,255,255,0.4); }
+  .dict-filter input:focus { outline: none; border-color: rgba(255,255,255,0.4); }
+  .dict-list { max-height: 400px; overflow-y: auto; }
+  .dict-list::-webkit-scrollbar { width: 6px; }
+  .dict-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+  .dict-entry { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); align-items: center; font-size: 0.85rem; font-weight: 700; }
+  .dict-entry:hover { background: rgba(255,255,255,0.05); border-radius: 10px; }
+  .dict-entry .en { color: #88ccff; } .dict-entry .jp { color: #ff88bb; font-family: 'Noto Sans JP', sans-serif; } .dict-entry .es { color: #b8ff8b; }
+  .del-word { background: none; border: none; color: rgba(255,255,255,0.3); cursor: pointer; font-size: 1rem; transition: color 0.2s; }
+  .del-word:hover { color: #ff3c8e; }
+
+  /* ===== DIARY ===== */
+  .diary-section { padding: 22px; }
+  .diary-section h3 { font-family: 'Baloo 2', cursive; font-size: 1.4rem; color: #fff; margin-bottom: 16px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+  .diary-input-area { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+  .diary-textarea { width: 100%; height: 120px; background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.25); color: #fff; border-radius: 16px; padding: 16px; font-family: 'Nunito', sans-serif; font-size: 0.95rem; resize: none; box-shadow: inset 0 2px 8px rgba(0,0,0,0.1); }
+  .diary-textarea:focus { outline: none; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.2); }
+  .diary-textarea::placeholder { color: rgba(255,255,255,0.5); }
+  .diary-controls { display: flex; justify-content: flex-end; }
+  .diary-btn { background: linear-gradient(135deg, #8b5cf6, #6d3fd6); color: #fff; border: none; padding: 10px 24px; border-radius: 14px; cursor: pointer; font-weight: 800; font-family: 'Nunito', sans-serif; box-shadow: 0 4px 12px rgba(139,92,246,0.3); transition: all 0.2s; }
+  .diary-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(139,92,246,0.4); }
+  .diary-list { display: flex; flex-direction: column; gap: 16px; max-height: 500px; overflow-y: auto; padding-right: 8px; }
+  .diary-list::-webkit-scrollbar { width: 6px; } .diary-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+  .diary-entry { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 16px; position: relative; }
+  .diary-entry-date { font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-bottom: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+  .diary-entry-text { font-size: 0.95rem; line-height: 1.6; color: rgba(255,255,255,0.9); white-space: pre-wrap; }
+  .diary-del-btn { position: absolute; top: 12px; right: 16px; background: none; border: none; color: rgba(255,255,255,0.3); cursor: pointer; font-size: 1.2rem; transition: color 0.2s; }
+  .diary-del-btn:hover { color: #ff3c8e; }
+
+  /* ===== HISTORY ===== */
+  .history-section { padding: 22px; }
+  .history-section h3 { font-family: 'Baloo 2', cursive; color: #fff; font-size: 1.2rem; margin-bottom: 16px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+  .history-grid { display: grid; gap: 8px; }
+  .history-day { display: grid; grid-template-columns: 110px 1fr 1fr 60px; gap: 10px; padding: 12px 14px; background: rgba(255,255,255,0.06); border-radius: 14px; font-size: 0.8rem; font-weight: 700; align-items: center; }
+  .history-day .day-date { color: rgba(255,255,255,0.6); }
+  .history-day .day-stat { color: #88ccff; }
+  .history-day .day-streak { color: #ffcc00; font-weight: 900; }
+
+  /* ===== NES PASSWORD SYSTEM ===== */
+  .nes-container { background-color: #000; color: #fff; font-family: 'Press Start 2P', monospace; padding: 20px; border: 4px solid #fff; box-shadow: 4px 4px 0px rgba(0,0,0,0.5), inset -4px -4px 0px #333; margin-top: 24px; text-align: center; }
+  .nes-container h3 { color: #e52521; font-size: 0.85rem; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0 #000; }
+  .nes-container p { font-size: 0.55rem; line-height: 1.6; color: #aaa; margin-bottom: 16px; }
+  .nes-textarea { width: 100%; height: 120px; background: #111; color: #33ff33; border: 2px solid #fff; font-family: 'Press Start 2P', monospace; font-size: 0.65rem; line-height: 1.4; padding: 12px; margin-bottom: 16px; resize: none; word-wrap: break-word; }
+  .nes-textarea:focus { outline: none; border-color: #e52521; background: #222; }
+  .nes-btn { background: #e52521; color: #fff; border: 2px solid #fff; font-family: 'Press Start 2P', monospace; font-size: 0.6rem; padding: 12px 16px; cursor: pointer; text-transform: uppercase; margin: 4px; transition: all 0.1s; }
+  .nes-btn:hover { background: #ff3c8e; }
+  .nes-btn:active { box-shadow: inset 4px 4px 0px rgba(0,0,0,0.5); transform: translateY(2px); }
+
+  /* ===== RANDOM PHRASE BUBBLE ===== */
+  .random-bubble { margin: 18px auto 0; max-width: 420px; padding: 12px 18px; text-align: center; font-size: 0.95rem; font-weight: 700; color: var(--text); position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; transition: opacity 0.4s; z-index: 2; }
+  .random-bubble::before { content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 10px solid rgba(255,255,255,0.30); }
+  .random-lang-tag { font-size: 0.55rem; font-weight: 900; padding: 2px 8px; border-radius: 50px; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
+  .random-lang-tag.rolo { background: linear-gradient(135deg, #ff8a00, #e06500); }
+  .random-lang-tag.nihongo { background: linear-gradient(135deg, #ff3c8e, #cc2060); }
+
+  /* ===== IFRAME CONTAINER ===== */
+  .iframe-container { width: 100%; height: 75vh; border-radius: 16px; overflow: hidden; position: relative; }
+  .iframe-container iframe { width: 100%; height: 100%; border: none; background: transparent; }
+
+  /* ===== NUMOGRAM COMPONENT ===== */
+  .numogram-wrapper { display: grid; grid-template-columns: 1fr 350px; gap: 20px; align-items: start; }
+  @media (max-width: 768px) { .numogram-wrapper { grid-template-columns: 1fr; } }
+  
+  .svg-numogram-container {
+      background: #000;
+      border-radius: 20px;
+      position: relative;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+      border: 2px solid rgba(255,50,50,0.3);
+      overflow: hidden;
+      aspect-ratio: 1;
+      width: 100%;
+      max-height: 800px;
+  }
+
+  .svg-numogram-container svg { width: 100%; height: 100%; display: block; }
+  .zone-group { cursor: pointer; transition: all 0.3s ease; }
+  .zone-group:hover circle:first-child, .zone-group.active circle:first-child {
+      fill: #1a1a1a;
+      stroke: #ff3c8e;
+      filter: drop-shadow(0 0 15px rgba(255, 60, 142, 0.8));
+  }
+
+  .numo-tools-col { display: flex; flex-direction: column; gap: 16px; }
+  .numo-calc { background: rgba(20, 0, 0, 0.6); border: 2px solid #ff3333; border-radius: 16px; padding: 16px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
+  .numo-calc h4 { font-family: 'Baloo 2', cursive; color: #ff3c8e; margin-bottom: 6px; font-size: 1.2rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+  .numo-calc p { font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-bottom: 12px; line-height: 1.4; }
+  .numo-calc-explanation { font-size: 0.7rem; color: #a8e84c; font-style: italic; border-left: 2px solid #a8e84c; padding-left: 8px; margin-bottom: 12px; background: rgba(168,232,76,0.1); padding: 8px; border-radius: 0 8px 8px 0; }
+  .numo-input-row { display: flex; gap: 10px; margin-bottom: 8px; }
+  .numo-input-row input { flex: 1; background: #000; color: #00e5ff; border: 1px solid rgba(255,255,255,0.3); padding: 10px 14px; font-family: 'Press Start 2P', monospace; font-size: 0.7rem; border-radius: 8px; width: 100%; }
+  .numo-input-row input:focus { outline: none; border-color: #00e5ff; box-shadow: 0 0 10px rgba(0,229,255,0.3); }
+  .numo-input-row button { background: #d92626; color: #fff; border: none; font-weight: 800; padding: 0 16px; border-radius: 8px; cursor: pointer; font-family: 'Nunito', sans-serif; transition: background 0.2s; }
+  .numo-input-row button:hover { background: #ff1111; box-shadow: 0 0 10px rgba(255,17,17,0.5); }
+  .numo-info-panel { padding: 20px; max-height: 300px; overflow-y: auto; }
+  .numo-info-panel::-webkit-scrollbar { width: 6px; } .numo-info-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+  .numo-info-panel h3 { font-family: 'Baloo 2', cursive; font-size: 1.6rem; margin-bottom: 10px; color: #ff3c8e; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  .numo-info-panel h4 { margin-top: 16px; margin-bottom: 8px; font-size: 1.1rem; color: #00e5ff; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px; }
+  .numo-info-panel p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 12px; color: rgba(255,255,255,0.9); }
+  .numo-info-panel ul { margin-left: 20px; margin-bottom: 12px; font-size: 0.85rem; color: rgba(255,255,255,0.9); }
+  #numo-data-store { display: none; }
+
+  /* ===== I-CHING ===== */
+  .iching-section { padding: 22px; display: flex; flex-direction: column; align-items: center; }
+  .iching-header { font-family: 'Baloo 2', cursive; font-size: 1.8rem; color: #fff; margin-bottom: 10px; text-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+  .iching-desc { font-size: 0.9rem; color: rgba(255,255,255,0.8); text-align: center; max-width: 600px; margin-bottom: 24px; line-height: 1.5; }
+  .hexagram-container { display: flex; gap: 40px; justify-content: center; margin-bottom: 30px; min-height: 180px; flex-wrap: wrap; }
+  .hexagram-box { display: flex; flex-direction: column; align-items: center; }
+  .hexagram-title { font-weight: 800; color: #a8e84c; margin-bottom: 12px; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
+  .hexagram-visual { display: flex; flex-direction: column-reverse; gap: 8px; } /* column-reverse to build from bottom up */
+  .hex-line { width: 120px; height: 16px; display: flex; justify-content: space-between; align-items: center; }
+  .hex-line.yang .seg { width: 100%; height: 100%; background: #fff; border-radius: 4px; box-shadow: 0 0 8px rgba(255,255,255,0.5); }
+  .hex-line.yin .seg { width: 45%; height: 100%; background: #fff; border-radius: 4px; box-shadow: 0 0 8px rgba(255,255,255,0.5); }
+  .hex-line-marker { position: absolute; margin-left: 130px; font-weight: 900; color: #ff3c8e; font-size: 14px; }
+  .iching-result-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 20px; max-width: 600px; width: 100%; margin-top: 20px; display: none; }
+  .iching-result-box h3 { color: #ffcc00; font-family: 'Baloo 2', cursive; font-size: 1.4rem; margin-bottom: 8px; }
+  .iching-result-box p { font-size: 0.95rem; color: #fff; line-height: 1.6; margin-bottom: 10px; }
+
+  @media (max-width: 700px) {
+    .creature-sprite { width: 280px; height: 420px; }
+    .pw-creature { width: 180px; height: 270px; }
+    .creature-area { min-height: 520px; }
+    .tasks-panel { grid-template-columns: 1fr; }
+    .dict-add-form { grid-template-columns: 1fr; }
+    .stats-strip { flex-wrap: wrap; }
+    .top-bar h2 { font-size: 1.2rem; }
+  }
+</style>
 </head>
 <body>
 
+<script>if (localStorage.getItem('studyBuddyTheme') === 'dark') document.body.classList.add('dark-mode');</script>
+
+<div class="metro-bg">
+  <div class="metro-sunburst"></div><div class="metro-halftone"></div>
+  <div class="metro-vectors">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <path d="M-100 700 Q 400 400, 900 800 T 1600 500 L 1600 1000 L -100 1000 Z" fill="#000" fill-opacity="0.15" />
+      <path d="M-100 750 Q 500 300, 1000 750 T 1600 400 L 1600 1000 L -100 1000 Z" fill="#fff" fill-opacity="0.25" />
+      <rect x="0" y="120" width="100%" height="40" fill="#fff" fill-opacity="0.15" />
+      <rect x="0" y="140" width="100%" height="8" fill="#000" fill-opacity="0.2" />
+      <circle cx="1200" cy="750" r="180" fill="none" stroke="#fff" stroke-width="40" stroke-opacity="0.15" />
+      <circle cx="1200" cy="750" r="60" fill="#000" fill-opacity="0.1" />
+      <g class="y2k-flower" transform="translate(150, 200) scale(1.5)" fill="#fff" fill-opacity="0.3"><circle cx="0" cy="-20" r="15"/><circle cx="19" cy="-6" r="15"/><circle cx="12" cy="16" r="15"/><circle cx="-12" cy="16" r="15"/><circle cx="-19" cy="-6" r="15"/><circle cx="0" cy="0" r="12" fill="var(--metro-bg1)" fill-opacity="1"/></g>
+      <g class="y2k-flower" transform="translate(1300, 250) scale(2)" fill="#000" fill-opacity="0.15"><circle cx="0" cy="-20" r="15"/><circle cx="19" cy="-6" r="15"/><circle cx="12" cy="16" r="15"/><circle cx="-12" cy="16" r="15"/><circle cx="-19" cy="-6" r="15"/><circle cx="0" cy="0" r="12" fill="#fff" fill-opacity="0.3"/></g>
+    </svg>
+  </div>
+</div>
+
 <div id="password-screen">
-    <div class="pw-box glass">
-        <h1>MOE-CHAN<br>SYSTEM</h1>
-        <input type="password" id="pw-input" class="pw-input" placeholder="ENTER PASSKEY" autofocus>
-        <div class="pw-error" id="pw-error"></div>
-        <p style="font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-top: 20px;">[Hint: The cake is a lie]</p>
-    </div>
+  <div class="pw-creature" id="pw-creature"><img src="./sleep.png" alt="sleeping"></div>
+  <h1>Moe-Chan<br>is sleeping...</h1>
+  <p class="pw-hint">whisper the secret word to wake her up</p>
+  <input type="password" id="pw-input" placeholder="• • • •" autofocus>
+  <p class="pw-error" id="pw-error"></p>
 </div>
 
 <div id="app">
-    <div class="top-bar glass">
-        <h2>Moe-Chan</h2>
-        <div class="top-controls">
-            <span id="date-display" style="font-weight: 800; color: #00e5ff; margin-right: 10px;"></span>
-            <div id="streak-badge" style="background: rgba(255,60,142,0.2); color: #ff3c8e; padding: 6px 12px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; border: 1px solid rgba(255,60,142,0.4);">🔥 0</div>
-            <button class="btn-glossy" onclick="toggleTheme()" style="padding: 8px 12px;" id="theme-btn">🌙</button>
-        </div>
+  <div class="top-bar glass">
+    <h2>Moe-Chan</h2>
+    <div class="top-controls">
+      <button class="btn-theme" style="padding: 8px 14px; border-radius: 50px;" id="theme-btn" onclick="toggleTheme()" title="Toggle Dark Mode">🌙</button>
+      <span class="streak-badge" id="streak-badge">🔥 0 day streak</span>
+      <span class="date-display" id="date-display"></span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="home">🏠 Home</button>
+    <button class="tab-btn" data-tab="dictionary">📖 Dictionary <span id="dict-tab-count"></span></button>
+    <button class="tab-btn" data-tab="diary">📓 Diary</button>
+    <button class="tab-btn" data-tab="history">📊 History</button>
+    <button class="tab-btn" data-tab="calc">🧮 COLcalc</button>
+    <button class="tab-btn" data-tab="numogram">🌀 Numogram</button>
+    <button class="tab-btn" data-tab="iching">☯️ I-Ching</button>
+  </div>
+
+  <!-- HOME TAB -->
+  <div class="tab-content active" id="tab-home">
+    <div class="creature-area glass">
+      <div class="creature-sprite" id="creature-sprite"><img src="./idle.png" id="sprite-img" alt="creature"></div>
+      <div class="speech-bubble">
+        <div class="speech-line"><span class="lang-tag lang-en">EN</span><span id="speech-en">Hello! Let's study today!</span></div>
+        <div class="speech-line"><span class="lang-tag lang-jp">JP</span><span id="speech-jp" style="font-family:'Noto Sans JP',sans-serif">こんにちは！今日も勉強しよう！</span></div>
+        <div class="speech-line"><span class="lang-tag lang-es">ES</span><span id="speech-es">¡Hola! ¡Estudiemos hoy!</span></div>
+      </div>
+      <div class="mood-bar">
+        <span class="mood-label">Mood:</span>
+        <div class="mood-track"><div class="mood-fill" id="mood-fill" style="width:50%;background:linear-gradient(90deg,#ffcc00,#ff8a00)"></div></div>
+        <span class="mood-label" id="mood-text">Neutral</span>
+      </div>
+      <div class="random-bubble glass-strong" id="random-bubble"><span id="random-phrase"></span><span class="random-lang-tag" id="random-lang-tag"></span></div>
     </div>
 
-    <div class="tabs">
-        <button class="tab-btn active" data-tab="home" onclick="switchTab('home')">🏠 Home</button>
-        <button class="tab-btn" data-tab="dictionary" onclick="switchTab('dictionary')">📖 Dict <span id="dict-tab-count"></span></button>
-        <button class="tab-btn" data-tab="diary" onclick="switchTab('diary')">📓 Diary</button>
-        <button class="tab-btn" data-tab="history" onclick="switchTab('history')">📊 History</button>
-        <button class="tab-btn" data-tab="numogram" onclick="switchTab('numogram')">🌀 Numogram</button>
-        <button class="tab-btn" data-tab="iching" onclick="switchTab('iching')">☯️ I-Ching</button>
+    <div class="tasks-panel">
+      <div class="task-card glass-dark" id="card-flash">
+        <h3>📇 Flashcards</h3>
+        <div class="tri-label">Study flashcards! / フラッシュカード！ / ¡Tarjetas!</div>
+        <div id="flash-input-area"><div class="task-input-row"><input type="number" id="flash-minutes" min="1" max="999" placeholder="0"><span>min</span></div><button class="btn-glossy log-btn" onclick="logFlashcards()">Log Study Time</button></div>
+        <div id="flash-done" style="display:none"><div class="task-done-check">✅</div><p class="task-done-text" style="font-size:0.8rem;margin-top:4px" id="flash-done-text"></p></div>
+      </div>
+      <div class="task-card glass-dark" id="card-read">
+        <h3>📚 Reading</h3>
+        <div class="tri-label">Reading time! / 読書タイム！ / ¡Hora de leer!</div>
+        <div id="read-input-area"><div class="task-input-row"><input type="number" id="read-hours" min="0.25" max="24" step="0.25" placeholder="0"><span>hrs</span></div><button class="btn-glossy btn-pink log-btn" onclick="logReading()">Log Reading Time</button></div>
+        <div id="read-done" style="display:none"><div class="task-done-check">✅</div><p class="task-done-text" style="font-size:0.8rem;margin-top:4px" id="read-done-text"></p></div>
+      </div>
     </div>
 
-    <div class="tab-content active" id="tab-home">
-        <div class="main-grid">
-            <div class="creature-area glass-strong">
-                <div class="speech-bubble">
-                    <div id="speech-en" style="margin-bottom: 4px;">Hello! Let's study today!</div>
-                    <div id="speech-jp" style="color: #ff3c8e; font-size: 0.85rem; margin-bottom: 2px;">こんにちは！今日も勉強しよう！</div>
-                    <div id="speech-es" style="color: #00b3cc; font-size: 0.85rem;">¡Hola! ¡Estudiemos hoy!</div>
-                </div>
-                <div class="creature-sprite">
-                    <img src="./idle.png" alt="Moe-Chan" class="pw-creature" id="sprite-img" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'300\' viewBox=\'0 0 200 300\'><rect width=\'200\' height=\'300\' fill=\'%23333\' rx=\'20\'/><text x=\'100\' y=\'150\' fill=\'white\' text-anchor=\'middle\' font-family=\'sans-serif\'>[Moe-Chan Sprite]</text></svg>'">
-                </div>
-                <div style="width: 80%; background: rgba(0,0,0,0.5); border-radius: 10px; height: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); position: relative;">
-                    <div id="mood-fill" style="height: 100%; width: 30%; background: linear-gradient(90deg, #ff3c8e, #ffcc00); transition: width 0.5s, background 0.5s;"></div>
-                    <div id="mood-text" style="position: absolute; top: 0; left: 0; width: 100%; text-align: center; font-size: 0.65rem; line-height: 16px; font-weight: 900; color: #fff; text-shadow: 0 1px 2px #000;">Needs attention</div>
-                </div>
-            </div>
-
-            <div class="tasks-panel">
-                <div class="task-card glass-dark" id="card-flash">
-                    <h3>📇 Flashcards</h3>
-                    <div id="flash-input-area" class="input-group">
-                        <input type="number" id="flash-minutes" class="input-basic" placeholder="Minutes..." min="1">
-                        <button class="btn-glossy btn-cyan" onclick="logFlashcards()">LOG</button>
-                    </div>
-                    <div id="flash-done" style="display:none"><div style="font-size: 1.5rem;">✅</div><p style="font-size:0.8rem;margin-top:4px" id="flash-done-text"></p></div>
-                </div>
-                <div class="task-card glass-dark" id="card-read">
-                    <h3>📚 Reading</h3>
-                    <div id="read-input-area" class="input-group">
-                        <input type="number" id="read-hours" class="input-basic" placeholder="Hours..." min="0.1" step="0.1">
-                        <button class="btn-glossy btn-cyan" onclick="logReading()">LOG</button>
-                    </div>
-                    <div id="read-done" style="display:none"><div style="font-size: 1.5rem;">✅</div><p style="font-size:0.8rem;margin-top:4px" id="read-done-text"></p></div>
-                </div>
-            </div>
-
-            <div class="stats-strip">
-                <div class="stat-box glass"><div class="num" id="stat-total-flash">0</div><div class="label">Flashcard Min</div></div>
-                <div class="stat-box glass"><div class="num" id="stat-total-read">0</div><div class="label">Reading Hrs</div></div>
-                <div class="stat-box glass"><div class="num" id="stat-words">0</div><div class="label">Words Saved</div></div>
-                <div class="stat-box glass"><div class="num" id="stat-days">0</div><div class="label">Days Active</div></div>
-            </div>
-        </div>
+    <div class="stats-strip">
+      <div class="stat-box glass"><div class="num" id="stat-total-flash">0</div><div class="label">Flashcard Min</div></div>
+      <div class="stat-box glass"><div class="num" id="stat-total-read">0</div><div class="label">Reading Hrs</div></div>
+      <div class="stat-box glass"><div class="num" id="stat-words">0</div><div class="label">Dict Words</div></div>
+      <div class="stat-box glass"><div class="num" id="stat-days">0</div><div class="label">Days Tracked</div></div>
     </div>
+  </div>
 
-    <div class="tab-content" id="tab-dictionary">
-        <div class="glass-dark" style="padding: 20px;">
-            <h3 style="font-family: 'Baloo 2', cursive; font-size: 1.5rem; margin-bottom: 15px; color: #00e5ff;">Personal Dictionary <span id="dict-count" style="font-size: 0.9rem; color: #fff; font-weight: normal; margin-left: 10px;"></span></h3>
-            <div class="dict-add-form">
-                <input type="text" id="dict-en" class="input-basic" placeholder="English...">
-                <input type="text" id="dict-jp" class="input-basic" placeholder="日本語...">
-                <input type="text" id="dict-es" class="input-basic" placeholder="Español...">
-                <button class="btn-glossy btn-cyan" onclick="addWord()">Add Word</button>
-            </div>
-            <div class="dict-list" id="dict-list"></div>
-        </div>
+  <!-- DICTIONARY TAB -->
+  <div class="tab-content" id="tab-dictionary">
+    <div class="dict-section glass-dark">
+      <div class="dict-header"><h3>📖 My Dictionary</h3><span class="dict-count" id="dict-count">0 words</span></div>
+      <div class="dict-add-form"><input type="text" id="dict-en" placeholder="English"><input type="text" id="dict-jp" placeholder="日本語"><input type="text" id="dict-es" placeholder="Español"><button class="add-word-btn" onclick="addWord()">+</button></div>
+      <div class="dict-filter"><input type="text" id="dict-search" placeholder="🔍 Search words..." oninput="renderDictionary()"></div>
+      <div class="dict-list" id="dict-list"></div>
     </div>
+  </div>
 
-    <div class="tab-content" id="tab-diary">
-        <div class="diary-section glass-dark">
-            <h3 style="font-family: 'Baloo 2', cursive; font-size: 1.5rem; margin-bottom: 15px; color: #a8e84c;">📓 Personal Diary</h3>
-            <div class="diary-input-area">
-                <textarea id="diary-input" class="diary-textarea" placeholder="Write your thoughts here..."></textarea>
-                <button class="btn-glossy btn-cyan" onclick="addDiaryEntry()">Save Entry</button>
-            </div>
-            <div class="diary-list" id="diary-list"></div>
-        </div>
+  <!-- DIARY TAB -->
+  <div class="tab-content" id="tab-diary">
+    <div class="diary-section glass-dark">
+      <h3>📓 Personal Diary</h3>
+      <div class="diary-input-area">
+        <textarea id="diary-input" class="diary-textarea" placeholder="Write your thoughts here..."></textarea>
+        <div class="diary-controls"><button class="diary-btn" onclick="addDiaryEntry()">Save Entry</button></div>
+      </div>
+      <div class="diary-list" id="diary-list"></div>
     </div>
+  </div>
 
-    <div class="tab-content" id="tab-history">
-        <div class="glass-dark" style="padding: 20px; margin-bottom: 20px;">
-            <h3 style="font-family: 'Baloo 2', cursive; font-size: 1.5rem; margin-bottom: 15px;">📊 Study History</h3>
-            <div id="history-grid" style="display: flex; flex-direction: column; gap: 8px;"></div>
-        </div>
-        <div class="nes-container">
-            <h3>PASSWORD SYSTEM</h3>
-            <p style="margin-bottom: 15px; font-size: 0.8rem; line-height: 1.4;">GENERATE A PASSWORD TO BACK UP YOUR PROGRESS, OR PASTE A PASSWORD BELOW TO RESTORE DATA.</p>
-            <textarea id="nes-password-box" class="nes-textarea" placeholder="[ ENTER PASSWORD HERE ]" spellcheck="false"></textarea>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button class="nes-btn" onclick="generatePassword()">GENERATE</button>
-                <button class="nes-btn" onclick="copyPassword()">COPY</button>
-                <button class="nes-btn" onclick="loadPassword()">RESTORE</button>
-            </div>
-        </div>
+  <!-- HISTORY TAB -->
+  <div class="tab-content" id="tab-history">
+    <div class="history-section glass-dark">
+      <h3>📊 Study History</h3>
+      <div class="history-grid" id="history-grid"></div>
     </div>
-
-    <div class="tab-content" id="tab-numogram">
-        <div class="numogram-wrapper">
-            <div class="numo-map-container" id="numo-map-container">
-                <svg viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%; display: block;">
-                    <defs>
-                        <filter id="glow"><feGaussianBlur stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-                        <filter id="grain" x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox">
-                            <feTurbulence type="fractalNoise" baseFrequency="1.5" numOctaves="4" seed="2" result="noise"/>
-                            <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0.6  0 0 0 0 0.6  0 0 0 0 0.6  0 0 0 -2.1 1.5" result="thresh"/>
-                            <feComposite operator="in" in="thresh" in2="SourceGraphic" result="masked"/>
-                        </filter>
-                        <filter id="grainD" x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox">
-                            <feTurbulence type="fractalNoise" baseFrequency="2.0" numOctaves="5" seed="7" result="noise"/>
-                            <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0.7  0 0 0 0 0.7  0 0 0 0 0.7  0 0 0 -1.8 1.4" result="thresh"/>
-                            <feComposite operator="in" in="thresh" in2="SourceGraphic" result="masked"/>
-                        </filter>
-                    </defs>
-
-                    <path d="M 728,415 C 790,320 780,220 680,155 Q 650,130 585,140" stroke="#aaa" stroke-width="55" fill="none" stroke-linecap="round" filter="url(#grain)"/>
-                    <path d="M 728,415 C 790,320 780,220 680,155 Q 650,130 585,140" stroke="#ddd" stroke-width="30" fill="none" stroke-linecap="round" filter="url(#grainD)" opacity="0.5"/>
-                    <path d="M 718,408 Q 580,375 400,408" stroke="#aaa" stroke-width="55" fill="none" stroke-linecap="round" filter="url(#grain)"/>
-                    <path d="M 718,408 Q 580,375 400,408" stroke="#ddd" stroke-width="30" fill="none" stroke-linecap="round" filter="url(#grainD)" opacity="0.5"/>
-                    <path d="M 312,548 Q 390,605 468,648" stroke="#aaa" stroke-width="55" fill="none" stroke-linecap="round" filter="url(#grain)"/>
-                    <path d="M 312,548 Q 390,605 468,648" stroke="#ddd" stroke-width="30" fill="none" stroke-linecap="round" filter="url(#grainD)" opacity="0.5"/>
-                    <path d="M 478,688 L 480,768" stroke="#999" stroke-width="42" fill="none" stroke-linecap="round" filter="url(#grain)"/>
-                    <path d="M 482,812 L 490,868" stroke="#888" stroke-width="36" fill="none" stroke-linecap="round" filter="url(#grain)"/>
-                    <path d="M 490,918 L 486,972" stroke="#777" stroke-width="28" fill="none" stroke-linecap="round" filter="url(#grain)"/>
-
-                    <text x="555" y="368" fill="#fff" font-size="30" font-weight="800" font-family="Nunito,sans-serif" text-anchor="middle">Hold</text>
-                    <text x="378" y="578" fill="#fff" font-size="30" font-weight="800" font-family="Nunito,sans-serif" text-anchor="middle">Sink</text>
-                    <text x="792" y="305" fill="#fff" font-size="30" font-weight="800" font-family="Nunito,sans-serif" text-anchor="middle">Rise</text>
-
-                    <circle cx="500" cy="168" r="125" fill="none" stroke="#fff" stroke-width="2" opacity="0.5"/>
-                    <circle cx="530" cy="152" r="78" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.4"/>
-                    <text x="652" y="155" fill="#fff" font-size="22" font-weight="800" font-family="Nunito,sans-serif">Warp</text>
-                    <text x="652" y="178" fill="#fff" font-size="17" font-family="Nunito,sans-serif">(Current)</text>
-
-                    <circle cx="494" cy="942" r="85" fill="none" stroke="#fff" stroke-width="2" opacity="0.5"/>
-                    <circle cx="487" cy="972" r="48" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.4"/>
-                    <text x="598" y="918" fill="#fff" font-size="22" font-weight="800" font-family="Nunito,sans-serif">Plex</text>
-                    <text x="598" y="940" fill="#fff" font-size="17" font-family="Nunito,sans-serif">(current)</text>
-
-                    <line x1="420" y1="198" x2="522" y2="165" stroke="#fff" stroke-width="2" opacity="0.55"/>
-                    <line x1="558" y1="182" x2="615" y2="300" stroke="#fff" stroke-width="2" opacity="0.55"/>
-                    <line x1="648" y1="335" x2="708" y2="398" stroke="#fff" stroke-width="1.5" opacity="0.45"/>
-                    <line x1="392" y1="445" x2="315" y2="520" stroke="#fff" stroke-width="2" opacity="0.55"/>
-                    <line x1="325" y1="558" x2="455" y2="642" stroke="#fff" stroke-width="1.5" opacity="0.45"/>
-                    <path d="M 738,398 Q 768,270 668,158" stroke="#fff" stroke-width="1.5" fill="none" opacity="0.35"/>
-                    <line x1="478" y1="688" x2="480" y2="765" stroke="#fff" stroke-width="2" opacity="0.55"/>
-                    <line x1="483" y1="815" x2="490" y2="868" stroke="#fff" stroke-width="2" opacity="0.55"/>
-                    <line x1="492" y1="918" x2="488" y2="960" stroke="#fff" stroke-width="2" opacity="0.55"/>
-
-                    <g class="zone-group" onclick="selectZone(3)">
-                        <circle cx="395" cy="198" r="28" fill="#000" stroke="#fff" stroke-width="2.5"/>
-                        <text x="379" y="208" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">3</text>
-                        <text x="410" y="190" fill="#fff" font-size="14" font-weight="700">+</text>
-                        <circle cx="395" cy="220" r="5" fill="none" stroke="#ff8800" stroke-width="1.5"/>
-                        <polygon points="395,230 389,240 401,240" fill="none" stroke="#ff8800" stroke-width="1.5"/>
-                        <text x="338" y="178" fill="#22dd22" font-size="19" font-weight="700" font-style="italic">"zx"</text>
-                    </g>
-                    <g class="zone-group" onclick="selectZone(6)">
-                        <circle cx="550" cy="152" r="30" fill="#000" stroke="#fff" stroke-width="2.5"/>
-                        <text x="534" y="162" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">6</text>
-                        <text x="565" y="145" fill="#fff" font-size="14" font-weight="700">-</text>
-                        <circle cx="550" cy="178" r="5" fill="none" stroke="#ff00ff" stroke-width="1.5"/>
-                        <text x="572" y="205" fill="#cccc00" font-size="19" font-weight="700" font-style="italic">"tch"</text>
-                    </g>
-                    <g class="zone-group" onclick="selectZone(2)">
-                        <circle cx="625" cy="318" r="27" fill="#000" stroke="#fff" stroke-width="2.5"/>
-                        <text x="610" y="327" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">2</text>
-                        <text x="640" y="310" fill="#fff" font-size="14" font-weight="700">-</text>
-                        <circle cx="625" cy="340" r="5" fill="none" stroke="#4488ff" stroke-width="1.5"/>
-                        <text x="652" y="308" fill="#4488ff" font-size="19" font-weight="700" font-style="italic">"dt"</text>
-                    </g>
-                    <g class="zone-group" onclick="selectZone(5)">
-                        <circle cx="390" cy="418" r="27" fill="#000" stroke="#fff" stroke-width="2.5"/>
-                        <text x="375" y="427" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">5</text>
-                        <text x="405" y="410" fill="#fff" font-size="14" font-weight="700">+</text>
-                        <circle cx="390" cy="440" r="5" fill="none" stroke="#cc9900" stroke-width="1.5"/>
-                        <text x="345" y="462" fill="#ccaa00" font-size="19" font-weight="700" font-style="italic">"ktt"</text>
-                    </g>
-                    <g class="zone-group" onclick="selectZone(4)">
-                        <circle cx="300" cy="538" r="27" fill="#000" stroke="#ff2222" stroke-width="2.5"/>
-                        <text x="285" y="547" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">4</text>
-                        <text x="315" y="530" fill="#fff" font-size="14" font-weight="700">-</text>
-                        <circle cx="300" cy="560" r="5" fill="none" stroke="#ff2222" stroke-width="1.5"/>
-                        <text x="245" y="580" fill="#ff3333" font-size="19" font-weight="700" font-style="italic">"skr"</text>
-                    </g>
-                    <g class="zone-group" onclick="selectZone(7)">
-                        <circle cx="728" cy="408" r="27" fill="#000" stroke="#fff" stroke-width="2.5"/>
-                        <text x="713" y="417" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">7</text>
-                        <text x="743" y="400" fill="#fff" font-size="14" font-weight="700">+</text>
-                        <circle cx="728" cy="430" r="5" fill="none" stroke="#4488ff" stroke-width="1.5"/>
-                        <text x="756" y="418" fill="#4488ff" font-size="19" font-weight="700" font-style="italic">"pb"</text>
-                    </g>
-                    <g class="zone-group" onclick="selectZone(1)">
-                        <circle cx="478" cy="652" r="32" fill="#fff" stroke="#fff" stroke-width="3" filter="url(#glow)"/>
-                        <text x="461" y="663" fill="#000" font-size="26" font-weight="900" font-family="Nunito,sans-serif">1</text>
-                        <text x="493" y="645" fill="#000" font-size="15" font-weight="700">+</text>
-                        <circle cx="478" cy="680" r="5" fill="none" stroke="#ff8800" stroke-width="1.5"/>
-                        <polygon points="478,688 472,698 484,698" fill="#fff" stroke="#fff" stroke-width="1"/>
-                        <text x="438" y="718" fill="#cccc00" font-size="19" font-weight="700" font-style="italic">"gl"</text>
-                    </g>
-                    <g class="zone-group" onclick="selectZone(8)">
-                        <circle cx="482" cy="788" r="27" fill="#000" stroke="#fff" stroke-width="2.5"/>
-                        <text x="467" y="797" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">8</text>
-                        <text x="497" y="780" fill="#fff" font-size="14" font-weight="700">-</text>
-                        <polygon points="482,761 476,751 488,751" fill="none" stroke="#fff" stroke-width="1.5"/>
-                        <circle cx="482" cy="810" r="5" fill="none" stroke="#44cc44" stroke-width="1.5"/>
-                        <text x="395" y="783" fill="#44cc44" font-size="19" font-weight="700" font-style="italic">"mnm"</text>
-                    </g>
-                    <g class="zone-group" onclick="selectZone(9)">
-                        <circle cx="492" cy="890" r="27" fill="#000" stroke="#fff" stroke-width="2.5"/>
-                        <text x="477" y="899" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">9</text>
-                        <text x="507" y="882" fill="#fff" font-size="14" font-weight="700">+</text>
-                        <polygon points="492,919 486,929 498,929" fill="#fff" stroke="#fff" stroke-width="1"/>
-                        <circle cx="492" cy="912" r="5" fill="none" stroke="#cccc00" stroke-width="1.5"/>
-                        <text x="520" y="892" fill="#cccc00" font-size="17" font-weight="700" font-style="italic">"tn"</text>
-                    </g>
-                    <g class="zone-group" onclick="selectZone(0)">
-                        <circle cx="486" cy="985" r="27" fill="#000" stroke="#fff" stroke-width="2.5"/>
-                        <text x="471" y="994" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">0</text>
-                        <text x="500" y="978" fill="#fff" font-size="14" font-weight="700">-</text>
-                        <polygon points="486,958 480,948 492,948" fill="none" stroke="#fff" stroke-width="1.5"/>
-                        <circle cx="486" cy="1008" r="5" fill="none" stroke="#44cc44" stroke-width="1.5"/>
-                        <text x="418" y="1038" fill="#44cc44" font-size="17" font-weight="700" font-style="italic">"eiaoung"</text>
-                    </g>
-
-                    <g opacity="0.75" font-family="Nunito,sans-serif" font-weight="700" fill="#fff" font-size="13">
-                        <circle cx="500" cy="46" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="500" y="51" text-anchor="middle">15</text>
-                        <circle cx="555" cy="76" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="555" y="81" text-anchor="middle">6</text>
-                        <circle cx="465" cy="158" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="465" y="163" text-anchor="middle">21</text>
-                        <circle cx="370" cy="252" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="370" y="257" text-anchor="middle">3</text>
-                        <circle cx="498" cy="600" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="498" y="605" text-anchor="middle">1</text>
-                        <circle cx="538" cy="635" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="538" y="640" text-anchor="middle">28</text>
-                        <circle cx="418" cy="668" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="418" y="673" text-anchor="middle">10</text>
-                        <circle cx="508" cy="845" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="508" y="850" text-anchor="middle">36</text>
-                        <circle cx="458" cy="940" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="458" y="945" text-anchor="middle">45</text>
-                    </g>
-                </svg>
-            </div>
-
-            <div class="numo-tools-col">
-                <div class="numo-calc">
-                    <h4>Gematria Time-Sorcery</h4>
-                    <p style="font-size: 0.8rem; color: #a8e84c; font-style: italic; margin-bottom: 10px;">Converts words to base-9 roots.</p>
-                    <div class="numo-input-row">
-                        <input type="text" id="numo-gematria-input" placeholder="e.g. CYBERNETICS">
-                        <button onclick="calculateNumogram()">EVAL</button>
-                    </div>
-                    <div id="numo-result-display" style="font-size: 0.85rem; color: #a8e84c; font-family: 'Baloo 2', cursive;"></div>
-                </div>
-                <div class="numo-calc">
-                    <h4>Net-Span Demon Finder</h4>
-                    <p style="font-size: 0.8rem; color: #a8e84c; font-style: italic; margin-bottom: 10px;">Locates entities bridging zones.</p>
-                    <div class="numo-input-row">
-                        <input type="number" id="demon-z1" min="0" max="9" placeholder="Z1">
-                        <input type="number" id="demon-z2" min="0" max="9" placeholder="Z2">
-                        <button onclick="findDemon()">FIND</button>
-                    </div>
-                    <div id="demon-result" style="font-size: 0.85rem; color: #fff; margin-top: 10px; line-height: 1.4;"></div>
-                </div>
-                <div class="numo-calc">
-                    <h4>CCRU Encyclopedia</h4>
-                    <div class="numo-input-row" style="margin-bottom: 0;">
-                        <input type="text" id="lexicon-search" placeholder="Search archives..." oninput="searchLexicon()">
-                    </div>
-                    <div id="lexicon-results" style="max-height: 150px; overflow-y: auto; margin-top: 10px; font-size: 0.8rem;"></div>
-                </div>
-                <div class="glass-dark numo-info-panel" id="numo-display">
-                    <h3>The Numogram</h3>
-                    <p>Click a Zone on the map to reveal its esoteric data and planetary alignments.</p>
-                </div>
-            </div>
-        </div>
+    <div class="nes-container">
+      <h3>PASSWORD SYSTEM</h3>
+      <p>GENERATE A PASSWORD TO BACK UP YOUR PROGRESS, OR PASTE A PASSWORD BELOW TO RESTORE DATA.</p>
+      <textarea id="nes-password-box" class="nes-textarea" placeholder="[ ENTER PASSWORD HERE ]" spellcheck="false"></textarea>
+      <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+        <button class="nes-btn" onclick="generatePassword()">GENERATE</button>
+        <button class="nes-btn" onclick="loadPassword()">RESTORE</button>
+        <button class="nes-btn" onclick="copyPassword()">COPY</button>
+      </div>
     </div>
+  </div>
 
-    <div class="tab-content" id="tab-iching">
-        <div class="iching-section glass-dark">
-            <h2 class="iching-header">☯️ The I-Ching Oracle</h2>
-            <button class="btn-glossy" style="background: linear-gradient(180deg, #8b5cf6 0%, #6d3fd6 100%); border-color: #a78bfa; margin-bottom: 30px; font-size: 1.1rem; padding: 14px 32px;" onclick="castOracle()">Cast Coins</button>
-            <p class="iching-desc">Concentrate on your question and cast the coins. The Oracle will generate a hexagram based on the ancient Book of Changes.</p>
-            
-            <div class="hexagram-container" id="iching-hex-container" style="display:none;">
-                <div class="hexagram-box">
-                    <div class="hexagram-title">Primary Hexagram</div>
-                    <div class="hexagram-visual" id="iching-primary-vis"></div>
-                </div>
-                <div class="hexagram-box" id="iching-secondary-box" style="display:none;">
-                    <div class="hexagram-title">Changing Hexagram</div>
-                    <div class="hexagram-visual" id="iching-secondary-vis"></div>
-                </div>
-            </div>
-
-            <div class="iching-result-box" id="iching-primary-result" style="display: none;"></div>
-            <div class="iching-result-box" id="iching-secondary-result" style="display: none; border-color: #ff3c8e;"></div>
-        </div>
+  <!-- CALC TAB -->
+  <div class="tab-content" id="tab-calc">
+    <div class="glass-dark" style="padding: 10px; height: 75vh;">
+      <div class="iframe-container"><iframe src="https://col-bun.github.io/COLcalc.github.io/" title="COLcalc"></iframe></div>
     </div>
+  </div>
+
+  <!-- NUMOGRAM TAB (INTEGRATED SVG) -->
+  <div class="tab-content" id="tab-numogram">
+    <div class="numogram-wrapper">
+      <div class="svg-numogram-container">
+        <svg viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <filter id="glow"><feGaussianBlur stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                <filter id="grain" x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox">
+                    <feTurbulence type="fractalNoise" baseFrequency="1.5" numOctaves="4" seed="2" result="noise"/>
+                    <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0.6  0 0 0 0 0.6  0 0 0 0 0.6  0 0 0 -2.1 1.5" result="thresh"/>
+                    <feComposite operator="in" in="thresh" in2="SourceGraphic" result="masked"/>
+                </filter>
+                <filter id="grainD" x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox">
+                    <feTurbulence type="fractalNoise" baseFrequency="2.0" numOctaves="5" seed="7" result="noise"/>
+                    <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0.7  0 0 0 0 0.7  0 0 0 0 0.7  0 0 0 -1.8 1.4" result="thresh"/>
+                    <feComposite operator="in" in="thresh" in2="SourceGraphic" result="masked"/>
+                </filter>
+            </defs>
+
+            <!-- Flow paths (stippled) -->
+            <path d="M 728,415 C 790,320 780,220 680,155 Q 650,130 585,140" stroke="#aaa" stroke-width="55" fill="none" stroke-linecap="round" filter="url(#grain)"/>
+            <path d="M 728,415 C 790,320 780,220 680,155 Q 650,130 585,140" stroke="#ddd" stroke-width="30" fill="none" stroke-linecap="round" filter="url(#grainD)" opacity="0.5"/>
+            <path d="M 718,408 Q 580,375 400,408" stroke="#aaa" stroke-width="55" fill="none" stroke-linecap="round" filter="url(#grain)"/>
+            <path d="M 718,408 Q 580,375 400,408" stroke="#ddd" stroke-width="30" fill="none" stroke-linecap="round" filter="url(#grainD)" opacity="0.5"/>
+            <path d="M 312,548 Q 390,605 468,648" stroke="#aaa" stroke-width="55" fill="none" stroke-linecap="round" filter="url(#grain)"/>
+            <path d="M 312,548 Q 390,605 468,648" stroke="#ddd" stroke-width="30" fill="none" stroke-linecap="round" filter="url(#grainD)" opacity="0.5"/>
+            <path d="M 478,688 L 480,768" stroke="#999" stroke-width="42" fill="none" stroke-linecap="round" filter="url(#grain)"/>
+            <path d="M 482,812 L 490,868" stroke="#888" stroke-width="36" fill="none" stroke-linecap="round" filter="url(#grain)"/>
+            <path d="M 490,918 L 486,972" stroke="#777" stroke-width="28" fill="none" stroke-linecap="round" filter="url(#grain)"/>
+
+            <!-- Flow labels -->
+            <text x="555" y="368" fill="#fff" font-size="30" font-weight="800" font-family="Nunito,sans-serif" text-anchor="middle">Hold</text>
+            <text x="378" y="578" fill="#fff" font-size="30" font-weight="800" font-family="Nunito,sans-serif" text-anchor="middle">Sink</text>
+            <text x="792" y="305" fill="#fff" font-size="30" font-weight="800" font-family="Nunito,sans-serif" text-anchor="middle">Rise</text>
+
+            <!-- Warp circles -->
+            <circle cx="500" cy="168" r="125" fill="none" stroke="#fff" stroke-width="2" opacity="0.5"/>
+            <circle cx="530" cy="152" r="78" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.4"/>
+            <text x="652" y="155" fill="#fff" font-size="22" font-weight="800" font-family="Nunito,sans-serif">Warp</text>
+            <text x="652" y="178" fill="#fff" font-size="17" font-family="Nunito,sans-serif">(Current)</text>
+
+            <!-- Plex circles -->
+            <circle cx="494" cy="942" r="85" fill="none" stroke="#fff" stroke-width="2" opacity="0.5"/>
+            <circle cx="487" cy="972" r="48" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.4"/>
+            <text x="598" y="918" fill="#fff" font-size="22" font-weight="800" font-family="Nunito,sans-serif">Plex</text>
+            <text x="598" y="940" fill="#fff" font-size="17" font-family="Nunito,sans-serif">(current)</text>
+
+            <!-- Connection lines -->
+            <line x1="420" y1="198" x2="522" y2="165" stroke="#fff" stroke-width="2" opacity="0.55"/>
+            <line x1="558" y1="182" x2="615" y2="300" stroke="#fff" stroke-width="2" opacity="0.55"/>
+            <line x1="648" y1="335" x2="708" y2="398" stroke="#fff" stroke-width="1.5" opacity="0.45"/>
+            <line x1="392" y1="445" x2="315" y2="520" stroke="#fff" stroke-width="2" opacity="0.55"/>
+            <line x1="325" y1="558" x2="455" y2="642" stroke="#fff" stroke-width="1.5" opacity="0.45"/>
+            <path d="M 738,398 Q 768,270 668,158" stroke="#fff" stroke-width="1.5" fill="none" opacity="0.35"/>
+            <line x1="478" y1="688" x2="480" y2="765" stroke="#fff" stroke-width="2" opacity="0.55"/>
+            <line x1="483" y1="815" x2="490" y2="868" stroke="#fff" stroke-width="2" opacity="0.55"/>
+            <line x1="492" y1="918" x2="488" y2="960" stroke="#fff" stroke-width="2" opacity="0.55"/>
+
+            <!-- Zone 3+ -->
+            <g class="zone-group" id="btn-zone-3" onclick="selectZone(3)">
+                <circle cx="395" cy="198" r="28" fill="#000" stroke="#fff" stroke-width="2.5"/>
+                <text x="379" y="208" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">3</text>
+                <text x="410" y="190" fill="#fff" font-size="14" font-weight="700">+</text>
+                <circle cx="395" cy="220" r="5" fill="none" stroke="#ff8800" stroke-width="1.5"/>
+                <polygon points="395,230 389,240 401,240" fill="none" stroke="#ff8800" stroke-width="1.5"/>
+                <text x="338" y="178" fill="#22dd22" font-size="19" font-weight="700" font-style="italic">"zx"</text>
+            </g>
+
+            <!-- Zone 6- -->
+            <g class="zone-group" id="btn-zone-6" onclick="selectZone(6)">
+                <circle cx="550" cy="152" r="30" fill="#000" stroke="#fff" stroke-width="2.5"/>
+                <text x="534" y="162" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">6</text>
+                <text x="565" y="145" fill="#fff" font-size="14" font-weight="700">-</text>
+                <circle cx="550" cy="178" r="5" fill="none" stroke="#ff00ff" stroke-width="1.5"/>
+                <text x="572" y="205" fill="#cccc00" font-size="19" font-weight="700" font-style="italic">"tch"</text>
+            </g>
+
+            <!-- Zone 2- -->
+            <g class="zone-group" id="btn-zone-2" onclick="selectZone(2)">
+                <circle cx="625" cy="318" r="27" fill="#000" stroke="#fff" stroke-width="2.5"/>
+                <text x="610" y="327" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">2</text>
+                <text x="640" y="310" fill="#fff" font-size="14" font-weight="700">-</text>
+                <circle cx="625" cy="340" r="5" fill="none" stroke="#4488ff" stroke-width="1.5"/>
+                <text x="652" y="308" fill="#4488ff" font-size="19" font-weight="700" font-style="italic">"dt"</text>
+            </g>
+
+            <!-- Zone 5+ -->
+            <g class="zone-group" id="btn-zone-5" onclick="selectZone(5)">
+                <circle cx="390" cy="418" r="27" fill="#000" stroke="#fff" stroke-width="2.5"/>
+                <text x="375" y="427" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">5</text>
+                <text x="405" y="410" fill="#fff" font-size="14" font-weight="700">+</text>
+                <circle cx="390" cy="440" r="5" fill="none" stroke="#cc9900" stroke-width="1.5"/>
+                <text x="345" y="462" fill="#ccaa00" font-size="19" font-weight="700" font-style="italic">"ktt"</text>
+            </g>
+
+            <!-- Zone 4- -->
+            <g class="zone-group" id="btn-zone-4" onclick="selectZone(4)">
+                <circle cx="300" cy="538" r="27" fill="#000" stroke="#ff2222" stroke-width="2.5"/>
+                <text x="285" y="547" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">4</text>
+                <text x="315" y="530" fill="#fff" font-size="14" font-weight="700">-</text>
+                <circle cx="300" cy="560" r="5" fill="none" stroke="#ff2222" stroke-width="1.5"/>
+                <text x="245" y="580" fill="#ff3333" font-size="19" font-weight="700" font-style="italic">"skr"</text>
+            </g>
+
+            <!-- Zone 7+ -->
+            <g class="zone-group" id="btn-zone-7" onclick="selectZone(7)">
+                <circle cx="728" cy="408" r="27" fill="#000" stroke="#fff" stroke-width="2.5"/>
+                <text x="713" y="417" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">7</text>
+                <text x="743" y="400" fill="#fff" font-size="14" font-weight="700">+</text>
+                <circle cx="728" cy="430" r="5" fill="none" stroke="#4488ff" stroke-width="1.5"/>
+                <text x="756" y="418" fill="#4488ff" font-size="19" font-weight="700" font-style="italic">"pb"</text>
+            </g>
+
+            <!-- Zone 1+ -->
+            <g class="zone-group" id="btn-zone-1" onclick="selectZone(1)">
+                <circle cx="478" cy="652" r="32" fill="#fff" stroke="#fff" stroke-width="3" filter="url(#glow)"/>
+                <text x="461" y="663" fill="#000" font-size="26" font-weight="900" font-family="Nunito,sans-serif">1</text>
+                <text x="493" y="645" fill="#000" font-size="15" font-weight="700">+</text>
+                <circle cx="478" cy="680" r="5" fill="none" stroke="#ff8800" stroke-width="1.5"/>
+                <polygon points="478,688 472,698 484,698" fill="#fff" stroke="#fff" stroke-width="1"/>
+                <text x="438" y="718" fill="#cccc00" font-size="19" font-weight="700" font-style="italic">"gl"</text>
+            </g>
+
+            <!-- Zone 8- -->
+            <g class="zone-group" id="btn-zone-8" onclick="selectZone(8)">
+                <circle cx="482" cy="788" r="27" fill="#000" stroke="#fff" stroke-width="2.5"/>
+                <text x="467" y="797" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">8</text>
+                <text x="497" y="780" fill="#fff" font-size="14" font-weight="700">-</text>
+                <polygon points="482,761 476,751 488,751" fill="none" stroke="#fff" stroke-width="1.5"/>
+                <circle cx="482" cy="810" r="5" fill="none" stroke="#44cc44" stroke-width="1.5"/>
+                <text x="395" y="783" fill="#44cc44" font-size="19" font-weight="700" font-style="italic">"mnm"</text>
+            </g>
+
+            <!-- Zone 9+ -->
+            <g class="zone-group" id="btn-zone-9" onclick="selectZone(9)">
+                <circle cx="492" cy="890" r="27" fill="#000" stroke="#fff" stroke-width="2.5"/>
+                <text x="477" y="899" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">9</text>
+                <text x="507" y="882" fill="#fff" font-size="14" font-weight="700">+</text>
+                <polygon points="492,919 486,929 498,929" fill="#fff" stroke="#fff" stroke-width="1"/>
+                <circle cx="492" cy="912" r="5" fill="none" stroke="#cccc00" stroke-width="1.5"/>
+                <text x="520" y="892" fill="#cccc00" font-size="17" font-weight="700" font-style="italic">"tn"</text>
+            </g>
+
+            <!-- Zone 0- -->
+            <g class="zone-group" id="btn-zone-0" onclick="selectZone(0)">
+                <circle cx="486" cy="985" r="27" fill="#000" stroke="#fff" stroke-width="2.5"/>
+                <text x="471" y="994" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">0</text>
+                <text x="500" y="978" fill="#fff" font-size="14" font-weight="700">-</text>
+                <polygon points="486,958 480,948 492,948" fill="none" stroke="#fff" stroke-width="1.5"/>
+                <circle cx="486" cy="1008" r="5" fill="none" stroke="#44cc44" stroke-width="1.5"/>
+                <text x="418" y="1038" fill="#44cc44" font-size="17" font-weight="700" font-style="italic">"eiaoung"</text>
+            </g>
+
+            <!-- Gate numbers -->
+            <g opacity="0.75" font-family="Nunito,sans-serif" font-weight="700" fill="#fff" font-size="13">
+                <circle cx="500" cy="46" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="500" y="51" text-anchor="middle">15</text>
+                <circle cx="555" cy="76" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="555" y="81" text-anchor="middle">6</text>
+                <circle cx="465" cy="158" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="465" y="163" text-anchor="middle">21</text>
+                <circle cx="370" cy="252" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="370" y="257" text-anchor="middle">3</text>
+                <circle cx="498" cy="600" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="498" y="605" text-anchor="middle">1</text>
+                <circle cx="538" cy="635" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="538" y="640" text-anchor="middle">28</text>
+                <circle cx="418" cy="668" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="418" y="673" text-anchor="middle">10</text>
+                <circle cx="508" cy="845" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="508" y="850" text-anchor="middle">36</text>
+                <circle cx="458" cy="940" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="458" y="945" text-anchor="middle">45</text>
+            </g>
+
+            <!-- Region labels -->
+            <text x="50" y="72" fill="#fff" font-size="34" font-weight="900" text-decoration="underline">Warp</text>
+            <text x="55" y="104" fill="#22dd22" font-size="24" font-weight="700" font-style="italic">Hyper-Reality</text>
+            <text x="55" y="134" fill="#22dd22" font-size="24" font-weight="700">Djynxx 6::3</text>
+
+            <text x="50" y="448" fill="#fff" font-size="32" font-weight="900" text-decoration="underline">e-Circuit</text>
+            <text x="55" y="480" fill="#22dd22" font-size="21" font-weight="700" font-style="italic">breakthrough</text>
+            <text x="55" y="506" fill="#22dd22" font-size="21" font-weight="700" font-style="italic">connected</text>
+            <text x="55" y="532" fill="#22dd22" font-size="21" font-weight="700" font-style="italic">psychoactives</text>
+
+            <text x="50" y="852" fill="#fff" font-size="34" font-weight="900" text-decoration="underline">Plex</text>
+            <text x="55" y="884" fill="#22dd22" font-size="21" font-weight="700" font-style="italic">Eiriel (Tchukululok)</text>
+            <text x="55" y="912" fill="#22dd22" font-size="21" font-weight="700">Dissociative Void</text>
+            <text x="55" y="940" fill="#22dd22" font-size="21" font-weight="700">Uttunul 9::0</text>
+
+            <!-- Zone/Aspect table -->
+            <g transform="translate(830,48)" font-family="Nunito,sans-serif">
+                <rect x="0" y="0" width="80" height="30" fill="none" stroke="#fff" stroke-width="2"/>
+                <text x="40" y="22" fill="#fff" font-size="16" font-weight="900" text-anchor="middle">Zone</text>
+                <rect x="80" y="0" width="140" height="30" fill="none" stroke="#fff" stroke-width="2"/>
+                <text x="150" y="22" fill="#fff" font-size="16" font-weight="900" text-anchor="middle">Aspect</text>
+
+                <rect x="0" y="30" width="80" height="28" fill="none" stroke="#fff" stroke-width="1"/><text x="40" y="50" fill="#fff" font-size="14" font-weight="700" font-family="monospace" text-anchor="middle">9::0</text>
+                <rect x="80" y="30" width="140" height="28" fill="#222" stroke="#fff" stroke-width="1"/><text x="90" y="50" fill="#fff" font-size="13" font-weight="700">Foundation</text>
+
+                <rect x="0" y="58" width="80" height="28" fill="none" stroke="#fff" stroke-width="1"/><text x="40" y="78" fill="#fff" font-size="14" font-weight="700" font-family="monospace" text-anchor="middle">8::1</text>
+                <rect x="80" y="58" width="140" height="28" fill="#222" stroke="#fff" stroke-width="1"/><text x="90" y="78" fill="#fff" font-size="13" font-weight="700">Anamnesis</text>
+
+                <rect x="0" y="86" width="80" height="28" fill="none" stroke="#fff" stroke-width="1"/><text x="40" y="106" fill="#fff" font-size="14" font-weight="700" font-family="monospace" text-anchor="middle">7::2</text>
+                <rect x="80" y="86" width="140" height="28" fill="#222" stroke="#fff" stroke-width="1"/><text x="90" y="106" fill="#fff" font-size="13" font-weight="700">Geotraumatics</text>
+
+                <rect x="0" y="114" width="80" height="28" fill="none" stroke="#fff" stroke-width="1"/><text x="40" y="134" fill="#fff" font-size="14" font-weight="700" font-family="monospace" text-anchor="middle">6::3</text>
+                <rect x="80" y="114" width="140" height="28" fill="#222" stroke="#fff" stroke-width="1"/><text x="90" y="134" fill="#fff" font-size="13" font-weight="700">Fortress</text>
+
+                <rect x="0" y="142" width="80" height="28" fill="none" stroke="#fff" stroke-width="1"/><text x="40" y="162" fill="#fff" font-size="14" font-weight="700" font-family="monospace" text-anchor="middle">5::4</text>
+                <rect x="80" y="142" width="140" height="28" fill="#222" stroke="#fff" stroke-width="1"/><text x="90" y="162" fill="#fff" font-size="13" font-weight="700">Apocalypse</text>
+            </g>
+        </svg>
+      </div>
+      <div class="numo-tools-col">
+        <div class="numo-calc">
+          <h4>Gematria Time-Sorcery</h4>
+          <div class="numo-calc-explanation"><strong>In CCRU Theory:</strong> Converts words to base-9 roots.</div>
+          <div class="numo-input-row"><input type="text" id="numo-gematria-input" placeholder="e.g. CYBERNETICS"><button onclick="calculateNumogram()">EVAL</button></div>
+          <div id="numo-result-display" style="font-size: 0.85rem; color: #a8e84c; font-family: 'Baloo 2', cursive;"></div>
+        </div>
+        <div class="numo-calc">
+          <h4>Net-Span Demon Finder</h4>
+          <div class="numo-calc-explanation"><strong>In CCRU Theory:</strong> Locates entities bridging zones.</div>
+          <div class="numo-input-row"><input type="number" id="demon-z1" min="0" max="9" placeholder="Z1"><input type="number" id="demon-z2" min="0" max="9" placeholder="Z2"><button onclick="findDemon()">FIND</button></div>
+          <div id="demon-result" style="font-size: 0.85rem; color: #fff; margin-top: 10px; line-height: 1.4;"></div>
+        </div>
+        <div class="numo-calc">
+          <h4>CCRU Encyclopedia</h4>
+          <div class="numo-input-row" style="margin-bottom: 0;"><input type="text" id="lexicon-search" placeholder="Search archives..." oninput="searchLexicon()"></div>
+          <div id="lexicon-results" style="max-height: 200px; overflow-y: auto; margin-top: 10px; font-size: 0.8rem;"></div>
+        </div>
+        <div class="glass-dark numo-info-panel"><div id="numo-display"><h3>The Numogram</h3><p>Click a Zone to reveal its esoteric data.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- I-CHING TAB -->
+  <div class="tab-content" id="tab-iching">
+    <div class="iching-section glass-dark">
+      <h2 class="iching-header">☯️ The I-Ching Oracle</h2>
+      <p class="iching-desc">Concentrate on your question and cast the coins. The Oracle will generate a hexagram based on the ancient Book of Changes.</p>
+      
+      <button class="btn-glossy btn-purple" style="background: linear-gradient(180deg, #8b5cf6 0%, #6d3fd6 100%); margin-bottom: 30px; font-size: 1.1rem; padding: 14px 32px;" onclick="castOracle()">Cast Coins (Generate Hexagram)</button>
+      
+      <div class="hexagram-container" id="iching-hex-container" style="display:none;">
+        <div class="hexagram-box">
+          <div class="hexagram-title">Primary Hexagram</div>
+          <div class="hexagram-visual" id="iching-primary-vis"></div>
+        </div>
+        <div class="hexagram-box" id="iching-secondary-box" style="display:none;">
+          <div class="hexagram-title">Changing Hexagram</div>
+          <div class="hexagram-visual" id="iching-secondary-vis"></div>
+        </div>
+      </div>
+
+      <div class="iching-result-box" id="iching-primary-result"></div>
+      <div class="iching-result-box" id="iching-secondary-result" style="border-color: #ff3c8e;"></div>
+    </div>
+  </div>
 
 </div>
 
+<!-- DATA STORE FOR NUMOGRAM TEXT -->
+<div id="numo-data-store">
+  <div id="data-zone-0"><h3>Zone Zero</h3><h4>The Numeral 0</h4><p>The figure ‘0' designates the number zero, anterior to the distinction odd/even.</p><h4>The Zeroth Planet: Sol</h4><p>The Sun (Sol-0) is by far the largest body in the Solar-system.</p><h4>System Notes</h4><p>Zone-0 is the first of two zones mutually composing the Plex-region.</p></div>
+  <div id="data-zone-1"><h3>Zone One</h3><h4>The Numeral 1</h4><p>The figure ‘1' designates the number one, first odd number, and the zeroth prime.</p><h4>The First Planet: Mercury</h4><p>Mercury is the innermost planet of the Solar-system.</p><h4>System Notes</h4><p>Zone-1 is the first of the six Torque-region Zones.</p></div>
+  <div id="data-zone-2"><h3>Zone Two</h3><h4>The Numeral 2</h4><p>The figure ‘2' designates the number two, the first and definitive even number.</p><h4>The Second Planet: Venus</h4><p>Venus (or Sol-2) has a mean orbital distance from sun of 108.2 million km.</p><h4>System Notes</h4><p>Zone-2 is the second of the six Torque-region Zones.</p></div>
+  <div id="data-zone-3"><h3>Zone Three</h3><h4>The Numeral 3</h4><p>The figure ‘3' designates the number three, the second odd number.</p><h4>The Third Planet: Earth</h4><p>Earth (or Sol-3) defines the standard Astronomical Unit (AU).</p><h4>System Notes</h4><p>Zone-3 is the first of the two Warp-region Zones.</p></div>
+  <div id="data-zone-4"><h3>Zone Four</h3><h4>The Numeral 4</h4><p>The figure ‘4' designates the number four, the second even number.</p><h4>The Fourth Planet: Mars</h4><p>Mars (or Sol-4) has a mean orbital distance from the sun of approx. 228 000 000 km.</p><h4>System Notes</h4><p>Zone-4 is the third of the six Torque-region Zones.</p></div>
+  <div id="data-zone-5"><h3>Zone Five</h3><h4>The Numeral 5</h4><p>The figure ‘5' designates the number five, the third odd number.</p><h4>The Fifth Planet: Jupiter</h4><p>Jupiter (or Sol-5) is the innermost gas-giant.</p><h4>System Notes</h4><p>Zone-5 is the sixth of the six Torque-region Zones.</p></div>
+  <div id="data-zone-6"><h3>Zone Six</h3><h4>The Numeral 6</h4><p>The figure ‘6' designates the number six, third even number.</p><h4>The Sixth Planet: Saturn</h4><p>Saturn (or Sol-6) has a mean orbital distance from the sun of approx. 1 429 400 000 km.</p><h4>System Notes</h4><p>Zone-6 is the second of the two Warp-region Zones.</p></div>
+  <div id="data-zone-7"><h3>Zone Seven</h3><h4>The Numeral 7</h4><p>The figure ‘7' designates the number seven, the fourth odd number.</p><h4>The Seventh Planet: Uranus</h4><p>Uranus (or Sol-7) rotation is abnormally tilted.</p><h4>System Notes</h4><p>Zone-7 is the fifth of the six Torque-region Zones.</p></div>
+  <div id="data-zone-8"><h3>Zone Eight</h3><h4>The Numeral 8</h4><p>The figure eight (8) is a partially rotated glyph of infinity.</p><h4>The Eighth Planet: Neptune</h4><p>Neptune (or Sol-8) is the outermost gas-giant.</p><h4>System Notes</h4><p>Zone-8 is the fourth of the six Torque-region Zones.</p></div>
+  <div id="data-zone-9"><h3>Zone Nine</h3><h4>The Numeral 9</h4><p>The figure nine (9) is zygospirally related to the figure six.</p><h4>The Ninth Planet: Pluto</h4><p>Pluto (or Sol-9) has the most highly elliptical orbital trajectory.</p><h4>System Notes</h4><p>Zone-9 is the second of the two zones mutually composing the Plex-region.</p></div>
+</div>
+
 <script>
-    // ===== UTILS =====
-    function escHtml(s){ return String(s).replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m];}); }
-    function todayStr(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-    function formatDate(ds){ const d = new Date(ds+'T00:00:00'); return d.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'}); }
-    function formatDateTime(d){ return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' ' + d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); }
+// ===== UTILS =====
+function todayStr() { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function formatDate(s) { const [y,m,d]=s.split('-'); const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return mo[parseInt(m)-1]+' '+parseInt(d)+', '+y; }
+function formatDateTime(d) { return formatDate(todayStr()) + ' at ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); }
+function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
-    // ===== DATA SETUP =====
-    const STORAGE_KEY = 'studyBuddyData';
-    function getDefaultData() { return { days: {}, dictionary: [], diary: [], streak: 0, starterLoaded: false }; }
-    function loadData() { 
-        try { 
-            const r = localStorage.getItem(STORAGE_KEY); 
-            if (r) { 
-                let loaded = JSON.parse(r); 
-                if (!loaded.diary) loaded.diary = []; 
-                return loaded; 
-            } 
-        } catch(e) {} 
-        return getDefaultData(); 
-    }
-    function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
-    let data = loadData();
+function updateThemeIcon() { document.getElementById('theme-btn').textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙'; }
+updateThemeIcon();
+function toggleTheme() { document.body.classList.toggle('dark-mode'); localStorage.setItem('studyBuddyTheme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); updateThemeIcon(); }
 
-    // Starter dict
-    const starterDeck = [ { en: "To read", jp: "読む", es: "Leer" }, { en: "Street", jp: "通り", es: "Calle" }, { en: "Store", jp: "店", es: "Tienda" } ];
-    if (!data.starterLoaded && data.dictionary.length === 0) {
-        starterDeck.forEach(w => { data.dictionary.push({ en: w.en, jp: w.jp, es: w.es, addedDate: todayStr() }); });
-        data.starterLoaded = true; saveData();
-    }
+// ===== STARTER DECK =====
+const starterDeck = [
+  { en: "To read", jp: "読む", es: "Leer" }, { en: "Street", jp: "通り", es: "Calle" }, { en: "Store", jp: "店", es: "Tienda" }
+];
 
-    // ===== LOGIN =====
-    document.getElementById('pw-input').addEventListener('keydown',function(e){
-        if(e.key === 'Enter'){
-            if(btoa(this.value.toLowerCase().trim()) === 'Y2FrZQ=='){
-                document.getElementById('password-screen').style.display='none'; 
-                document.getElementById('app').style.display='block'; 
-                initApp(); 
-            } else { 
-                document.getElementById('pw-error').textContent='Wrong password... try again!'; 
-                this.value=''; 
-            }
-        }
-    });
+const STORAGE_KEY = 'studyBuddyData';
+function getDefaultData() { return { days: {}, dictionary: [], diary: [], streak: 0, lastActiveDate: null, starterLoaded: false }; }
+function loadData() { try { const r = localStorage.getItem(STORAGE_KEY); if (r) { let loaded = JSON.parse(r); if (!loaded.diary) loaded.diary = []; return loaded; } } catch(e) {} return getDefaultData(); }
+function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+let data = loadData();
 
-    // ===== THEME =====
-    if(localStorage.getItem('studyBuddyTheme') === 'dark') document.body.classList.add('dark-mode');
-    function updateThemeIcon() { document.getElementById('theme-btn').textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙'; }
-    updateThemeIcon();
-    function toggleTheme() { 
-        document.body.classList.toggle('dark-mode'); 
-        localStorage.setItem('studyBuddyTheme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); 
-        updateThemeIcon(); 
-    }
+if (!data.starterLoaded) {
+  starterDeck.forEach(word => { if (!data.dictionary.some(w => w.en === word.en)) data.dictionary.push({ en: word.en, jp: word.jp, es: word.es, addedDate: todayStr() }); });
+  data.starterLoaded = true; saveData();
+}
 
-    // ===== NAVIGATION =====
-    function switchTab(tab) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
-        document.getElementById('tab-' + tab).classList.add('active');
-    }
+// ===== NES PASSWORD =====
+function generatePassword() { document.getElementById('nes-password-box').value = btoa(encodeURIComponent(JSON.stringify(data))).match(/.{1,8}/g).join('-'); }
+function loadPassword() {
+  const input = document.getElementById('nes-password-box').value.trim(); if (!input) return alert("ENTER PASSWORD.");
+  try {
+    let imported = JSON.parse(decodeURIComponent(atob(input.replace(/[-\s]/g, ''))));
+    if (imported.days && imported.dictionary) { if (!imported.diary) imported.diary = []; data = imported; saveData(); initApp(); alert("RESTORED!"); document.getElementById('nes-password-box').value = ''; } else alert("INVALID DATA.");
+  } catch (err) { alert("INVALID FORMAT."); }
+}
+function copyPassword() { const pwBox = document.getElementById('nes-password-box'); if (!pwBox.value) return; pwBox.select(); document.execCommand('copy'); alert("COPIED!"); }
 
-    // ===== MOE-CHAN LOGIC =====
-    const speeches = { 
-        greeting: { en: "Hello! Let's study today!", jp: "こんにちは！今日も勉強しよう！", es: "¡Hola! ¡Estudiemos hoy!" }, 
-        bothDone: { en: "Amazing work today!", jp: "今日はすごい！", es: "¡Increíble hoy!" }, 
-        flashDone: { en: "Great flashcards! Now read!", jp: "次は読書だよ！", es: "¡Bien! ¡Ahora a leer!" }, 
-        readDone: { en: "Nice reading!", jp: "読書お疲れ！", es: "¡Buena lectura!" }, 
-        streakHigh: { en: "🔥 Incredible streak!", jp: "🔥 すごい連続記録！", es: "🔥 ¡Racha increíble!" }, 
-        newWord: { en: "New word learned!", jp: "新しい単語を覚えた！", es: "¡Nueva palabra!" } 
-    };
+function calcStreak() {
+  const sortedDays=Object.keys(data.days).sort().reverse(); if(!sortedDays.length){data.streak=0;return;}
+  let streak=0, cd=new Date(); if(!data.days[todayStr()])cd.setDate(cd.getDate()-1);
+  while(true){ const ds=cd.getFullYear()+'-'+String(cd.getMonth()+1).padStart(2,'0')+'-'+String(cd.getDate()).padStart(2,'0'); const day=data.days[ds]; if(day&&(day.flash>0||day.read>0)){streak++;cd.setDate(cd.getDate()-1);}else break; }
+  data.streak=streak;
+}
+
+const speeches={ greeting:{en:"Hello! Let's study today!",jp:"こんにちは！今日も勉強しよう！",es:"¡Hola! ¡Estudiemos hoy!"}, bothDone:{en:"Amazing work today!",jp:"今日はすごい！",es:"¡Increíble hoy!"}, flashDone:{en:"Great flashcards! Now read!",jp:"次は読書だよ！",es:"¡Bien! ¡Ahora a leer!"}, readDone:{en:"Nice reading!",jp:"読書お疲れ！",es:"¡Buena lectura!"}, streakHigh:{en:"🔥 Incredible streak!",jp:"🔥 すごい連続記録！",es:"🔥 ¡Racha increíble!"}, newWord:{en:"New word learned!",jp:"新しい単語を覚えた！",es:"¡Nueva palabra!"} };
+function setSpeech(k){const s=speeches[k];if(!s)return;document.getElementById('speech-en').textContent=s.en;document.getElementById('speech-jp').textContent=s.jp;document.getElementById('speech-es').textContent=s.es;}
+
+function updateMood(){
+  const today=data.days[todayStr()]||{};let mood=30; if(today.flash>0)mood+=30;if(today.read>0)mood+=30;if(data.streak>=3)mood+=10; mood=Math.min(100,mood);
+  const fill=document.getElementById('mood-fill'),text=document.getElementById('mood-text'); fill.style.width=mood+'%';
+  if(mood>=90){fill.style.background='linear-gradient(90deg,#7ec832,#a8e84c)';text.textContent='Ecstatic!';setCreatureState('happy');}
+  else if(mood>=60){fill.style.background='linear-gradient(90deg,#ffcc00,#ff8a00)';text.textContent='Happy';setCreatureState('idle');}
+  else if(mood>=40){fill.style.background='linear-gradient(90deg,#ff8a00,#e06500)';text.textContent='Neutral';setCreatureState('idle');}
+  else{fill.style.background='linear-gradient(90deg,#ff3c8e,#d42070)';text.textContent='Needs attention';setCreatureState('sad');}
+}
+
+const spriteMap={ idle:'./idle.png', happy:'./happy.png', sad:'./sad.png', sleep:'./sleep.png', study:'./study.png', read:'./read.png', celebrate:'./celebrate.png' };
+function setCreatureState(state){ const el=document.getElementById('sprite-img');if(!el)return; el.src=spriteMap[state]||spriteMap.idle; }
+
+let isBouncing = false;
+document.getElementById('creature-sprite').addEventListener('click', function(e) {
+  if(isBouncing) return; isBouncing = true; const img = document.getElementById('sprite-img'); const prevSrc = img.src; img.src = spriteMap.happy; this.classList.add('animate-bounce');
+  for(let i = 0; i < Math.floor(Math.random() * 3) + 3; i++) {
+    const heart = document.createElement('div'); heart.textContent = ['💖', '✨', '💕', '💗'][Math.floor(Math.random()*4)]; heart.className = 'heart-particle';
+    heart.style.setProperty('--tx', (Math.random() - 0.5) * 120 + 'px'); heart.style.setProperty('--ty', -(Math.random() * 120 + 60) + 'px'); heart.style.left = '45%'; heart.style.top = '45%';
+    this.appendChild(heart); setTimeout(() => heart.remove(), 800);
+  }
+  setTimeout(() => { this.classList.remove('animate-bounce'); if(img.src.includes('happy.png')) img.src = prevSrc; isBouncing = false; }, 400);
+});
+
+document.getElementById('pw-input').addEventListener('keydown',function(e){
+  if(e.key==='Enter'){
+    if(btoa(this.value.toLowerCase().trim()) === 'Y2FrZQ=='){
+      document.getElementById('password-screen').style.display='none'; document.getElementById('app').style.display='block'; initApp();
+    }else{ document.getElementById('pw-error').textContent='Wrong password... try again!'; this.value=''; }
+  }
+});
+
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active'); document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+function logFlashcards(){
+  const val=parseInt(document.getElementById('flash-minutes').value);if(!val||val<=0)return;
+  const today=todayStr();if(!data.days[today])data.days[today]={flash:0,read:0}; data.days[today].flash+=val;
+  document.getElementById('flash-input-area').style.display='none'; document.getElementById('flash-done').style.display='block'; document.getElementById('flash-done-text').textContent=data.days[today].flash+' min today!';
+  document.getElementById('card-flash').classList.add('done'); setCreatureState('study');
+  const readDone=(data.days[today].read||0)>0;setSpeech(readDone?'bothDone':'flashDone'); calcStreak();saveData();updateStats();updateMood(); if(readDone)setTimeout(()=>setCreatureState('celebrate'),300);
+}
+function logReading(){
+  const val=parseFloat(document.getElementById('read-hours').value);if(!val||val<=0)return;
+  const today=todayStr();if(!data.days[today])data.days[today]={flash:0,read:0}; data.days[today].read+=val;
+  document.getElementById('read-input-area').style.display='none'; document.getElementById('read-done').style.display='block'; document.getElementById('read-done-text').textContent=data.days[today].read+' hrs today!';
+  document.getElementById('card-read').classList.add('done'); setCreatureState('read');
+  const flashDone=(data.days[today].flash||0)>0;setSpeech(flashDone?'bothDone':'readDone'); calcStreak();saveData();updateStats();updateMood(); if(flashDone)setTimeout(()=>setCreatureState('celebrate'),300);
+}
+
+function addWord(){
+  const en=document.getElementById('dict-en').value.trim(),jp=document.getElementById('dict-jp').value.trim(),es=document.getElementById('dict-es').value.trim(); if(!en&&!jp&&!es)return;
+  data.dictionary.push({en:en||'—',jp:jp||'—',es:es||'—',addedDate:todayStr()});
+  document.getElementById('dict-en').value='';document.getElementById('dict-jp').value='';document.getElementById('dict-es').value=''; saveData();renderDictionary();updateStats();setSpeech('newWord');setCreatureState('happy');
+}
+['dict-en','dict-jp','dict-es'].forEach(id=>{document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')addWord();});});
+function deleteWord(i){data.dictionary.splice(i,1);saveData();renderDictionary();updateStats();}
+
+function renderDictionary(){
+  const search=(document.getElementById('dict-search').value||'').toLowerCase(); const list=document.getElementById('dict-list');list.innerHTML='';
+  const filtered=data.dictionary.filter(w=>{if(!search)return true;return w.en.toLowerCase().includes(search)||w.jp.toLowerCase().includes(search)||w.es.toLowerCase().includes(search);});
+  filtered.slice().reverse().forEach((w)=>{ const realIndex=data.dictionary.lastIndexOf(w); const row=document.createElement('div');row.className='dict-entry';
+    row.innerHTML=`<span class="en">${escHtml(w.en)}</span><span class="jp">${escHtml(w.jp)}</span><span class="es">${escHtml(w.es)}</span><button class="del-word" onclick="deleteWord(${realIndex})">×</button>`; list.appendChild(row); });
+  document.getElementById('dict-count').textContent=data.dictionary.length+' words'; document.getElementById('dict-tab-count').textContent='('+data.dictionary.length+')';
+}
+
+function renderHistory(){
+  const grid=document.getElementById('history-grid');grid.innerHTML=''; const sortedDays=Object.keys(data.days).sort().reverse();
+  if(!sortedDays.length){grid.innerHTML='<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px">No study days yet!</p>';return;}
+  sortedDays.forEach(day=>{const d=data.days[day];const row=document.createElement('div');row.className='history-day'; row.innerHTML=`<span class="day-date">${formatDate(day)}</span><span class="day-stat">📇 ${d.flash||0} min</span><span class="day-stat">📚 ${d.read||0} hrs</span><span class="day-streak">${(d.flash>0||d.read>0)?'✓':'—'}</span>`; grid.appendChild(row);});
+}
+
+function updateStats(){
+  let tf=0,tr=0;Object.values(data.days).forEach(d=>{tf+=d.flash||0;tr+=d.read||0;});
+  document.getElementById('stat-total-flash').textContent=tf; document.getElementById('stat-total-read').textContent=tr;
+  document.getElementById('stat-words').textContent=data.dictionary.length; document.getElementById('stat-days').textContent=Object.keys(data.days).length;
+  document.getElementById('streak-badge').textContent='🔥 '+data.streak+' day streak'; renderHistory();
+}
+
+// ===== DIARY =====
+function addDiaryEntry() { const text = document.getElementById('diary-input').value.trim(); if(!text) return; data.diary.push({ date: formatDateTime(new Date()), text: text }); document.getElementById('diary-input').value = ''; saveData(); renderDiary(); }
+function deleteDiaryEntry(i) { data.diary.splice(i, 1); saveData(); renderDiary(); }
+function renderDiary() {
+  const list = document.getElementById('diary-list'); list.innerHTML = '';
+  if(!data.diary.length) return list.innerHTML = '<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px">No diary entries yet.</p>';
+  data.diary.slice().reverse().forEach(entry => { const realIndex = data.diary.lastIndexOf(entry); const row = document.createElement('div'); row.className = 'diary-entry'; row.innerHTML = `<div class="diary-entry-date">${escHtml(entry.date)}</div><div class="diary-entry-text">${escHtml(entry.text)}</div><button class="diary-del-btn" onclick="deleteDiaryEntry(${realIndex})">×</button>`; list.appendChild(row); });
+}
+
+// ===== RANDOM PHRASES =====
+const randomPhrases = [ { text: "¡Qué nota, parcero! ¡A estudiar se dijo!", lang: "rolo", label: "ROLO" }, { text: "No sea tan ñero, póngase las pilas.", lang: "rolo", label: "ROLO" }, { text: "¡Uy, hermano, qué chimba de racha!", lang: "rolo", label: "ROLO" }, { text: "Mijo, no joda, estudie que le conviene.", lang: "rolo", label: "ROLO" }, { text: "よっしゃ！今日もがんばろう！", lang: "nihongo", label: "日本語" }, { text: "すごいじゃん！その調子！", lang: "nihongo", label: "日本語" }, { text: "勉強は大事だよ、ファイト！", lang: "nihongo", label: "日本語" } ];
+let lastPhraseIndex = -1;
+function showRandomPhrase() {
+  const bubble = document.getElementById('random-bubble'); if (!bubble) return; let idx; do { idx = Math.floor(Math.random() * randomPhrases.length); } while (idx === lastPhraseIndex && randomPhrases.length > 1); lastPhraseIndex = idx;
+  const p = randomPhrases[idx]; bubble.style.opacity = '0'; setTimeout(() => { document.getElementById('random-phrase').textContent = p.text; document.getElementById('random-lang-tag').textContent = p.label; document.getElementById('random-lang-tag').className = 'random-lang-tag ' + p.lang; bubble.style.opacity = '1'; }, 400);
+}
+function startPhraseCycle() { showRandomPhrase(); setInterval(showRandomPhrase, 8000); }
+
+function initApp(){
+  document.getElementById('date-display').textContent=formatDate(todayStr()); calcStreak();
+  const td=data.days[todayStr()]; if(td){ if(td.flash>0){document.getElementById('flash-input-area').style.display='none';document.getElementById('flash-done').style.display='block';document.getElementById('flash-done-text').textContent=td.flash+' min today!';document.getElementById('card-flash').classList.add('done');} if(td.read>0){document.getElementById('read-input-area').style.display='none';document.getElementById('read-done').style.display='block';document.getElementById('read-done-text').textContent=td.read+' hrs today!';document.getElementById('card-read').classList.add('done');} if(td.flash>0&&td.read>0)setSpeech('bothDone');else if(td.flash>0)setSpeech('flashDone');else if(td.read>0)setSpeech('readDone');else setSpeech('greeting'); }else setSpeech('greeting');
+  if(data.streak>=5)setSpeech('streakHigh'); renderDictionary(); renderDiary(); updateStats(); updateMood(); saveData(); startPhraseCycle();
+}
+
+// ===== NUMOGRAM =====
+function selectZone(zoneNum) { 
+  // Removes active class from all SVG zone-groups
+  document.querySelectorAll('.zone-group').forEach(n => n.classList.remove('active')); 
+  
+  // Adds active class to clicked zone-group
+  const btn = document.getElementById('btn-zone-' + zoneNum); 
+  if(btn) btn.classList.add('active'); 
+  
+  // Update information panel
+  document.getElementById('numo-display').innerHTML = document.getElementById('data-zone-' + zoneNum).innerHTML; 
+}
+
+function calculateNumogram() {
+  const input = document.getElementById('numo-gematria-input').value.trim().toUpperCase(); const display = document.getElementById('numo-result-display'); if (!input) return display.textContent = "Please enter data.";
+  let totalSum = 0; for (let i = 0; i < input.length; i++) { const char = input[i]; if (/[A-Z]/.test(char)) totalSum += char.charCodeAt(0) - 64; else if (/[0-9]/.test(char)) totalSum += parseInt(char); }
+  if (totalSum === 0) return display.textContent = "Invalid entry.";
+  let digitalRoot = totalSum % 9; if (digitalRoot === 0 && totalSum > 0) digitalRoot = 9;
+  display.innerHTML = `Sum: <span style="color:#fff">${totalSum}</span> ➔ Digital Root: <span style="color:#fff; font-size:1.5rem">${digitalRoot}</span>`; selectZone(digitalRoot);
+}
+
+function findDemon() {
+   const z1Str = document.getElementById('demon-z1').value; const z2Str = document.getElementById('demon-z2').value; if(z1Str === "" || z2Str === "") return;
+   const z1 = parseInt(z1Str); const z2 = parseInt(z2Str); const max = Math.max(z1, z2); const min = Math.min(z1, z2);
+   const warpPlex = [0, 3, 6, 9]; const torque = [1, 2, 4, 5, 7, 8];
+   let classification = (warpPlex.includes(max) && warpPlex.includes(min)) ? "Xenodemon (Outside Time)" : (torque.includes(max) && torque.includes(min)) ? "Chronodemon (Chronic Time)" : "Amphidemon (Crossing)";
+   const planets = ["Sol", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"];
+   document.getElementById('demon-result').innerHTML = `<strong>Net-Span [${max}::${min}]</strong><br>Class: <span style="color:#00e5ff">${classification}</span><br>Planetary Bridge: ${planets[max]} ↔ ${planets[min]}`;
+}
+
+const ccruLexicon = [ { term: "Hyperstition", def: "A fictional quantity functional as a time-traveling device." }, { term: "Numogram", def: "The Decimal Labyrinth. A diagram of time-sorcery." } ];
+function searchLexicon() {
+   const q = document.getElementById('lexicon-search').value.toLowerCase(); const resDiv = document.getElementById('lexicon-results'); resDiv.innerHTML = ''; if(!q) return;
+   const matches = ccruLexicon.filter(item => item.term.toLowerCase().includes(q) || item.def.toLowerCase().includes(q));
+   if(matches.length === 0) return resDiv.innerHTML = '<p style="color:rgba(255,255,255,0.5)">No archives found.</p>';
+   matches.forEach(m => { resDiv.innerHTML += `<div style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1)"><strong style="color: #ff3c8e; font-size:0.95rem;">${m.term}</strong><p style="margin-top: 4px;">${m.def}</p></div>`; });
+}
+
+// ===== I-CHING ORACLE =====
+const iChingDatabase = {
+  "111111": { num: 1, name: "Qian (The Creative)", meaning: "Strong, dynamic action. Time to initiate, lead, and persevere with inner strength." },
+  "000000": { num: 2, name: "Kun (The Receptive)", meaning: "Yielding, passive support. Wait and follow the current rather than forcing change." },
+  "100010": { num: 3, name: "Chun (Difficulty at the Beginning)", meaning: "Chaos before order. A time of painful but necessary growth. Seek guidance." },
+  "010001": { num: 4, name: "Meng (Youthful Folly)", meaning: "Inexperience. Learn from mistakes and respect the guidance of a teacher." },
+  "111010": { num: 5, name: "Xu (Waiting)", meaning: "Patience. Bide your time, gather your strength, and wait for the right moment." },
+  "010111": { num: 6, name: "Song (Conflict)", meaning: "Disagreement and friction. Compromise is better than pushing for a total victory." },
+  "010000": { num: 7, name: "Shi (The Army)", meaning: "Discipline and organization. Align yourself with a strong purpose and leadership." },
+  "000010": { num: 8, name: "Bi (Holding Together)", meaning: "Union and alliance. True connection is found in sincere cooperation." },
+  "111011": { num: 9, name: "Xiao Chu (The Taming Power of the Small)", meaning: "Gentle restraint. Minor obstacles delay progress; use gentle persuasion." },
+  "110111": { num: 10, name: "Lu (Treading)", meaning: "Walking cautiously. Proceed with extreme care and respect for those in power." },
+  "111000": { num: 11, name: "Tai (Peace)", meaning: "Harmony and prosperity. A perfect balance of energies bringing success." },
+  "000111": { num: 12, name: "Pi (Standstill)", meaning: "Stagnation. Energies are disconnected. Retreat into yourself and wait." },
+  "101111": { num: 13, name: "Tong Ren (Fellowship with Men)", meaning: "Community. Success comes through cooperation and shared goals." },
+  "111101": { num: 14, name: "Da You (Possession in Great Measure)", meaning: "Abundance. You have the resources and power; use them generously." },
+  "001000": { num: 15, name: "Qian (Modesty)", meaning: "Humility. Balance is achieved by not boasting or overextending." },
+  "000100": { num: 16, name: "Yu (Enthusiasm)", meaning: "Inspiration and movement. Channel your excitement into constructive action." },
+  "100110": { num: 17, name: "Sui (Following)", meaning: "Adaptation. True leadership requires knowing when to follow and adapt." },
+  "011001": { num: 18, name: "Gu (Work on what has been spoiled)", meaning: "Decay. It is time to fix past mistakes and clean out the rot." },
+  "110000": { num: 19, name: "Lin (Approach)", meaning: "Advancement. Spring is coming; take advantage of the favorable timing." },
+  "000011": { num: 20, name: "Guan (Contemplation)", meaning: "Observation. Step back and look at the big picture before making a move." },
+  "100101": { num: 21, name: "Shi He (Biting Through)", meaning: "Overcoming obstacles. Force may be necessary to remove a blockage." },
+  "101001": { num: 22, name: "Bi (Grace)", meaning: "Aesthetics and form. Superficial beauty is pleasant but lacks deep substance." },
+  "000001": { num: 23, name: "Bo (Splitting Apart)", meaning: "Deterioration. Things are falling apart. Do not act; wait out the collapse." },
+  "100000": { num: 24, name: "Fu (Return)", meaning: "Renewal. A turning point. The darkness has passed, and light is returning." },
+  "100111": { num: 25, name: "Wu Wang (Innocence)", meaning: "Natural action. Act without ulterior motives; let things flow organically." },
+  "111001": { num: 26, name: "Da Chu (The Taming Power of the Great)", meaning: "Accumulation of energy. Hold your power back until the perfect moment." },
+  "100001": { num: 27, name: "Yi (The Corners of the Mouth)", meaning: "Nourishment. Pay attention to what you consume, both food and words." },
+  "011110": { num: 28, name: "Da Guo (Preponderance of the Great)", meaning: "Overload. The structure is buckling under extreme pressure; act decisively." },
+  "010010": { num: 29, name: "Kan (The Abysmal/Water)", meaning: "Danger. You are in deep water. Stay calm, keep moving, and be sincere." },
+  "101101": { num: 30, name: "Li (The Clinging/Fire)", meaning: "Clarity and dependence. Fire needs fuel; attach yourself to what is good." },
+  "001110": { num: 31, name: "Xian (Influence)", meaning: "Mutual attraction. Open yourself to the influence of others and connect." },
+  "011100": { num: 32, name: "Heng (Duration)", meaning: "Consistency. Success comes through steady, unchanging persistence." },
+  "001111": { num: 33, name: "Dun (Retreat)", meaning: "Strategic withdrawal. Pull back from a losing battle to preserve your strength." },
+  "111100": { num: 34, name: "Da Zhuang (The Power of the Great)", meaning: "Immense power. Use your strength justly and avoid reckless aggression." },
+  "000101": { num: 35, name: "Jin (Progress)", meaning: "Rapid advancement. The sun is rising; step into the light and succeed." },
+  "101000": { num: 36, name: "Ming I (Darkening of the Light)", meaning: "Adversity. Hide your light and lay low while surrounded by darkness." },
+  "101011": { num: 37, name: "Jia Ren (The Family)", meaning: "Inner structures. Focus on domestic harmony and the roles within a group." },
+  "110101": { num: 38, name: "Kui (Opposition)", meaning: "Misunderstanding. People are working at cross-purposes. Find small agreements." },
+  "001010": { num: 39, name: "Jian (Obstruction)", meaning: "Impassable blockage. Do not push forward; retreat and ask for advice." },
+  "010100": { num: 40, name: "Xie (Deliverance)", meaning: "Relief. The tension has broken. Forgive, forget, and move on swiftly." },
+  "110001": { num: 41, name: "Sun (Decrease)", meaning: "Letting go. Give up the non-essential to achieve a greater simplicity." },
+  "100011": { num: 42, name: "Yi (Increase)", meaning: "Expansion. A time of great opportunity and blessing. Act boldly." },
+  "111110": { num: 43, name: "Guai (Breakthrough)", meaning: "Resolution. Firmly but carefully remove corrupt influences." },
+  "011111": { num: 44, name: "Gou (Coming to Meet)", meaning: "Unexpected encounters. Beware of seemingly harmless but dangerous temptations." },
+  "000110": { num: 45, name: "Cui (Gathering Together)", meaning: "Massing. Bring people and resources together for a common cause." },
+  "011000": { num: 46, name: "Sheng (Pushing Upward)", meaning: "Steady growth. Like a tree growing from the earth, rise slowly and surely." },
+  "010110": { num: 47, name: "Kun (Oppression)", meaning: "Exhaustion. Resources are drained. Hold on to your inner truth and wait." },
+  "011010": { num: 48, name: "Jing (The Well)", meaning: "Source. The fundamental needs of life remain unchanged. Go to the source." },
+  "101110": { num: 49, name: "Ge (Revolution)", meaning: "Radical change. Shed the old skin; a necessary overthrow of the old order." },
+  "011101": { num: 50, name: "Ding (The Caldron)", meaning: "Transformation. A spiritual and cultural refinement bringing high success." },
+  "100100": { num: 51, name: "Zhen (The Arousing/Thunder)", meaning: "Shock. A sudden, terrifying event that brings necessary awakening." },
+  "001001": { num: 52, name: "Gen (Keeping Still/Mountain)", meaning: "Stillness. Stop all movement. Quiet your mind and find inner peace." },
+  "001011": { num: 53, name: "Jian (Development/Gradual Progress)", meaning: "Slow progress. Do not rush; let things unfold at their natural pace." },
+  "110100": { num: 54, name: "Gui Mei (The Marrying Maiden)", meaning: "Subordination. You are in a disadvantageous position. Accept your limits." },
+  "101100": { num: 55, name: "Feng (Abundance)", meaning: "Zenith. Peak prosperity, but recognize that peaks are followed by declines." },
+  "001101": { num: 56, name: "Lu (The Wanderer)", meaning: "Travel. You are an outsider. Be cautious, adaptable, and respectful." },
+  "011011": { num: 57, name: "Xun (The Gentle/Wind)", meaning: "Penetration. Gentle, persistent effort over time yields massive results." },
+  "110110": { num: 58, name: "Dui (The Joyous/Lake)", meaning: "Joy. True happiness comes through open communication and shared pleasure." },
+  "010011": { num: 59, name: "Huan (Dispersion)", meaning: "Dissolving. Illusions and blockages are clearing. Let things flow apart naturally." },
+  "110010": { num: 60, name: "Jie (Limitation)", meaning: "Boundaries. Set healthy limits and stick to a defined budget or structure." },
+  "110011": { num: 61, name: "Zhong Fu (Inner Truth)", meaning: "Sincerity. Profound trust and honesty have the power to influence even the hardest hearts." },
+  "001100": { num: 62, name: "Xiao Guo (Preponderance of the Small)", meaning: "Small measures. Keep a low profile and focus on minor, practical details." },
+  "101010": { num: 63, name: "Ji Ji (After Completion)", meaning: "Order achieved. Everything is in its place, but stay alert to prevent future decay." },
+  "010101": { num: 64, name: "Wei Ji (Before Completion)", meaning: "Threshold. The transition is incomplete. Proceed with extreme caution." }
+};
+
+function renderHexagram(containerId, lines) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  // lines array is [bottom, 2, 3, 4, 5, top]. Render bottom-up using flex column-reverse in CSS.
+  lines.forEach((val) => {
+    const isYang = (val === 7 || val === 9);
+    const isChanging = (val === 6 || val === 9);
     
-    function setSpeech(k) {
-        const s = speeches[k]; if(!s) return;
-        document.getElementById('speech-en').textContent = s.en;
-        document.getElementById('speech-jp').textContent = s.jp;
-        document.getElementById('speech-es').textContent = s.es;
-    }
-
-    const spriteMap = { idle: './idle.png', happy: './happy.png', sad: './sad.png', sleep: './sleep.png', study: './study.png', read: './read.png', celebrate: './celebrate.png' };
-    function setCreatureState(state) { 
-        const el = document.getElementById('sprite-img'); if(!el) return; 
-        el.src = spriteMap[state] || spriteMap.idle; 
-    }
-
-    let isBouncing = false;
-    document.getElementById('sprite-img').addEventListener('click', function() {
-        if(isBouncing) return; isBouncing = true;
-        this.style.transform = 'translateY(-20px)';
-        const prevSrc = this.src; this.src = spriteMap.happy;
-        setTimeout(() => { this.style.transform = ''; if(this.src.includes('happy.png')) this.src = prevSrc; isBouncing = false; }, 400);
-    });
-
-    function updateMood() {
-        const today = data.days[todayStr()] || {}; let mood = 30; 
-        if(today.flash > 0) mood += 30; 
-        if(today.read > 0) mood += 30; 
-        if(data.streak >= 3) mood += 10; 
-        mood = Math.min(100, mood);
-        
-        const fill = document.getElementById('mood-fill'), text = document.getElementById('mood-text'); 
-        fill.style.width = mood + '%';
-        
-        if(mood >= 90) { fill.style.background = 'linear-gradient(90deg,#7ec832,#a8e84c)'; text.textContent = 'Ecstatic!'; setCreatureState('happy'); }
-        else if(mood >= 60) { fill.style.background = 'linear-gradient(90deg,#ffcc00,#ff8a00)'; text.textContent = 'Happy'; setCreatureState('idle'); }
-        else if(mood >= 40) { fill.style.background = 'linear-gradient(90deg,#ff8a00,#e06500)'; text.textContent = 'Neutral'; setCreatureState('idle'); }
-        else { fill.style.background = 'linear-gradient(90deg,#ff3c8e,#d42070)'; text.textContent = 'Needs attention'; setCreatureState('sad'); }
-    }
-
-    // ===== TASK LOGGING & STREAKS =====
-    function calcStreak() {
-        const sortedDays = Object.keys(data.days).sort().reverse(); 
-        if(!sortedDays.length) { data.streak = 0; return; }
-        
-        let streak = 0, cd = new Date(); 
-        if(!data.days[todayStr()]) cd.setDate(cd.getDate() - 1);
-        
-        while(true) { 
-            const ds = cd.getFullYear()+'-'+String(cd.getMonth()+1).padStart(2,'0')+'-'+String(cd.getDate()).padStart(2,'0'); 
-            const day = data.days[ds]; 
-            if(day && (day.flash > 0 || day.read > 0)) { streak++; cd.setDate(cd.getDate() - 1); } 
-            else break; 
-        }
-        data.streak = streak;
-    }
-
-    function logFlashcards() {
-        const val = parseInt(document.getElementById('flash-minutes').value); if(!val || val <= 0) return;
-        const today = todayStr(); if(!data.days[today]) data.days[today] = { flash: 0, read: 0 }; 
-        data.days[today].flash += val;
-        
-        document.getElementById('flash-input-area').style.display = 'none';
-        document.getElementById('flash-done').style.display = 'block';
-        document.getElementById('flash-done-text').textContent = data.days[today].flash + ' min today!';
-        document.getElementById('card-flash').classList.add('done'); 
-        setCreatureState('study');
-        
-        const readDone = (data.days[today].read || 0) > 0;
-        setSpeech(readDone ? 'bothDone' : 'flashDone'); 
-        calcStreak(); saveData(); updateStats(); updateMood(); 
-        if(readDone) setTimeout(() => setCreatureState('celebrate'), 300);
-    }
-
-    function logReading() {
-        const val = parseFloat(document.getElementById('read-hours').value); if(!val || val <= 0) return;
-        const today = todayStr(); if(!data.days[today]) data.days[today] = { flash: 0, read: 0 }; 
-        data.days[today].read += val;
-        
-        document.getElementById('read-input-area').style.display = 'none';
-        document.getElementById('read-done').style.display = 'block';
-        document.getElementById('read-done-text').textContent = data.days[today].read + ' hrs today!';
-        document.getElementById('card-read').classList.add('done'); 
-        setCreatureState('read');
-        
-        const flashDone = (data.days[today].flash || 0) > 0;
-        setSpeech(flashDone ? 'bothDone' : 'readDone'); 
-        calcStreak(); saveData(); updateStats(); updateMood(); 
-        if(flashDone) setTimeout(() => setCreatureState('celebrate'), 300);
-    }
-
-    // ===== DICTIONARY =====
-    function addWord() {
-        const en = document.getElementById('dict-en').value.trim();
-        const jp = document.getElementById('dict-jp').value.trim();
-        const es = document.getElementById('dict-es').value.trim(); 
-        if(!en && !jp && !es) return;
-        
-        data.dictionary.push({ en: en || '—', jp: jp || '—', es: es || '—', addedDate: todayStr() });
-        document.getElementById('dict-en').value = ''; document.getElementById('dict-jp').value = ''; document.getElementById('dict-es').value = '';
-        saveData(); renderDictionary(); setSpeech('newWord');
+    const div = document.createElement('div');
+    div.className = `hex-line ${isYang ? 'yang' : 'yin'}`;
+    
+    let innerHTML = '';
+    if (isYang) {
+      innerHTML = `<div class="seg"></div>`;
+    } else {
+      innerHTML = `<div class="seg"></div><div class="seg"></div>`;
     }
     
-    function deleteWord(i) { data.dictionary.splice(i, 1); saveData(); renderDictionary(); }
-    
-    function renderDictionary() {
-        const list = document.getElementById('dict-list'); list.innerHTML = '';
-        data.dictionary.slice().reverse().forEach(w => {
-            const realIndex = data.dictionary.lastIndexOf(w);
-            const row = document.createElement('div'); row.className = 'dict-row';
-            row.innerHTML = `<div class="dict-cell">${escHtml(w.en)}</div><div class="dict-cell jp">${escHtml(w.jp)}</div><div class="dict-cell es">${escHtml(w.es)}</div><button class="diary-del-btn" style="position:static" onclick="deleteWord(${realIndex})">×</button>`;
-            list.appendChild(row);
-        });
-        document.getElementById('dict-count').textContent = data.dictionary.length + ' words'; 
-        document.getElementById('dict-tab-count').textContent = '(' + data.dictionary.length + ')';
-    }
-
-    // ===== DIARY =====
-    function addDiaryEntry() { 
-        const text = document.getElementById('diary-input').value.trim(); if(!text) return; 
-        data.diary.push({ date: formatDateTime(new Date()), text: text }); 
-        document.getElementById('diary-input').value = ''; 
-        saveData(); renderDiary(); 
+    if (isChanging) {
+      innerHTML += `<span class="hex-line-marker">${val === 9 ? '(O)' : '(X)'}</span>`;
     }
     
-    function deleteDiaryEntry(i) { data.diary.splice(i, 1); saveData(); renderDiary(); }
+    div.innerHTML = innerHTML;
+    container.appendChild(div);
+  });
+}
+
+function getBinaryFromLines(lines) {
+  // Convert 6,7,8,9 to 0 (yin) or 1 (yang)
+  // lines[0] is bottom, lines[5] is top.
+  // Standard hexagram binary strings map bottom-to-top as left-to-right.
+  return lines.map(v => (v === 7 || v === 9) ? '1' : '0').join('');
+}
+
+function castOracle() {
+  document.getElementById('iching-hex-container').style.display = 'flex';
+  
+  // Cast 6 lines
+  const primaryLines = [];
+  const secondaryLines = [];
+  let hasChanging = false;
+  
+  for(let i = 0; i < 6; i++) {
+    // Cast 3 coins (heads=3, tails=2)
+    const coin1 = Math.random() < 0.5 ? 2 : 3;
+    const coin2 = Math.random() < 0.5 ? 2 : 3;
+    const coin3 = Math.random() < 0.5 ? 2 : 3;
+    const sum = coin1 + coin2 + coin3;
     
-    function renderDiary() {
-        const list = document.getElementById('diary-list'); list.innerHTML = '';
-        if(!data.diary.length) return list.innerHTML = '<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px">No diary entries yet.</p>';
-        data.diary.slice().reverse().forEach(entry => { 
-            const realIndex = data.diary.lastIndexOf(entry); 
-            const row = document.createElement('div'); row.className = 'diary-entry'; 
-            row.innerHTML = `<div class="diary-entry-date">${escHtml(entry.date)}</div><div class="diary-entry-text">${escHtml(entry.text)}</div><button class="diary-del-btn" onclick="deleteDiaryEntry(${realIndex})">×</button>`; 
-            list.appendChild(row); 
-        });
-    }
-
-    // ===== HISTORY & STATS =====
-    function renderHistory() {
-        const grid = document.getElementById('history-grid'); grid.innerHTML = ''; 
-        const sortedDays = Object.keys(data.days).sort().reverse();
-        if(!sortedDays.length) { grid.innerHTML = '<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px">No study days yet!</p>'; return; }
-        
-        sortedDays.forEach(day => {
-            const d = data.days[day];
-            const row = document.createElement('div'); 
-            row.style.cssText = "display: flex; justify-content: space-between; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;";
-            row.innerHTML = `<span style="color:#00e5ff; font-weight:bold;">${formatDate(day)}</span><span>📇 ${d.flash||0} min</span><span>📚 ${d.read||0} hrs</span><span style="color:#ffcc00">${(d.flash>0||d.read>0)?'✓':'—'}</span>`; 
-            grid.appendChild(row);
-        });
-    }
-
-    function updateStats() {
-        let tf = 0, tr = 0; Object.values(data.days).forEach(d => { tf += d.flash || 0; tr += d.read || 0; });
-        document.getElementById('stat-total-flash').textContent = tf; 
-        document.getElementById('stat-total-read').textContent = tr;
-        document.getElementById('stat-words').textContent = data.dictionary.length; 
-        document.getElementById('stat-days').textContent = Object.keys(data.days).length;
-        document.getElementById('streak-badge').textContent = '🔥 ' + data.streak + ' day streak'; 
-        renderHistory();
-    }
-
-    // ===== NES PASSWORD =====
-    function generatePassword() { document.getElementById('nes-password-box').value = btoa(encodeURIComponent(JSON.stringify(data))).match(/.{1,8}/g).join('-'); }
-    function loadPassword() {
-        const input = document.getElementById('nes-password-box').value.trim(); if (!input) return alert("ENTER PASSWORD.");
-        try {
-            let imported = JSON.parse(decodeURIComponent(atob(input.replace(/[-\s]/g, ''))));
-            if (imported.days && imported.dictionary) { 
-                if (!imported.diary) imported.diary = []; 
-                data = imported; saveData(); initApp(); 
-                alert("RESTORED!"); document.getElementById('nes-password-box').value = ''; 
-            } else alert("INVALID DATA.");
-        } catch (err) { alert("INVALID FORMAT."); }
-    }
-    function copyPassword() { const pwBox = document.getElementById('nes-password-box'); if (!pwBox.value) return; pwBox.select(); document.execCommand('copy'); alert("COPIED!"); }
-
-    // ===== I-CHING ORACLE =====
-    const iChingDatabase = {
-        "111111": { num: 1, name: "Qian (The Creative)", meaning: "Strong, unbroken action. Success through persistent effort and creation." },
-        "000000": { num: 2, name: "Kun (The Receptive)", meaning: "Receptivity and yielding. Success through acceptance and following a leader." },
-        "100010": { num: 3, name: "Chun (Difficulty at the Beginning)", meaning: "Birth pangs. New growth is struggling to emerge; be patient and find helpers." },
-        "010001": { num: 4, name: "Meng (Youthful Folly)", meaning: "Inexperience. Seek guidance from an experienced teacher and learn from mistakes." },
-        "111010": { num: 5, name: "Xu (Waiting)", meaning: "Calculated delay. Wait for the right moment while nourishing yourself." },
-        "010111": { num: 6, name: "Song (Conflict)", meaning: "Friction. You are opposed. Do not push to extremes; seek compromise." },
-        "010000": { num: 7, name: "Shi (The Army)", meaning: "Discipline. Organize your forces and act with strict adherence to rules." },
-        "000010": { num: 8, name: "Bi (Holding Together)", meaning: "Union. Draw close to like-minded people. A strong center creates unity." },
-        "111011": { num: 9, name: "Xiao Chu (The Taming Power of the Small)", meaning: "Gentle restraint. You lack the power for big changes; focus on small refinements." },
-        "110111": { num: 10, name: "Lu (Treading)", meaning: "Walking cautiously. Proceed with extreme care and respect for those in power." },
-        "111000": { num: 11, name: "Tai (Peace)", meaning: "Harmony and prosperity. A perfect balance of energies bringing success." },
-        "000111": { num: 12, name: "Pi (Standstill)", meaning: "Stagnation. Energies are disconnected. Retreat into yourself and wait." },
-        "101111": { num: 13, name: "Tong Ren (Fellowship with Men)", meaning: "Community. Success comes through cooperation and shared goals." },
-        "111101": { num: 14, name: "Da You (Possession in Great Measure)", meaning: "Abundance. You have the resources and power; use them generously." },
-        "001000": { num: 15, name: "Qian (Modesty)", meaning: "Humility. Balance is achieved by not boasting or overextending." },
-        "000100": { num: 16, name: "Yu (Enthusiasm)", meaning: "Inspiration and movement. Channel your excitement into constructive action." },
-        "100110": { num: 17, name: "Sui (Following)", meaning: "Adaptation. True leadership requires knowing when to follow and adapt." },
-        "011001": { num: 18, name: "Gu (Work on what has been spoiled)", meaning: "Decay. It is time to fix past mistakes and clean out the rot." },
-        "110000": { num: 19, name: "Lin (Approach)", meaning: "Advancement. Spring is coming; take advantage of the favorable timing." },
-        "000011": { num: 20, name: "Guan (Contemplation)", meaning: "Observation. Step back and look at the big picture before making a move." },
-        "100101": { num: 21, name: "Shi He (Biting Through)", meaning: "Overcoming obstacles. Force may be necessary to remove a blockage." },
-        "101001": { num: 22, name: "Bi (Grace)", meaning: "Aesthetics and form. Superficial beauty is pleasant but lacks deep substance." },
-        "000001": { num: 23, name: "Bo (Splitting Apart)", meaning: "Deterioration. Things are falling apart. Do not act; wait out the collapse." },
-        "100000": { num: 24, name: "Fu (Return)", meaning: "Renewal. A turning point. The darkness has passed, and light is returning." },
-        "100111": { num: 25, name: "Wu Wang (Innocence)", meaning: "Natural action. Act without ulterior motives; let things flow organically." },
-        "111001": { num: 26, name: "Da Chu (The Taming Power of the Great)", meaning: "Accumulation of energy. Hold your power back until the perfect moment." },
-        "100001": { num: 27, name: "Yi (The Corners of the Mouth)", meaning: "Nourishment. Pay attention to what you consume, both food and words." },
-        "011110": { num: 28, name: "Da Guo (Preponderance of the Great)", meaning: "Overload. The structure is buckling under extreme pressure; act decisively." },
-        "010010": { num: 29, name: "Kan (The Abysmal/Water)", meaning: "Danger. You are in deep water. Stay calm, keep moving, and be sincere." },
-        "101101": { num: 30, name: "Li (The Clinging/Fire)", meaning: "Clarity and dependence. Fire needs fuel; attach yourself to what is good." },
-        "001110": { num: 31, name: "Xian (Influence)", meaning: "Mutual attraction. Open yourself to the influence of others and connect." },
-        "011100": { num: 32, name: "Heng (Duration)", meaning: "Consistency. Success comes through steady, unchanging persistence." },
-        "001111": { num: 33, name: "Dun (Retreat)", meaning: "Strategic withdrawal. Pull back from a losing battle to preserve your strength." },
-        "111100": { num: 34, name: "Da Zhuang (The Power of the Great)", meaning: "Immense power. Use your strength justly and avoid reckless aggression." },
-        "000101": { num: 35, name: "Jin (Progress)", meaning: "Rapid advancement. The sun is rising; step into the light and succeed." },
-        "101000": { num: 36, name: "Ming I (Darkening of the Light)", meaning: "Adversity. Hide your light and lay low while surrounded by darkness." },
-        "101011": { num: 37, name: "Jia Ren (The Family)", meaning: "Inner structures. Focus on domestic harmony and the roles within a group." },
-        "110101": { num: 38, name: "Kui (Opposition)", meaning: "Misunderstanding. You are seeing things differently from others. Find the middle ground." },
-        "001010": { num: 39, name: "Jian (Obstruction)", meaning: "Roadblock. You cannot go forward. Retreat, reassess, and seek help." },
-        "010100": { num: 40, name: "Xie (Deliverance)", meaning: "Relief. The tension has broken. Forgive past wrongs and move forward freely." },
-        "110001": { num: 41, name: "Sun (Decrease)", meaning: "Loss. Give up something lower in order to gain something higher." },
-        "100011": { num: 42, name: "Yi (Increase)", meaning: "Expansion. It is a time for grand actions and sharing wealth with others." },
-        "111110": { num: 43, name: "Guai (Breakthrough)", meaning: "Resolution. A tense situation requires a decisive, vocal, and non-violent stand." },
-        "011111": { num: 44, name: "Gou (Coming to Meet)", meaning: "Temptation. A small, dark element is entering. Be cautious of seductions." },
-        "000110": { num: 45, name: "Cui (Gathering Together)", meaning: "Massing. Bring people and resources together around a common spiritual purpose." },
-        "011000": { num: 46, name: "Sheng (Pushing Upward)", meaning: "Ascent. Gradual, sustained effort brings you to the top of the mountain." },
-        "010110": { num: 47, name: "Kun (Oppression/Exhaustion)", meaning: "Exhaustion. Resources are gone. Hold onto your inner truth and endure the drought." },
-        "011010": { num: 48, name: "Jing (The Well)", meaning: "Inner source. The foundation remains unchanged. Draw from your deep spiritual reserves." },
-        "101110": { num: 49, name: "Ge (Revolution)", meaning: "Radical change. The old system is dead. Act decisively to establish a new order." },
-        "011101": { num: 50, name: "Ding (The Caldron)", meaning: "Transformation. A spiritual and cultural refinement bringing high success." },
-        "100100": { num: 51, name: "Zhen (The Arousing/Thunder)", meaning: "Shock. A sudden, terrifying event that brings necessary awakening." },
-        "001001": { num: 52, name: "Gen (Keeping Still/Mountain)", meaning: "Stillness. Stop all movement. Quiet your mind and find inner peace." },
-        "001011": { num: 53, name: "Jian (Development/Gradual Progress)", meaning: "Slow progress. Do not rush; let things unfold at their natural pace." },
-        "110100": { num: 54, name: "Gui Mei (The Marrying Maiden)", meaning: "Subordination. You are in a disadvantageous position. Accept your limits." },
-        "101100": { num: 55, name: "Feng (Abundance)", meaning: "Zenith. Peak prosperity, but recognize that peaks are followed by declines." },
-        "001101": { num: 56, name: "Lu (The Wanderer)", meaning: "Travel. You are an outsider. Be cautious, adaptable, and respectful." },
-        "011011": { num: 57, name: "Xun (The Gentle/Wind)", meaning: "Penetration. Gentle, persistent effort over time yields massive results." },
-        "110110": { num: 58, name: "Dui (The Joyous/Lake)", meaning: "Joy. True happiness comes through open communication and shared pleasure." },
-        "010011": { num: 59, name: "Huan (Dispersion)", meaning: "Dissolving. Illusions and blockages are clearing. Let things flow apart naturally." },
-        "110010": { num: 60, name: "Jie (Limitation)", meaning: "Boundaries. Set healthy limits and stick to a defined budget or structure." },
-        "110011": { num: 61, name: "Zhong Fu (Inner Truth)", meaning: "Sincerity. Profound trust and honesty have the power to influence even the hardest hearts." },
-        "001100": { num: 62, name: "Xiao Guo (Preponderance of the Small)", meaning: "Caution. Keep a low profile. Focus on minor details; grand gestures will fail." },
-        "101010": { num: 63, name: "Ji Ji (After Completion)", meaning: "Climax. The goal is achieved, but chaos threatens to return. Stay vigilant." },
-        "010101": { num: 64, name: "Wei Ji (Before Completion)", meaning: "Threshold. You are almost there. Proceed with extreme caution to finalize the transition." }
-    };
-
-    function renderHexagram(containerId, lines) {
-        const container = document.getElementById(containerId);
-        container.innerHTML = '';
-        lines.forEach((val) => {
-            const isYang = (val === 7 || val === 9);
-            const isChanging = (val === 6 || val === 9);
-            const div = document.createElement('div');
-            div.className = `hex-line ${isYang ? 'yang' : 'yin'}`;
-            let innerHTML = '';
-            if (isYang) {
-                innerHTML = `<div class="seg"></div>`;
-            } else {
-                innerHTML = `<div class="seg"></div><div class="seg"></div>`;
-            }
-            if (isChanging) {
-                innerHTML += `<span class="hex-line-marker">${val === 9 ? '(O)' : '(X)'}</span>`;
-            }
-            div.innerHTML = innerHTML;
-            container.appendChild(div);
-        });
-    }
-
-    function getBinaryFromLines(lines) {
-        return lines.map(v => (v === 7 || v === 9) ? '1' : '0').join('');
-    }
-
-    function castOracle() {
-        document.getElementById('iching-hex-container').style.display = 'flex';
-        const primaryLines = [];
-        const secondaryLines = [];
-        let hasChanging = false;
-        
-        for(let i = 0; i < 6; i++) {
-            const coin1 = Math.random() < 0.5 ? 2 : 3;
-            const coin2 = Math.random() < 0.5 ? 2 : 3;
-            const coin3 = Math.random() < 0.5 ? 2 : 3;
-            const sum = coin1 + coin2 + coin3;
-            primaryLines.push(sum);
-            
-            if (sum === 6) { hasChanging = true; secondaryLines.push(7); } 
-            else if (sum === 9) { hasChanging = true; secondaryLines.push(8); } 
-            else { secondaryLines.push(sum); }
-        }
-        
-        renderHexagram('iching-primary-vis', primaryLines);
-        const primaryBin = getBinaryFromLines(primaryLines);
-        const primaryData = iChingDatabase[primaryBin];
-        
-        const priBox = document.getElementById('iching-primary-result');
-        priBox.style.display = 'block';
-        priBox.innerHTML = `<h3>Hexagram ${primaryData.num}: ${primaryData.name}</h3><p>${primaryData.meaning}</p>`;
-        
-        const secBoxUI = document.getElementById('iching-secondary-box');
-        const secResultBox = document.getElementById('iching-secondary-result');
-
-        if (hasChanging) {
-            secBoxUI.style.display = 'flex';
-            renderHexagram('iching-secondary-vis', secondaryLines);
-            
-            const secondaryBin = getBinaryFromLines(secondaryLines);
-            const secondaryData = iChingDatabase[secondaryBin];
-            
-            secResultBox.style.display = 'block';
-            secResultBox.innerHTML = `<h3>Changes to Hexagram ${secondaryData.num}: ${secondaryData.name}</h3><p>${secondaryData.meaning}</p>`;
-        } else {
-            secBoxUI.style.display = 'none';
-            secResultBox.style.display = 'none';
-        }
-    }
-
-    // ===== NUMOGRAM JAVASCRIPT =====
-    const introData = `<h3>The Numogram</h3><p>Click a Zone on the map to reveal its esoteric data and planetary alignments.</p>`;
+    primaryLines.push(sum);
     
-    const zoneData = {
-        0: `<h3>Zone Zero (0-) : Flatline</h3><h4>The Numeral 0</h4><p>The figure ‘0' designates the number zero, anterior to the distinction odd/even.</p><h4>The Zeroth Planet: Sol</h4><p>The Sun (Sol-0) is by far the largest body in the Solar-system.</p><h4>System Notes</h4><p>Zone-0 is the first of two zones mutually composing the Plex-region.</p>`,
-        1: `<h3>Zone One (1+) : Deep</h3><h4>The Numeral 1</h4><p>The figure ‘1' designates the number one, first odd number, and the zeroth prime.</p><h4>The First Planet: Mercury</h4><p>Mercury is the innermost planet of the Solar-system.</p><h4>System Notes</h4><p>Zone-1 is the first of the six Torque-region Zones.</p>`,
-        2: `<h3>Zone Two (2-) : Transcience</h3><h4>The Numeral 2</h4><p>The figure ‘2' designates the number two, the first and definitive even number.</p><h4>The Second Planet: Venus</h4><p>Venus (or Sol-2) has a mean orbital distance from sun of 108.2 million km.</p><h4>System Notes</h4><p>Zone-2 is the second of the six Torque-region Zones.</p>`,
-        3: `<h3>Zone Three (3+) : Vortex</h3><h4>The Numeral 3</h4><p>The figure ‘3' designates the number three, the second odd number.</p><h4>The Third Planet: Earth</h4><p>Earth (or Sol-3) defines the standard Astronomical Unit (AU).</p><h4>System Notes</h4><p>Zone-3 is the first of the two Warp-region Zones.</p>`,
-        4: `<h3>Zone Four (4-) : Melt</h3><h4>The Numeral 4</h4><p>The figure ‘4' designates the number four, the second even number.</p><h4>The Fourth Planet: Mars</h4><p>Mars (or Sol-4) has a mean orbital distance from the sun of approx. 228 000 000 km.</p><h4>System Notes</h4><p>Zone-4 is the third of the six Torque-region Zones.</p>`,
-        5: `<h3>Zone Five (5+) : Pressure</h3><h4>The Numeral 5</h4><p>The figure ‘5' designates the number five, the third odd number.</p><h4>The Fifth Planet: Jupiter</h4><p>Jupiter (or Sol-5) is the innermost gas-giant.</p><h4>System Notes</h4><p>Zone-5 is the sixth of the six Torque-region Zones.</p>`,
-        6: `<h3>Zone Six (6-) : Psyclone</h3><h4>The Numeral 6</h4><p>The figure ‘6' designates the number six, third even number.</p><h4>The Sixth Planet: Saturn</h4><p>Saturn (or Sol-6) has a mean orbital distance from the sun of approx. 1 429 400 000 km.</p><h4>System Notes</h4><p>Zone-6 is the second of the two Warp-region Zones.</p>`,
-        7: `<h3>Zone Seven (7+) : Lure</h3><h4>The Numeral 7</h4><p>The figure ‘7' designates the number seven, the fourth odd number.</p><h4>The Seventh Planet: Uranus</h4><p>Uranus (or Sol-7) rotation is abnormally tilted.</p><h4>System Notes</h4><p>Zone-7 is the fifth of the six Torque-region Zones.</p>`,
-        8: `<h3>Zone Eight (8-) : Comatose</h3><h4>The Numeral 8</h4><p>The figure eight (8) is a partially rotated glyph of infinity.</p><h4>The Eighth Planet: Neptune</h4><p>Neptune (or Sol-8) is the outermost gas-giant.</p><h4>System Notes</h4><p>Zone-8 is the fourth of the six Torque-region Zones.</p>`,
-        9: `<h3>Zone Nine (9+) : Black mirror</h3><h4>The Numeral 9</h4><p>The figure nine (9) is zygospirally related to the figure six.</p><h4>The Ninth Planet: Pluto</h4><p>Pluto (or Sol-9) has the most highly elliptical orbital trajectory.</p><h4>System Notes</h4><p>Zone-9 is the second of the two zones mutually composing the Plex-region.</p>`
-    };
-
-    function selectZone(zoneNum) {
-        const display = document.getElementById('numo-display');
-        if (zoneData[zoneNum]) {
-            display.innerHTML = zoneData[zoneNum];
-        } else {
-            display.innerHTML = introData;
-        }
-    }
-
-    function calculateNumogram() {
-        const input = document.getElementById('numo-gematria-input').value.trim().toUpperCase(); 
-        const display = document.getElementById('numo-result-display'); 
-        if (!input) return display.textContent = "Please enter data.";
-        
-        let totalSum = 0; 
-        for (let i = 0; i < input.length; i++) { 
-            const char = input[i]; 
-            if (/[A-Z]/.test(char)) totalSum += char.charCodeAt(0) - 64; 
-            else if (/[0-9]/.test(char)) totalSum += parseInt(char); 
-        }
-        
-        if (totalSum === 0) return display.textContent = "Invalid entry.";
-        
-        let digitalRoot = totalSum % 9; 
-        if (digitalRoot === 0 && totalSum > 0) digitalRoot = 9;
-        display.innerHTML = `Sum: <span style="color:#fff">${totalSum}</span> ➔ Digital Root: <span style="color:#fff; font-size:1.5rem">${digitalRoot}</span>`; 
-        selectZone(digitalRoot);
-    }
-
-    function findDemon() {
-        const z1Str = document.getElementById('demon-z1').value; 
-        const z2Str = document.getElementById('demon-z2').value; 
-        if(z1Str === "" || z2Str === "") return;
-        
-        const z1 = parseInt(z1Str); 
-        const z2 = parseInt(z2Str); 
-        const max = Math.max(z1, z2); 
-        const min = Math.min(z1, z2);
-        const warpPlex = [0, 3, 6, 9]; 
-        const torque = [1, 2, 4, 5, 7, 8];
-        
-        let classification = (warpPlex.includes(max) && warpPlex.includes(min)) ? "Xenodemon (Outside Time)" : (torque.includes(max) && torque.includes(min)) ? "Chronodemon (Chronic Time)" : "Amphidemon (Crossing)";
-        const planets = ["Sol", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"];
-        document.getElementById('demon-result').innerHTML = `<strong>Net-Span [${max}::${min}]</strong><br>Class: <span style="color:#00e5ff">${classification}</span><br>Planetary Bridge: ${planets[max]} ↔ ${planets[min]}`;
-    }
-
-    const ccruLexicon = [ 
-        { term: "Hyperstition", def: "A fictional quantity functional as a time-traveling device." }, 
-        { term: "Numogram", def: "The Decimal Labyrinth. A diagram of time-sorcery." } 
-    ];
-
-    function searchLexicon() {
-        const q = document.getElementById('lexicon-search').value.toLowerCase(); 
-        const resDiv = document.getElementById('lexicon-results'); 
-        resDiv.innerHTML = ''; 
-        if(!q) return;
-        
-        const matches = ccruLexicon.filter(item => item.term.toLowerCase().includes(q) || item.def.toLowerCase().includes(q));
-        if(matches.length === 0) return resDiv.innerHTML = '<p style="color:rgba(255,255,255,0.5)">No archives found.</p>';
-        matches.forEach(m => { 
-            resDiv.innerHTML += `<div style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1)"><strong style="color: #ff3c8e; font-size:0.95rem;">${m.term}</strong><p style="margin-top: 4px;">${m.def}</p></div>`; 
-        });
-    }
-
-    // ===== INIT =====
-    function initApp() {
-        document.getElementById('date-display').textContent = formatDate(todayStr()); 
-        calcStreak();
-        
-        const td = data.days[todayStr()]; 
-        if(td) { 
-            if(td.flash > 0) {
-                document.getElementById('flash-input-area').style.display='none';
-                document.getElementById('flash-done').style.display='block';
-                document.getElementById('flash-done-text').textContent=td.flash+' min today!';
-                document.getElementById('card-flash').classList.add('done');
-            } 
-            if(td.read > 0) {
-                document.getElementById('read-input-area').style.display='none';
-                document.getElementById('read-done').style.display='block';
-                document.getElementById('read-done-text').textContent=td.read+' hrs today!';
-                document.getElementById('card-read').classList.add('done');
-            } 
-            if(td.flash > 0 && td.read > 0) setSpeech('bothDone');
-            else if(td.flash > 0) setSpeech('flashDone');
-            else if(td.read > 0) setSpeech('readDone');
-            else setSpeech('greeting'); 
-        } else {
-            setSpeech('greeting');
-        }
-        
-        if(data.streak >= 5) setSpeech('streakHigh'); 
-        renderDictionary(); 
-        renderDiary(); 
-        updateStats(); 
-        updateMood(); 
-        saveData(); 
-    }
-
+    if (sum === 6) { hasChanging = true; secondaryLines.push(7); } // Old Yin -> Young Yang
+    else if (sum === 9) { hasChanging = true; secondaryLines.push(8); } // Old Yang -> Young Yin
+    else { secondaryLines.push(sum); } // Static
+  }
+  
+  renderHexagram('iching-primary-vis', primaryLines);
+  const primaryBin = getBinaryFromLines(primaryLines);
+  const primaryData = iChingDatabase[primaryBin];
+  
+  const priBox = document.getElementById('iching-primary-result');
+  priBox.style.display = 'block';
+  priBox.innerHTML = `<h3>Hexagram ${primaryData.num}: ${primaryData.name}</h3><p>${primaryData.meaning}</p>`;
+  
+  const secBoxUI = document.getElementById('iching-secondary-box');
+  const secResultBox = document.getElementById('iching-secondary-result');
+  
+  if (hasChanging) {
+    secBoxUI.style.display = 'flex';
+    renderHexagram('iching-secondary-vis', secondaryLines);
+    
+    const secondaryBin = getBinaryFromLines(secondaryLines);
+    const secondaryData = iChingDatabase[secondaryBin];
+    
+    secResultBox.style.display = 'block';
+    secResultBox.innerHTML = `<h3>Changes to Hexagram ${secondaryData.num}: ${secondaryData.name}</h3><p>${secondaryData.meaning}</p>`;
+  } else {
+    secBoxUI.style.display = 'none';
+    secResultBox.style.display = 'none';
+  }
+}
 </script>
 </body>
 </html>
