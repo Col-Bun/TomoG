@@ -1,719 +1,1098 @@
-<!-- NUMOGRAM COMPONENT START -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moe-Chan & The Oracle</title>
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Nunito:wght@400;700;900&family=Baloo+2:wght@700;800&family=Press+Start+2P&display=swap');
 
-    .numogram-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 30px;
-        width: 100%;
-        align-items: flex-start;
-        font-family: 'Nunito', sans-serif;
-        color: #e0e0e0;
-    }
+  :root {
+    --sky1: #0099ff; --sky2: #00d4ff; --sky3: #66e0ff;
+    --green1: #7ec832; --green2: #a8e84c;
+    --orange: #ff8a00; --pink: #ff3c8e; --purple: #8b5cf6;
+    --glass: rgba(255,255,255,0.18); --glass2: rgba(255,255,255,0.10);
+    --glass-border: rgba(255,255,255,0.30);
+    --text: #1a2744; --text-light: #fff;
+    --shadow: rgba(0,60,120,0.18);
+    --metro-bg1: #ff1e78; --metro-bg2: #ff3c8e;
+  }
 
-    .numogram-wrapper {
-        flex: 1 1 500px; /* Allows it to scale nicely inside your existing layout */
-        background: #000;
-        border-radius: 20px;
-        position: relative;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.8);
-        border: 2px solid rgba(255,50,50,0.3);
-        overflow: hidden;
-        aspect-ratio: 1;
-    }
+  body.dark-mode {
+    --metro-bg1: #121215; --metro-bg2: #1e1e24; --text: #f0f0f0;
+  }
 
-    .numogram-wrapper svg {
-        width: 100%;
-        height: 100%;
-        display: block;
-    }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    .zone-group {
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
+  body { font-family: 'Nunito', sans-serif; min-height: 100vh; overflow-x: hidden; color: var(--text); transition: color 0.3s; }
 
-    .zone-group:hover circle:first-child {
-        fill: #1a1a1a;
-        stroke: #ff3c8e;
-        filter: drop-shadow(0 0 15px rgba(255, 60, 142, 0.8));
-    }
+  /* ===== FRUTIGER METRO / Y2K VECTOR BACKGROUND ===== */
+  .metro-bg { position: fixed; inset: 0; z-index: -1; background-color: var(--metro-bg1); overflow: hidden; transition: background-color 0.4s; }
+  .metro-sunburst { position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: repeating-conic-gradient(var(--metro-bg1) 0 12deg, var(--metro-bg2) 12deg 24deg); transition: background 0.4s; }
+  .metro-halftone { position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.2) 2.5px, transparent 2.5px); background-size: 20px 20px; opacity: 0.8; }
+  body.dark-mode .metro-halftone { background-image: radial-gradient(rgba(0,0,0,0.4) 2.5px, transparent 2.5px); }
+  .metro-vectors { position: absolute; inset: 0; }
+  .metro-vectors svg { width: 100%; height: 100%; }
+  .y2k-flower { transform-origin: center; transform-box: fill-box; }
 
-    .info-panel {
-        flex: 1 1 400px;
-        background: rgba(20, 0, 0, 0.6);
-        border: 2px solid #ff3333;
-        border-radius: 16px;
-        padding: 24px;
-        box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-        height: calc(100vh - 150px); /* Adjusted to account for your top nav bar */
-        max-height: 800px;
-        overflow-y: auto;
-    }
+  /* ===== GLASS PANEL STYLE ===== */
+  .glass { background: var(--glass); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1.5px solid var(--glass-border); border-radius: 24px; box-shadow: 0 8px 32px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.25); transition: background 0.4s, border-color 0.4s; }
+  .glass-strong { background: rgba(255,255,255,0.30); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1.5px solid rgba(255,255,255,0.45); border-radius: 24px; box-shadow: 0 8px 32px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.4); }
+  .glass-dark { background: rgba(0,40,80,0.35); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1.5px solid rgba(255,255,255,0.15); border-radius: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); color: #fff; }
+  body.dark-mode .glass { background: rgba(20, 20, 30, 0.45); border-color: rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05); }
+  body.dark-mode .glass-strong { background: rgba(20, 20, 30, 0.65); border-color: rgba(255,255,255,0.1); }
+  body.dark-mode .glass-dark { background: rgba(0, 0, 0, 0.5); border-color: rgba(255,255,255,0.1); }
+  body.dark-mode .speech-bubble { background: rgba(30, 30, 40, 0.85); border-color: rgba(255,255,255,0.1); }
+  body.dark-mode .speech-bubble::before { border-bottom-color: rgba(30, 30, 40, 0.85); }
+  body.dark-mode .speech-line { color: #fff; }
 
-    .info-panel::-webkit-scrollbar {
-        width: 8px;
-    }
+  /* ===== GLOSSY BUTTON ===== */
+  .btn-glossy { border: none; padding: 10px 24px; border-radius: 50px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.9rem; cursor: pointer; color: #fff; background: linear-gradient(180deg, #ff8a00 0%, #e06500 100%); box-shadow: 0 4px 14px rgba(255,138,0,0.35), inset 0 1px 0 rgba(255,255,255,0.35); transition: all 0.2s; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+  .btn-glossy:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,138,0,0.4); }
+  .btn-glossy:active { transform: translateY(0); }
+  .btn-green { background: linear-gradient(180deg, #7ec832 0%, #5ea020 100%); box-shadow: 0 4px 14px rgba(126,200,50,0.35), inset 0 1px 0 rgba(255,255,255,0.35); }
+  .btn-pink { background: linear-gradient(180deg, #ff3c8e 0%, #d42070 100%); box-shadow: 0 4px 14px rgba(255,60,142,0.35), inset 0 1px 0 rgba(255,255,255,0.35); }
+  .btn-theme { background: rgba(0,0,0,0.2); box-shadow: none; padding: 6px 14px; font-size: 1rem; cursor: pointer; color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+  .btn-theme:hover { background: rgba(0,0,0,0.4); }
+  body.dark-mode .btn-theme { background: rgba(255,255,255,0.1); }
+  body.dark-mode .btn-theme:hover { background: rgba(255,255,255,0.2); }
 
-    .info-panel::-webkit-scrollbar-thumb {
-        background: #ff3333;
-        border-radius: 4px;
-    }
+  /* ===== PASSWORD SCREEN ===== */
+  #password-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; gap: 20px; position: relative; z-index: 1; }
+  .pw-creature { width: 200px; height: 300px; display: flex; align-items: flex-end; justify-content: center; filter: drop-shadow(0 12px 24px rgba(0,0,0,0.15)); }
+  .pw-creature img { width: 100%; height: 100%; object-fit: contain; }
+  #password-screen h1 { font-family: 'Baloo 2', cursive; font-size: 2.2rem; color: #fff; text-shadow: 0 2px 8px rgba(0,60,120,0.3); text-align: center; line-height: 1.4; }
+  .pw-hint { font-size: 0.9rem; color: rgba(255,255,255,0.7); }
+  #password-screen input { background: rgba(255,255,255,0.25); backdrop-filter: blur(12px); border: 2px solid rgba(255,255,255,0.4); color: #fff; padding: 14px 24px; border-radius: 50px; font-size: 1.1rem; text-align: center; width: 240px; font-family: 'Nunito', sans-serif; font-weight: 700; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+  #password-screen input::placeholder { color: rgba(255,255,255,0.5); }
+  #password-screen input:focus { outline: none; border-color: #fff; background: rgba(255,255,255,0.35); }
+  .pw-error { color: #ffcc00; font-size: 0.85rem; font-weight: 700; min-height: 1.2em; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
 
-    .info-panel h2 {
-        color: #ff3c8e;
-        margin-bottom: 12px;
-        font-size: 1.8rem;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        margin-top: 0;
-    }
+  /* ===== MAIN APP ===== */
+  #app { display: none; max-width: 900px; margin: 0 auto; padding: 20px; min-height: 100vh; position: relative; z-index: 1; }
+  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding: 12px 20px; flex-wrap: wrap; gap: 10px; }
+  .top-bar h2 { font-family: 'Baloo 2', cursive; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 6px rgba(0,40,100,0.3); }
+  .top-controls { display: flex; align-items: center; gap: 10px; }
+  .streak-badge { display: inline-flex; align-items: center; gap: 4px; background: linear-gradient(135deg, #ff8a00, #ffcc00); color: #7a3800; padding: 6px 14px; border-radius: 50px; font-weight: 900; font-size: 0.8rem; box-shadow: 0 3px 10px rgba(255,138,0,0.3); }
+  .date-display { font-size: 0.8rem; color: rgba(255,255,255,0.7); }
 
-    .info-panel h3 {
-        color: #a8e84c;
-        margin-top: 20px;
-        margin-bottom: 8px;
-        font-size: 1.2rem;
-        border-bottom: 1px solid rgba(168,232,76,0.3);
-        padding-bottom: 4px;
-    }
+  .tabs { display: flex; gap: 6px; margin-bottom: 16px; padding: 0 4px; flex-wrap: wrap; }
+  .tab-btn { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.85); padding: 10px 20px; border-radius: 16px 16px 4px 4px; cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.85rem; transition: all 0.25s; backdrop-filter: blur(8px); }
+  .tab-btn.active { background: rgba(255,255,255,0.35); border-color: rgba(255,255,255,0.5); color: #fff; box-shadow: 0 4px 16px rgba(0,100,200,0.15); }
+  body.dark-mode .tab-btn { color: rgba(255,255,255,0.6); }
+  body.dark-mode .tab-btn.active { background: rgba(255,255,255,0.15); color: #fff; }
+  .tab-btn:hover { background: rgba(255,255,255,0.25); color: #fff; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
 
-    .info-panel p {
-        font-size: 0.95rem;
-        color: rgba(255,255,255,0.85);
-        margin-bottom: 12px;
-        line-height: 1.6;
-    }
+  /* ===== CREATURE AREA ===== */
+  .creature-area { padding: 28px; text-align: center; margin-bottom: 16px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; min-height: 720px; }
+  .creature-area::before { content: ''; position: absolute; top: -60px; right: -60px; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%); pointer-events: none; }
+  .creature-area::after { content: ''; position: absolute; bottom: -40px; left: -40px; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, rgba(126,200,50,0.1) 0%, transparent 70%); pointer-events: none; }
+  .creature-sprite { width: 400px; height: 600px; margin: 0 auto 20px; position: relative; display: flex; align-items: flex-end; justify-content: center; flex-shrink: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .creature-sprite img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15)); }
+  @keyframes bounce-up { 0% { transform: translateY(0); } 50% { transform: translateY(-30px); } 100% { transform: translateY(0); } }
+  .animate-bounce { animation: bounce-up 0.4s cubic-bezier(0.28, 0.84, 0.42, 1); }
+  .heart-particle { position: absolute; font-size: 2rem; pointer-events: none; animation: float-heart 0.8s ease-out forwards; z-index: 10; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
+  @keyframes float-heart { 0% { transform: translate(0, 0) scale(0.5); opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) scale(1.2); opacity: 0; } }
+  .speech-bubble { background: rgba(255,255,255,0.5); backdrop-filter: blur(16px); border: 1.5px solid rgba(255,255,255,0.6); border-radius: 20px; padding: 18px; margin: 0 auto; width: 100%; max-width: 520px; position: relative; text-align: left; box-shadow: 0 6px 24px rgba(0,60,120,0.1); z-index: 2; transition: background 0.4s, border-color 0.4s; }
+  .speech-bubble::before { content: ''; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); border-left: 14px solid transparent; border-right: 14px solid transparent; border-bottom: 14px solid rgba(255,255,255,0.5); transition: border-color 0.4s; }
+  .speech-line { display: flex; gap: 10px; padding: 5px 0; font-size: 0.9rem; align-items: flex-start; color: var(--text); }
+  .lang-tag { font-size: 0.55rem; font-weight: 900; padding: 3px 8px; border-radius: 50px; min-width: 32px; text-align: center; flex-shrink: 0; margin-top: 3px; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
+  .lang-en { background: linear-gradient(135deg, #0099ff, #0066cc); } .lang-jp { background: linear-gradient(135deg, #ff3c8e, #cc2060); } .lang-es { background: linear-gradient(135deg, #7ec832, #5ea020); }
+  .mood-bar { display: flex; align-items: center; gap: 10px; margin-top: 16px; justify-content: center; z-index: 2; }
+  .mood-label { font-size: 0.75rem; color: rgba(255,255,255,0.7); font-weight: 700; }
+  .mood-track { width: 160px; height: 12px; background: rgba(0,0,0,0.15); border-radius: 50px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+  .mood-fill { height: 100%; border-radius: 50px; transition: width 0.5s, background 0.5s; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.4); }
 
-    .info-panel ul {
-        margin-left: 20px;
-        margin-bottom: 12px;
-        color: rgba(255,255,255,0.85);
-    }
+  .tasks-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  .task-card { padding: 22px; text-align: center; transition: all 0.3s; position: relative; overflow: hidden; }
+  .task-card::before { content: ''; position: absolute; top: -30px; right: -30px; width: 80px; height: 80px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); pointer-events: none; }
+  .task-card.done { border-color: rgba(126,200,50,0.5); background: rgba(126,200,50,0.15); }
+  .task-card h3 { font-family: 'Baloo 2', cursive; font-size: 1.1rem; margin-bottom: 4px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+  .task-card .tri-label { font-size: 0.65rem; color: rgba(255,255,255,0.65); margin-bottom: 14px; }
+  .task-input-row { display: flex; gap: 8px; align-items: center; justify-content: center; }
+  .task-input-row input { background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.3); color: #fff; padding: 10px 12px; border-radius: 14px; width: 80px; text-align: center; font-size: 1rem; font-family: 'Nunito', sans-serif; font-weight: 800; }
+  .task-input-row input::placeholder { color: rgba(255,255,255,0.4); }
+  .task-input-row input:focus { outline: none; border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.3); }
+  .task-input-row span { font-size: 0.8rem; color: rgba(255,255,255,0.7); font-weight: 700; }
+  .log-btn { margin-top: 12px; }
+  .task-done-check { font-size: 1.6rem; margin-top: 8px; }
+  .task-done-text { color: rgba(255,255,255,0.9) !important; }
 
-    .info-panel li {
-        margin-bottom: 6px;
-    }
+  .stats-strip { display: flex; gap: 10px; margin-bottom: 16px; }
+  .stat-box { flex: 1; padding: 14px; text-align: center; position: relative; overflow: hidden; }
+  .stat-box::after { content: ''; position: absolute; top: -20px; right: -20px; width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.08); pointer-events: none; }
+  .stat-box .num { font-family: 'Baloo 2', cursive; font-size: 1.8rem; color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,0.15); line-height: 1; }
+  .stat-box .label { font-size: 0.65rem; color: rgba(255,255,255,0.65); margin-top: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ===== DICTIONARY ===== */
+  .dict-section { padding: 22px; }
+  .dict-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+  .dict-header h3 { font-family: 'Baloo 2', cursive; font-size: 1.2rem; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+  .dict-count { font-size: 0.75rem; color: #fff; background: linear-gradient(135deg, var(--purple), #6d3fd6); padding: 4px 12px; border-radius: 50px; font-weight: 800; box-shadow: 0 2px 8px rgba(139,92,246,0.3); }
+  .dict-add-form { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; margin-bottom: 16px; }
+  .dict-add-form input { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.25); color: #fff; padding: 10px 12px; border-radius: 14px; font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700; }
+  .dict-add-form input::placeholder { color: rgba(255,255,255,0.4); }
+  .dict-add-form input:focus { outline: none; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.25); }
+  .add-word-btn { background: linear-gradient(180deg, #7ec832, #5ea020); border: none; color: #fff; padding: 10px 18px; border-radius: 14px; cursor: pointer; font-weight: 900; font-size: 1.2rem; box-shadow: 0 3px 10px rgba(126,200,50,0.3), inset 0 1px 0 rgba(255,255,255,0.3); transition: all 0.2s; }
+  .add-word-btn:hover { transform: translateY(-2px); }
+  .dict-filter { display: flex; gap: 6px; margin-bottom: 14px; }
+  .dict-filter input { flex: 1; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.2); color: #fff; padding: 10px 14px; border-radius: 50px; font-family: 'Nunito', sans-serif; font-weight: 700; }
+  .dict-filter input::placeholder { color: rgba(255,255,255,0.4); }
+  .dict-filter input:focus { outline: none; border-color: rgba(255,255,255,0.4); }
+  .dict-list { max-height: 400px; overflow-y: auto; }
+  .dict-list::-webkit-scrollbar { width: 6px; }
+  .dict-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+  .dict-entry { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); align-items: center; font-size: 0.85rem; font-weight: 700; }
+  .dict-entry:hover { background: rgba(255,255,255,0.05); border-radius: 10px; }
+  .dict-entry .en { color: #88ccff; } .dict-entry .jp { color: #ff88bb; font-family: 'Noto Sans JP', sans-serif; } .dict-entry .es { color: #b8ff8b; }
+  .del-word { background: none; border: none; color: rgba(255,255,255,0.3); cursor: pointer; font-size: 1rem; transition: color 0.2s; }
+  .del-word:hover { color: #ff3c8e; }
+
+  /* ===== DIARY ===== */
+  .diary-section { padding: 22px; }
+  .diary-section h3 { font-family: 'Baloo 2', cursive; font-size: 1.4rem; color: #fff; margin-bottom: 16px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+  .diary-input-area { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+  .diary-textarea { width: 100%; height: 120px; background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.25); color: #fff; border-radius: 16px; padding: 16px; font-family: 'Nunito', sans-serif; font-size: 0.95rem; resize: none; box-shadow: inset 0 2px 8px rgba(0,0,0,0.1); }
+  .diary-textarea:focus { outline: none; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.2); }
+  .diary-textarea::placeholder { color: rgba(255,255,255,0.5); }
+  .diary-controls { display: flex; justify-content: flex-end; }
+  .diary-btn { background: linear-gradient(135deg, #8b5cf6, #6d3fd6); color: #fff; border: none; padding: 10px 24px; border-radius: 14px; cursor: pointer; font-weight: 800; font-family: 'Nunito', sans-serif; box-shadow: 0 4px 12px rgba(139,92,246,0.3); transition: all 0.2s; }
+  .diary-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(139,92,246,0.4); }
+  .diary-list { display: flex; flex-direction: column; gap: 16px; max-height: 500px; overflow-y: auto; padding-right: 8px; }
+  .diary-list::-webkit-scrollbar { width: 6px; } .diary-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+  .diary-entry { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 16px; position: relative; }
+  .diary-entry-date { font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-bottom: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+  .diary-entry-text { font-size: 0.95rem; line-height: 1.6; color: rgba(255,255,255,0.9); white-space: pre-wrap; }
+  .diary-del-btn { position: absolute; top: 12px; right: 16px; background: none; border: none; color: rgba(255,255,255,0.3); cursor: pointer; font-size: 1.2rem; transition: color 0.2s; }
+  .diary-del-btn:hover { color: #ff3c8e; }
+
+  /* ===== HISTORY ===== */
+  .history-section { padding: 22px; }
+  .history-section h3 { font-family: 'Baloo 2', cursive; color: #fff; font-size: 1.2rem; margin-bottom: 16px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+  .history-grid { display: grid; gap: 8px; }
+  .history-day { display: grid; grid-template-columns: 110px 1fr 1fr 60px; gap: 10px; padding: 12px 14px; background: rgba(255,255,255,0.06); border-radius: 14px; font-size: 0.8rem; font-weight: 700; align-items: center; }
+  .history-day .day-date { color: rgba(255,255,255,0.6); }
+  .history-day .day-stat { color: #88ccff; }
+  .history-day .day-streak { color: #ffcc00; font-weight: 900; }
+
+  /* ===== NES PASSWORD SYSTEM ===== */
+  .nes-container { background-color: #000; color: #fff; font-family: 'Press Start 2P', monospace; padding: 20px; border: 4px solid #fff; box-shadow: 4px 4px 0px rgba(0,0,0,0.5), inset -4px -4px 0px #333; margin-top: 24px; text-align: center; }
+  .nes-container h3 { color: #e52521; font-size: 0.85rem; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0 #000; }
+  .nes-container p { font-size: 0.55rem; line-height: 1.6; color: #aaa; margin-bottom: 16px; }
+  .nes-textarea { width: 100%; height: 120px; background: #111; color: #33ff33; border: 2px solid #fff; font-family: 'Press Start 2P', monospace; font-size: 0.65rem; line-height: 1.4; padding: 12px; margin-bottom: 16px; resize: none; word-wrap: break-word; }
+  .nes-textarea:focus { outline: none; border-color: #e52521; background: #222; }
+  .nes-btn { background: #e52521; color: #fff; border: 2px solid #fff; font-family: 'Press Start 2P', monospace; font-size: 0.6rem; padding: 12px 16px; cursor: pointer; text-transform: uppercase; margin: 4px; transition: all 0.1s; }
+  .nes-btn:hover { background: #ff3c8e; }
+  .nes-btn:active { box-shadow: inset 4px 4px 0px rgba(0,0,0,0.5); transform: translateY(2px); }
+
+  /* ===== RANDOM PHRASE BUBBLE ===== */
+  .random-bubble { margin: 18px auto 0; max-width: 420px; padding: 12px 18px; text-align: center; font-size: 0.95rem; font-weight: 700; color: var(--text); position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; transition: opacity 0.4s; z-index: 2; }
+  .random-bubble::before { content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 10px solid rgba(255,255,255,0.30); }
+  .random-lang-tag { font-size: 0.55rem; font-weight: 900; padding: 2px 8px; border-radius: 50px; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
+  .random-lang-tag.rolo { background: linear-gradient(135deg, #ff8a00, #e06500); }
+  .random-lang-tag.nihongo { background: linear-gradient(135deg, #ff3c8e, #cc2060); }
+
+  /* ===== IFRAME CONTAINER ===== */
+  .iframe-container { width: 100%; height: 75vh; border-radius: 16px; overflow: hidden; position: relative; }
+  .iframe-container iframe { width: 100%; height: 100%; border: none; background: transparent; }
+
+  /* ===== NUMOGRAM COMPONENT ===== */
+  .numogram-wrapper { display: grid; grid-template-columns: 1fr 350px; gap: 20px; align-items: start; }
+  @media (max-width: 768px) { .numogram-wrapper { grid-template-columns: 1fr; } }
+  
+  .svg-numogram-container {
+      background: #000;
+      border-radius: 20px;
+      position: relative;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+      border: 2px solid rgba(255,50,50,0.3);
+      overflow: hidden;
+      width: 100%;
+  }
+  .svg-numogram-container svg { width: 100%; height: auto; display: block; max-height: 95vh; }
+
+  /* Numogram 1:1 Specifics */
+  .label-region { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 28px; fill: #fff; text-decoration: underline; }
+  .label-sub { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 18px; fill: #a8e84c; }
+  .label-sub-italic { font-style: italic; }
+  .label-current { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 24px; fill: #fff; }
+  .label-sound { font-family: 'Nunito', sans-serif; font-weight: 800; font-style: italic; font-size: 16px; }
+  .zone-text { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 32px; pointer-events: none; }
+  .zone-polarity { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 18px; fill: #fff; pointer-events: none; }
+  .gate-text { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; fill: #fff; }
+  
+  /* Stippled / Dotted Lines CSS */
+  .dot-base { fill: none; stroke: #ffffff; stroke-linecap: round; }
+  .dot-wide { stroke-width: 40; stroke-dasharray: 0 25; opacity: 0.15; }
+  .dot-mid  { stroke-width: 20; stroke-dasharray: 0 12; opacity: 0.3; }
+  .dot-core { stroke-width: 6; stroke-dasharray: 0 8; opacity: 0.6; }
+
+  .glow { filter: drop-shadow(0 0 10px rgba(255,255,255,0.8)); }
+
+  /* Zone Interactivity */
+  .zone-group { cursor: pointer; transition: all 0.3s ease; }
+  .zone-group:hover circle:first-child, .zone-group.active circle:first-child {
+      fill: #1a1a1a;
+      stroke: #ff3c8e;
+      filter: drop-shadow(0 0 15px rgba(255, 60, 142, 0.8));
+  }
+
+  .numo-tools-col { display: flex; flex-direction: column; gap: 16px; }
+  .numo-calc { background: rgba(20, 0, 0, 0.6); border: 2px solid #ff3333; border-radius: 16px; padding: 16px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
+  .numo-calc h4 { font-family: 'Baloo 2', cursive; color: #ff3c8e; margin-bottom: 6px; font-size: 1.2rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+  .numo-calc p { font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-bottom: 12px; line-height: 1.4; }
+  .numo-calc-explanation { font-size: 0.7rem; color: #a8e84c; font-style: italic; border-left: 2px solid #a8e84c; padding-left: 8px; margin-bottom: 12px; background: rgba(168,232,76,0.1); padding: 8px; border-radius: 0 8px 8px 0; }
+  .numo-input-row { display: flex; gap: 10px; margin-bottom: 8px; }
+  .numo-input-row input { flex: 1; background: #000; color: #00e5ff; border: 1px solid rgba(255,255,255,0.3); padding: 10px 14px; font-family: 'Press Start 2P', monospace; font-size: 0.7rem; border-radius: 8px; width: 100%; }
+  .numo-input-row input:focus { outline: none; border-color: #00e5ff; box-shadow: 0 0 10px rgba(0,229,255,0.3); }
+  .numo-input-row button { background: #d92626; color: #fff; border: none; font-weight: 800; padding: 0 16px; border-radius: 8px; cursor: pointer; font-family: 'Nunito', sans-serif; transition: background 0.2s; }
+  .numo-input-row button:hover { background: #ff1111; box-shadow: 0 0 10px rgba(255,17,17,0.5); }
+  .numo-info-panel { padding: 20px; max-height: 400px; overflow-y: auto; }
+  .numo-info-panel::-webkit-scrollbar { width: 6px; } .numo-info-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+  .numo-info-panel h3 { font-family: 'Baloo 2', cursive; font-size: 1.6rem; margin-bottom: 10px; color: #ff3c8e; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  .numo-info-panel h4 { margin-top: 16px; margin-bottom: 8px; font-size: 1.1rem; color: #00e5ff; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px; }
+  .numo-info-panel p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 12px; color: rgba(255,255,255,0.9); }
+  .numo-info-panel ul { margin-left: 20px; margin-bottom: 12px; font-size: 0.85rem; color: rgba(255,255,255,0.9); }
+  #numo-data-store { display: none; }
+
+  /* ===== I-CHING ===== */
+  .iching-section { padding: 22px; display: flex; flex-direction: column; align-items: center; }
+  .iching-header { font-family: 'Baloo 2', cursive; font-size: 1.8rem; color: #fff; margin-bottom: 10px; text-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+  .iching-desc { font-size: 0.9rem; color: rgba(255,255,255,0.8); text-align: center; max-width: 600px; margin-bottom: 24px; line-height: 1.5; }
+  .hexagram-container { display: flex; gap: 40px; justify-content: center; margin-bottom: 30px; min-height: 180px; flex-wrap: wrap; }
+  .hexagram-box { display: flex; flex-direction: column; align-items: center; }
+  .hexagram-title { font-weight: 800; color: #a8e84c; margin-bottom: 12px; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
+  .hexagram-visual { display: flex; flex-direction: column-reverse; gap: 8px; }
+  .hex-line { width: 120px; height: 16px; display: flex; justify-content: space-between; align-items: center; }
+  .hex-line.yang .seg { width: 100%; height: 100%; background: #fff; border-radius: 4px; box-shadow: 0 0 8px rgba(255,255,255,0.5); }
+  .hex-line.yin .seg { width: 45%; height: 100%; background: #fff; border-radius: 4px; box-shadow: 0 0 8px rgba(255,255,255,0.5); }
+  .hex-line-marker { position: absolute; margin-left: 130px; font-weight: 900; color: #ff3c8e; font-size: 14px; }
+  .iching-result-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 20px; max-width: 600px; width: 100%; margin-top: 20px; display: none; }
+  .iching-result-box h3 { color: #ffcc00; font-family: 'Baloo 2', cursive; font-size: 1.4rem; margin-bottom: 8px; }
+  .iching-result-box p { font-size: 0.95rem; color: #fff; line-height: 1.6; margin-bottom: 10px; }
+
+  @media (max-width: 700px) {
+    .creature-sprite { width: 280px; height: 420px; }
+    .pw-creature { width: 180px; height: 270px; }
+    .creature-area { min-height: 520px; }
+    .tasks-panel { grid-template-columns: 1fr; }
+    .dict-add-form { grid-template-columns: 1fr; }
+    .stats-strip { flex-wrap: wrap; }
+    .top-bar h2 { font-size: 1.2rem; }
+  }
 </style>
+</head>
+<body>
 
-<div class="numogram-container">
+<script>if (localStorage.getItem('studyBuddyTheme') === 'dark') document.body.classList.add('dark-mode');</script>
+
+<div class="metro-bg">
+  <div class="metro-sunburst"></div><div class="metro-halftone"></div>
+  <div class="metro-vectors">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <path d="M-100 700 Q 400 400, 900 800 T 1600 500 L 1600 1000 L -100 1000 Z" fill="#000" fill-opacity="0.15" />
+      <path d="M-100 750 Q 500 300, 1000 750 T 1600 400 L 1600 1000 L -100 1000 Z" fill="#fff" fill-opacity="0.25" />
+      <rect x="0" y="120" width="100%" height="40" fill="#fff" fill-opacity="0.15" />
+      <rect x="0" y="140" width="100%" height="8" fill="#000" fill-opacity="0.2" />
+      <circle cx="1200" cy="750" r="180" fill="none" stroke="#fff" stroke-width="40" stroke-opacity="0.15" />
+      <circle cx="1200" cy="750" r="60" fill="#000" fill-opacity="0.1" />
+      <g class="y2k-flower" transform="translate(150, 200) scale(1.5)" fill="#fff" fill-opacity="0.3"><circle cx="0" cy="-20" r="15"/><circle cx="19" cy="-6" r="15"/><circle cx="12" cy="16" r="15"/><circle cx="-12" cy="16" r="15"/><circle cx="-19" cy="-6" r="15"/><circle cx="0" cy="0" r="12" fill="var(--metro-bg1)" fill-opacity="1"/></g>
+      <g class="y2k-flower" transform="translate(1300, 250) scale(2)" fill="#000" fill-opacity="0.15"><circle cx="0" cy="-20" r="15"/><circle cx="19" cy="-6" r="15"/><circle cx="12" cy="16" r="15"/><circle cx="-12" cy="16" r="15"/><circle cx="-19" cy="-6" r="15"/><circle cx="0" cy="0" r="12" fill="#fff" fill-opacity="0.3"/></g>
+    </svg>
+  </div>
+</div>
+
+<div id="password-screen">
+  <div class="pw-creature" id="pw-creature"><img src="./sleep.png" alt="sleeping"></div>
+  <h1>Moe-Chan<br>is sleeping...</h1>
+  <p class="pw-hint">whisper the secret word to wake her up</p>
+  <input type="password" id="pw-input" placeholder="• • • •" autofocus>
+  <p class="pw-error" id="pw-error"></p>
+</div>
+
+<div id="app">
+  <div class="top-bar glass">
+    <h2>Moe-Chan</h2>
+    <div class="top-controls">
+      <button class="btn-theme" style="padding: 8px 14px; border-radius: 50px;" id="theme-btn" onclick="toggleTheme()" title="Toggle Dark Mode">🌙</button>
+      <span class="streak-badge" id="streak-badge">🔥 0 day streak</span>
+      <span class="date-display" id="date-display"></span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="home">🏠 Home</button>
+    <button class="tab-btn" data-tab="dictionary">📖 Dictionary <span id="dict-tab-count"></span></button>
+    <button class="tab-btn" data-tab="diary">📓 Diary</button>
+    <button class="tab-btn" data-tab="history">📊 History</button>
+    <button class="tab-btn" data-tab="calc">🧮 COLcalc</button>
+    <button class="tab-btn" data-tab="numogram">🌀 Numogram</button>
+    <button class="tab-btn" data-tab="iching">☯️ I-Ching</button>
+  </div>
+
+  <!-- HOME TAB -->
+  <div class="tab-content active" id="tab-home">
+    <div class="creature-area glass">
+      <div class="creature-sprite" id="creature-sprite"><img src="./idle.png" id="sprite-img" alt="creature"></div>
+      <div class="speech-bubble">
+        <div class="speech-line"><span class="lang-tag lang-en">EN</span><span id="speech-en">Hello! Let's study today!</span></div>
+        <div class="speech-line"><span class="lang-tag lang-jp">JP</span><span id="speech-jp" style="font-family:'Noto Sans JP',sans-serif">こんにちは！今日も勉強しよう！</span></div>
+        <div class="speech-line"><span class="lang-tag lang-es">ES</span><span id="speech-es">¡Hola! ¡Estudiemos hoy!</span></div>
+      </div>
+      <div class="mood-bar">
+        <span class="mood-label">Mood:</span>
+        <div class="mood-track"><div class="mood-fill" id="mood-fill" style="width:50%;background:linear-gradient(90deg,#ffcc00,#ff8a00)"></div></div>
+        <span class="mood-label" id="mood-text">Neutral</span>
+      </div>
+      <div class="random-bubble glass-strong" id="random-bubble"><span id="random-phrase"></span><span class="random-lang-tag" id="random-lang-tag"></span></div>
+    </div>
+
+    <div class="tasks-panel">
+      <div class="task-card glass-dark" id="card-flash">
+        <h3>📇 Flashcards</h3>
+        <div class="tri-label">Study flashcards! / フラッシュカード！ / ¡Tarjetas!</div>
+        <div id="flash-input-area"><div class="task-input-row"><input type="number" id="flash-minutes" min="1" max="999" placeholder="0"><span>min</span></div><button class="btn-glossy log-btn" onclick="logFlashcards()">Log Study Time</button></div>
+        <div id="flash-done" style="display:none"><div class="task-done-check">✅</div><p class="task-done-text" style="font-size:0.8rem;margin-top:4px" id="flash-done-text"></p></div>
+      </div>
+      <div class="task-card glass-dark" id="card-read">
+        <h3>📚 Reading</h3>
+        <div class="tri-label">Reading time! / 読書タイム！ / ¡Hora de leer!</div>
+        <div id="read-input-area"><div class="task-input-row"><input type="number" id="read-hours" min="0.25" max="24" step="0.25" placeholder="0"><span>hrs</span></div><button class="btn-glossy btn-pink log-btn" onclick="logReading()">Log Reading Time</button></div>
+        <div id="read-done" style="display:none"><div class="task-done-check">✅</div><p class="task-done-text" style="font-size:0.8rem;margin-top:4px" id="read-done-text"></p></div>
+      </div>
+    </div>
+
+    <div class="stats-strip">
+      <div class="stat-box glass"><div class="num" id="stat-total-flash">0</div><div class="label">Flashcard Min</div></div>
+      <div class="stat-box glass"><div class="num" id="stat-total-read">0</div><div class="label">Reading Hrs</div></div>
+      <div class="stat-box glass"><div class="num" id="stat-words">0</div><div class="label">Dict Words</div></div>
+      <div class="stat-box glass"><div class="num" id="stat-days">0</div><div class="label">Days Tracked</div></div>
+    </div>
+  </div>
+
+  <!-- DICTIONARY TAB -->
+  <div class="tab-content" id="tab-dictionary">
+    <div class="dict-section glass-dark">
+      <div class="dict-header"><h3>📖 My Dictionary</h3><span class="dict-count" id="dict-count">0 words</span></div>
+      <div class="dict-add-form"><input type="text" id="dict-en" placeholder="English"><input type="text" id="dict-jp" placeholder="日本語"><input type="text" id="dict-es" placeholder="Español"><button class="add-word-btn" onclick="addWord()">+</button></div>
+      <div class="dict-filter"><input type="text" id="dict-search" placeholder="🔍 Search words..." oninput="renderDictionary()"></div>
+      <div class="dict-list" id="dict-list"></div>
+    </div>
+  </div>
+
+  <!-- DIARY TAB -->
+  <div class="tab-content" id="tab-diary">
+    <div class="diary-section glass-dark">
+      <h3>📓 Personal Diary</h3>
+      <div class="diary-input-area">
+        <textarea id="diary-input" class="diary-textarea" placeholder="Write your thoughts here..."></textarea>
+        <div class="diary-controls"><button class="diary-btn" onclick="addDiaryEntry()">Save Entry</button></div>
+      </div>
+      <div class="diary-list" id="diary-list"></div>
+    </div>
+  </div>
+
+  <!-- HISTORY TAB -->
+  <div class="tab-content" id="tab-history">
+    <div class="history-section glass-dark">
+      <h3>📊 Study History</h3>
+      <div class="history-grid" id="history-grid"></div>
+    </div>
+    <div class="nes-container">
+      <h3>PASSWORD SYSTEM</h3>
+      <p>GENERATE A PASSWORD TO BACK UP YOUR PROGRESS, OR PASTE A PASSWORD BELOW TO RESTORE DATA.</p>
+      <textarea id="nes-password-box" class="nes-textarea" placeholder="[ ENTER PASSWORD HERE ]" spellcheck="false"></textarea>
+      <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+        <button class="nes-btn" onclick="generatePassword()">GENERATE</button>
+        <button class="nes-btn" onclick="loadPassword()">RESTORE</button>
+        <button class="nes-btn" onclick="copyPassword()">COPY</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALC TAB -->
+  <div class="tab-content" id="tab-calc">
+    <div class="glass-dark" style="padding: 10px; height: 75vh;">
+      <div class="iframe-container"><iframe src="https://col-bun.github.io/COLcalc.github.io/" title="COLcalc"></iframe></div>
+    </div>
+  </div>
+
+  <!-- NUMOGRAM TAB (INTEGRATED ACCURATE SVG WITH STIPPLED CURRENTS) -->
+  <div class="tab-content" id="tab-numogram">
     <div class="numogram-wrapper">
-        <svg viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+      <div class="svg-numogram-container">
+        <!-- Expanded ViewBox height to 1250 to prevent Zone 0 cutoff -->
+        <svg viewBox="0 0 1000 1250" xmlns="http://www.w3.org/2000/svg">
             <defs>
-                <filter id="glow"><feGaussianBlur stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-                <filter id="grain" x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox">
-                    <feTurbulence type="fractalNoise" baseFrequency="1.5" numOctaves="4" seed="2" result="noise"/>
-                    <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0.6  0 0 0 0 0.6  0 0 0 0 0.6  0 0 0 -2.1 1.5" result="thresh"/>
-                    <feComposite operator="in" in="thresh" in2="SourceGraphic" result="masked"/>
-                </filter>
-                <filter id="grainD" x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox">
-                    <feTurbulence type="fractalNoise" baseFrequency="2.0" numOctaves="5" seed="7" result="noise"/>
-                    <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0.7  0 0 0 0 0.7  0 0 0 0 0.7  0 0 0 -1.8 1.4" result="thresh"/>
-                    <feComposite operator="in" in="thresh" in2="SourceGraphic" result="masked"/>
-                </filter>
+              <marker id="arrow-white" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#fff" />
+              </marker>
+              <marker id="arrow-black" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#000" />
+              </marker>
             </defs>
 
-            <!-- Flow paths (stippled) -->
-            <path d="M 728,415 C 790,320 780,220 680,155 Q 650,130 585,140" stroke="#aaa" stroke-width="55" fill="none" stroke-linecap="round" filter="url(#grain)"/>
-            <path d="M 728,415 C 790,320 780,220 680,155 Q 650,130 585,140" stroke="#ddd" stroke-width="30" fill="none" stroke-linecap="round" filter="url(#grainD)" opacity="0.5"/>
-            <path d="M 718,408 Q 580,375 400,408" stroke="#aaa" stroke-width="55" fill="none" stroke-linecap="round" filter="url(#grain)"/>
-            <path d="M 718,408 Q 580,375 400,408" stroke="#ddd" stroke-width="30" fill="none" stroke-linecap="round" filter="url(#grainD)" opacity="0.5"/>
-            <path d="M 312,548 Q 390,605 468,648" stroke="#aaa" stroke-width="55" fill="none" stroke-linecap="round" filter="url(#grain)"/>
-            <path d="M 312,548 Q 390,605 468,648" stroke="#ddd" stroke-width="30" fill="none" stroke-linecap="round" filter="url(#grainD)" opacity="0.5"/>
-            <path d="M 478,688 L 480,768" stroke="#999" stroke-width="42" fill="none" stroke-linecap="round" filter="url(#grain)"/>
-            <path d="M 482,812 L 490,868" stroke="#888" stroke-width="36" fill="none" stroke-linecap="round" filter="url(#grain)"/>
-            <path d="M 490,918 L 486,972" stroke="#777" stroke-width="28" fill="none" stroke-linecap="round" filter="url(#grain)"/>
+            <!-- 1:1 STIPPLED CURRENTS (DOTS) -->
+            <g class="dot-base">
+                <!-- Sink 5 -> 4 -->
+                <path d="M 330 350 Q 280 410 290 440" class="dot-wide"/>
+                <path d="M 330 350 Q 280 410 290 440" class="dot-mid"/>
+                <path d="M 330 350 Q 280 410 290 440" class="dot-core"/>
+                <!-- Sink 4 -> 1 -->
+                <path d="M 320 510 Q 380 570 450 600" class="dot-wide"/>
+                <path d="M 320 510 Q 380 570 450 600" class="dot-mid"/>
+                <path d="M 320 510 Q 380 570 450 600" class="dot-core"/>
 
-            <!-- Flow labels -->
-            <text x="555" y="368" fill="#fff" font-size="30" font-weight="800" font-family="Nunito,sans-serif" text-anchor="middle">Hold</text>
-            <text x="378" y="578" fill="#fff" font-size="30" font-weight="800" font-family="Nunito,sans-serif" text-anchor="middle">Sink</text>
-            <text x="792" y="305" fill="#fff" font-size="30" font-weight="800" font-family="Nunito,sans-serif" text-anchor="middle">Rise</text>
+                <!-- Hold 7 -> 5 -->
+                <path d="M 660 470 Q 500 400 390 330" class="dot-wide"/>
+                <path d="M 660 470 Q 500 400 390 330" class="dot-mid"/>
+                <path d="M 660 470 Q 500 400 390 330" class="dot-core"/>
 
-            <!-- Warp circles -->
-            <circle cx="500" cy="168" r="125" fill="none" stroke="#fff" stroke-width="2" opacity="0.5"/>
-            <circle cx="530" cy="152" r="78" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.4"/>
-            <text x="652" y="155" fill="#fff" font-size="22" font-weight="800" font-family="Nunito,sans-serif">Warp</text>
-            <text x="652" y="178" fill="#fff" font-size="17" font-family="Nunito,sans-serif">(Current)</text>
+                <!-- Rise 1 -> 7 -->
+                <path d="M 550 600 Q 640 550 670 510" class="dot-wide"/>
+                <path d="M 550 600 Q 640 550 670 510" class="dot-mid"/>
+                <path d="M 550 600 Q 640 550 670 510" class="dot-core"/>
+                <!-- Rise 7 -> 2 -->
+                <path d="M 690 440 Q 690 380 660 330" class="dot-wide"/>
+                <path d="M 690 440 Q 690 380 660 330" class="dot-mid"/>
+                <path d="M 690 440 Q 690 380 660 330" class="dot-core"/>
 
-            <!-- Plex circles -->
-            <circle cx="494" cy="942" r="85" fill="none" stroke="#fff" stroke-width="2" opacity="0.5"/>
-            <circle cx="487" cy="972" r="48" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.4"/>
-            <text x="598" y="918" fill="#fff" font-size="22" font-weight="800" font-family="Nunito,sans-serif">Plex</text>
-            <text x="598" y="940" fill="#fff" font-size="17" font-family="Nunito,sans-serif">(current)</text>
+                <!-- Warp 6 <-> 3 -->
+                <path d="M 430 180 C 500 250 650 220 580 180" class="dot-wide"/>
+                <path d="M 430 180 C 500 250 650 220 580 180" class="dot-mid"/>
+                <path d="M 430 180 C 500 250 650 220 580 180" class="dot-core"/>
 
-            <!-- Connection lines -->
-            <line x1="420" y1="198" x2="522" y2="165" stroke="#fff" stroke-width="2" opacity="0.55"/>
-            <line x1="558" y1="182" x2="615" y2="300" stroke="#fff" stroke-width="2" opacity="0.55"/>
-            <line x1="648" y1="335" x2="708" y2="398" stroke="#fff" stroke-width="1.5" opacity="0.45"/>
-            <line x1="392" y1="445" x2="315" y2="520" stroke="#fff" stroke-width="2" opacity="0.55"/>
-            <line x1="325" y1="558" x2="455" y2="642" stroke="#fff" stroke-width="1.5" opacity="0.45"/>
-            <path d="M 738,398 Q 768,270 668,158" stroke="#fff" stroke-width="1.5" fill="none" opacity="0.35"/>
-            <line x1="478" y1="688" x2="480" y2="765" stroke="#fff" stroke-width="2" opacity="0.55"/>
-            <line x1="483" y1="815" x2="490" y2="868" stroke="#fff" stroke-width="2" opacity="0.55"/>
-            <line x1="492" y1="918" x2="488" y2="960" stroke="#fff" stroke-width="2" opacity="0.55"/>
-
-            <!-- Zone 3+ -->
-            <g class="zone-group" onclick="showZone(3)">
-                <circle cx="395" cy="198" r="28" fill="#000" stroke="#fff" stroke-width="2.5"/>
-                <text x="379" y="208" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">3</text>
-                <text x="410" y="190" fill="#fff" font-size="14" font-weight="700">+</text>
-                <circle cx="395" cy="220" r="5" fill="none" stroke="#ff8800" stroke-width="1.5"/>
-                <polygon points="395,230 389,240 401,240" fill="none" stroke="#ff8800" stroke-width="1.5"/>
-                <text x="338" y="178" fill="#22dd22" font-size="19" font-weight="700" font-style="italic">"zx"</text>
+                <!-- Plex 1 -> 8 -->
+                <path d="M 500 670 L 500 740" class="dot-wide"/>
+                <path d="M 500 670 L 500 740" class="dot-mid"/>
+                <path d="M 500 670 L 500 740" class="dot-core"/>
+                <!-- Plex 8 -> 9 -->
+                <path d="M 500 820 L 500 880" class="dot-wide"/>
+                <path d="M 500 820 L 500 880" class="dot-mid"/>
+                <path d="M 500 820 L 500 880" class="dot-core"/>
+                <!-- Plex 9 -> 0 -->
+                <path d="M 500 960 Q 550 1010 500 1020" class="dot-wide"/>
+                <path d="M 500 960 Q 550 1010 500 1020" class="dot-mid"/>
+                <path d="M 500 960 Q 550 1010 500 1020" class="dot-core"/>
             </g>
 
-            <!-- Zone 6- -->
-            <g class="zone-group" onclick="showZone(6)">
-                <circle cx="550" cy="152" r="30" fill="#000" stroke="#fff" stroke-width="2.5"/>
-                <text x="534" y="162" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">6</text>
-                <text x="565" y="145" fill="#fff" font-size="14" font-weight="700">-</text>
-                <circle cx="550" cy="178" r="5" fill="none" stroke="#ff00ff" stroke-width="1.5"/>
-                <text x="572" y="205" fill="#cccc00" font-size="19" font-weight="700" font-style="italic">"tch"</text>
+            <!-- CURRENT ARROWS (Matching B&W) -->
+            <polygon points="415,150 385,140 385,160" fill="#fff" />
+            <polygon points="585,150 615,140 615,160" fill="#fff" />
+            <polygon points="635,300 665,290 665,310" fill="#fff" />
+            <polygon points="365,320 335,310 335,330" fill="#fff" />
+            <polygon points="310,495 290,465 320,475" fill="#fff" />
+            <polygon points="685,480 715,470 715,490" fill="#fff" />
+            <polygon points="500,645 485,615 515,615" fill="#000" />
+            <polygon points="500,755 485,785 515,785" fill="#fff" />
+            <polygon points="500,945 485,915 515,915" fill="#fff" />
+            <polygon points="500,1035 485,1065 515,1065" fill="#fff" />
+
+            <!-- SOLID TRACTS (LINES) -->
+            <g stroke="#fff" stroke-width="2" fill="none">
+              <path d="M 650 300 Q 500 350 350 320" />
+              <path d="M 650 300 Q 525 225 400 150" />
+              <path d="M 400 150 Q 500 50 600 150" />
+              <path d="M 400 150 Q 500 250 600 150" />
+              <path d="M 350 320 C 300 -50 700 -50 600 150" />
+              <line x1="300" y1="480" x2="500" y2="620" />
+              <line x1="700" y1="480" x2="500" y2="620" />
+              <line x1="500" y1="780" x2="500" y2="920" />
+              <path d="M 500 620 C 400 500 600 500 500 620" />
+              <path d="M 500 920 C 400 920 400 820 500 920" />
             </g>
 
-            <!-- Zone 2- -->
-            <g class="zone-group" onclick="showZone(2)">
-                <circle cx="625" cy="318" r="27" fill="#000" stroke="#fff" stroke-width="2.5"/>
-                <text x="610" y="327" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">2</text>
-                <text x="640" y="310" fill="#fff" font-size="14" font-weight="700">-</text>
-                <circle cx="625" cy="340" r="5" fill="none" stroke="#4488ff" stroke-width="1.5"/>
-                <text x="652" y="308" fill="#4488ff" font-size="19" font-weight="700" font-style="italic">"dt"</text>
+            <!-- GATE CIRCLES & TEXT -->
+            <g stroke="#fff" stroke-width="2" fill="#000">
+              <circle cx="515" cy="18" r="15" /> 
+              <circle cx="500" cy="100" r="15" /> 
+              <circle cx="500" cy="200" r="15" /> 
+              <circle cx="525" cy="225" r="15" /> 
+              <circle cx="400" cy="550" r="15" /> 
+              <circle cx="600" cy="550" r="15" /> 
+              <circle cx="500" cy="530" r="15" /> 
+              <circle cx="500" cy="850" r="15" /> 
+              <circle cx="435" cy="880" r="15" /> 
+            </g>
+            <g class="gate-text" text-anchor="middle" dominant-baseline="central">
+              <text x="515" y="18">15</text>
+              <text x="500" y="100">6</text>
+              <text x="500" y="200">21</text>
+              <text x="525" y="225">3</text>
+              <text x="400" y="550">10</text>
+              <text x="600" y="550">28</text>
+              <text x="500" y="530">1</text>
+              <text x="500" y="850">36</text>
+              <text x="435" y="880">45</text>
             </g>
 
-            <!-- Zone 5+ -->
-            <g class="zone-group" onclick="showZone(5)">
-                <circle cx="390" cy="418" r="27" fill="#000" stroke="#fff" stroke-width="2.5"/>
-                <text x="375" y="427" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">5</text>
-                <text x="405" y="410" fill="#fff" font-size="14" font-weight="700">+</text>
-                <circle cx="390" cy="440" r="5" fill="none" stroke="#cc9900" stroke-width="1.5"/>
-                <text x="345" y="462" fill="#ccaa00" font-size="19" font-weight="700" font-style="italic">"ktt"</text>
+            <!-- INTERACTIVE ZONES -->
+            <g class="zone-group" id="btn-zone-3" onclick="selectZone(3)">
+              <circle cx="400" cy="150" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="390" y="150" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">3</text>
+              <text x="420" y="130" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text>
+            </g>
+            <g class="zone-group" id="btn-zone-6" onclick="selectZone(6)">
+              <circle cx="600" cy="150" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="590" y="150" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">6</text>
+              <text x="620" y="130" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text>
+            </g>
+            <g class="zone-group" id="btn-zone-2" onclick="selectZone(2)">
+              <circle cx="650" cy="300" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="640" y="300" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">2</text>
+              <text x="670" y="280" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text>
+            </g>
+            <g class="zone-group" id="btn-zone-5" onclick="selectZone(5)">
+              <circle cx="350" cy="320" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="340" y="320" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">5</text>
+              <text x="370" y="300" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text>
+            </g>
+            <g class="zone-group" id="btn-zone-4" onclick="selectZone(4)">
+              <circle cx="300" cy="480" r="40" fill="#000" stroke="#ff0000" stroke-width="3"/>
+              <text x="290" y="480" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">4</text>
+              <text x="320" y="460" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text>
+            </g>
+            <g class="zone-group" id="btn-zone-7" onclick="selectZone(7)">
+              <circle cx="700" cy="480" r="40" fill="#000" class="glow" stroke="#ff3366" stroke-width="3"/>
+              <text x="690" y="480" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">7</text>
+              <text x="720" y="460" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text>
+            </g>
+            <g class="zone-group" id="btn-zone-1" onclick="selectZone(1)">
+              <circle cx="500" cy="620" r="50" fill="#fff" class="glow" stroke="#fff" stroke-width="3"/>
+              <text x="485" y="620" fill="#000" class="zone-text" text-anchor="middle" dominant-baseline="central">1</text>
+              <text x="525" y="600" fill="#000" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text>
+            </g>
+            <g class="zone-group" id="btn-zone-8" onclick="selectZone(8)">
+              <circle cx="500" cy="780" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="490" y="780" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">8</text>
+              <text x="520" y="760" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text>
+            </g>
+            <g class="zone-group" id="btn-zone-9" onclick="selectZone(9)">
+              <circle cx="500" cy="920" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="490" y="920" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">9</text>
+              <text x="520" y="900" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text>
+            </g>
+            <g class="zone-group" id="btn-zone-0" onclick="selectZone(0)">
+              <circle cx="500" cy="1060" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="490" y="1060" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">0</text>
+              <text x="520" y="1040" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text>
             </g>
 
-            <!-- Zone 4- -->
-            <g class="zone-group" onclick="showZone(4)">
-                <circle cx="300" cy="538" r="27" fill="#000" stroke="#ff2222" stroke-width="2.5"/>
-                <text x="285" y="547" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">4</text>
-                <text x="315" y="530" fill="#fff" font-size="14" font-weight="700">-</text>
-                <circle cx="300" cy="560" r="5" fill="none" stroke="#ff2222" stroke-width="1.5"/>
-                <text x="245" y="580" fill="#ff3333" font-size="19" font-weight="700" font-style="italic">"skr"</text>
+            <!-- SOUND LABELS -->
+            <g class="label-sound">
+              <text x="330" y="130" fill="#22dd22">"zx"</text>
+              <text x="630" y="190" fill="#dddd00">"tch"</text>
+              <text x="690" y="270" fill="#4488ff">"dt"</text>
+              <text x="280" y="360" fill="#ffaa00">"ktt"</text>
+              <text x="220" y="520" fill="#ff3333">"skr"</text>
+              <text x="750" y="470" fill="#4488ff">"pb"</text>
+              <text x="480" y="700" fill="#ddaa00">"gl"</text>
+              <text x="430" y="770" fill="#22dd22">"mnm"</text>
+              <text x="550" y="910" fill="#dddd00">"tn"</text>
+              <text x="410" y="1110" fill="#22dd22">"eiaoung"</text>
             </g>
 
-            <!-- Zone 7+ -->
-            <g class="zone-group" onclick="showZone(7)">
-                <circle cx="728" cy="408" r="27" fill="#000" stroke="#fff" stroke-width="2.5"/>
-                <text x="713" y="417" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">7</text>
-                <text x="743" y="400" fill="#fff" font-size="14" font-weight="700">+</text>
-                <circle cx="728" cy="430" r="5" fill="none" stroke="#4488ff" stroke-width="1.5"/>
-                <text x="756" y="418" fill="#4488ff" font-size="19" font-weight="700" font-style="italic">"pb"</text>
-            </g>
+            <!-- REGION / CURRENT LABELS -->
+            <text x="50" y="80" class="label-region">Warp</text>
+            <text x="50" y="110" class="label-sub label-sub-italic">Hyper-Reality</text>
+            <text x="50" y="135" class="label-sub">Djynxx 6::3</text>
+            
+            <text x="50" y="450" class="label-region">e-Circuit</text>
+            <text x="50" y="480" class="label-sub label-sub-italic">breakthrough</text>
+            <text x="50" y="505" class="label-sub label-sub-italic">connected</text>
+            <text x="50" y="530" class="label-sub label-sub-italic">psychoactives</text>
+            
+            <text x="50" y="850" class="label-region">Plex</text>
+            <text x="50" y="880" class="label-sub label-sub-italic">Eiriel (Tchukululok)</text>
+            <text x="50" y="905" class="label-sub">Dissociative Void</text>
+            <text x="50" y="930" class="label-sub">Uttunul 9::0</text>
 
-            <!-- Zone 1+ -->
-            <g class="zone-group" onclick="showZone(1)">
-                <circle cx="478" cy="652" r="32" fill="#fff" stroke="#fff" stroke-width="3" filter="url(#glow)"/>
-                <text x="461" y="663" fill="#000" font-size="26" font-weight="900" font-family="Nunito,sans-serif">1</text>
-                <text x="493" y="645" fill="#000" font-size="15" font-weight="700">+</text>
-                <circle cx="478" cy="680" r="5" fill="none" stroke="#ff8800" stroke-width="1.5"/>
-                <polygon points="478,688 472,698 484,698" fill="#fff" stroke="#fff" stroke-width="1"/>
-                <text x="438" y="718" fill="#cccc00" font-size="19" font-weight="700" font-style="italic">"gl"</text>
-            </g>
-
-            <!-- Zone 8- -->
-            <g class="zone-group" onclick="showZone(8)">
-                <circle cx="482" cy="788" r="27" fill="#000" stroke="#fff" stroke-width="2.5"/>
-                <text x="467" y="797" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">8</text>
-                <text x="497" y="780" fill="#fff" font-size="14" font-weight="700">-</text>
-                <polygon points="482,761 476,751 488,751" fill="none" stroke="#fff" stroke-width="1.5"/>
-                <circle cx="482" cy="810" r="5" fill="none" stroke="#44cc44" stroke-width="1.5"/>
-                <text x="395" y="783" fill="#44cc44" font-size="19" font-weight="700" font-style="italic">"mnm"</text>
-            </g>
-
-            <!-- Zone 9+ -->
-            <g class="zone-group" onclick="showZone(9)">
-                <circle cx="492" cy="890" r="27" fill="#000" stroke="#fff" stroke-width="2.5"/>
-                <text x="477" y="899" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">9</text>
-                <text x="507" y="882" fill="#fff" font-size="14" font-weight="700">+</text>
-                <polygon points="492,919 486,929 498,929" fill="#fff" stroke="#fff" stroke-width="1"/>
-                <circle cx="492" cy="912" r="5" fill="none" stroke="#cccc00" stroke-width="1.5"/>
-                <text x="520" y="892" fill="#cccc00" font-size="17" font-weight="700" font-style="italic">"tn"</text>
-            </g>
-
-            <!-- Zone 0- -->
-            <g class="zone-group" onclick="showZone(0)">
-                <circle cx="486" cy="985" r="27" fill="#000" stroke="#fff" stroke-width="2.5"/>
-                <text x="471" y="994" fill="#fff" font-size="24" font-weight="900" font-family="Nunito,sans-serif">0</text>
-                <text x="500" y="978" fill="#fff" font-size="14" font-weight="700">-</text>
-                <polygon points="486,958 480,948 492,948" fill="none" stroke="#fff" stroke-width="1.5"/>
-                <circle cx="486" cy="1008" r="5" fill="none" stroke="#44cc44" stroke-width="1.5"/>
-                <text x="418" y="1038" fill="#44cc44" font-size="17" font-weight="700" font-style="italic">"eiaoung"</text>
-            </g>
-
-            <!-- Gate numbers -->
-            <g opacity="0.75" font-family="Nunito,sans-serif" font-weight="700" fill="#fff" font-size="13">
-                <circle cx="500" cy="46" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="500" y="51" text-anchor="middle">15</text>
-                <circle cx="555" cy="76" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="555" y="81" text-anchor="middle">6</text>
-                <circle cx="465" cy="158" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="465" y="163" text-anchor="middle">21</text>
-                <circle cx="370" cy="252" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="370" y="257" text-anchor="middle">3</text>
-                <circle cx="498" cy="600" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="498" y="605" text-anchor="middle">1</text>
-                <circle cx="538" cy="635" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="538" y="640" text-anchor="middle">28</text>
-                <circle cx="418" cy="668" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="418" y="673" text-anchor="middle">10</text>
-                <circle cx="508" cy="845" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="508" y="850" text-anchor="middle">36</text>
-                <circle cx="458" cy="940" r="14" fill="none" stroke="#fff" stroke-width="1.5"/><text x="458" y="945" text-anchor="middle">45</text>
-            </g>
-
-            <!-- Region labels -->
-            <text x="50" y="72" fill="#fff" font-size="34" font-weight="900" text-decoration="underline">Warp</text>
-            <text x="55" y="104" fill="#22dd22" font-size="24" font-weight="700" font-style="italic">Hyper-Reality</text>
-            <text x="55" y="134" fill="#22dd22" font-size="24" font-weight="700">Djynxx 6::3</text>
-
-            <text x="50" y="448" fill="#fff" font-size="32" font-weight="900" text-decoration="underline">e-Circuit</text>
-            <text x="55" y="480" fill="#22dd22" font-size="21" font-weight="700" font-style="italic">breakthrough</text>
-            <text x="55" y="506" fill="#22dd22" font-size="21" font-weight="700" font-style="italic">connected</text>
-            <text x="55" y="532" fill="#22dd22" font-size="21" font-weight="700" font-style="italic">psychoactives</text>
-
-            <text x="50" y="852" fill="#fff" font-size="34" font-weight="900" text-decoration="underline">Plex</text>
-            <text x="55" y="884" fill="#22dd22" font-size="21" font-weight="700" font-style="italic">Eiriel (Tchukululok)</text>
-            <text x="55" y="912" fill="#22dd22" font-size="21" font-weight="700">Dissociative Void</text>
-            <text x="55" y="940" fill="#22dd22" font-size="21" font-weight="700">Uttunul 9::0</text>
-
-            <!-- Zone/Aspect table -->
-            <g transform="translate(830,48)" font-family="Nunito,sans-serif">
-                <rect x="0" y="0" width="80" height="30" fill="none" stroke="#fff" stroke-width="2"/>
-                <text x="40" y="22" fill="#fff" font-size="16" font-weight="900" text-anchor="middle">Zone</text>
-                <rect x="80" y="0" width="140" height="30" fill="none" stroke="#fff" stroke-width="2"/>
-                <text x="150" y="22" fill="#fff" font-size="16" font-weight="900" text-anchor="middle">Aspect</text>
-
-                <rect x="0" y="30" width="80" height="28" fill="none" stroke="#fff" stroke-width="1"/><text x="40" y="50" fill="#fff" font-size="14" font-weight="700" font-family="monospace" text-anchor="middle">9::0</text>
-                <rect x="80" y="30" width="140" height="28" fill="#222" stroke="#fff" stroke-width="1"/><text x="90" y="50" fill="#fff" font-size="13" font-weight="700">Foundation</text>
-
-                <rect x="0" y="58" width="80" height="28" fill="none" stroke="#fff" stroke-width="1"/><text x="40" y="78" fill="#fff" font-size="14" font-weight="700" font-family="monospace" text-anchor="middle">8::1</text>
-                <rect x="80" y="58" width="140" height="28" fill="#222" stroke="#fff" stroke-width="1"/><text x="90" y="78" fill="#fff" font-size="13" font-weight="700">Anamnesis</text>
-
-                <rect x="0" y="86" width="80" height="28" fill="none" stroke="#fff" stroke-width="1"/><text x="40" y="106" fill="#fff" font-size="14" font-weight="700" font-family="monospace" text-anchor="middle">7::2</text>
-                <rect x="80" y="86" width="140" height="28" fill="#222" stroke="#fff" stroke-width="1"/><text x="90" y="106" fill="#fff" font-size="13" font-weight="700">Geotraumatics</text>
-
-                <rect x="0" y="114" width="80" height="28" fill="none" stroke="#fff" stroke-width="1"/><text x="40" y="134" fill="#fff" font-size="14" font-weight="700" font-family="monospace" text-anchor="middle">6::3</text>
-                <rect x="80" y="114" width="140" height="28" fill="#222" stroke="#fff" stroke-width="1"/><text x="90" y="134" fill="#fff" font-size="13" font-weight="700">Fortress</text>
-
-                <rect x="0" y="142" width="80" height="28" fill="none" stroke="#fff" stroke-width="1"/><text x="40" y="162" fill="#fff" font-size="14" font-weight="700" font-family="monospace" text-anchor="middle">5::4</text>
-                <rect x="80" y="142" width="140" height="28" fill="#222" stroke="#fff" stroke-width="1"/><text x="90" y="162" fill="#fff" font-size="13" font-weight="700">Apocalypse</text>
-            </g>
+            <text x="650" y="110" class="label-current">Warp</text>
+            <text x="650" y="135" font-family="Nunito" font-weight="700" fill="#fff" font-size="16">(Current)</text>
+            
+            <text x="500" y="370" class="label-current">Hold</text>
+            <text x="800" y="300" class="label-current">Rise</text>
+            <text x="380" y="570" class="label-current">Sink</text>
+            
+            <text x="560" y="980" class="label-current">Plex</text>
+            <text x="560" y="1005" font-family="Nunito" font-weight="700" fill="#fff" font-size="16">(Current)</text>
         </svg>
+      </div>
+      <div class="numo-tools-col">
+        <div class="numo-calc">
+          <h4>Gematria Time-Sorcery</h4>
+          <div class="numo-calc-explanation"><strong>In CCRU Theory:</strong> Converts words to base-9 roots.</div>
+          <div class="numo-input-row"><input type="text" id="numo-gematria-input" placeholder="e.g. CYBERNETICS"><button onclick="calculateNumogram()">EVAL</button></div>
+          <div id="numo-result-display" style="font-size: 0.85rem; color: #a8e84c; font-family: 'Baloo 2', cursive;"></div>
+        </div>
+        <div class="numo-calc">
+          <h4>Net-Span Demon Finder</h4>
+          <div class="numo-calc-explanation"><strong>In CCRU Theory:</strong> Locates entities bridging zones.</div>
+          <div class="numo-input-row"><input type="number" id="demon-z1" min="0" max="9" placeholder="Z1"><input type="number" id="demon-z2" min="0" max="9" placeholder="Z2"><button onclick="findDemon()">FIND</button></div>
+          <div id="demon-result" style="font-size: 0.85rem; color: #fff; margin-top: 10px; line-height: 1.4;"></div>
+        </div>
+        <div class="numo-calc">
+          <h4>CCRU Encyclopedia</h4>
+          <div class="numo-input-row" style="margin-bottom: 0;"><input type="text" id="lexicon-search" placeholder="Search archives..." oninput="searchLexicon()"></div>
+          <div id="lexicon-results" style="max-height: 200px; overflow-y: auto; margin-top: 10px; font-size: 0.8rem;"></div>
+        </div>
+        <div class="glass-dark numo-info-panel"><div id="numo-display"><h3>The Numogram</h3><p>Click a Zone to reveal its esoteric data.</p></div></div>
+      </div>
     </div>
-    <div class="info-panel" id="info-panel">
-        <!-- Default Content -->
+  </div>
+
+  <!-- I-CHING TAB -->
+  <div class="tab-content" id="tab-iching">
+    <div class="iching-section glass-dark">
+      <h2 class="iching-header">☯️ The I-Ching Oracle</h2>
+      <p class="iching-desc">Concentrate on your question and cast the coins. The Oracle will generate a hexagram based on the ancient Book of Changes.</p>
+      
+      <button class="btn-glossy btn-purple" style="background: linear-gradient(180deg, #8b5cf6 0%, #6d3fd6 100%); margin-bottom: 30px; font-size: 1.1rem; padding: 14px 32px;" onclick="castOracle()">Cast Coins (Generate Hexagram)</button>
+      
+      <div class="hexagram-container" id="iching-hex-container" style="display:none;">
+        <div class="hexagram-box">
+          <div class="hexagram-title">Primary Hexagram</div>
+          <div class="hexagram-visual" id="iching-primary-vis"></div>
+        </div>
+        <div class="hexagram-box" id="iching-secondary-box" style="display:none;">
+          <div class="hexagram-title">Changing Hexagram</div>
+          <div class="hexagram-visual" id="iching-secondary-vis"></div>
+        </div>
+      </div>
+
+      <div class="iching-result-box" id="iching-primary-result"></div>
+      <div class="iching-result-box" id="iching-secondary-result" style="border-color: #ff3c8e;"></div>
     </div>
+  </div>
+
+</div>
+
+<!-- DATA STORE FOR NUMOGRAM TEXT -->
+<div id="numo-data-store">
+  <div id="data-zone-0">
+    <h3>Zone Zero</h3>
+    <h4>The Numeral 0</h4>
+    <p>The figure ‘0' designates the number zero, anterior to the distinction odd/even, and also to the determination of primes (zeroth prime = 1). Zero is the only natural number that is indivisible by one. Zero digitally cumulates to zero. Numeric Keypad direction: anomalous.</p>
+    <h4>The Zeroth Planet: Sol</h4>
+    <p>The Sun (Sol-0) is by far the largest body in the Solar-system. The Sun is approximately 4.5 billion years old, roughly half-way through it's normal existence (or main-sequence of hydrogen-to-helium nucleosynthesis).</p>
+    <h4>System Notes</h4>
+    <p>Zone-0 is the first of two zones mutually composing the Plex-region of the Numogram. Its Syzygetic-twin is Zone-9. This 9+0 Syzygy is carried by the demon Uttunul. Zone-0 provides the terminus for a single Plex-channel (the 0th).</p>
+  </div>
+  <div id="data-zone-1">
+    <h3>Zone One</h3>
+    <h4>The Numeral 1</h4>
+    <p>The figure ‘1' designates the number one, first odd number (with odditude of aleph-null), and the zeroth prime (first prime = 2). One digitally cumulates to one. Numeric Keypad direction: South-West.</p>
+    <h4>The First Planet: Mercury</h4>
+    <p>Mercury is the innermost planet of the Solar-system (with a mean orbital distance from the sun of approx. 58 000 000 km). In Lemurian Planetwork Mercury is astrozygonomously paired with Neptune.</p>
+    <h4>System Notes</h4>
+    <p>Zone-1 is the first of the six Torque-region Zones of the Numogram, and Tractor-Zone of the 5-4 (or 'Sink') Current. Its Syzygetic-twin is Zone-8. This 8+1 Syzygy is carried by the demon Murmur. Zone-1 provides the terminus for three Torque-channels (the 1st, 4th, and 7th).</p>
+  </div>
+  <div id="data-zone-2">
+    <h3>Zone Two</h3>
+    <h4>The Numeral 2</h4>
+    <p>The figure ‘2' designates the number two, the first and definitive even number, and the first prime (second prime = 3). Two digitally cumulates to three. Numeric Keypad direction: South.</p>
+    <h4>The Second Planet: Venus</h4>
+    <p>Venus (or Sol-2) has a mean orbital distance from sun of 108.2 million km. In Lemurian Planetwork Venus is astrozygonomously paired with Uranus.</p>
+    <h4>System Notes</h4>
+    <p>Zone-2 is the second of the six Torque-region Zones of the Numogram. Its Syzygetic-twin is Zone-7. This 7+2 Syzygy is carried by the demon Oddubb.</p>
+  </div>
+  <div id="data-zone-3">
+    <h3>Zone Three</h3>
+    <h4>The Numeral 3</h4>
+    <p>The figure ‘3' designates the number three, the second odd number (with odditude of 1), and second prime (third prime = 5). Three digitally cumulates to six. Numeric Keypad direction: South-East.</p>
+    <h4>The Third Planet: Earth</h4>
+    <p>Earth (or Sol-3) has a mean orbital distance from the sun of approx. 149 600 000 km, defining the standard Astronomical Unit (AU). In Lemurian Planetwork the Earth is astrozygonomously paired with Saturn.</p>
+    <h4>System Notes</h4>
+    <p>Zone-3 is the first of the two Warp-region Zones of the Numogram, and Tractor-Zone of the 6-3 (or 'Warp') Current. Its Syzygetic-twin is Zone-6. This 6+3 Syzygy is carried by the demon Djynxx. Zone-3 provides the terminus for two channels, one each from the Torque (the 2nd), and the Warp (the 6th).</p>
+  </div>
+  <div id="data-zone-4">
+    <h3>Zone Four</h3>
+    <h4>The Numeral 4</h4>
+    <p>The figure ‘4' designates the number four, the second even number, and first non-prime (or complex) natural number, with prime factors of 2 x 2. Four digitally cumulates to ten. Numeric Keypad direction: West.</p>
+    <h4>The Fourth Planet: Mars</h4>
+    <p>Mars (or Sol-4) has a mean orbital distance from the sun of approx. 228 000 000 km. In Lemurian Planetwork Mars is astrozygonomously paired Jupiter.</p>
+    <h4>System Notes</h4>
+    <p>Zone-4 is the third of the six Torque-region Zones of the Numogram. Its Syzygetic-twin is Zone-5. The 5+4 Syzygy is carried by the demon Katak.</p>
+  </div>
+  <div id="data-zone-5">
+    <h3>Zone Five</h3>
+    <h4>The Numeral 5</h4>
+    <p>The figure ‘5' designates the number five, the third odd number (with odditude of 2), and the third prime (fifth prime = 11). Five digitally cumulates to fifteen. Numeric Keypad direction: Centre.</p>
+    <h4>The Fifth Planet: Jupiter</h4>
+    <p>Jupiter (or Sol-5) has a mean orbital distance from the sun of approx. 778 330 000 km. In Lemurian Planetwork Jupiter is astrozygonomously paired with Mars.</p>
+    <h4>System Notes</h4>
+    <p>Zone-5 is the sixth of the six Torque-region Zones of the Numogram, and Tractor-Zone of the 7-2 (or 'Hold') Current. Its Syzygetic-twin is Zone-4. This 5+4 Syzygy (carried by the demon Katak) draws the innermost curve of the Barker-spiral, with Zone-5 itself marking its central and terminal node (or 'inner-eye').</p>
+  </div>
+  <div id="data-zone-6">
+    <h3>Zone Six</h3>
+    <h4>The Numeral 6</h4>
+    <p>The figure ‘6' designates the number six, third even number, and second non-prime (with prime-factors 2 and 3). Six digitally cumulates to twenty-one. Numeric Keypad direction: East.</p>
+    <h4>The Sixth Planet: Saturn</h4>
+    <p>Saturn (or Sol-6) has a mean orbital distance from the sun of approx. 1 429 400 000 km. In Lemurian Planetwork Saturn is astrozygonomously paired with Earth.</p>
+    <h4>System Notes</h4>
+    <p>Zone-6 is the second of the two Warp-region Zones of the Numogram. Its Warp-complement and Syzygetic-twin is Zone-3. It is this 6+3 Syzygy (carried by the demon Djynxx) which draws the 'Ulterior Vortex' of Outer-Time. Zone-6 provides the terminus for two channels, one each from the Torque (the 5th), and the Warp (the 3rd).</p>
+  </div>
+  <div id="data-zone-7">
+    <h3>Zone Seven</h3>
+    <h4>The Numeral 7</h4>
+    <p>The figure ‘7' designates the number seven, the fourth odd number (with odditude of one), and the fourth prime (seventh prime = 17). Seven digitally cumulates to twenty-eight. Numeric Keypad direction: North-West.</p>
+    <h4>The Seventh Planet: Uranus</h4>
+    <p>Uranus (or Sol-7) has a mean orbital distance from the sun of approx. 2 870 990 000 km. In Lemurian Planetwork Uranus is astrozygonomously paired with Venus.</p>
+    <h4>System Notes</h4>
+    <p>Zone-7 is the fifth of the six Torque-region Zones of the Numogram, and Tractor-Zone of the 8-1 (or 'Surge') Current. Its Syzygetic-twin is Zone-2. The 7+2 Syzygy is carried by the demon Oddubb, whose associations with hyperstitious doublings reinforces its twin character.</p>
+  </div>
+  <div id="data-zone-8">
+    <h3>Zone Eight</h3>
+    <h4>The Numeral 8</h4>
+    <p>The figure ‘8' designates the number eight, the fourth even number, and the third non-prime (with prime factors 2 x 2 x 2). Eight digitally cumulates to thirty-six. Numeric Keypad direction: North.</p>
+    <h4>The Eighth Planet: Neptune</h4>
+    <p>Neptune (or Sol-8) is the outermost gas-giant, with a mean orbital distance from the sun of approx. 4 504 000 000 km. In Lemurian Planetwork Neptune is astrozygonomously paired with Mercury.</p>
+    <h4>System Notes</h4>
+    <p>Zone-8 is the fourth of the six Torque-region Zones of the Numogram. Its Syzygetic-twin is Zone-1. The 8+1 Syzygy is carried by the demon Murmur (known to Muvian sorcerors as 'the nethermost denizen of time').</p>
+  </div>
+  <div id="data-zone-9">
+    <h3>Zone Nine</h3>
+    <h4>The Numeral 9</h4>
+    <p>The figure ‘9' designates the number nine, the fifth odd number (with odditude of three), and the fourth non-prime (with prime factors 3 x 3). Nine digitally cumulates to forty-five. Numeric Keypad direction: North-East.</p>
+    <h4>The Ninth Planet: Pluto</h4>
+    <p>Pluto (or Sol-9) has the most highly elliptical orbital trajectory of any planet in the Solar-system, with a (highly variable) mean orbital distance from the sun of approx. 5 913 520 000 km. In Lemurian Planetwork Pluto is astrozygonomously paired with the Sun.</p>
+    <h4>System Notes</h4>
+    <p>Zone-9 is the second of the two zones mutually composing the Plex-region of the Numogram, and Tractor-Zone for the 9-0 (or 'Plex') current. Its Plex-complement and Syzygetic-twin is Zone-0. This 9+0 Syzygy (carried by the demon Uttunul) draws the outermost curve of the Barker-spiral, which coincides with the limit ordinal-span in Barkerian arithmetic. Zone-9 provides the terminus for two channels, one each from the Torque (the 8th), and the Plex (the 9th).</p>
+  </div>
 </div>
 
 <script>
-    const introData = `
-    <h2>The Decimal Numogram</h2>
-    <p>Pandemonium is the complete system of Lemurian demonism and time sorcery. It consists of two principal components: Numogram (time-map) and Matrix (listing the names, numbers and attributes of the demons).</p>
-    <p>The system is constructed according to immanent criteria latent in decimal numeracy, and involves only basic arithmetical operations (assembled from additions and subtractions).</p>
-    <p>The Numogram, or Decimal Labyrinth, is composed of ten zones (numbered 0-9) and their interconnections. These zones are grouped into five pairs (syzygies) by nine-sum twinning [zygonovism]. The arithmetical difference of each syzygy defines a current (or connection to a tractor zone). Currents constitute the primary flows of the numogram.</p>
-    <p>Each zone number when digitally cumulated defines the value of a gate, whose reduction sets the course of a corresponding channel. Channels constitute the secondary flows, time-holes, or secret interconnections of the numogram.</p>
-    <p>The arrangement of currents divides the Maze into three basic time-systems. Firstly, the currents of the three central syzygies mutually compose a cycle, rotating in anticlockwise steps. Lemurian sorcery calls this inner loop the Time-Circuit. Secondly, and thirdly, in both the Upper and the Lower syzygies the currents produced fold back into (a half of) themselves, constituting autonomous loops: the Warp (upper), and Plex (lower). Warp and Plex circuitries are of an intrinsically cryptic nature, which is compounded by the enigmas of their interconnection. They are variously considered to be Outside- or Outer-time.</p>
-    <p>The gates and their channels knit the Maze together, providing connections between otherwise incompatible time-systems. They open and close the ways of sorcerous traffic. Although each gate deranges time in its own way, their operations vary with a certain regional consistency.</p>
-    <h3>1. Numogram and Otz Chaiim</h3>
-    <p>To those familiar with the Western Magical Tradition, it is likely that the Numogram will initially evoke the Qabbalistic Tree of Life. Both are constructed as decimal diagrams, involving webs of connectivity between ten basic zones, mysteriously twisted into a cryptic ultra-cycle (that links upper and lower regions). Both treat names as numbers, and numerize by digital reduction and cumulation. Both include passages across abysmal waters and through infernal regions. Both map zones onto spinal levels.</p>
-    <p>Despite these manifold interlinkages, there are compelling reasons to consider the Tree of Life a scrambled variant of the Numogram, rather than a parallel system. During its long passage through Atlantean and post-Atlantean hermetic traditions the systematic distortions of the Numogram (introduced to confuse the uninitiated) gradually hardened into erroneous doctrines, and a dogmatic image of the Tree.</p>
-    <p>Most evidently, a vulgar distribution of the numbers - in their exoteric counting-order - was substituted (redundantly) for the now esoteric numogrammatical distribution, which proceeds in accordance with immanent criteria (the web emerging qabbalisitically from the zone-numbers themselves). More devastatingly, the orginal consistency of numeracy and language seems to have been fractured at an early stage, introducing a division between the number of the Sephiroth (10) and that of the Hebrew alphabet (22). The result was a break between the nodes of the tree and the interconnecting paths, ruining all prospect of decipherment. The Sephiroth -segmented over-aganist their connections - become static and structural, whilst the paths lose any rigorous principle of allocation. A strictly analogous outcome is evident in the segmentation of the Tarot into Major and Minor Arcana. Increasingly desperate, arbitrary, and mystifying attempts to re-unite the numbers and their linkages seems to have bedevilled all succeeding occult traditions.</p>
-    <h3>2. Numogram and I Ching</h3>
-    <p>There is considerable evidence, both immanent and historical, that the chinese I Ching and the Nma numogram share a hypercultural matrix. Both are associated with intricate zygonomies, or double-numbering systems, and process abstract problematics involving subdivisions of decimal arrays (as suggested by the Ten Wings of traditional I Ching commentary). Digital reduction of binary powers stabilizes in a six-step cycle (with the values 1, 2, 4, 8, 7, 5). These steps correspond to the lines of the hexagram, and to the time-circuit zones of the Numogram, producing a binodecimal 6-Cycle (which is also generated in reverse by quintuplicative numbering). In both cases a supplementary rule of pairing is followed, according to a zygonovic criterion (9-twinning of reduced values: 8:1, 7:2, 5:4, mapping the hexagram line pairs).</p>
-    <p>The numogram time-circuit, or I Ching hexagam, implictly associates zero with the set of excluded triadic values. It is intriguing in this respect that numerous indications point to an early struggle between triadic and binary numbering practices in ancient chinese culture, suggesting that the binary domination of decimal numeracy systematically produces a triadic residue consistent with nullity. The hexagram itself exhibits obvious tension in this respect, since it reinserts a triadic hyperfactor into the reduced binodigital set (compounded by its summation to twenty-seven, or the third power of three).</p>
-    <p>An ancient binotriadic parallel to the I Ching, called the T'ai Hsuan Ching (or Book of the Great Dark) consisted of eighty-one tetragrams, reversing the relation of foregrounded and implicit numerical values. The division of Lao Tse's Tao Te Ching into eighty-one sections suggests that this numerical conflict was an animating factor in the early history of Taoism.</p>
-    <h3>3. Ethnography of the Nma</h3>
-    <p>Nma culture cannot be decoded without the key provided by the Lemurian Time-Maze. The influence of a hyper triadic criterion of time is evident in the relics of Nma kinship organization, calendrics, and associated rituals. Prior to the calamity of 1883, the Nma consisted of true tribes (tripartite macrosocial divisions). They were distributed in a basic tridentity (interlocking large-scale groupings into Tak- Mu- and Dib-Nma), supported by a triangular patrilocal marriage-cycle. Each marriage identified a woman with a numogram current, or time-passage. (Tak-Nma women marrying into the Mu-Nma, Mu-Nma ditto Dib-Nma, Dib-Nma ditto Tak-Nma). The common calendar of all three tribes was based upon a zygotriadic system (using 6 digits to divide a double-year period of 729 days into fractional powers of three). The Mu-Nma still employ such a calendar today. (The current Mu-Nma calendar is adjusted by regular intercalations of three additional days every second cycle, or four years. The earlier practice of intercalations is not easily recoverable).</p>
-    <p>In the rituals of the Nma the time-circuit is concretized as a hydro-cycle: a division and recombination of the waters. The three stages of this recurrent transmutation are, 1) the undivided waters (oceanic), 2) cloud-building (evaporation), and 3) down-pour (precipitation, river-flow). These are associated with the great sea-beast (Mur Mur), the lurker of steaming swamps (Oddubb), and that which hunts amongst the raging storms (Katak). The cycle is closed by a return to the abysmal waters, intrinsically linking the order of time, and its recurrence, to an ultimate cataclysm (prior to any opposition of cyclic and apocalyptic time). It is in this context that the transcultural deluge-mythos can be restored to its aboriginal sense (which also corresponds to the Hindu Trimurti, with its three stages of creation, preservation and destruction).</p>
-    <p><strong>Click on any numbered zone (0-9) on the map to reveal its attributes, planetary alignments, and esoteric data.</strong></p>
-    `;
+// ===== UTILS =====
+function todayStr() { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function formatDate(s) { const [y,m,d]=s.split('-'); const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return mo[parseInt(m)-1]+' '+parseInt(d)+', '+y; }
+function formatDateTime(d) { return formatDate(todayStr()) + ' at ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); }
+function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
-    const zoneData = {
-        0: `
-    <h2>Zone Zero</h2>
-    <h3>The Numeral 0</h3>
-    <p>The modern figure zero (0) is a closed circle, oval, or ellipse (sometimes differentiated from the letter ‘O' by a diagonal slash). Its archaic Hindu form was the ‘bindu' (or dot, retained in the modern system as the ‘decimal point'). Both of these ciphers are of such abstraction that no rapid summary can be other than misleading. The figure ‘0' designates the number zero, anterior to the distinction odd/even, and also to the determination of primes (zeroth prime = 1).</p>
-    <p>Zero is the only natural number that is indivisible by one. The division of any number by zero produces an infinity (multiplication of any number by zero = 0), in this respect zero treats itself as any other number.</p>
-    <p>Zero digitally cumulates to zero.</p>
-    <p>Numeric Keypad direction: anomalous.</p>
-    <p>As an arithmetical function zero is strongly affined to place value - or ‘positional' - systems in which it typically operates as the designator of empty magnitudes. The modern decimal and binary systems are the most familiar examples of such modular numeracies. (The widespread assumption that such a zero-function is indispensable to any possible place-value numeracy is, however, a fallacious one).</p>
-    <p>On the number line zero marks the transition from negative to positive numbers. In modern binary code zero is instantiated by electronic ‘off' (see One). In set theory zero corresponds to the null (or empty) set. In coordinate geometry zero marks the ‘origin' or intersection point of all dimensional axes, and is marked uniquely across all dimensions. In game theory a zero-sum game is one in which all gains and losses are mere redistributions (‘I win, you lose' or inversely). In Boolean algebra zero symbolizes logical negation. Absolute zero (or zero-degrees Kelvin) marks the cryonic limit of physically attainable temperature. In schizoanalysis ‘zero-intensity' designates the planomenon, plane of consistency, or body without organs (immanent to all intensities).</p>
-    <p>With no other number does arithmetical function cross so imperceptibly into religious and philosophical abstraction. There is a mathematico-cosmic continuum connecting the numeral zero to concepts of nullity, nihility, nothingness, absence, emptiness, void (Hindu ‘Sunya'), vacuum, and neutrality.</p>
-    <p>Zero also has an initiatory sense, as indicated by the ‘year zero' of new beginnings, or cycles (as in the case of the Y2K 00-date, and in that of the zero-strings marking accumulations in the Hindu ‘Yugas'). A similar function is that of ‘time-zero,' or ‘zero-hour' (synchronizing a distributed operation, particular one of a military nature).</p>
-    <h3>The Zeroth Planet: Sol</h3>
-    <p>The Sun (Sol-0) is by far the largest body in the Solar-system. It spins on its own axis at different speeds (with a period of rotation varying from about 36 Earth-days at the poles, to 25.4 at the equator). The sun-spot cycle - driven by periodic reversals in the solar magnetoprocess - lasts for approximately twenty-two years.</p>
-    <p>The Sun is approximately 4.5 billion years old, roughly half-way through it's normal existence (or main-sequence of hydrogen-to-helium nucleosynthesis). After the completion of this phase it is destined to expand into a Red Giant (consuming the inner Solar-system). Its current temperature varies enormously according to depth, between 5 800 k at the surface to 15 600 000 k at the core. The pressure at the Sun's core is equivalent to 250 billion (terrestrial) atmospheres.</p>
-    <p>The preponderance of the Sun's mass within the Solar-system is such that the orbits of the planets (notably Jupiter) only produce minor perturbations in its behavior. Solar radiation sustains all photosynthetic activity on Earth, and thus all plant-based terrestrial life. Its wide range of complex and ambivalent effects extend from regulating circadian biorhythms to triggering skin-cancers.</p>
-    <p>The Sun's magnetic field (the heliosphere) is immensely powerful by planetary standards, extending beyond the edge of the outer Solar-system (as defined by the orbit of Pluto). Other Solar-influences - in addition to gravitational and electomagnetic forces - include the solar-wind (which also extends, on a declining gradient, beyond the edge of the solar-system).</p>
-    <p>The two predominant aspects of the Earth's mechanical relation to the Sun - the day and the year - have been the basis of traditional human time-keeping. The earliest known clocks were sun-dials.</p>
-    <p>Sun-worship is extremely prevalent within human religious history. The apparent rotation of the Sun around the zodiac is the keystone of exoteric astrology (allocating Sun-signs). Oecumenic Sunday is dedicated to Sol.</p>
-    <h3>System Notes</h3>
-    <p>Zone-0 is the first of two zones mutually composing the Plex-region of the Numogram. Its Syzygetic-twin is Zone-9. This 9+0 Syzygy is carried by the demon Uttunul (see Zone-9). Zone-0 provides the terminus for a single Plex-channel (the 0th ).</p>
-    <p>Systematic consistency suggests that Zone-0 envelops the Zeroth-Phase of Pandemonium, but as this includes nothing beyond itself it constitutes a nominal or virtual multitude and an "absolute abstraction." Zone-0 has no separable power of initiation, and since it does not support imps (or impulse-entities) - even of the first degree - there is no zeroth door.</p>
-    <p>The Zeroth Gate (Gt-00) seems to connect Zone-0 to itself, but its nature is peculiarly problematical, and within the Mu-Archive texts its ultimate reality is fundamentally disputed. Many versions of the Numogram delete it entirely. Horovitz says of this Gate that "between its existence and nonexistence there is no difference."</p>
-    <p>Mu Tantrism plots Zone-0 intensities onto the Coccygeal level of the spine, the vestigial remnant of a lost tail (and biotectonic link to the ancient lemur-people).</p>
-    <p>Zone-0 is allotted the Sarkonian Mesh-Tag 0000.</p>
-    <p>Lemurian subcultures associate Zone-0 with the dense void of the cosmic hypermatrix, upon which absolute desolation crosses infinity as flatline and loss of signal. Blind Humpty Johnson’s Channel-Zero ‘black snow’ cult communicate the influence of this zone in their call for the return of true Tohu Bohu or the subprimordial Earth.</p>
-    <p>Centauri subdecadence maps Zone-0 onto the eclipsed side of the Fifth (or Root) Pylon on the Atlantean Cross. As the dark aspect of Foundation (‘deep past’) it corresponds to the protocosmic abyss anticipating primal reality, fusing indissociably into the ultimate gulfs of chaotic unbeing.</p>
-    <p>Stillwell links Zone-0 to the unvoiced Munumese quasiphonic particle ‘eiaoung,’ the ‘silent whisper of the ulterior depths.’</p>
-    <h3>Phase-0 Lemurs</h3>
-    <p>Phase-0 tolerates no populations of any kind.</p>
-        `,
-        1: `
-    <h2>Zone One</h2>
-    <h3>The Numeral 1</h3>
-    <p>The figure one (1) - elaborated from a simple vertical stroke - is at least semi-ideographic as a relic tally-mark (basically identical in this respect to the Roman numeral . I'). This figure has obvious phallic resonance (especially in contrast to the sign for zero (0)). Its relation to the figure seven (7) is supported by numerological analyses (since seven cumulated (28) reduces to one).</p>
-    <p>The figure . 1' designates the number one, first odd number (with odditude of aleph-null), and the zeroth prime (first prime = 2).</p>
-    <p>One is the lowest cardinal number, and the first ordinal.</p>
-    <p>One digitally cumulates to one.</p>
-    <p>Numeric Keypad direction: South-West.</p>
-    <p>In modulus-2 systems the numeral one bears all (non-zero) values (corresponding to powers of two). Binary informatic systems code electronic 'on' as 'one.'</p>
-    <p>The number one is exceptionally multivalent. It has two basic cardinal values - both deriving from its status as the smallest, basic, or irreducible factor defining the natural number series - that of the elementary, the atom, the unit or module - 'one alone' - and also that of the whole, the complete, unity as totality, the universe. Its ordinal value as first, primary, principal, or initial is fractured by the ordinal function of zero, but retains much of its ancient dignity as the beginning of the counting series.</p>
-    <p>In addition one bears a diversity of quasinumerical and logical associations, including self-identity ('oneself,' 'one and the same'), nondifferentitation, uniqueness ('one of a kind'), logical universality, uniformity, and - at a further remove, or more problematically - singularity (anomaly, exception), and the unilateral ('one-sided,' unbalanced, disequilibriated).</p>
-    <p>One also has a complicated syntactical-linguistic usage that interlinks with its numerical and logical functions. In particular it operates as a carrier of nominal and indefinite reference ('the one that,' 'someone or anyone,' 'once upon a time'), which extends also to relation ('one another').</p>
-    <p>Within monotheistic cultures One attains a supreme dignity, identifying God directly with 'the One' (or 'the Old One'). In this context one is bound to the 'I am that I am' of YHVH, and to the absolute concentration of religion within the assertion that 'there is no God but God.' H P Lovecraft upsets this exclusive and definitive sense of the One by reintroducing the plural and multiple, whether grammatically as in the case of 'the Old Ones,' or thematically, as in that of Yog Sothoth, who is described as the 'all in one, and one in all.'</p>
-    <h3>The First Planet: Mercury</h3>
-    <p>Mercury is the innermost planet of the Solar-system (with a mean orbital distance from the sun of approx. 58 000 000 km). The mercurian year (approx. 88 Earth-days in length) is also the swiftest, which accounts for it's use as the base calculative unit in planetwork calendrics.</p>
-    <p>Due to it's long day (approx. 58.7 Earth-days in length) Mercury has semi-permanent light and dark sides (with average temperatures of +430 and -180 degrees celsius respectively).</p>
-    <p>Mercury has a weak magnetic field (approx 1% the strength of Earth's).</p>
-    <p>In Roman mythology Mercury (a latinization of the greek Hermes) is known as the messenger of the gods, associated with communication and trade.</p>
-    <p>The element Mercury (or 'quicksilver,' symbol Hg) has particular alchemical importance, shared in Indian yogic traditions (where it is ritually ingested to produce an anorganic cosmic body).</p>
-    <p>In Lemurian Planetwork Mercury is astrozygonomously paired with Neptune.</p>
-    <h3>System Notes</h3>
-    <p>Zone-1 is the first of the six Torque-region Zones of the Numogram, and Tractor-Zone of the 5-4 (or 'Sink') Current. Its Syzygetic-twin is Zone-8. This 8+1 Syzygy is carried by the demon Murmur (see Zone-8). Zone-1 provides the terminus for three Torque-channels (the 1st, 4th, and 7th).</p>
-    <p>Zone-1 both initiates and envelops the First-Phase of Pandemonium (including 2 impulse-entities). This phase consists of nothing beyond the Zone (1) and the Door (1::0), thus tending to a highly 'idealized' state. Zone-1 has a particularly powerful and manifest initiatory dimension. The First Door - or 'Door of Doors'- is attributed by Muvian sorcery to the amphidemon (and imp of the first degree) Lurgo (1::0) 'the Initiator,' and widely related to Legba (the first and last Loa to be invoked in any vudu ceremony).</p>
-    <p>The First Gate (Gt-01) connects Zone-1 to itself, and its corresponding channel provides a reduced microcosmic model of the Torque as a whole, in which Zone-1 provides both beginning and end. In this respect Horovitz describes Zone-1 'turning forever into itself.'The resulting metastability of this channel accounts for its strong associations with all known variants of the Bubble-Pod mythos.</p>
-    <p>Mu Tantrism plots Zone-1 intensities onto the Dorsal (or Thoracic) level of the spine, which maps onto the domain of lunged creatures (and colonization of the land).</p>
-    <p>Zone-1 is allotted the Sarkonian Mesh-Tag 0001 (matching the primordial click of Tzikvik cipher-shamanism).</p>
-    <p>Lemurian subcultures associate Zone-1 with (meta)static pod-deliria and techno-immortalism. It maintains relatively recent religious structures patterned on transcendent-oppressor ‘sky-god’ divinity, as well as harboring the more archaic gnosis of the shelled ‘old one’ who supports the world (turtle cults).</p>
-    <p>Centauri subdecadence maps Zone-1 onto the palpable side of the First (or Center) Pylon on the Atlantean Cross. As the light aspect of Anamnesis (‘memories and dreams’) it corresponds to enduring ideas, historical time and remembrance (recall).</p>
-    <p>Stillwell links Zone-1 to the Munumese quasiphonic particle ‘gl,’ emanating from the sublaryngeal region (the Horowitzean ‘collapsed gargle’ or ‘glottal spasm,’ a relic from lost gilled/gulping life-forms).</p>
-    <p>Stillwell’s ethno-topography of the Nma allocates Zone-1 to the coral atolls of the Mu Nma, and through their hydrocycle mythos to shallow seas.</p>
-    <p>Zone-1 totem animals are drawn from the spectrum of armored fish creatures (combining a basic icthyoid model with traits extracted from crustaceans, mollusks and gastropods).</p>
-    <h3>Phase-1 Lemurs</h3>
-    <ul>
-    <li>[M#00] 1::0 Lurgo</li>
-    </ul>
-        `,
-        2: `
-    <h2>Zone Two</h2>
-    <h3>The Numeral 2</h3>
-    <p>The figure two (2) is quasisymmetric with the figure five (5). This pairing is echoed in the alphabet by the letters ‘Z' and ‘S' (whose shared consistency across case and phonetic coherence has been taken by figural grammarians as indicative of a zygophidian - or ‘forked-tongue' - cultural source).</p>
-    <p>The figure ‘2' designates the number two, the first and definitive even number, and the first prime (second prime = 3).</p>
-    <p>The encounter with the irrationality of the square-root of two has special importance in the disturbance of Hellenic (‘rationalistic') arithmetic. It is rumoured that the Pythagoreans resorted to assassination in their attempt to suppress this discovery.</p>
-    <p>Two digitally cumulates to three.</p>
-    <p>Numeric Keypad direction: South</p>
-    <p>The mechanical importance of bi-stable (on/off) micro-states within contemporary electronic data-systems has resulted in a vast and diffuse cultural investment in modulus-2 numeracy (pure place-value semiotics). ‘Digital' and ‘binary-coded' have now become almost synonymous in their colloquial usage.</p>
-    <p>Perhaps the supreme exemplar of a binary-numeric system is that of the ancient Chinese I Ching (or ‘book of changes'), which involves both binary numeracy (of broken and unbroken lines) and double-numbering (of numeric hexagrams tagged by a series of ordinal numbers). It is Leibniz' study of this text which elaborates the first Western example of modern binary arithmetic.</p>
-    <p>The syzygetic (or zygonomous) power of two is a productive of an entire series of subtly differentiated binary concepts, which include: coupling, twinning, doubling, polarity, schism, contrast, balance, opposition, and reflection.</p>
-    <p>Binarity is multiply ambivalent. It conspires with both the certainties of analytical reason in general, by way of two-value logics (governed by the principle of the ‘excluded middle'), and also the uncertainties of dialogue, or ‘two-way' communication. It is associated - equally or unequally - with both justice (even-handedness, seeing both sides of a ‘dilemma'), and deceit (two-faced, two-timing, double-dealing ...).</p>
-    <p>Duality is particularly widespread within biological order, from the ‘base-pairs' of (RNA and) DNA code, through the binary fission of bacterial propagation, the (binary) sexual difference of meiotic reproduction, to the bilateral symmetry of the typical vertebrate organism with consequent pairing of limbs (arms, legs), sense-organs (eyes, ears), lungs, brain-hemispheres, etc. ‘Dual-organization' provides a basic model for primordial human kinship structure.</p>
-    <p>Many aspects of binarity are prominent within religious systems, whether gods with two heads or faces (such as the Roman Janus, and the Deleuze-Guattari gods of the State), twin gods (the Dogon Nommo, or the Zoroastrian couple Ahriman/Ormuzd), divine couples (god-goddess pairings being widespread throughout many religions), and twice-born gods (both Zeus and Dionysos amongst the Greek pantheon, for instance). Hindu culture describes Brahmins as ‘twice-born.'</p>
-    <h3>The Second Planet: Venus</h3>
-    <p>Venus (or Sol-2) has a mean orbital distance from sun of 108.2 million km. The Venusian year is approx. 224.4 Earth days in length. Since the rotation of Venus is very slow (and also retrograde) a Venusian day (lasting 243 Earth-days) is longer than its year. In recent times Venus has become the exemplary victim of a ‘runaway greenhouse effect' which has rendered it infernal (with a uniform surface temperature of +462 degrees celsius).</p>
-    <p>Venus has no magnetic field.</p>
-    <p>Venus has been historically identified by two different names, known as the morning star (Phosphorous or Lucifer) when seen in the East at sunrise, and the evening star (Hesperus) when seen in the West at sunset. The Roman goddess Venus (a latinization of the greek Aphrodite) was the deity associated with female beauty and love (accounting in part, perhaps, for Burroughs' hatred of Venusians).</p>
-    <p>In Lemurian Planetwork Venus is astrozygonomously paired with Uranus.</p>
-    <h3>System Notes</h3>
-    <p>Zone-2 is the second of the six Torque-region Zones of the Numogram. Its Syzygetic-twin is Zone-7. This 7+2 Syzygy is carried by the demon Oddubb (see Zone-7).</p>
-    <p>Zone-2 both initiates and envelops the Second-Phase of Pandemonium (including 4 impulse-entities). With cryptic rigor Horovitz thus describes Zone-2 as "reduplicating its double-twinness though its multitude." As initiator it functions as the Second Door, invoked by K-goth cults as the "Main Lo-Way" into the Crypt. Muvian sorcery identifies this door with the amphidemon (and imp of the first degree) Duoddod (2::0).</p>
-    <p>The Second Gate (Gt-3) connects Zone-2 to Zone-3, and its corresponding channel draws an intense line of escape from the Torque to the Warp. This passage is especially compelling, since it is multiply consolidated by cumulation, prime-ordination, and mesh-tagging. Tzikvik shamanism both honours and fears the Second Gate as the opening to the "way of the Storm-Worm."</p>
-    <p>Zone-2 is allotted the Sarkonian Mesh-Tag 0003.</p>
-    <p>Lemurian subcultures associate Zone-2 with crypt-navigation, occulted cyberspace and the spectral / liminal populations of hallucination and time fragmentation (greys, ghosts and zombies). Zone-2 mirrors Zone-5 and shares in its ‘Hyperborean’ themes of time-lapse and abduction.</p>
-    <p>Centauri subdecadence maps Zone-2 onto the eclipsed side of the Second (or Right) Pylon on the Atlantean Cross. As the dark aspect of Genesis (‘creative influences’) it corresponds to epidemic fertility (bacterial fission, clones, replicants, vampiric contagion).</p>
-    <p>Stillwell links Zone-2 to the Munumese quasiphonic particle ‘dt’ (the Horowitzean ‘imploded fricative/fractured plosive’).</p>
-    <p>Stillwell’s ethno-topography of the Nma allocates Zone-2 to the interior marshlands of the Dib Nma, and through the Mu Nma hydrocycle mythos to mist, vaporization and hazing.</p>
-    <p>Zone-2 totem animals are modelled on metamorphic insects, principally lepidoptera (moths and butterflies) but also dragonflies and dibboma flashbugs.</p>
-    <h3>Phase-2 Lemurs</h3>
-    <ul>
-    <li>[M#01] 2::0 Duoddod</li>
-    <li>[M#02] 2::1 Doogu</li>
-    </ul>
-        `,
-        3: `
-    <h2>Zone Three</h2>
-    <h3>The Numeral 3</h3>
-    <p>The figure three (3) is semi-iconic (incorporating a stack of three horizontal strokes). It is quasisymmetric with the (upper-case) letter ‘E,' and partially echoed in the figure ‘8' (designating the third power of two). Figural grammarians consider it to involve a progression of compressive folding beyond ‘1' and ‘2.' The figure ‘3' designates the number three, the second odd number (with odditude of 1), and second prime (third prime = 5).</p>
-    <p>Three is the square-root of nine (relating it intimately to Barkerian arithmetic and Zygonovism).</p>
-    <p>Three digitally cumulates to six.</p>
-    <p>Three is itself the sum of the three preceding natural numbers (0 + 1 + 2 = 3), demonstrating a unique affinity with numerical triangularity.</p>
-    <p>Numeric Keypad direction: South-East.</p>
-    <p>A peculiarly obsessive triadic numeracy is evidenced in the vulgar (‘zygotriadic') calendar of the Mu Nma.</p>
-    <p>The number three is unique for both the intensity and diversity of its cross-cutting hyperstitious investments. It is associated on the right hand with numerological completeness and transcendence, and on the left hand with the middle, the between, and the diagonal line.</p>
-    <p>Prevalent triplicities include (amongst many others) the three dimensions of manifest time (past, present, future) and space (height, length, depth), the triad game (paper, scissors, stone), the Atlantean Tridentity (Nunnil-Ixor, Domu-Loguhn, Hummpa-Taddum), the Hindu trimurty (Brahma, Vishnu, Shiva) and gunas (rajas, tamas, and sattva), the alchemical elements (salt, sulphur, and mercury), the Christian trinity (Father, Son, Holy ghost), the stages of formalized dialectic (thesis, antithesis, synthesis), the oedipal triangle (daddy, mummy, me), and the three virtuous monkeys (blind, deaf, and mute to evil). History exhibits strong tendencies towards a triadic order of the world, both in the realm of mythology (heaven, hell, limbo), and in that of geopolitics (first-, second-, and third-world). The extraordinary numinousness of the number three is also indicated by ethnomes such as tribalism, tributaries, trickery, and trials, the three body problem, three wishes, three fates, three graces, the third-eye, and the arch-magician (Hermes) Trismegistus.</p>
-    <p>Atlantean sources relate the cultural dominance of the number three to the fact that Alpha Centauri is a triple system.</p>
-    <h3>The Third Planet: Earth</h3>
-    <p>Earth (or Sol-3) has a mean orbital distance from the sun of approx. 149 600 000 km, defining the standard Astronomical Unit (AU). Its orbital period (of approx. 365.2422 Earth days) and rotational period (approx. 24 hours) are used as the basis of terrestrial calendrics (along with the period of its satellitic - lunar - orbit), and traditionally for time-keeping (now supplanted by atomic clocks). The Earth has one moon - Luna - of abnormal size relative to that of the planet, and exercizing considerable influence, principally through tidal forces. Lunar influences - such as that evident in the human ovulatory cycle - have consolidated deep cultural associations between the moon, oceans, women, blood, sorcery, and madness (lunacy).</p>
-    <p>The Earth is the densest major body in the Solar-system. It is polarized by a moderate magnetic field which reverses intermittently (once or twice every million years). By the end of the second millennium of the Common Era the Earth was still the only known source of life in the Universe.</p>
-    <p>Prior to the Copernican revolution (in the C16th) the Earth was considered to be the centre of the Solar-system - and even of the universe - by the dominant cultures of mankind (an orthodoxy ruthlessly defended by the Christian Church among others).</p>
-    <p>Alone amongst the Planets, the Earth is not named after a Greek or Roman deity. The name ‘Earth' is of Anglogermanic origin. (The Greek goddess Gaia is increasingly evoked as the name for Earth conceived as a living macro-entity, provoked in part by systemic - or ‘ecospheric' - changes in climate, atmosphere, and biodynamics).</p>
-    <p>In Lemurian Planetwork the Earth is astrozygonomously paired with Saturn.</p>
-    <h3>System Notes</h3>
-    <p>Zone-3 is the first of the two Warp-region Zones of the Numogram, and Tractor-Zone of the 6-3 (or 'Warp') Current. Its Syzygetic-twin is Zone-6. This 6+3 Syzygy is carried by the demon Djynxx (see Zone-6). Zone-3 provides the terminus for two channels, one each from the Torque (the 2nd), and the Warp (the 6th).</p>
-    <p>Zone-3 both initiates and envelops the Third-Phase of Pandemonium (including 8 impulse-entities). In the first of these aspects it functions as the Third Door, which opens onto the Swirl, and is attributed by Muvian sorcery to the chaotic xenodemon (and imp of the first degree) Ixix (3::0).</p>
-    <p>The Third Gate (Gt-6) twists Zone-3 through Zone-6, with its corresponding channel vortically complementing that of the Sixth Gate (Gt-21), and also the Warp-Current itself, thus adding an increment of spin to the entire region. Horovitz invests Zone-3 with a particular potency of intrinsic coincidence, since its second cumular power (6) is also the number of its Syzygetic double (through which he accounts for the compact tension of the Warp system).</p>
-    <p>Mu Tantrism plots Warp-region intensities onto the plane of the third-eye.</p>
-    <p>Zone-3 is allotted the Sarkonian Mesh-Tag 0007.</p>
-    <p>Lemurian subcultures associate Zone-3 with swirling nebulae (cosmic dust clouds) and alien pattern. The intensity of vortical involvement with Zone-6 problematizes distinct characterization.</p>
-    <p>Centauri subdecadence maps Zone-3 onto the active side of the Fourth (or Crown) Pylon on the Atlantean Cross. As the light aspect of Fortune (‘far future’) it corresponds to extrinsic fatality, unexpected messages, and xenosignal.</p>
-    <p>Stillwell links Zone-3 to the Munumese quasiphonic particle ‘zx.’ It designates the ‘buzz-cutter’ sonics which Horowitz describes as a ‘swarming insectoid reversion within mammalian vocality.’</p>
-    <h3>Phase-3 Lemurs</h3>
-    <ul>
-    <li>[M#-03] 3::0 Ixix</li>
-    <li>[M#-04] 3::1 Ixigool</li>
-    <li>[M#-05] 3::2 Ixidod</li>
-    </ul>
-        `,
-        4: `
-    <h2>Zone Four</h2>
-    <h3>The Numeral 4</h3>
-    <p>There are two basic versions of the figure, one ‘open' and the other closed into a triangle. The former design is echoed in the symbol for the planet Jupiter. It is the latter (instantiated here) that figurally relates four to the sign for delta (fourth letter of the Greek alphabet), and accounts for the fact that in certain hacker numerolects it is substituted for the (upper-case) letter ‘A.'</p>
-    <p>The figure ‘4' designates the number four, the second even number, and first non-prime (or complex) natural number, with prime factors of 2 x 2. (The fourth prime = 7).</p>
-    <p>The triangular summation - or digital cumulation - of four equals ten (numerologically identified with a superior power of unity, classically conceived as the pythagorean Tetrakys). The pre-eminences of four - as ‘first' non-prime and ‘first' square - are formally or germinally anticipated by unity.</p>
-    <p>Four digitally cumulates to ten (see above).</p>
-    <p>Numeric Keypad direction: West.</p>
-    <p>Due to the internal redundancy of its dual symmetry (2 x 2 = 2 + 2 = 4), four is commonly conceived as the model outcome of calculation - as indicated by the phrase ‘putting two and two together.'</p>
-    <p>The dominant associations of the number four are balance and stability, exemplified by the ‘four-square' - or solidary - structure of four walls, wheels, or quadrupedal support, as well as by the ‘four-four beats' of rigidly metric dance-music. It is this sense of quadrature that predominates in the four elements (earth, air, water, fire), the four cardinal directions (north, south, east, and west), and the four DNA bases (adenine, cytosine, guanine, and thymine). A similar fourfold typology is expressed by the four suits of the playing-card pack (clubs, diamonds, hearts, spades). Four is also associated with temporal stability - or cyclic regeneration - , as evidenced by the four seasons (Spring, Summer, Autumn, Winter), four classical ages (those of gold, silver, bronze, and lead), and in Hindu culture, far more intricately, by the four Yugas (those of Krita, Treta, Dvapara, and Kali). The system of the Yugas is a fully elaborated quadro-decimal system (highly suggestive in relation to the Tetrakys).</p>
-    <p>Within the Judaeo-Christian tradition the number four is invested with extraordinary significance, from the four letters of the Tetragrammaton, through the four gospels, to the four great ‘Zoas' and four horsemen of apocalypse. The biblical time - of both old and new testaments - places particular importance on the period of forty days (e.g. the duration of the flood, and of Jesus' temptation in the desert). This privileging of quadrate order - as the ground-plan of the temple - is also instantiated by the masonic ‘square.'</p>
-    <p>The number four is also of special importance to Buddhism, as exemplified by the ‘four noble truths' of its basic doctrine, and by the typical (quadrate) design of the mandala. On the flip-side the number four is connected with excess (the fourth dimension), anomaly (the four-leafed clover), and vulgarity (four-letter words).</p>
-    <h3>The Fourth Planet: Mars</h3>
-    <p>Mars (or Sol-4) has a mean orbital distance from the sun of approx. 228 000 000 km. The Martian year is roughly twice as long as that of Earth, and its day about 30 minutes longer.</p>
-    <p>Mars has two moons, Phobos and Deimos.</p>
-    <p>The surface of Mars is swept by vast dust-storms that occasionally envelop the whole planet for months.</p>
-    <p>In popular legend Mars has long been envisaged as the home of intelligent alien life. Recent examples include the ‘canals' discovered by Percival Lowell, the fictions of H.G. Wells and Edgar Rice Burroughs, and the Cydonia ‘face' (based on images from the 1976 Viking missions). Mars is widely seen as a plausible candidate for human colonization. It has also become notorious for cursed space-missions.</p>
-    <p>In August 1996 scientists announced the discovery of Martian nanoworms in a ancient meteorite (cat. ALH84001).</p>
-    <p>In Roman mythology Mars (a latinization of the Greek Ares) is the god of war, and father of Romulus (legendary founder of Rome). Mars is commemorated by the month of March.</p>
-    <p>In Lemurian Planetwork Mars is astrozygonomously paired Jupiter.</p>
-    <h3>System Notes</h3>
-    <p>Zone-4 is the third of the six Torque-region Zones of the Numogram. Its Syzygetic-twin is Zone-5. The 5+4 Syzygy is carried by the demon Katak (see Zone-5).</p>
-    <p>Zone-4 both initiates and envelops the Fourth-Phase of Pandemonium (including 16 impulse-entities). This equation of phase-population with the square of the zone-number establishes an exceptional solidarity between the two, although this rigidity has as its flip-side a tendency to cataclysmic instability. In its initiatory aspect Zone-4 functions as the Fourth Door (or 'Time-Delta,' familiar from variations of the Kurtz-mythos as 'the worst place in the world'). Muvian sorcery attributes this door to the amphidemon (and imp of the first degree) Krako (4::0).</p>
-    <p>The Fourth Gate (Gt-10) feeds Zone-4 forward to Zone-1. Its ancient (proto-Atlantean) name the 'Gate of Submergence' hints at its interlocking associations with completion, catastrophe, subsidence, and decadence. The Channel corresponding to the Fourth Gate is one of three concluding in Zone-1, and the only pro-cyclic channel within the Torque. Its course reinforces the 5-4 (or 'Sink') Current in its rush towards termination, and augments the weight of destiny (it was under the influence of this line that Cecil Curtis departed upon his fatal journey into the land of the Tak Nma).</p>
-    <p>Zone-4 is allotted the Sarkonian Mesh-Tag 0015.</p>
-    <p>Lemurian subcultures associate Zone-4 with ‘delta-phase’ or terminal deliria (Kurtz/Curtis end-of-the-river disintegration into malarial nightmares), geoconvulsions, continental subsidence, and ‘red-out.’</p>
-    <p>Centauri subdecadence maps Zone-4 onto the passive side of the Third (or Left) Pylon on the Atlantean Cross. As the dark aspect of Apocalypse (‘destructive influences’) it corresponds to random calamity.</p>
-    <p>Stillwell links Zone-4 to the Munumese quasiphonic particle ‘skr,’ which Horowitz identifies as an anthropo-reptiloid precursor to the qabbalistic ‘hard resh.’</p>
-    <p>Stillwell’s ethno-topography of the Nma allocates Zone-4 to the volcanic jungles of the Tak Nma, and through the Mu Nma hydrocycle mythos to riverine flow.</p>
-    <p>Zone-4 totem animals are typified by cats and dogs, especially in their predatory mode. Among the Tak Nma rabid animals are given particular prominence.</p>
-    <h3>Phase-4 Lemurs</h3>
-    <ul>
-    <li>[M#06] 4::0 Krako</li>
-    <li>[M#07] 4::1 Sukugool</li>
-    <li>[M#08] 4::2 Skoodu</li>
-    <li>[M#09] 4::3 Skarkix</li>
-    </ul>
-        `,
-        5: `
-    <h2>Zone Five</h2>
-    <h3>The Numeral 5</h3>
-    <p>The figure five (5) - echoed by the (upper-case) letter ‘S' - is of the ophidian-symmetric type (see ‘two').</p>
-    <p>The still widely used Roman numeral V (upper-case letter ‘V') - despite appearing as a quasi-alphabetical numeral - is actually a numerical figure of a far older type, exhibiting a vestigial link to pre-symbolic tallying systems (such as the ‘five-bar gate' (see ‘one')).</p>
-    <p>The figure ‘5' designates the number five, the third odd number (with odditude of 2), and the third prime (fifth prime = 11).</p>
-    <p>Five is one of the two prime factors of the decimal module (with two), a fact that is usually attributed to the number of fingers on one hand. It is on this basis that five serves as modulus or submodulus in many counting (and currency) systems.</p>
-    <p>Five digitally cumulates to fifteen.</p>
-    <p>Numeric Keypad direction: Centre.</p>
-    <p>The number five has particularly strong anthropomorphic associations, due to its multiple connections with human biological organization. These are not restricted to the five digits per limb (so crucial to the social history of numeracy), but extend also to structural dimensions as varied as the five senses (sight, hearing, smell, taste, and touch), and the five spinal-levels (coccygeal, sacral, lumbar, dorsal, cervical). These anthropomorphic resonances are disturbed, however, by instances of fundamentally pentagonal body-plans - pre-eminently that of the star-fish - which is intrinsic to the aberrancy of the Lovecraftean Old Ones.</p>
-    <p>In monotheistic traditions the number five is associated with doctrinal authority, as evidenced in the Pentateuch (or five books of Moses), and in the five pillars of Islam (the ‘arkan,' or five ritual duties).</p>
-    <p>In occult circles the importance of the number five is even more emphatic, as indicated by the five elements of Chinese alchemy, and by the designs of the pentagram, the pentazygon, and the the Atlantean Cross (with its five ‘stations').</p>
-    <p>Secular relics of the authoritative sense of five can be found in the ‘Five-year plans' of command economies, in the geopolitical symbolism of The Pentagon, and perhaps in the near-universal prestige invested in Intel's ‘Pentium' processor.</p>
-    <h3>The Fifth Planet: Jupiter</h3>
-    <p>Jupiter (or Sol-5) has a mean orbital distance from the sun of approx. 778 330 000 km. The Jovian year is roughly 11.9 Earth years in length, and its day about 9.9 hours long.</p>
-    <p>Jupiter is the innermost gas-giant, and by far the largest planet in the Solar-system, accounting on its own for more than two-thirds of total planetary mass. It has an extremely powerful magnetic field (its magnetosphere extends beyond the orbit of Saturn).</p>
-    <p>Jupiter has sixteen moons. The four largest (or Galilean) moons are Callisto, Europa, Ganymede, Io. Galileo's observations of these bodies provided crucial evidence for the Copernican revolution. The oceans of Europa have been frequently identified as potential habitations for alien life (a neomyth shared by Arthur C Clarke, who also populated Jupiter with his alien ‘Monoliths').</p>
-    <p>The most distinctive feature on the Jovian surface is the Great Red Spot, a vast self-sustaining storm.</p>
-    <p>The size, position, and orbital regularity of Jupiter has led to it being credited with a crucial role in protecting the inner solar-system from meteoritic and cometary bombardment.</p>
-    <p>Jupiter (or Jove, latinizing the Greek Zeus) is the sovereign of the Gods. As god of the sky, and of storms, he has been systematically cross-identified with the Abrahamic Jehovah.</p>
-    <p>In Lemurian Planetwork Jupiter is astrozygonomously paired with Mars. (Between Mars and Jupiter lies the asteroid belt, widely hypothesized to be the fragments from a destroyed intermediate planet).</p>
-    <h3>System Notes</h3>
-    <p>Zone-5 is the sixth of the six Torque-region Zones of the Numogram, and Tractor-Zone of the 7-2 (or 'Hold') Current. Its Syzygetic-twin is Zone-4. This 5+4 Syzygy (carried by the demon Katak) draws the innermost curve of the Barker-spiral, with Zone-5 itself marking its central and terminal node (or 'inner-eye').</p>
-    <p>Zone-5 both initiates and envelops the Fifth-Phase of Pandemonium (including 32 impulse-entities). Horovitz remarks specifically upon the qabbalistic resonance of these values. In its initiatory aspect Zone-5 functions as the Fifth (or Hyperborean) Door, attributed by Muvian sorcery to the amphidemon (and imp of the first degree) Tokhatto (5::0). In the inner esoteric circles of the AOE this demon is reverenced as the Angel of the Decadence Pack, and even identified with the Archangel Meteka (associations reinforced by numerous qabbalistic peculiarities).</p>
-    <p>The Fifth Gate (Gt-15) connects Zone-5 to Zone-6, and its corresponding channel tracks the path of abductions into the Warp.</p>
-    <p>Zone-5 is allotted the Sarkonian Mesh-Tag 0031.</p>
-    <p>Lemurian subcultures associate Zone-5 with Hyperborean or Wendigo mythology. Zone-5 mirrors Zone-2 and shares in its Crypt-linked themes of missing time and alien abduction.</p>
-    <p>Centauri subdecadence maps Zone-5 onto the active side of the Third (or Left) Pylon on the Atlantean Cross. As the light aspect of Apocalypse (‘destructive influences’) it corresponds to decision, judgement, and war.</p>
-    <p>Stillwell links Zone-5 to the Munumese quasiphonic particle ‘ktt’ (the Horowitzean ‘paravocal tic’).</p>
-    <p>Stillwell’s ethno-topography of the Nma allocates Zone-5 to the upland rain forests of the Tak Nma, and through the Mu Nma hydrocycle mythos to the monsoon.</p>
-    <p>Zone-5 totem animals are predominantly hybrid bird-reptile forms (with the art of the Highland Tak described by Cecil Curtis as ‘a flapping howling chaos of flying worms, bat-monsters and barking snakes’).</p>
-    <h3>Phase-5 Lemurs</h3>
-    <ul>
-    <li>[M#10] 5::0 Tokhatto</li>
-    <li>[M#11] 5::1 Tukkamu</li>
-    <li>[M#12] 5::2 Kuttadid</li>
-    <li>[M#13] 5::3 Tikkitix</li>
-    <li>[M#14] 5::4 Katak</li>
-    </ul>
-        `,
-        6: `
-    <h2>Zone Six</h2>
-    <h3>The Numeral 6</h3>
-    <p>The figure six (6) is rotationally equivalent to the numeral ‘9' (the two figures together composing a system of twin-spirals). Six participates in a figural set - including the (lower-case) letters b, d, and q, plus (upper- and lower-case) P - of particular and distinct interest to figural grammarians, who have suggested that the ur-form of both six and nine were continuously involutionary spirals.</p>
-    <p>The figure ‘6' designates the number six, third even number, and second non-prime (with prime-factors 2 and 3).</p>
-    <p>Six is the first ‘perfect' number, equivalent to the sum of its factors (1, 2, and 3), and revered as such by Pythagoras.</p>
-    <p>Six digitally cumulates to twenty-one.</p>
-    <p>Numeric Keypad direction: East.</p>
-    <p>Despite its ‘perfection,' six is perhaps the darkest of the elementary decimal numbers, due to its association with chance (the six faces of the die), ill-omen (indicated by the ambivalence of the word or prefix ‘Hex'), and occult intuition (the ‘sixth sense').</p>
-    <p>The six lines of the I Ching hexagram designate the six stages of change discovered by archaic Taoism (which are numerically equivalent to the cyclic-sequence of digitally reduced binary-powers, with values: 1, 2, 4, 8, 7, 5).</p>
-    <p>In the Christian world the number six is ominously coloured by its triplicate reiteration - 666 (or six hundred three-score and six), the Number of the Beast of Revelation - which has preoccupied Christian qabbalism throughout the greater part of the last two Millennia. Six-hunded and sixty-six is the triangular cumulation of thirty-six (itself the second power of six). The division of modern bar-codes into blocks punctuated by (three) sixes has been taken by some as an uncanny fulfillment of the biblical prophecy [Rev XIII:17] 'that no man might buy or sell, save he that had the mark, or the name of the beast, or the number of his name.' (Since thirty-six is the digital cumulation of eight, however, it is to that number - and not six - that this entire complex should ultimately be referred).</p>
-    <p>The number sixty (60) - decimal escalation of six - has acquired prominence due to its extraordinary and influential importance to Sumero-Babylonian culture, from whom the modern world has inherited the sexigesimal principle of division (into minutes and seconds) still current within both chronometry and geometry.</p>
-    <h3>The Sixth Planet: Saturn</h3>
-    <p>Saturn (or Sol-6) has a mean orbital distance from the sun of approx. 1 429 400 000 km. The Saturnian year is a little over 29.47 earth-years in length, and its day has a length of roughly 10.18 hours on the surface (which is half an hour less than that of its solid core).</p>
-    <p>The Saturnian ring-system is divided into seven major bands (labelled D, C, B, A, F, G, E since Huygens), and actually consists of more than 100 000 component rings.</p>
-    <p>Saturn has eighteen confirmed (and named) moons, although the total might be as high as thirty-two. The largest moon - Titan - is more massive than Mercury.</p>
-    <p>Saturn has a magnetic field. Its magnetosphere is about one-third the size of Jupiter's. It is the least dense of the planets (with an average density lower than that of water). A huge standing wave pattern around the northern polar region produces the appearance of a permanent hexagon.</p>
-    <p>The Roman god Saturn is identified with the Greek Cronos, god of time, and father of Jupiter, Neptune, and Pluto (amongst the planetary deities). Saturn is celebrated in the seven days of Saturnalia (the Roman Winter-festival), and in the name of Saturday.</p>
-    <p>In Lemurian Planetwork Saturn is astrozygonomously paired with Earth.</p>
-    <h3>System Notes</h3>
-    <p>Zone-6 is the second of the two Warp-region Zones of the Numogram. Its Warp-complement and Syzygetic-twin is Zone-3. It is this 6+3 Syzygy (carried by the demon Djynxx) which draws the 'Ulterior Vortex' of Outer-Time. Zone-6 provides the terminus for two channels, one each from the Torque (the 5th), and the Warp (the 3rd).</p>
-    <p>Zone-6 both initiates and envelops the Sixth-Phase of Pandemonium (including 64 impulse-entities). Chaim Horovitz qabbalistically relates this phase, multitude, or 'Tone' to the hexagrams of the I Ching and to the yantras of the Ur-Oriyan Yoginis. As initiator, Zone-6 corresponds to the Sixth Door. Muvian sorcery attributes this door - which it names Undu - to the terrible chaotic xenodemon (and imp of the first degree) Tchu (6::0), primordially associated with shocking disappearances.</p>
-    <p>The Sixth Gate (Gt-21) twists Zone-6 through Zone-3, vortically recycling it into the Warp. Its corresponding channel tracks the course of the Warp-current, reinforcing the turbular-momentum of the entire region.</p>
-    <p>Mu Tantrism plots Warp-region intensities onto the plane of the third-eye.</p>
-    <p>Zone-6 is allotted the Sarkonian Mesh-Tag 0063 (a fact of obvious importance to the culture of Tzikvik cipher-shamanism).</p>
-    <p>Lemurian subcultures associate Zone-6 with the occulted dimensions of Undu, turbular erosion and the dead eye of the cyclone. The intensity of vortical involvement with Zone-3 problematizes distinct characterization.</p>
-    <p>Centauri subdecadence maps Zone-6 onto the passive side of the Fourth (or Crown) Pylon on the Atlantean Cross. As the dark aspect of Fortune (‘far future’) it corresponds to ‘gnostic death,’ event horizon, and the absolutely unexpected.</p>
-    <p>Stillwell links Zone-6 to the Munumese quasiphonic particle ‘tch,’ approximating to the interphoneme ‘dzch/tj.’</p>
-    <h3>Phase-6 Lemurs</h3>
-    <ul>
-    <li>[M#-15] 6::0 Tchu</li>
-    <li>[M#-16] 6::1 Djungo</li>
-    <li>[M#-17] 6::2 Djuddha</li>
-    <li>[M#-18] 6::3 Djynxx</li>
-    <li>[M#-19] 6::4 Tchakki</li>
-    <li>[M#-20] 6::5 Tchattuk</li>
-    </ul>
-        `,
-        7: `
-    <h2>Zone Seven</h2>
-    <h3>The Numeral 7</h3>
-    <p>The figure seven (7) includes the only pure diagonal to be found amongst the numeral figures (and depends upon this oblique line to differentiate it from the numeral ‘1,' as also to break it's rotational bond with the (upper-case) letter ‘L'). It is ideographically connected to the lightning-stroke, and related by composition to the (similarly associated) letter ‘Z.'</p>
-    <p>The figure ‘7' designates the number seven, the fourth odd number (with odditude of one), and the fourth prime (seventh prime = 17).</p>
-    <p>Seven digitally cumulates to twenty-eight.</p>
-    <p>Numeric Keypad direction: North-West.</p>
-    <p>The biblical importance of the number seven is established at the beginning of Genesis, with the religious derivation of the seven-day week (from the six days of creation +1). Jewish mysticism deepens this association between seven and sacred time with an account of seven discarded creations (preceding the current one, and cast into the abyss). The number seven is also notably prominent in Revelation (where it is referred to the seven ancient churches, to the seven angels, seven seals, seven last plagues, seven vials of wrath, and to the seven heads of the great beast (which perhaps refer - in turn - to the seven hills of Rome)). The heptamania of Revelation is the probable source of the structurally ambivalence of seven within popular Christianity, where it is attributed both to the seven cardinal virtues, and the seven deadly sins.</p>
-    <p>A crescendo of seven-obsession is found in the Theosophical writings of Madame Blavatsky, who divides the cosmic process into seven phases, each characterized by one of seven sequential ‘root races.' Blavatsky draws from biblical sources, but is more directly influenced (through the teachings of her ‘Ascended Tibetan Masters') by the usage of the number seven in a variety of Eastern religions (including the Hindu seven worlds, seven divine mothers, and seven Rishis - or sages -, the seven Buddhas, and the seven Shinto gods of good fortune).</p>
-    <p>Religious and mystical investments of the number seven are closely connected to the seven planets of classical astronomy and traditional astrology (from which the phrase ‘seventh heaven' is derived). In recent times, the Seven Sisters (or Pleiades) have taken up an increasing proportion of this cosmic-numerical freight.</p>
-    <p>The triplicate reiteration of the number seven is used as the title for Alistair Crowley's book of numbers, 777 (a number corresponding to the gematria value of the law of Thelema according to Alphanumeric Qabbala).</p>
-    <h3>The Seventh Planet: Uranus</h3>
-    <p>Uranus (or Sol-7) has a mean orbital distance from the sun of approx. 2 870 990 000 km. The Uranian year is a little over 84 Earth-years in length. Its day lasts for roughly seventeen and one quarter hours.</p>
-    <p>Uranus has five large moons, plus at least ten smaller ones. The two largest moons - Oberon and Titania - were discovered by Herschel in 1787. It also has a ring-system involving eleven known bands (the five most prominent of these are designated by the Greek letters from Alpha to Epsilon).</p>
-    <p>The rotation of Uranus is abnormally tilted, and is almost perpendicular to the ecliptic, warping its magnetic field.</p>
-    <p>The bluish colour of Uranus is ascribed to absorption of red-light by atmospheric methane.</p>
-    <p>In Greek mythology Uranus was the god of the heavens, incestuous son of Gaia and father of Cronos (Saturn), the other Titans, the Cyclops, the hundred-headed giants, and others. Led by Cronos, the Titans killed and mutilated Uranus, spawning the Furies from his blood (and Aphrodite from his severed genitals).</p>
-    <p>In recent times Uranus has become the butt of infantile scatalogical humour.</p>
-    <p>In Lemurian Planetwork Uranus is astrozygonomously paired with Venus.</p>
-    <h3>System Notes</h3>
-    <p>Zone-7 is the fifth of the six Torque-region Zones of the Numogram, and Tractor-Zone of the 8-1 (or 'Surge') Current. Its Syzygetic-twin is Zone-2. The 7+2 Syzygy is carried by the demon Oddubb, whose associations with hyperstitious doublings reinforces its twin character.</p>
-    <p>Zone-7 both initiates and envelops the Seventh-Phase of Pandemonium (including 128 impulse-entities). In its initiatory aspect - as the Seventh Door - Zone-7 opens onto the cosmic swamp-labyrinths or 'Tracts of Dobo.' Muvian sorcery attributes this door to the amphidemon (and imp of the first degree) Puppo (7::0).</p>
-    <p>The Seventh Gate (Gt-28) feeds Zone-7 back to Zone-1, and this tendency to precipitate 'fold-type' time-anomalies accounts for its Black-Atlantean name 'Gate of Relapse.' The Channel corresponding to the Seventh Gate is one of three concluding in Zone-1, and the only counter-cyclic path within the Torque. The aquassasins of Hyper-C fetishize this gate in their bizarre mysteries of the Bubble Pod.</p>
-    <p>Zone-7 is allotted the Sarkonian Mesh-Tag 0127.</p>
-    <p>Lemurian subcultures associate Zone-7 with emergence from the depths (hyper-sea water-carriers and amphibious colonization).</p>
-    <p>Centauri subdecadence maps Zone-7 onto the active side of the Second (or Right) Pylon on the Atlantean Cross. As the light aspect of Genesis (‘creative influences’) it corresponds to genealogy, ancestor worship and inherited wealth.</p>
-    <p>Stillwell links Zone-7 to the Munumese quasiphonic particle ‘pb’ (the Horowitzean ‘compounded plosive’).</p>
-    <p>Her ethno-topography of the Nma allocates Zone-4 to the coastal swamps of the Dib Nma, and through the Mu Nma hydrocycle mythos to salt-water marshes.</p>
-    <p>Zone-7 totem animals are predominantly of the chubby batrachian (burping toad) type.</p>
-    <h3>Phase-7 Lemurs</h3>
-    <ul>
-    <li>[M#21] 7::0 Puppo</li>
-    <li>[M#22] 7::1 Bubbamu</li>
-    <li>[M#23] 7::2 Oddubb</li>
-    <li>[M#24] 7::3 Pabbakis</li>
-    <li>[M#25] 7::4 Ababbatok</li>
-    <li>[M#26] 7::5 Papatakoo</li>
-    <li>[M#27] 7::6 Bobobja</li>
-    </ul>
-        `,
-        8: `
-    <h2>Zone Eight</h2>
-    <h3>The Numeral 8</h3>
-    <p>The figure eight (8) is a partially rotated glyph of infinity, and also of the Moebian strip. It has strong ophidian resonances, linked in Indian culture to the realm of snake-demons (Nagas), and to the serpent of the deep (Ahi). In the West it is related to Ourobouros (the serpent of eternity, eating its own tail).</p>
-    <p>The figure ‘8' designates the number eight, the fourth even number, and the third non-prime (with prime factors 2 x 2 x 2).</p>
-    <p>Multiple evidences indicate that eight was an important modulus in the late pre-history of numeracy (most remarkable in this respect is the strong connection between the words for ‘nine' and ‘new' in various languages, including Latin).</p>
-    <p>Eight is the third power of two (with factors 1, 2, and 4), and constitutes a crucial grouping in digital electronics (with eight bits equalling one byte (with a power of combinatorial variation equal to two-hundred and fifty-six). It is the same set of numerical features that support the octave of western music.</p>
-    <p>Eight digitally cumulates to thirty-six.</p>
-    <p>Numeric Keypad direction: North.</p>
-    <p>The ophidian tendency in the figure eight is compunded by the deep association of the number with cephalopodian entities - pre-eminently the octopus - and by derivation with the entire range of ‘tentacle-face' beings (such as the Oankali of Octavia Butler). A further - more tenuous - connection might be made to the amphibian hybrids of Dr Octagon (‘half shark-alligator, half man').</p>
-    <p>Both numerically and figurally, eight is associated with perfection (in the sense of macrocosmic completion and return). These are particularly notable in the East, where obvious references include the Buddhist eightfold path, and the eight immortals of Taoism. The number eight - particularly in its triplicate reiteration (888) is considered an especially auspicious number in Chinese culture.</p>
-    <p>According to the Dogon, eight is the number of Nomo, and as such the primary key to their cosmo-numerical system.</p>
-    <p>Eight is the digital source (by cumulation to the second power) of the number of the beast, 666 (see Six).</p>
-    <h3>The Eighth Planet: Neptune</h3>
-    <p>Neptune (or Sol-8) is the outermost gas-giant, with a mean orbital distance from the sun of approx. 4 504 000 000 km. Due to eccentricities in the orbit of Pluto it is periodically the outermost (ninth) planet (see Pluto, Zone-9). The Neptunian year is slightly under 164.8 Earth-years in length. Its day lasts for approximately sixteen hours.</p>
-    <p>Neptune has eight known moons, of which Triton is by far the largest. It also has at least five (thin and dark) rings.</p>
-    <p>Neptune shares various features with Uranus, including an anomolously oriented magnetic field, and a bluish hue (due to absorption of red-light by atmospheric methane).</p>
-    <p>The prediction of Neptune's existence, and its subsequent discovery in 1846 (on the basis of perturbations in the orbit of Uranus) was a crucial moment of consolidation for mathematical celestial mechanics.</p>
-    <p>In Roman mythology Neptune is the sea god (identified with the Greek Poseidon).</p>
-    <p>In Lemurian Planetwork Neptune is astrozygonomously paired with Mercury.</p>
-    <h3>System Notes</h3>
-    <p>Zone-8 is the fourth of the six Torque-region Zones of the Numogram. Its Syzygetic-twin is Zone-1. The 8+1 Syzygy is carried by the demon Murmur (known to Muvian sorcerors as 'the nethermost denizen of time').</p>
-    <p>Zone-8 both initiates and envelops the Eighth-Phase of Pandemonium (including 256 impulse-entities). This association with the digital byte (eight bits) cements its importance within cybergothic cults. In its initiatory aspect - as the Eighth Door - Zone-8 is problematically identifiable with the Muvian amphidemon (and imp of the first degree) Minommo (8::0). This demon figures prominently in the dream sorcery of the Mu Nma.</p>
-    <p>The Eighth Gate (Gt-36) connects Zone-8 to Zone-9, and the corresponding Channel is the sole path of escape from the Torque - or 'Time-Circuit' - into the Plex. Due to its digital cross-match with the 6+3 Syzygy (occupying the Warp-region of the Numogram, and carried by the Xenodemon Djynxx (6::3)) the Eighth Gate seems to address what Stillwell has called the 'ultimate numogrammatic enigma' - that of the intercommunication between the Warp and Plex regions. This linkage is crucially emphasized in the culture of Tzikvik shamanism, and - under the name 'Gate of Charon'- is taken-up into Late-Atlantean apocalypticism (since its digital sum (36) itself cumulates to 666, and thus echoes the number of Seals to the Great Abyss (long associated with the thirty-six cards of the Decadence pack)).</p>
-    <p>Mu Tantrism plots Zone-8 intensities onto the Lumbar level of the spine, archaic fish- region of the mammalian nervous-system.</p>
-    <p>Zone-8 is allotted the Sarkonian Mesh-Tag 0255.</p>
-    <p>Lemurian subcultures associate Zone-8 with limbic drift, dreams, trance-states and foetal sentience.</p>
-    <p>Centauri subdecadence maps Zone-8 onto the passive side of the First (or Centre) Pylon on the Atlantean Cross. As the dark aspect of Anamnesis (‘memories and dreams’) it corresponds to submerged currents of fatality.</p>
-    <p>Stillwell links Zone-8 to the Munumese quasiphonic particle ‘mnm,’ the diffuse subvocal hum that Horowitz links to the ‘proto-originary enunciation’ Oumn.</p>
-    <p>Stillwell’s ethno-topography of the Nma allocates Zone-8 to the fabled submarine cities of the ancient Mu Nma, and through the Mu Nma hydrocycle mythos to the deep sea.</p>
-    <p>Zone-8 totem animals are typified by polytendrilled abominations.</p>
-    <h3>Phase-8 Lemurs</h3>
-    <ul>
-    <li>[M#28] 8::0 Minommo</li>
-    <li>[M#29] 8::1 Murrumur</li>
-    <li>[M#30] 8::2 Nammamad</li>
-    <li>[M#31] 8::3 Mummumix</li>
-    <li>[M#32] 8::4 Numko</li>
-    <li>[M#33] 8::5 Muntuk</li>
-    <li>[M#34] 8::6 Mommoljo</li>
-    <li>[M#35] 8::7 Mombbo</li>
-    </ul>
-        `,
-        9: `
-    <h2>Zone Nine</h2>
-    <h3>The Numeral 9</h3>
-    <p>The figure nine (9) is zygospirally related to the figure six (6, see six), and quasisymmetric with the sign for Pluto.</p>
-    <p>The figure ‘9' designates the number nine, the fifth odd number (with odditude of three), and the fourth non-prime (with prime factors 3 x 3).</p>
-    <p>Nines are produced by unit subtractions (n -1) from pure decimal magnitudes (a numerical practice most frequently encountered in a retail context, e.g. $9.99). In order to produce arithmetical consistency in respect to 1/3 x 3, one is mathematically equated with point nine recurring (0.999...). This equation - which provides a virtual infinite decimal-expansion for every number - is indispensable for Cantorean diagonalization.</p>
-    <p>Nine digitally cumulates to forty-five.</p>
-    <p>Numeric Keypad direction: North-East.</p>
-    <p>The number nine has a null value in digital reduction, practically enabling all nines to be eliminated from any complex reduction (involving at least one digit other than nine or zero). The same formula (9 = 0) is also derivable from Barker twinning (or Zygonovism) - long familiar to Dogon sorcery - for which nine functions as the summative key. Such zygonovism (or nine-sum coupling) divides the decimal numerals into five twins, and underlies both Numogram syzygetics and the game of Subdecadence.</p>
-    <p>The number nine is the last numeral of the decimal system, and its associations with death and fatality are primarily based on this purely numerical (modular) function of termination. There are nine rivers of the underworld, and the mortuary aspect of the cat is indicated by her nine lives. Charles Manson's adoption of the Beatle's Revolution-9 (or Revelation IX) as an apocalyptic ‘family anthem' was fully in keeping with this aspect of the number.</p>
-    <p>Alternatively, nine is acknowledged as the highest numeral, and associated with celestial inspiration (the nine muses) and bliss (Cloud-9). Nine solar planets are recognized by modern astronomy (as also by the ancient Lemurian Planetwork).</p>
-    <p>The duplicate reiteration of nine is remarkable for it's theomystical resonances. Islam (= 99) lists ninety nine ‘incomparable attributes' of Allah. The Anglossic value of YHVH = 99. According to the cryptic Black Atlantean cargo-cult Hyper-C the number ninety-nine - as dramatized by the Y2K panic - designates the cyclic completion of time.</p>
-    <h3>The Ninth Planet: Pluto</h3>
-    <p>Pluto (or Sol-9) has the most highly elliptical orbital trajectory of any planet in the Solar-system, with a (highly variable) mean orbital distance from the sun of approx. 5 913 520 000 km. Due to the extreme eccentrity of its orbit, Pluto periodically switches places with Neptune as eighth planet from the Sun. The Plutonian year is approximately under 247.7 Earth-years in length.</p>
-    <p>Pluto was not discovered until 1930. It's anomalous orbit, which is both abnormally elliptical and also angled off the ecliptic, has led many to the conclusion that it is not a normal planet at all. Suggestions as to its nature include the hypothesis that it is a captured or adopted body (perhaps from the Kuiper Belt of Trans-Neptunian objects), or alternatively an escaped Neptunian moon.</p>
-    <p>Pluto has one known moon, Charon (discovered in 1978, and named after the ferryman who guides the dead across the river Styx). Charon is the largest satellite relative to its ‘parent' planet in the Solar-system.</p>
-    <p>In Roman mythology Pluto is the god of the underworld (identified with the Greek Hades). The topographically twisted association of the innermost with the outermost - technically described as ‘Plutonic-looping' - is exemplified by the identification of the most distant planet with the inner core of the Earth.</p>
-    <p>The existence of Pluto was anticipated by H.P.Lovecraft, who named the as-yet-unknown planet Yuggoth.</p>
-    <p>In Lemurian Planetwork Pluto is astrozygonomously paired with the Sun.</p>
-    <h3>System Notes</h3>
-    <p>Zone-9 is the second of the two zones mutually composing the Plex-region of the Numogram, and Tractor-Zone for the 9-0 (or 'Plex') current. Its Plex-complement and Syzygetic-twin is Zone-0. This 9+0 Syzygy (carried by the demon Uttunul) draws the outermost curve of the Barker-spiral, which coincides with the limit ordinal-span in Barkerian arithmetic. Zone-9 provides the terminus for two channels, one each from the Torque (the 8th), and the Plex (the 9th).</p>
-    <p>Zone-9 both initiates and envelops the Ninth-Phase of Pandemonium (including 512 impulse-entities, one half of the fully disorganized population). In the first of these aspects it functions as the Ninth (or Ultimate) Door, which degenerated Muvian sorceries identify with the syzygetic xenodemon (and imp of the first degree) Uttunul (9::0, see above).</p>
-    <p>The Ninth Gate (Gt-45) connects Zone-9 to itself, transducing the third involutionary channel (see Zone-0, Zone-1). Nma sorcery refers to it as the Gate of Pandemonium (a fact Stillwell attributes to the coincidence of its number (45) with that of the Nma demonomy). The Tzikvik associate it with Tchukululok (fabled City of the Worms), and emphasize its numerical cross-match with the 5+4 Syzygy, whose demonic carrier they call Kattku (the Nma ‘Katak'). The Xxignal track Utterminus is dedicated to the Ninth Gate, linking it to K-goth synthanatonic fugues. In contrast, Polanski's film ‘The Ninth Gate' - despite its title - has only the most tenuous and allusive relation to the Numogram path of this name.</p>
-    <p>Mu Tantrism plots Zone-9 intensities onto the Sacral level of the spine. The Sacrum (or ‘sacred bone') has been identified (by Goethe amongst others) as a degenerated second skull.</p>
-    <p>Zone-9 is allotted the Sarkonian Mesh-Tag 0511.</p>
-    <p>Lemurian subcultures associate Zone-9 with the Cthellloid metallic ocean of the earth’s iron core.</p>
-    <p>Centauri subdecadence maps Zone-9 onto the active side of the Fifth (or Root) Pylon on the Atlantean Cross. As the light aspect of Foundation (‘deep past’) it corresponds to the prehuman cultures of the Old Ones.</p>
-    <p>Stillwell links Zone-9 to the Munumese quasiphonic particle ‘tn,’ which Horowitz describes as ‘the ultimate unutterable mystery of vocal nullity.’</p>
-    <h3>Phase-9 Lemurs</h3>
-    <ul>
-    <li>[M#36] 9::0 Uttunul</li>
-    <li>[M#37] 9::1 Tuttagool</li>
-    <li>[M#38] 9::2 Unnunddo</li>
-    <li>[M#39] 9::3 Ununuttix</li>
-    <li>[M#40] 9::4 Unnunaka</li>
-    <li>[M#41] 9::5 Tukutu</li>
-    <li>[M#42] 9::6 Unnutchi</li>
-    <li>[M#43] 9::7 Nuttubab</li>
-    <li>[M#44] 9::8 Ummnu</li>
-    </ul>
-        `
-    };
+function updateThemeIcon() { document.getElementById('theme-btn').textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙'; }
+updateThemeIcon();
+function toggleTheme() { document.body.classList.toggle('dark-mode'); localStorage.setItem('studyBuddyTheme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); updateThemeIcon(); }
 
-    const infoPanel = document.getElementById('info-panel');
-    // Set default state
-    infoPanel.innerHTML = introData;
+// ===== STARTER DECK =====
+const starterDeck = [
+  { en: "To read", jp: "読む", es: "Leer" }, { en: "Street", jp: "通り", es: "Calle" }, { en: "Store", jp: "店", es: "Tienda" }
+];
 
-    function showZone(zoneNum) {
-        if (zoneData[zoneNum]) {
-            infoPanel.innerHTML = zoneData[zoneNum];
-        }
+const STORAGE_KEY = 'studyBuddyData';
+function getDefaultData() { return { days: {}, dictionary: [], diary: [], streak: 0, lastActiveDate: null, starterLoaded: false }; }
+function loadData() { try { const r = localStorage.getItem(STORAGE_KEY); if (r) { let loaded = JSON.parse(r); if (!loaded.diary) loaded.diary = []; return loaded; } } catch(e) {} return getDefaultData(); }
+function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+let data = loadData();
+
+if (!data.starterLoaded) {
+  starterDeck.forEach(word => { if (!data.dictionary.some(w => w.en === word.en)) data.dictionary.push({ en: word.en, jp: word.jp, es: word.es, addedDate: todayStr() }); });
+  data.starterLoaded = true; saveData();
+}
+
+// ===== NES PASSWORD =====
+function generatePassword() { document.getElementById('nes-password-box').value = btoa(encodeURIComponent(JSON.stringify(data))).match(/.{1,8}/g).join('-'); }
+function loadPassword() {
+  const input = document.getElementById('nes-password-box').value.trim(); if (!input) return alert("ENTER PASSWORD.");
+  try {
+    let imported = JSON.parse(decodeURIComponent(atob(input.replace(/[-\s]/g, ''))));
+    if (imported.days && imported.dictionary) { if (!imported.diary) imported.diary = []; data = imported; saveData(); initApp(); alert("RESTORED!"); document.getElementById('nes-password-box').value = ''; } else alert("INVALID DATA.");
+  } catch (err) { alert("INVALID FORMAT."); }
+}
+function copyPassword() { const pwBox = document.getElementById('nes-password-box'); if (!pwBox.value) return; pwBox.select(); document.execCommand('copy'); alert("COPIED!"); }
+
+function calcStreak() {
+  const sortedDays=Object.keys(data.days).sort().reverse(); if(!sortedDays.length){data.streak=0;return;}
+  let streak=0, cd=new Date(); if(!data.days[todayStr()])cd.setDate(cd.getDate()-1);
+  while(true){ const ds=cd.getFullYear()+'-'+String(cd.getMonth()+1).padStart(2,'0')+'-'+String(cd.getDate()).padStart(2,'0'); const day=data.days[ds]; if(day&&(day.flash>0||day.read>0)){streak++;cd.setDate(cd.getDate()-1);}else break; }
+  data.streak=streak;
+}
+
+const speeches={ greeting:{en:"Hello! Let's study today!",jp:"こんにちは！今日も勉強しよう！",es:"¡Hola! ¡Estudiemos hoy!"}, bothDone:{en:"Amazing work today!",jp:"今日はすごい！",es:"¡Increíble hoy!"}, flashDone:{en:"Great flashcards! Now read!",jp:"次は読書だよ！",es:"¡Bien! ¡Ahora a leer!"}, readDone:{en:"Nice reading!",jp:"読書お疲れ！",es:"¡Buena lectura!"}, streakHigh:{en:"🔥 Incredible streak!",jp:"🔥 すごい連続記録！",es:"🔥 ¡Racha increíble!"}, newWord:{en:"New word learned!",jp:"新しい単語を覚えた！",es:"¡Nueva palabra!"} };
+function setSpeech(k){const s=speeches[k];if(!s)return;document.getElementById('speech-en').textContent=s.en;document.getElementById('speech-jp').textContent=s.jp;document.getElementById('speech-es').textContent=s.es;}
+
+function updateMood(){
+  const today=data.days[todayStr()]||{};let mood=30; if(today.flash>0)mood+=30;if(today.read>0)mood+=30;if(data.streak>=3)mood+=10; mood=Math.min(100,mood);
+  const fill=document.getElementById('mood-fill'),text=document.getElementById('mood-text'); fill.style.width=mood+'%';
+  if(mood>=90){fill.style.background='linear-gradient(90deg,#7ec832,#a8e84c)';text.textContent='Ecstatic!';setCreatureState('happy');}
+  else if(mood>=60){fill.style.background='linear-gradient(90deg,#ffcc00,#ff8a00)';text.textContent='Happy';setCreatureState('idle');}
+  else if(mood>=40){fill.style.background='linear-gradient(90deg,#ff8a00,#e06500)';text.textContent='Neutral';setCreatureState('idle');}
+  else{fill.style.background='linear-gradient(90deg,#ff3c8e,#d42070)';text.textContent='Needs attention';setCreatureState('sad');}
+}
+
+const spriteMap={ idle:'./idle.png', happy:'./happy.png', sad:'./sad.png', sleep:'./sleep.png', study:'./study.png', read:'./read.png', celebrate:'./celebrate.png' };
+function setCreatureState(state){ const el=document.getElementById('sprite-img');if(!el)return; el.src=spriteMap[state]||spriteMap.idle; }
+
+let isBouncing = false;
+document.getElementById('creature-sprite').addEventListener('click', function(e) {
+  if(isBouncing) return; isBouncing = true; const img = document.getElementById('sprite-img'); const prevSrc = img.src; img.src = spriteMap.happy; this.classList.add('animate-bounce');
+  for(let i = 0; i < Math.floor(Math.random() * 3) + 3; i++) {
+    const heart = document.createElement('div'); heart.textContent = ['💖', '✨', '💕', '💗'][Math.floor(Math.random()*4)]; heart.className = 'heart-particle';
+    heart.style.setProperty('--tx', (Math.random() - 0.5) * 120 + 'px'); heart.style.setProperty('--ty', -(Math.random() * 120 + 60) + 'px'); heart.style.left = '45%'; heart.style.top = '45%';
+    this.appendChild(heart); setTimeout(() => heart.remove(), 800);
+  }
+  setTimeout(() => { this.classList.remove('animate-bounce'); if(img.src.includes('happy.png')) img.src = prevSrc; isBouncing = false; }, 400);
+});
+
+document.getElementById('pw-input').addEventListener('keydown',function(e){
+  if(e.key==='Enter'){
+    if(btoa(this.value.toLowerCase().trim()) === 'Y2FrZQ=='){
+      document.getElementById('password-screen').style.display='none'; document.getElementById('app').style.display='block'; initApp();
+    }else{ document.getElementById('pw-error').textContent='Wrong password... try again!'; this.value=''; }
+  }
+});
+
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active'); document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+function logFlashcards(){
+  const val=parseInt(document.getElementById('flash-minutes').value);if(!val||val<=0)return;
+  const today=todayStr();if(!data.days[today])data.days[today]={flash:0,read:0}; data.days[today].flash+=val;
+  document.getElementById('flash-input-area').style.display='none'; document.getElementById('flash-done').style.display='block'; document.getElementById('flash-done-text').textContent=data.days[today].flash+' min today!';
+  document.getElementById('card-flash').classList.add('done'); setCreatureState('study');
+  const readDone=(data.days[today].read||0)>0;setSpeech(readDone?'bothDone':'flashDone'); calcStreak();saveData();updateStats();updateMood(); if(readDone)setTimeout(()=>setCreatureState('celebrate'),300);
+}
+function logReading(){
+  const val=parseFloat(document.getElementById('read-hours').value);if(!val||val<=0)return;
+  const today=todayStr();if(!data.days[today])data.days[today]={flash:0,read:0}; data.days[today].read+=val;
+  document.getElementById('read-input-area').style.display='none'; document.getElementById('read-done').style.display='block'; document.getElementById('read-done-text').textContent=data.days[today].read+' hrs today!';
+  document.getElementById('card-read').classList.add('done'); setCreatureState('read');
+  const flashDone=(data.days[today].flash||0)>0;setSpeech(flashDone?'bothDone':'readDone'); calcStreak();saveData();updateStats();updateMood(); if(flashDone)setTimeout(()=>setCreatureState('celebrate'),300);
+}
+
+function addWord(){
+  const en=document.getElementById('dict-en').value.trim(),jp=document.getElementById('dict-jp').value.trim(),es=document.getElementById('dict-es').value.trim(); if(!en&&!jp&&!es)return;
+  data.dictionary.push({en:en||'—',jp:jp||'—',es:es||'—',addedDate:todayStr()});
+  document.getElementById('dict-en').value='';document.getElementById('dict-jp').value='';document.getElementById('dict-es').value=''; saveData();renderDictionary();updateStats();setSpeech('newWord');setCreatureState('happy');
+}
+['dict-en','dict-jp','dict-es'].forEach(id=>{document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')addWord();});});
+function deleteWord(i){data.dictionary.splice(i,1);saveData();renderDictionary();updateStats();}
+
+function renderDictionary(){
+  const search=(document.getElementById('dict-search').value||'').toLowerCase(); const list=document.getElementById('dict-list');list.innerHTML='';
+  const filtered=data.dictionary.filter(w=>{if(!search)return true;return w.en.toLowerCase().includes(search)||w.jp.toLowerCase().includes(search)||w.es.toLowerCase().includes(search);});
+  filtered.slice().reverse().forEach((w)=>{ const realIndex=data.dictionary.lastIndexOf(w); const row=document.createElement('div');row.className='dict-entry';
+    row.innerHTML=`<span class="en">${escHtml(w.en)}</span><span class="jp">${escHtml(w.jp)}</span><span class="es">${escHtml(w.es)}</span><button class="del-word" onclick="deleteWord(${realIndex})">×</button>`; list.appendChild(row); });
+  document.getElementById('dict-count').textContent=data.dictionary.length+' words'; document.getElementById('dict-tab-count').textContent='('+data.dictionary.length+')';
+}
+
+function renderHistory(){
+  const grid=document.getElementById('history-grid');grid.innerHTML=''; const sortedDays=Object.keys(data.days).sort().reverse();
+  if(!sortedDays.length){grid.innerHTML='<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px">No study days yet!</p>';return;}
+  sortedDays.forEach(day=>{const d=data.days[day];const row=document.createElement('div');row.className='history-day'; row.innerHTML=`<span class="day-date">${formatDate(day)}</span><span class="day-stat">📇 ${d.flash||0} min</span><span class="day-stat">📚 ${d.read||0} hrs</span><span class="day-streak">${(d.flash>0||d.read>0)?'✓':'—'}</span>`; grid.appendChild(row);});
+}
+
+function updateStats(){
+  let tf=0,tr=0;Object.values(data.days).forEach(d=>{tf+=d.flash||0;tr+=d.read||0;});
+  document.getElementById('stat-total-flash').textContent=tf; document.getElementById('stat-total-read').textContent=tr;
+  document.getElementById('stat-words').textContent=data.dictionary.length; document.getElementById('stat-days').textContent=Object.keys(data.days).length;
+  document.getElementById('streak-badge').textContent='🔥 '+data.streak+' day streak'; renderHistory();
+}
+
+// ===== DIARY =====
+function addDiaryEntry() { const text = document.getElementById('diary-input').value.trim(); if(!text) return; data.diary.push({ date: formatDateTime(new Date()), text: text }); document.getElementById('diary-input').value = ''; saveData(); renderDiary(); }
+function deleteDiaryEntry(i) { data.diary.splice(i, 1); saveData(); renderDiary(); }
+function renderDiary() {
+  const list = document.getElementById('diary-list'); list.innerHTML = '';
+  if(!data.diary.length) return list.innerHTML = '<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px">No diary entries yet.</p>';
+  data.diary.slice().reverse().forEach(entry => { const realIndex = data.diary.lastIndexOf(entry); const row = document.createElement('div'); row.className = 'diary-entry'; row.innerHTML = `<div class="diary-entry-date">${escHtml(entry.date)}</div><div class="diary-entry-text">${escHtml(entry.text)}</div><button class="diary-del-btn" onclick="deleteDiaryEntry(${realIndex})">×</button>`; list.appendChild(row); });
+}
+
+// ===== RANDOM PHRASES =====
+const randomPhrases = [ { text: "¡Qué nota, parcero! ¡A estudiar se dijo!", lang: "rolo", label: "ROLO" }, { text: "No sea tan ñero, póngase las pilas.", lang: "rolo", label: "ROLO" }, { text: "¡Uy, hermano, qué chimba de racha!", lang: "rolo", label: "ROLO" }, { text: "Mijo, no joda, estudie que le conviene.", lang: "rolo", label: "ROLO" }, { text: "よっしゃ！今日もがんばろう！", lang: "nihongo", label: "日本語" }, { text: "すごいじゃん！その調子！", lang: "nihongo", label: "日本語" }, { text: "勉強は大事だよ、ファイト！", lang: "nihongo", label: "日本語" } ];
+let lastPhraseIndex = -1;
+function showRandomPhrase() {
+  const bubble = document.getElementById('random-bubble'); if (!bubble) return; let idx; do { idx = Math.floor(Math.random() * randomPhrases.length); } while (idx === lastPhraseIndex && randomPhrases.length > 1); lastPhraseIndex = idx;
+  const p = randomPhrases[idx]; bubble.style.opacity = '0'; setTimeout(() => { document.getElementById('random-phrase').textContent = p.text; document.getElementById('random-lang-tag').textContent = p.label; document.getElementById('random-lang-tag').className = 'random-lang-tag ' + p.lang; bubble.style.opacity = '1'; }, 400);
+}
+function startPhraseCycle() { showRandomPhrase(); setInterval(showRandomPhrase, 8000); }
+
+function initApp(){
+  document.getElementById('date-display').textContent=formatDate(todayStr()); calcStreak();
+  const td=data.days[todayStr()]; if(td){ if(td.flash>0){document.getElementById('flash-input-area').style.display='none';document.getElementById('flash-done').style.display='block';document.getElementById('flash-done-text').textContent=td.flash+' min today!';document.getElementById('card-flash').classList.add('done');} if(td.read>0){document.getElementById('read-input-area').style.display='none';document.getElementById('read-done').style.display='block';document.getElementById('read-done-text').textContent=td.read+' hrs today!';document.getElementById('card-read').classList.add('done');} if(td.flash>0&&td.read>0)setSpeech('bothDone');else if(td.flash>0)setSpeech('flashDone');else if(td.read>0)setSpeech('readDone');else setSpeech('greeting'); }else setSpeech('greeting');
+  if(data.streak>=5)setSpeech('streakHigh'); renderDictionary(); renderDiary(); updateStats(); updateMood(); saveData(); startPhraseCycle();
+}
+
+// ===== NUMOGRAM =====
+function selectZone(zoneNum) { 
+  document.querySelectorAll('.zone-group').forEach(n => n.classList.remove('active')); 
+  const btn = document.getElementById('btn-zone-' + zoneNum); 
+  if(btn) btn.classList.add('active'); 
+  document.getElementById('numo-display').innerHTML = document.getElementById('data-zone-' + zoneNum).innerHTML; 
+}
+
+function calculateNumogram() {
+  const input = document.getElementById('numo-gematria-input').value.trim().toUpperCase(); const display = document.getElementById('numo-result-display'); if (!input) return display.textContent = "Please enter data.";
+  let totalSum = 0; for (let i = 0; i < input.length; i++) { const char = input[i]; if (/[A-Z]/.test(char)) totalSum += char.charCodeAt(0) - 64; else if (/[0-9]/.test(char)) totalSum += parseInt(char); }
+  if (totalSum === 0) return display.textContent = "Invalid entry.";
+  let digitalRoot = totalSum % 9; if (digitalRoot === 0 && totalSum > 0) digitalRoot = 9;
+  display.innerHTML = `Sum: <span style="color:#fff">${totalSum}</span> ➔ Digital Root: <span style="color:#fff; font-size:1.5rem">${digitalRoot}</span>`; selectZone(digitalRoot);
+}
+
+function findDemon() {
+   const z1Str = document.getElementById('demon-z1').value; const z2Str = document.getElementById('demon-z2').value; if(z1Str === "" || z2Str === "") return;
+   const z1 = parseInt(z1Str); const z2 = parseInt(z2Str); const max = Math.max(z1, z2); const min = Math.min(z1, z2);
+   const warpPlex = [0, 3, 6, 9]; const torque = [1, 2, 4, 5, 7, 8];
+   let classification = (warpPlex.includes(max) && warpPlex.includes(min)) ? "Xenodemon (Outside Time)" : (torque.includes(max) && torque.includes(min)) ? "Chronodemon (Chronic Time)" : "Amphidemon (Crossing)";
+   const planets = ["Sol", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"];
+   document.getElementById('demon-result').innerHTML = `<strong>Net-Span [${max}::${min}]</strong><br>Class: <span style="color:#00e5ff">${classification}</span><br>Planetary Bridge: ${planets[max]} ↔ ${planets[min]}`;
+}
+
+const ccruLexicon = [ { term: "Hyperstition", def: "A fictional quantity functional as a time-traveling device." }, { term: "Numogram", def: "The Decimal Labyrinth. A diagram of time-sorcery." } ];
+function searchLexicon() {
+   const q = document.getElementById('lexicon-search').value.toLowerCase(); const resDiv = document.getElementById('lexicon-results'); resDiv.innerHTML = ''; if(!q) return;
+   const matches = ccruLexicon.filter(item => item.term.toLowerCase().includes(q) || item.def.toLowerCase().includes(q));
+   if(matches.length === 0) return resDiv.innerHTML = '<p style="color:rgba(255,255,255,0.5)">No archives found.</p>';
+   matches.forEach(m => { resDiv.innerHTML += `<div style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1)"><strong style="color: #ff3c8e; font-size:0.95rem;">${m.term}</strong><p style="margin-top: 4px;">${m.def}</p></div>`; });
+}
+
+// ===== I-CHING ORACLE =====
+const iChingDatabase = {
+  "111111": { num: 1, name: "Qian (The Creative)", meaning: "Strong, dynamic action. Time to initiate, lead, and persevere with inner strength." },
+  "000000": { num: 2, name: "Kun (The Receptive)", meaning: "Yielding, passive support. Wait and follow the current rather than forcing change." },
+  "100010": { num: 3, name: "Chun (Difficulty at the Beginning)", meaning: "Chaos before order. A time of painful but necessary growth. Seek guidance." },
+  "010001": { num: 4, name: "Meng (Youthful Folly)", meaning: "Inexperience. Learn from mistakes and respect the guidance of a teacher." },
+  "111010": { num: 5, name: "Xu (Waiting)", meaning: "Patience. Bide your time, gather your strength, and wait for the right moment." },
+  "010111": { num: 6, name: "Song (Conflict)", meaning: "Disagreement and friction. Compromise is better than pushing for a total victory." },
+  "010000": { num: 7, name: "Shi (The Army)", meaning: "Discipline and organization. Align yourself with a strong purpose and leadership." },
+  "000010": { num: 8, name: "Bi (Holding Together)", meaning: "Union and alliance. True connection is found in sincere cooperation." },
+  "111011": { num: 9, name: "Xiao Chu (The Taming Power of the Small)", meaning: "Gentle restraint. Minor obstacles delay progress; use gentle persuasion." },
+  "110111": { num: 10, name: "Lu (Treading)", meaning: "Walking cautiously. Proceed with extreme care and respect for those in power." },
+  "111000": { num: 11, name: "Tai (Peace)", meaning: "Harmony and prosperity. A perfect balance of energies bringing success." },
+  "000111": { num: 12, name: "Pi (Standstill)", meaning: "Stagnation. Energies are disconnected. Retreat into yourself and wait." },
+  "101111": { num: 13, name: "Tong Ren (Fellowship with Men)", meaning: "Community. Success comes through cooperation and shared goals." },
+  "111101": { num: 14, name: "Da You (Possession in Great Measure)", meaning: "Abundance. You have the resources and power; use them generously." },
+  "001000": { num: 15, name: "Qian (Modesty)", meaning: "Humility. Balance is achieved by not boasting or overextending." },
+  "000100": { num: 16, name: "Yu (Enthusiasm)", meaning: "Inspiration and movement. Channel your excitement into constructive action." },
+  "100110": { num: 17, name: "Sui (Following)", meaning: "Adaptation. True leadership requires knowing when to follow and adapt." },
+  "011001": { num: 18, name: "Gu (Work on what has been spoiled)", meaning: "Decay. It is time to fix past mistakes and clean out the rot." },
+  "110000": { num: 19, name: "Lin (Approach)", meaning: "Advancement. Spring is coming; take advantage of the favorable timing." },
+  "000011": { num: 20, name: "Guan (Contemplation)", meaning: "Observation. Step back and look at the big picture before making a move." },
+  "100101": { num: 21, name: "Shi He (Biting Through)", meaning: "Overcoming obstacles. Force may be necessary to remove a blockage." },
+  "101001": { num: 22, name: "Bi (Grace)", meaning: "Aesthetics and form. Superficial beauty is pleasant but lacks deep substance." },
+  "000001": { num: 23, name: "Bo (Splitting Apart)", meaning: "Deterioration. Things are falling apart. Do not act; wait out the collapse." },
+  "100000": { num: 24, name: "Fu (Return)", meaning: "Renewal. A turning point. The darkness has passed, and light is returning." },
+  "100111": { num: 25, name: "Wu Wang (Innocence)", meaning: "Natural action. Act without ulterior motives; let things flow organically." },
+  "111001": { num: 26, name: "Da Chu (The Taming Power of the Great)", meaning: "Accumulation of energy. Hold your power back until the perfect moment." },
+  "100001": { num: 27, name: "Yi (The Corners of the Mouth)", meaning: "Nourishment. Pay attention to what you consume, both food and words." },
+  "011110": { num: 28, name: "Da Guo (Preponderance of the Great)", meaning: "Overload. The structure is buckling under extreme pressure; act decisively." },
+  "010010": { num: 29, name: "Kan (The Abysmal/Water)", meaning: "Danger. You are in deep water. Stay calm, keep moving, and be sincere." },
+  "101101": { num: 30, name: "Li (The Clinging/Fire)", meaning: "Clarity and dependence. Fire needs fuel; attach yourself to what is good." },
+  "001110": { num: 31, name: "Xian (Influence)", meaning: "Mutual attraction. Open yourself to the influence of others and connect." },
+  "011100": { num: 32, name: "Heng (Duration)", meaning: "Consistency. Success comes through steady, unchanging persistence." },
+  "001111": { num: 33, name: "Dun (Retreat)", meaning: "Strategic withdrawal. Pull back from a losing battle to preserve your strength." },
+  "111100": { num: 34, name: "Da Zhuang (The Power of the Great)", meaning: "Immense power. Use your strength justly and avoid reckless aggression." },
+  "000101": { num: 35, name: "Jin (Progress)", meaning: "Rapid advancement. The sun is rising; step into the light and succeed." },
+  "101000": { num: 36, name: "Ming I (Darkening of the Light)", meaning: "Adversity. Hide your light and lay low while surrounded by darkness." },
+  "101011": { num: 37, name: "Jia Ren (The Family)", meaning: "Inner structures. Focus on domestic harmony and the roles within a group." },
+  "110101": { num: 38, name: "Kui (Opposition)", meaning: "Misunderstanding. People are working at cross-purposes. Find small agreements." },
+  "001010": { num: 39, name: "Jian (Obstruction)", meaning: "Impassable blockage. Do not push forward; retreat and ask for advice." },
+  "010100": { num: 40, name: "Xie (Deliverance)", meaning: "Relief. The tension has broken. Forgive, forget, and move on swiftly." },
+  "110001": { num: 41, name: "Sun (Decrease)", meaning: "Letting go. Give up the non-essential to achieve a greater simplicity." },
+  "100011": { num: 42, name: "Yi (Increase)", meaning: "Expansion. A time of great opportunity and blessing. Act boldly." },
+  "111110": { num: 43, name: "Guai (Breakthrough)", meaning: "Resolution. Firmly but carefully remove corrupt influences." },
+  "011111": { num: 44, name: "Gou (Coming to Meet)", meaning: "Unexpected encounters. Beware of seemingly harmless but dangerous temptations." },
+  "000110": { num: 45, name: "Cui (Gathering Together)", meaning: "Massing. Bring people and resources together for a common cause." },
+  "011000": { num: 46, name: "Sheng (Pushing Upward)", meaning: "Steady growth. Like a tree growing from the earth, rise slowly and surely." },
+  "010110": { num: 47, name: "Kun (Oppression)", meaning: "Exhaustion. Resources are drained. Hold on to your inner truth and wait." },
+  "011010": { num: 48, name: "Jing (The Well)", meaning: "Source. The fundamental needs of life remain unchanged. Go to the source." },
+  "101110": { num: 49, name: "Ge (Revolution)", meaning: "Radical change. Shed the old skin; a necessary overthrow of the old order." },
+  "011101": { num: 50, name: "Ding (The Caldron)", meaning: "Transformation. A spiritual and cultural refinement bringing high success." },
+  "100100": { num: 51, name: "Zhen (The Arousing/Thunder)", meaning: "Shock. A sudden, terrifying event that brings necessary awakening." },
+  "001001": { num: 52, name: "Gen (Keeping Still/Mountain)", meaning: "Stillness. Stop all movement. Quiet your mind and find inner peace." },
+  "001011": { num: 53, name: "Jian (Development/Gradual Progress)", meaning: "Slow progress. Do not rush; let things unfold at their natural pace." },
+  "110100": { num: 54, name: "Gui Mei (The Marrying Maiden)", meaning: "Subordination. You are in a disadvantageous position. Accept your limits." },
+  "101100": { num: 55, name: "Feng (Abundance)", meaning: "Zenith. Peak prosperity, but recognize that peaks are followed by declines." },
+  "001101": { num: 56, name: "Lu (The Wanderer)", meaning: "Travel. You are an outsider. Be cautious, adaptable, and respectful." },
+  "011011": { num: 57, name: "Xun (The Gentle/Wind)", meaning: "Penetration. Gentle, persistent effort over time yields massive results." },
+  "110110": { num: 58, name: "Dui (The Joyous/Lake)", meaning: "Joy. True happiness comes through open communication and shared pleasure." },
+  "010011": { num: 59, name: "Huan (Dispersion)", meaning: "Dissolving. Illusions and blockages are clearing. Let things flow apart naturally." },
+  "110010": { num: 60, name: "Jie (Limitation)", meaning: "Boundaries. Set healthy limits and stick to a defined budget or structure." },
+  "110011": { num: 61, name: "Zhong Fu (Inner Truth)", meaning: "Sincerity. Profound trust and honesty have the power to influence even the hardest hearts." },
+  "001100": { num: 62, name: "Xiao Guo (Preponderance of the Small)", meaning: "Small measures. Keep a low profile and focus on minor, practical details." },
+  "101010": { num: 63, name: "Ji Ji (After Completion)", meaning: "Order achieved. Everything is in its place, but stay alert to prevent future decay." },
+  "010101": { num: 64, name: "Wei Ji (Before Completion)", meaning: "Threshold. The transition is incomplete. Proceed with extreme caution." }
+};
+
+function renderHexagram(containerId, lines) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  lines.forEach((val) => {
+    const isYang = (val === 7 || val === 9);
+    const isChanging = (val === 6 || val === 9);
+    
+    const div = document.createElement('div');
+    div.className = `hex-line ${isYang ? 'yang' : 'yin'}`;
+    
+    let innerHTML = '';
+    if (isYang) {
+      innerHTML = `<div class="seg"></div>`;
+    } else {
+      innerHTML = `<div class="seg"></div><div class="seg"></div>`;
     }
+    
+    if (isChanging) {
+      innerHTML += `<span class="hex-line-marker">${val === 9 ? '(O)' : '(X)'}</span>`;
+    }
+    
+    div.innerHTML = innerHTML;
+    container.appendChild(div);
+  });
+}
+
+function getBinaryFromLines(lines) {
+  return lines.map(v => (v === 7 || v === 9) ? '1' : '0').join('');
+}
+
+function castOracle() {
+  document.getElementById('iching-hex-container').style.display = 'flex';
+  
+  const primaryLines = [];
+  const secondaryLines = [];
+  let hasChanging = false;
+  
+  for(let i = 0; i < 6; i++) {
+    const coin1 = Math.random() < 0.5 ? 2 : 3;
+    const coin2 = Math.random() < 0.5 ? 2 : 3;
+    const coin3 = Math.random() < 0.5 ? 2 : 3;
+    const sum = coin1 + coin2 + coin3;
+    
+    primaryLines.push(sum);
+    
+    if (sum === 6) { hasChanging = true; secondaryLines.push(7); }
+    else if (sum === 9) { hasChanging = true; secondaryLines.push(8); }
+    else { secondaryLines.push(sum); }
+  }
+  
+  renderHexagram('iching-primary-vis', primaryLines);
+  const primaryBin = getBinaryFromLines(primaryLines);
+  const primaryData = iChingDatabase[primaryBin];
+  
+  const priBox = document.getElementById('iching-primary-result');
+  priBox.style.display = 'block';
+  priBox.innerHTML = `<h3>Hexagram ${primaryData.num}: ${primaryData.name}</h3><p>${primaryData.meaning}</p>`;
+  
+  const secBoxUI = document.getElementById('iching-secondary-box');
+  const secResultBox = document.getElementById('iching-secondary-result');
+  
+  if (hasChanging) {
+    secBoxUI.style.display = 'flex';
+    renderHexagram('iching-secondary-vis', secondaryLines);
+    
+    const secondaryBin = getBinaryFromLines(secondaryLines);
+    const secondaryData = iChingDatabase[secondaryBin];
+    
+    secResultBox.style.display = 'block';
+    secResultBox.innerHTML = `<h3>Changes to Hexagram ${secondaryData.num}: ${secondaryData.name}</h3><p>${secondaryData.meaning}</p>`;
+  } else {
+    secBoxUI.style.display = 'none';
+    secResultBox.style.display = 'none';
+  }
+}
 </script>
-<!-- NUMOGRAM COMPONENT END -->
+</body>
+</html>
