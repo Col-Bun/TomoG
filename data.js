@@ -1,4 +1,5 @@
 /* DATA.JS - FULL DATABASES */
+
 const yojijukugoList = [
   { k: "一石二鳥", m: "Killing two birds with one stone" },
   { k: "一刀両断", m: "Cutting in two with a single stroke; Taking decisive action" },
@@ -254,7 +255,7 @@ const yojijukugoList = [
   { k: "天壌無窮", m: "Eternal as heaven and earth" },
   { k: "同工異曲", m: "Different execution, same result" },
   { k: "独断専行", m: "Acting on one's own authority" },
-  { k: "南船北馬", m: "Constant traveling (Boats in south, horses in north)" }
+  { k: "南船北馬", m: "Constant traveling" }
 ];
 
 const iChingDatabase = {
@@ -325,25 +326,29 @@ const iChingDatabase = {
 };
 
 const ccruLexicon = [
-  { term: "Abomenon", def: "Postulated substrate of absolute horror (the worst thing in the world)." }, 
-  { term: "A-Death", def: "Neuroelectronic flatline, based upon Sarkonian mesh-engineering." }, 
-  { term: "Ccru", def: "Cryptic hyperstitional entity." }, 
-  { term: "Cthelll", def: "Earth's iron ocean, comprising one third of terrestrial mass." }, 
-  { term: "Lemuria", def: "Hypergeographical terrestrial arrangement." }, 
-  { term: "Numogram", def: "Diagrammatization of decimal numeracy, providing the key to Lemurian culture." }, 
-  { term: "Pandemonium", def: "Utterminus of Cthelll. Comprehensive system of the demons." }, 
-  { term: "Time-Sorcery", def: "Counterchronic effectuation of the Numogram." }, 
+  { term: "Abomenon", def: "Postulated substrate of absolute horror (the worst thing in the world)." },
+  { term: "A-Death", def: "Neuroelectronic flatline, based upon Sarkonian mesh-engineering." },
+  { term: "Ccru", def: "Cryptic hyperstitional entity." },
+  { term: "Cthelll", def: "Earth's iron ocean, comprising one third of terrestrial mass." },
+  { term: "Lemuria", def: "Hypergeographical terrestrial arrangement." },
+  { term: "Numogram", def: "Diagrammatization of decimal numeracy, providing the key to Lemurian culture." },
+  { term: "Pandemonium", def: "Utterminus of Cthelll. Comprehensive system of the demons." },
+  { term: "Time-Sorcery", def: "Counterchronic effectuation of the Numogram." },
   { term: "Tic-Systems", def: "Consistent microstimular assemblages dismantling semiotic regimes onto a flat machinic plane." }
 ];
 
-const randomPhrases = [ 
-  { text: "¡Qué nota, parcero! ¡A estudiar se dijo!", lang: "rolo", label: "ROLO" }, 
-  { text: "No sea tan ñero, póngase las pilas.", lang: "rolo", label: "ROLO" }, 
-  { text: "¡Uy, hermano, qué chimba de racha!", lang: "rolo", label: "ROLO" }, 
-  { text: "Mijo, no joda, estudie que le conviene.", lang: "rolo", label: "ROLO" }, 
-  { text: "よっしゃ！今日もがんばろう！", lang: "nihongo", label: "日本語" }, 
-  { text: "すごいじゃん！その調子！", lang: "nihongo", label: "日本語" }, 
-  { text: "勉強は大事だよ、ファイト！", lang: "nihongo", label: "日本語" } 
+const randomPhrases = [
+  { text: "¡Qué nota, parcero! ¡A estudiar se dijo!", lang: "rolo", label: "ROLO" },
+  { text: "No sea tan ñero, póngase las pilas.", lang: "rolo", label: "ROLO" },
+  { text: "¡Uy, hermano, qué chimba de racha!", lang: "rolo", label: "ROLO" },
+  { text: "Mijo, no joda, estudie que le conviene.", lang: "rolo", label: "ROLO" },
+  { text: "よっしゃ！今日もがんばろう！", lang: "nihongo", label: "日本語" },
+  { text: "すごいじゃん！その調子！", lang: "nihongo", label: "日本語" },
+  { text: "勉強は大事だよ、ファイト！", lang: "nihongo", label: "日本語" }
 ];
 
-const starterDeck = [ { en: "To read", jp: "読む", es: "Leer" }, { en: "Street", jp: "通り", es: "Calle" }, { en: "Store", jp: "店", es: "Tienda" } ];
+const starterDeck = [
+  { en: "To read", jp: "読む", es: "Leer" },
+  { en: "Street", jp: "通り", es: "Calle" },
+  { en: "Store", jp: "店", es: "Tienda" }
+];
