@@ -1,254 +1,300 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moe-Chan & The Oracle</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moe-Chan & The Oracle</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <script>if (localStorage.getItem('studyBuddyTheme') === 'dark') document.body.classList.add('dark-mode');</script>
+<script>if (localStorage.getItem('studyBuddyTheme') === 'dark') document.body.classList.add('dark-mode');</script>
 
-    <div class="metro-bg">
-        <div class="metro-sunburst"></div><div class="metro-halftone"></div>
-        <div class="metro-vectors">
-            <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-                <path d="M-100 700 Q 400 400, 900 800 T 1600 500 L 1600 1000 L -100 1000 Z" fill="#000" fill-opacity="0.15" />
-                <path d="M-100 750 Q 500 300, 1000 750 T 1600 400 L 1600 1000 L -100 1000 Z" fill="#fff" fill-opacity="0.25" />
-                <rect x="0" y="120" width="100%" height="40" fill="#fff" fill-opacity="0.15" />
-                <rect x="0" y="140" width="100%" height="8" fill="#000" fill-opacity="0.2" />
-                <circle cx="1200" cy="750" r="180" fill="none" stroke="#fff" stroke-width="40" stroke-opacity="0.15" />
-                <circle cx="1200" cy="750" r="60" fill="#000" fill-opacity="0.1" />
-                <g class="y2k-flower" transform="translate(150, 200) scale(1.5)" fill="#fff" fill-opacity="0.3">
-                    <circle cx="0" cy="-20" r="15"/><circle cx="19" cy="-6" r="15"/><circle cx="12" cy="16" r="15"/><circle cx="-12" cy="16" r="15"/><circle cx="-19" cy="-6" r="15"/><circle cx="0" cy="0" r="12" fill="var(--metro-bg1)" fill-opacity="1"/>
-                </g>
-            </svg>
-        </div>
+<div class="metro-bg">
+  <div class="metro-sunburst"></div><div class="metro-halftone"></div>
+  <div class="metro-vectors">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <path d="M-100 700 Q 400 400, 900 800 T 1600 500 L 1600 1000 L -100 1000 Z" fill="#000" fill-opacity="0.15" />
+      <path d="M-100 750 Q 500 300, 1000 750 T 1600 400 L 1600 1000 L -100 1000 Z" fill="#fff" fill-opacity="0.25" />
+      <rect x="0" y="120" width="100%" height="40" fill="#fff" fill-opacity="0.15" />
+      <rect x="0" y="140" width="100%" height="8" fill="#000" fill-opacity="0.2" />
+      <circle cx="1200" cy="750" r="180" fill="none" stroke="#fff" stroke-width="40" stroke-opacity="0.15" />
+      <circle cx="1200" cy="750" r="60" fill="#000" fill-opacity="0.1" />
+      <g class="y2k-flower" transform="translate(150, 200) scale(1.5)" fill="#fff" fill-opacity="0.3"><circle cx="0" cy="-20" r="15"/><circle cx="19" cy="-6" r="15"/><circle cx="12" cy="16" r="15"/><circle cx="-12" cy="16" r="15"/><circle cx="-19" cy="-6" r="15"/><circle cx="0" cy="0" r="12" fill="var(--metro-bg1)" fill-opacity="1"/></g>
+      <g class="y2k-flower" transform="translate(1300, 250) scale(2)" fill="#000" fill-opacity="0.15"><circle cx="0" cy="-20" r="15"/><circle cx="19" cy="-6" r="15"/><circle cx="12" cy="16" r="15"/><circle cx="-12" cy="16" r="15"/><circle cx="-19" cy="-6" r="15"/><circle cx="0" cy="0" r="12" fill="#fff" fill-opacity="0.3"/></g>
+    </svg>
+  </div>
+</div>
+
+<div id="password-screen">
+  <div class="pw-creature" id="pw-creature"><img src="./sleep.png" alt="sleeping"></div>
+  <h1>Moe-Chan<br>is sleeping...</h1>
+  <p class="pw-hint">whisper the secret word to wake her up</p>
+  <input type="password" id="pw-input" placeholder="• • • •" autofocus>
+  <p class="pw-error" id="pw-error"></p>
+</div>
+
+<div id="app">
+  <div class="top-bar glass">
+    <h2>Moe-Chan</h2>
+    <div class="top-controls">
+      <button class="btn-theme" style="padding: 8px 14px; border-radius: 50px;" id="theme-btn" onclick="toggleTheme()" title="Toggle Dark Mode">🌙</button>
+      <span class="streak-badge" id="streak-badge">🔥 0 day streak</span>
+      <span class="date-display" id="date-display"></span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="home">🏠 Home</button>
+    <button class="tab-btn" data-tab="calendar">📅 Calendar</button>
+    <button class="tab-btn" data-tab="dictionary">📖 Dictionary <span id="dict-tab-count"></span></button>
+    <button class="tab-btn" data-tab="diary">📓 Diary</button>
+    <button class="tab-btn" data-tab="history">📊 History</button>
+    <button class="tab-btn" data-tab="calc">🧮 COLcalc</button>
+    <button class="tab-btn" data-tab="numogram">🌀 Numogram</button>
+    <button class="tab-btn" data-tab="iching">☯️ I-Ching</button>
+  </div>
+
+  <!-- HOME TAB -->
+  <div class="tab-content active" id="tab-home">
+    <div class="creature-area glass">
+      <div class="creature-sprite" id="creature-sprite"><img src="./idle.png" id="sprite-img" alt="creature"></div>
+      <div class="speech-bubble">
+        <div class="speech-line"><span class="lang-tag lang-en">EN</span><span id="speech-en">Hello! Let's study today!</span></div>
+        <div class="speech-line"><span class="lang-tag lang-jp">JP</span><span id="speech-jp" style="font-family:'Noto Sans JP',sans-serif">こんにちは！今日も勉強しよう！</span></div>
+        <div class="speech-line"><span class="lang-tag lang-es">ES</span><span id="speech-es">¡Hola! ¡Estudiemos hoy!</span></div>
+      </div>
+      <div class="mood-bar">
+        <span class="mood-label">Mood:</span>
+        <div class="mood-track"><div class="mood-fill" id="mood-fill" style="width:50%;background:linear-gradient(90deg,#ffcc00,#ff8a00)"></div></div>
+        <span class="mood-label" id="mood-text">Neutral</span>
+      </div>
+      <div class="random-bubble glass-strong" id="random-bubble"><span id="random-phrase"></span><span class="random-lang-tag" id="random-lang-tag"></span></div>
     </div>
 
-    <div id="password-screen">
-        <div class="pw-creature" id="pw-creature"><img src="./sleep.png" alt="sleeping"></div>
-        <h1>Moe-Chan<br>is sleeping...</h1>
-        <p class="pw-hint">whisper the secret word to wake her up</p>
-        <input type="password" id="pw-input" placeholder="• • • •" autofocus>
-        <p class="pw-error" id="pw-error"></p>
+    <div class="tasks-panel">
+      <div class="task-card glass-dark" id="card-flash">
+        <h3>📇 Flashcards</h3>
+        <div class="tri-label">Study flashcards! / フラッシュカード！ / ¡Tarjetas!</div>
+        <div id="flash-input-area">
+          <div class="task-input-row"><input type="number" id="flash-minutes" min="1" max="999" placeholder="0"><span>min</span></div>
+          <button class="btn-glossy log-btn" onclick="logFlashcards()">Log Study Time</button>
+        </div>
+        <div id="flash-done" style="display:none"><div class="task-done-check">✅</div><p class="task-done-text" style="font-size:0.8rem;margin-top:4px" id="flash-done-text"></p></div>
+      </div>
+      <div class="task-card glass-dark" id="card-read">
+        <h3>📚 Reading</h3>
+        <div class="tri-label">Reading time! / 読書タイム！ / ¡Hora de leer!</div>
+        <div id="read-input-area">
+          <div class="task-input-row"><input type="number" id="read-hours" min="0.25" max="24" step="0.25" placeholder="0"><span>hrs</span></div>
+          <button class="btn-glossy btn-pink log-btn" onclick="logReading()">Log Reading Time</button>
+        </div>
+        <div id="read-done" style="display:none"><div class="task-done-check">✅</div><p class="task-done-text" style="font-size:0.8rem;margin-top:4px" id="read-done-text"></p></div>
+      </div>
     </div>
 
-    <div id="app" style="display:none;">
-        <div class="top-bar glass">
-            <h2>Moe-Chan</h2>
-            <div class="top-controls">
-                <button class="btn-theme" style="padding: 8px 14px; border-radius: 50px;" id="theme-btn" onclick="toggleTheme()">🌙</button>
-                <span class="streak-badge" id="streak-badge">🔥 0 day streak</span>
-                <span class="date-display" id="date-display"></span>
-            </div>
-        </div>
-
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="home">🏠 Home</button>
-            <button class="tab-btn" data-tab="calendar">📅 Calendar</button>
-            <button class="tab-btn" data-tab="dictionary">📖 Dictionary <span id="dict-tab-count"></span></button>
-            <button class="tab-btn" data-tab="diary">📓 Diary</button>
-            <button class="tab-btn" data-tab="history">📊 History</button>
-            <button class="tab-btn" data-tab="calc">🧮 COLcalc</button>
-            <button class="tab-btn" data-tab="numogram">🌀 Numogram</button>
-            <button class="tab-btn" data-tab="iching">☯️ I-Ching</button>
-        </div>
-
-        <!-- HOME TAB -->
-        <div class="tab-content active" id="tab-home">
-            <div class="creature-area glass">
-                <div class="creature-sprite" id="creature-sprite"><img src="./idle.png" id="sprite-img" alt="creature"></div>
-                <div class="speech-bubble">
-                    <div class="speech-line"><span class="lang-tag lang-en">EN</span><span id="speech-en"></span></div>
-                    <div class="speech-line"><span class="lang-tag lang-jp">JP</span><span id="speech-jp" style="font-family:'Noto Sans JP',sans-serif"></span></div>
-                    <div class="speech-line"><span class="lang-tag lang-es">ES</span><span id="speech-es"></span></div>
-                </div>
-                <div class="mood-bar">
-                    <span class="mood-label">Mood:</span>
-                    <div class="mood-track"><div class="mood-fill" id="mood-fill"></div></div>
-                    <span class="mood-label" id="mood-text">Neutral</span>
-                </div>
-                <div class="random-bubble glass-strong" id="random-bubble">
-                    <span id="random-phrase"></span><span class="random-lang-tag" id="random-lang-tag"></span>
-                </div>
-            </div>
-
-            <div class="tasks-panel">
-                <div class="task-card glass-dark" id="card-flash">
-                    <h3>📇 Flashcards</h3>
-                    <div class="tri-label">Study flashcards! / フラッシュカード！ / ¡Tarjetas!</div>
-                    <div id="flash-input-area">
-                        <div class="task-input-row"><input type="number" id="flash-minutes" placeholder="0"><span>min</span></div>
-                        <button class="btn-glossy log-btn" onclick="logFlashcards()">Log Study Time</button>
-                    </div>
-                    <div id="flash-done" style="display:none"><div class="task-done-check">✅</div><p id="flash-done-text"></p></div>
-                </div>
-                <div class="task-card glass-dark" id="card-read">
-                    <h3>📚 Reading</h3>
-                    <div class="tri-label">Reading time! / 読書タイム！ / ¡Hora de leer!</div>
-                    <div id="read-input-area">
-                        <div class="task-input-row"><input type="number" id="read-hours" step="0.25" placeholder="0"><span>hrs</span></div>
-                        <button class="btn-glossy btn-pink log-btn" onclick="logReading()">Log Reading Time</button>
-                    </div>
-                    <div id="read-done" style="display:none"><div class="task-done-check">✅</div><p id="read-done-text"></p></div>
-                </div>
-            </div>
-
-            <div class="stats-strip">
-                <div class="stat-box glass"><div class="num" id="stat-total-flash">0</div><div class="label">Flashcard Min</div></div>
-                <div class="stat-box glass"><div class="num" id="stat-total-read">0</div><div class="label">Reading Hrs</div></div>
-                <div class="stat-box glass"><div class="num" id="stat-words">0</div><div class="label">Dict Words</div></div>
-                <div class="stat-box glass"><div class="num" id="stat-days">0</div><div class="label">Days Tracked</div></div>
-            </div>
-        </div>
-
-        <!-- CALENDAR TAB -->
-        <div class="tab-content" id="tab-calendar">
-            <div class="calendar-section glass-dark">
-                <div style="text-align: center;"><div class="cal-jp-date" id="cal-jp-date"></div></div>
-                <div class="cal-header">
-                    <button class="btn-theme" onclick="changeMonth(-1)">◀</button>
-                    <h2 id="cal-month-year"></h2>
-                    <button class="btn-theme" onclick="changeMonth(1)">▶</button>
-                </div>
-                <div class="cal-grid-header"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
-                <div class="cal-grid" id="cal-grid"></div>
-                <div id="cal-event-editor" class="cal-event-editor" style="display:none;">
-                    <h4 id="cal-edit-date"></h4>
-                    <div class="cal-input-wrapper">
-                        <input type="text" id="cal-event-input" placeholder="Enter event or note...">
-                        <button class="btn-glossy btn-green" onclick="saveCalendarEvent()">Save</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- DICTIONARY TAB -->
-        <div class="tab-content" id="tab-dictionary">
-            <div class="dict-section glass-dark">
-                <div class="dict-header"><h3>📖 My Dictionary</h3><span class="dict-count" id="dict-count">0 words</span></div>
-                <div class="dict-add-form">
-                    <input type="text" id="dict-en" placeholder="English">
-                    <input type="text" id="dict-jp" placeholder="日本語">
-                    <input type="text" id="dict-es" placeholder="Español">
-                    <button class="add-word-btn" onclick="addWord()">+</button>
-                </div>
-                <div class="dict-filter"><input type="text" id="dict-search" placeholder="🔍 Search words..." oninput="renderDictionary()"></div>
-                <div class="dict-list" id="dict-list"></div>
-            </div>
-        </div>
-
-        <!-- DIARY TAB -->
-        <div class="tab-content" id="tab-diary">
-            <div class="diary-section glass-dark">
-                <h3>📓 Personal Diary</h3>
-                <div class="diary-input-area">
-                    <textarea id="diary-input" class="diary-textarea" placeholder="Write your thoughts here..."></textarea>
-                    <div class="diary-controls"><button class="diary-btn" onclick="addDiaryEntry()">Save Entry</button></div>
-                </div>
-                <div class="diary-list" id="diary-list"></div>
-            </div>
-        </div>
-
-        <!-- HISTORY & NES TAB -->
-        <div class="tab-content" id="tab-history">
-            <div class="history-section glass-dark">
-                <h3>📊 Study History</h3>
-                <div class="history-grid" id="history-grid"></div>
-            </div>
-            <div class="nes-container">
-                <h3>PASSWORD SYSTEM</h3>
-                <p>GENERATE A PASSWORD TO BACK UP YOUR PROGRESS, OR PASTE A PASSWORD BELOW TO RESTORE DATA.</p>
-                <textarea id="nes-password-box" class="nes-textarea" placeholder="[ ENTER PASSWORD HERE ]" spellcheck="false"></textarea>
-                <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-                    <button class="nes-btn" onclick="generatePassword()">GENERATE</button>
-                    <button class="nes-btn" onclick="loadPassword()">RESTORE</button>
-                    <button class="nes-btn" onclick="copyPassword()">COPY</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- COLCALC TAB -->
-        <div class="tab-content" id="tab-calc">
-            <div class="glass-dark" style="padding: 10px; height: 75vh;">
-                <div class="iframe-container"><iframe src="https://col-bun.github.io/COLcalc.github.io/" title="COLcalc"></iframe></div>
-            </div>
-        </div>
-
-        <!-- NUMOGRAM TAB -->
-        <div class="tab-content" id="tab-numogram">
-            <div class="numogram-wrapper">
-                <div class="svg-numogram-container">
-                    <svg viewBox="0 0 1000 1250" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <marker id="arrow-white" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#fff" /></marker>
-                        </defs>
-                        <!-- (SVG Paths from your original go here - they are preserved in the script logic below) -->
-                        <g class="dot-base">
-                            <path d="M 330 350 Q 280 410 290 440" class="dot-wide"/><path d="M 330 350 Q 280 410 290 440" class="dot-mid"/><path d="M 330 350 Q 280 410 290 440" class="dot-core"/>
-                            <!-- ... all other dot paths ... -->
-                        </g>
-                        <!-- Simplified version for response length - please keep your original SVG paths here -->
-                        <g class="zone-group" id="btn-zone-1" onclick="selectZone(1)"><circle cx="500" cy="620" r="50" fill="#fff" class="glow"/><text x="485" y="620" fill="#000" class="zone-text">1</text></g>
-                        <!-- ... all zones 0-9 ... -->
-                    </svg>
-                </div>
-                <div class="numo-tools-col">
-                    <div class="numo-calc" style="border-color: #00e5ff;">
-                        <h4 style="color: #00e5ff;">📜 How to Use</h4>
-                        <div class="custom-scrollbar" style="max-height: 200px; overflow-y: auto;">
-                            <p>Interactive map of Lemurian time-sorcery.</p>
-                        </div>
-                    </div>
-                    <div class="numo-calc">
-                        <h4>Gematria Time-Sorcery</h4>
-                        <div class="numo-input-row"><input type="text" id="numo-gematria-input" placeholder="WORD"><button onclick="calculateNumogram()">EVAL</button></div>
-                        <div id="numo-result-display"></div>
-                    </div>
-                    <div class="numo-calc">
-                        <h4>CCRU Encyclopedia</h4>
-                        <div class="numo-input-row"><input type="text" id="lexicon-search" placeholder="Search..." oninput="searchLexicon()"></div>
-                        <div id="lexicon-results" class="custom-scrollbar"></div>
-                    </div>
-                    <div class="glass-dark numo-info-panel custom-scrollbar"><div id="numo-display"><h3>The Numogram</h3><p>Click a Zone.</p></div></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- I-CHING TAB -->
-        <div class="tab-content" id="tab-iching">
-            <div class="iching-section glass-dark">
-                <h2 class="iching-header">☯️ The I-Ching Oracle</h2>
-                <div id="daily-oracle-panel" class="daily-oracle-panel">
-                    <div class="daily-oracle-title">✨ Today's Reading ✨</div>
-                    <div class="yoji-display">
-                        <div class="yoji-kanji" id="daily-yoji-kanji"></div>
-                        <div class="yoji-meaning" id="daily-yoji-meaning"></div>
-                    </div>
-                    <div class="daily-hexagram-preview">
-                        <div class="preview-box"><div class="preview-title">Primary</div><div id="daily-pri-name"></div></div>
-                        <div class="preview-box" id="daily-sec-box" style="display:none;"><div class="preview-title">Changing</div><div id="daily-sec-name"></div></div>
-                    </div>
-                </div>
-                <button class="btn-glossy btn-purple" onclick="castOracle()">Cast Coins</button>
-                <div class="hexagram-container" id="iching-hex-container" style="display:none;">
-                    <div class="hexagram-box"><div class="hexagram-title">Primary</div><div class="hexagram-visual" id="iching-primary-vis"></div></div>
-                    <div class="hexagram-box" id="iching-secondary-box" style="display:none;"><div class="hexagram-title">Changing</div><div class="hexagram-visual" id="iching-secondary-vis"></div></div>
-                </div>
-                <div class="iching-result-box" id="iching-primary-result"></div>
-                <div class="iching-result-box" id="iching-secondary-result"></div>
-            </div>
-        </div>
+    <div class="stats-strip">
+      <div class="stat-box glass"><div class="num" id="stat-total-flash">0</div><div class="label">Flashcard Min</div></div>
+      <div class="stat-box glass"><div class="num" id="stat-total-read">0</div><div class="label">Reading Hrs</div></div>
+      <div class="stat-box glass"><div class="num" id="stat-words">0</div><div class="label">Dict Words</div></div>
+      <div class="stat-box glass"><div class="num" id="stat-days">0</div><div class="label">Days Tracked</div></div>
     </div>
+  </div>
 
-    <!-- Hidden Zone Data Store -->
-    <div id="numo-data-store" style="display:none;">
-        <div id="data-zone-0"><h3>Zone Zero</h3><p>The figure ‘0' designates the number zero...</p></div>
-        <!-- ... zones 1-9 ... -->
+  <!-- CALENDAR TAB -->
+  <div class="tab-content" id="tab-calendar">
+    <div class="calendar-section glass-dark">
+      <div style="text-align: center;"><div class="cal-jp-date" id="cal-jp-date"></div></div>
+      <div class="cal-header">
+        <button class="btn-theme" style="border-radius: 50%; width: 40px; height: 40px; padding: 0;" onclick="changeMonth(-1)">◀</button>
+        <h2 id="cal-month-year"></h2>
+        <button class="btn-theme" style="border-radius: 50%; width: 40px; height: 40px; padding: 0;" onclick="changeMonth(1)">▶</button>
+      </div>
+      <div class="cal-grid-header"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div id="cal-event-editor" class="cal-event-editor" style="display:none;">
+        <h4 id="cal-edit-date"></h4>
+        <div class="cal-input-wrapper">
+          <input type="text" id="cal-event-input" placeholder="Enter event or note...">
+          <button class="btn-glossy btn-green" onclick="saveCalendarEvent()">Save</button>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <script src="data.js"></script>
-    <script src="script.js"></script>
+  <!-- DICTIONARY TAB -->
+  <div class="tab-content" id="tab-dictionary">
+    <div class="dict-section glass-dark">
+      <div class="dict-header"><h3>📖 My Dictionary</h3><span class="dict-count" id="dict-count">0 words</span></div>
+      <div class="dict-add-form">
+        <input type="text" id="dict-en" placeholder="English">
+        <input type="text" id="dict-jp" placeholder="日本語">
+        <input type="text" id="dict-es" placeholder="Español">
+        <button class="add-word-btn" onclick="addWord()">+</button>
+      </div>
+      <div class="dict-filter"><input type="text" id="dict-search" placeholder="🔍 Search words..." oninput="renderDictionary()"></div>
+      <div class="dict-list" id="dict-list"></div>
+    </div>
+  </div>
+
+  <!-- DIARY TAB -->
+  <div class="tab-content" id="tab-diary">
+    <div class="diary-section glass-dark">
+      <h3>📓 Personal Diary</h3>
+      <div class="diary-input-area">
+        <textarea id="diary-input" class="diary-textarea" placeholder="Write your thoughts here..."></textarea>
+        <div class="diary-controls"><button class="diary-btn" onclick="addDiaryEntry()">Save Entry</button></div>
+      </div>
+      <div class="diary-list" id="diary-list"></div>
+    </div>
+  </div>
+
+  <!-- HISTORY TAB -->
+  <div class="tab-content" id="tab-history">
+    <div class="history-section glass-dark">
+      <h3>📊 Study History</h3>
+      <div class="history-grid" id="history-grid"></div>
+    </div>
+    <div class="nes-container">
+      <h3>PASSWORD SYSTEM</h3>
+      <p>GENERATE A PASSWORD TO BACK UP YOUR PROGRESS, OR PASTE A PASSWORD BELOW TO RESTORE DATA.</p>
+      <textarea id="nes-password-box" class="nes-textarea" placeholder="[ ENTER PASSWORD HERE ]" spellcheck="false"></textarea>
+      <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+        <button class="nes-btn" onclick="generatePassword()">GENERATE</button>
+        <button class="nes-btn" onclick="loadPassword()">RESTORE</button>
+        <button class="nes-btn" onclick="copyPassword()">COPY</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALC TAB -->
+  <div class="tab-content" id="tab-calc">
+    <div class="glass-dark" style="padding: 10px; height: 75vh;">
+      <div class="iframe-container"><iframe src="https://col-bun.github.io/COLcalc.github.io/" title="COLcalc"></iframe></div>
+    </div>
+  </div>
+
+  <!-- NUMOGRAM TAB -->
+  <div class="tab-content" id="tab-numogram">
+    <div class="numogram-wrapper">
+      <div class="svg-numogram-container">
+        <svg viewBox="0 0 1000 1250" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="arrow-white" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#fff" /></marker>
+              <marker id="arrow-black" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#000" /></marker>
+            </defs>
+            <g class="dot-base">
+                <path d="M 330 350 Q 280 410 290 440" class="dot-wide"/><path d="M 330 350 Q 280 410 290 440" class="dot-mid"/><path d="M 330 350 Q 280 410 290 440" class="dot-core"/>
+                <path d="M 320 510 Q 380 570 450 600" class="dot-wide"/><path d="M 320 510 Q 380 570 450 600" class="dot-mid"/><path d="M 320 510 Q 380 570 450 600" class="dot-core"/>
+                <path d="M 660 470 Q 500 400 390 330" class="dot-wide"/><path d="M 660 470 Q 500 400 390 330" class="dot-mid"/><path d="M 660 470 Q 500 400 390 330" class="dot-core"/>
+                <path d="M 550 600 Q 640 550 670 510" class="dot-wide"/><path d="M 550 600 Q 640 550 670 510" class="dot-mid"/><path d="M 550 600 Q 640 550 670 510" class="dot-core"/>
+                <path d="M 690 440 Q 690 380 660 330" class="dot-wide"/><path d="M 690 440 Q 690 380 660 330" class="dot-mid"/><path d="M 690 440 Q 690 380 660 330" class="dot-core"/>
+                <path d="M 430 180 C 500 250 650 220 580 180" class="dot-wide"/><path d="M 430 180 C 500 250 650 220 580 180" class="dot-mid"/><path d="M 430 180 C 500 250 650 220 580 180" class="dot-core"/>
+                <path d="M 500 670 L 500 740" class="dot-wide"/><path d="M 500 670 L 500 740" class="dot-mid"/><path d="M 500 670 L 500 740" class="dot-core"/>
+                <path d="M 500 820 L 500 880" class="dot-wide"/><path d="M 500 820 L 500 880" class="dot-mid"/><path d="M 500 820 L 500 880" class="dot-core"/>
+                <path d="M 500 960 Q 550 1010 500 1020" class="dot-wide"/><path d="M 500 960 Q 550 1010 500 1020" class="dot-mid"/><path d="M 500 960 Q 550 1010 500 1020" class="dot-core"/>
+            </g>
+            <polygon points="415,150 385,140 385,160" fill="#fff" /><polygon points="585,150 615,140 615,160" fill="#fff" /><polygon points="635,300 665,290 665,310" fill="#fff" /><polygon points="365,320 335,310 335,330" fill="#fff" /><polygon points="310,495 290,465 320,475" fill="#fff" /><polygon points="685,480 715,470 715,490" fill="#fff" /><polygon points="500,645 485,615 515,615" fill="#000" /><polygon points="500,755 485,785 515,785" fill="#fff" /><polygon points="500,945 485,915 515,915" fill="#fff" /><polygon points="500,1035 485,1065 515,1065" fill="#fff" />
+            <g stroke="#fff" stroke-width="2" fill="none">
+              <path d="M 650 300 Q 500 350 350 320" /><path d="M 650 300 Q 525 225 400 150" /><path d="M 400 150 Q 500 50 600 150" /><path d="M 400 150 Q 500 250 600 150" /><path d="M 350 320 C 300 -50 700 -50 600 150" />
+              <line x1="300" y1="480" x2="500" y2="620" /><line x1="700" y1="480" x2="500" y2="620" /><line x1="500" y1="780" x2="500" y2="920" />
+              <path d="M 500 620 C 400 500 600 500 500 620" /><path d="M 500 920 C 400 920 400 820 500 920" />
+            </g>
+            <g stroke="#fff" stroke-width="2" fill="#000">
+              <circle cx="515" cy="18" r="15" /> <circle cx="500" cy="100" r="15" /> <circle cx="500" cy="200" r="15" /> <circle cx="525" cy="225" r="15" /> <circle cx="400" cy="550" r="15" /> <circle cx="600" cy="550" r="15" /> <circle cx="500" cy="530" r="15" /> <circle cx="500" cy="850" r="15" /> <circle cx="435" cy="880" r="15" /> 
+            </g>
+            <g class="gate-text" text-anchor="middle" dominant-baseline="central">
+              <text x="515" y="18">15</text> <text x="500" y="100">6</text> <text x="500" y="200">21</text> <text x="525" y="225">3</text> <text x="400" y="550">10</text> <text x="600" y="550">28</text> <text x="500" y="530">1</text> <text x="500" y="850">36</text> <text x="435" y="880">45</text>
+            </g>
+            <g class="zone-group" id="btn-zone-3" onclick="selectZone(3)"><circle cx="400" cy="150" r="40" fill="#000" stroke="#fff" stroke-width="3" /><text x="390" y="150" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">3</text><text x="420" y="130" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text></g>
+            <g class="zone-group" id="btn-zone-6" onclick="selectZone(6)"><circle cx="600" cy="150" r="40" fill="#000" stroke="#fff" stroke-width="3" /><text x="590" y="150" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">6</text><text x="620" y="130" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text></g>
+            <g class="zone-group" id="btn-zone-2" onclick="selectZone(2)"><circle cx="650" cy="300" r="40" fill="#000" stroke="#fff" stroke-width="3" /><text x="640" y="300" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">2</text><text x="670" y="280" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text></g>
+            <g class="zone-group" id="btn-zone-5" onclick="selectZone(5)"><circle cx="350" cy="320" r="40" fill="#000" stroke="#fff" stroke-width="3" /><text x="340" y="320" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">5</text><text x="370" y="300" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text></g>
+            <g class="zone-group" id="btn-zone-4" onclick="selectZone(4)"><circle cx="300" cy="480" r="40" fill="#000" stroke="#ff0000" stroke-width="3"/><text x="290" y="480" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">4</text><text x="320" y="460" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text></g>
+            <g class="zone-group" id="btn-zone-7" onclick="selectZone(7)"><circle cx="700" cy="480" r="40" fill="#000" class="glow" stroke="#ff3366" stroke-width="3"/><text x="690" y="480" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">7</text><text x="720" y="460" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text></g>
+            <g class="zone-group" id="btn-zone-1" onclick="selectZone(1)"><circle cx="500" cy="620" r="50" fill="#fff" class="glow" stroke="#fff" stroke-width="3"/><text x="485" y="620" fill="#000" class="zone-text" text-anchor="middle" dominant-baseline="central">1</text><text x="525" y="600" fill="#000" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text></g>
+            <g class="zone-group" id="btn-zone-8" onclick="selectZone(8)"><circle cx="500" cy="780" r="40" fill="#000" stroke="#fff" stroke-width="3" /><text x="490" y="780" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">8</text><text x="520" y="760" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text></g>
+            <g class="zone-group" id="btn-zone-9" onclick="selectZone(9)"><circle cx="500" cy="920" r="40" fill="#000" stroke="#fff" stroke-width="3" /><text x="490" y="920" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">9</text><text x="520" y="900" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text></g>
+            <g class="zone-group" id="btn-zone-0" onclick="selectZone(0)"><circle cx="500" cy="1060" r="40" fill="#000" stroke="#fff" stroke-width="3" /><text x="490" y="1060" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">0</text><text x="520" y="1040" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text></g>
+            <g class="label-sound">
+              <text x="330" y="130" fill="#22dd22">"zx"</text> <text x="630" y="190" fill="#dddd00">"tch"</text> <text x="690" y="270" fill="#4488ff">"dt"</text> <text x="280" y="360" fill="#ffaa00">"ktt"</text> <text x="220" y="520" fill="#ff3333">"skr"</text> <text x="750" y="470" fill="#4488ff">"pb"</text> <text x="480" y="700" fill="#ddaa00">"gl"</text> <text x="430" y="770" fill="#22dd22">"mnm"</text> <text x="550" y="910" fill="#dddd00">"tn"</text> <text x="410" y="1110" fill="#22dd22">"eiaoung"</text>
+            </g>
+            <text x="50" y="80" class="label-region">Warp</text><text x="50" y="110" class="label-sub label-sub-italic">Hyper-Reality</text><text x="50" y="135" class="label-sub">Djynxx 6::3</text>
+            <text x="50" y="450" class="label-region">e-Circuit</text><text x="50" y="480" class="label-sub label-sub-italic">breakthrough</text><text x="50" y="850" class="label-region">Plex</text><text x="50" y="880" class="label-sub label-sub-italic">Eiriel (Tchukululok)</text><text x="50" y="905" class="label-sub">Dissociative Void</text>
+            <text x="650" y="110" class="label-current">Warp</text><text x="500" y="370" class="label-current">Hold</text><text x="800" y="300" class="label-current">Rise</text><text x="380" y="570" class="label-current">Sink</text><text x="560" y="980" class="label-current">Plex</text>
+        </svg>
+      </div>
+      <div class="numo-tools-col">
+        <div class="numo-calc" style="border-color: #00e5ff;">
+          <h4 style="color: #00e5ff;">📜 How to Use the Numogram</h4>
+          <div style="max-height: 220px; overflow-y: auto; padding-right: 8px; font-size: 0.8rem; color: rgba(255,255,255,0.85); line-height: 1.5;" class="custom-scrollbar">
+            <p><strong>The Decimal Labyrinth</strong> is a map of Lemurian time-sorcery.</p>
+            <ul style="margin-left: 16px;">
+              <li><strong>Interactive Map:</strong> Click any numbered Zone (0-9).</li>
+              <li><strong>Gematria:</strong> Converts words to base-9 roots.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="numo-calc">
+          <h4>Gematria Time-Sorcery</h4>
+          <div class="numo-input-row"><input type="text" id="numo-gematria-input" placeholder="e.g. CYBERNETICS"><button onclick="calculateNumogram()">EVAL</button></div>
+          <div id="numo-result-display" style="font-size: 0.85rem; color: #a8e84c; font-family: 'Baloo 2', cursive;"></div>
+        </div>
+        <div class="numo-calc">
+          <h4>Net-Span Demon Finder</h4>
+          <div class="numo-input-row"><input type="number" id="demon-z1" min="0" max="9" placeholder="Z1"><input type="number" id="demon-z2" min="0" max="9" placeholder="Z2"><button onclick="findDemon()">FIND</button></div>
+          <div id="demon-result" style="font-size: 0.85rem; color: #fff; margin-top: 10px; line-height: 1.4;"></div>
+        </div>
+        <div class="numo-calc">
+          <h4>CCRU Encyclopedia</h4>
+          <div class="numo-input-row" style="margin-bottom: 0;"><input type="text" id="lexicon-search" placeholder="Search archives..." oninput="searchLexicon()"></div>
+          <div id="lexicon-results" style="max-height: 200px; overflow-y: auto; margin-top: 10px; font-size: 0.8rem;" class="custom-scrollbar"></div>
+        </div>
+        <div class="glass-dark numo-info-panel custom-scrollbar"><div id="numo-display"><h3>The Numogram</h3><p>Click a Zone to reveal its esoteric data.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- I-CHING TAB -->
+  <div class="tab-content" id="tab-iching">
+    <div class="iching-section glass-dark">
+      <h2 class="iching-header">☯️ The I-Ching Oracle</h2>
+      <p class="iching-desc">Concentrate on your question and cast the coins.</p>
+      <div id="daily-oracle-panel" class="daily-oracle-panel">
+        <div class="daily-oracle-title">✨ Today's Reading ✨</div>
+        <div class="yoji-display">
+          <div class="yoji-kanji" id="daily-yoji-kanji"></div>
+          <div class="yoji-meaning" id="daily-yoji-meaning"></div>
+        </div>
+        <div class="daily-hexagram-preview">
+          <div class="preview-box"><div class="preview-title">Primary</div><div class="preview-name" id="daily-pri-name"></div></div>
+          <div class="preview-box" id="daily-sec-box" style="display:none;"><div class="preview-title">Changing</div><div class="preview-name" id="daily-sec-name"></div></div>
+        </div>
+      </div>
+      <button class="btn-glossy btn-purple" style="background: linear-gradient(180deg, #8b5cf6 0%, #6d3fd6 100%); margin-bottom: 30px; font-size: 1.1rem; padding: 14px 32px;" onclick="castOracle()">Cast Coins</button>
+      <div class="hexagram-container" id="iching-hex-container" style="display:none;">
+        <div class="hexagram-box"><div class="hexagram-title">Primary Hexagram</div><div class="hexagram-visual" id="iching-primary-vis"></div></div>
+        <div class="hexagram-box" id="iching-secondary-box" style="display:none;"><div class="hexagram-title">Changing Hexagram</div><div class="hexagram-visual" id="iching-secondary-vis"></div></div>
+      </div>
+      <div class="iching-result-box" id="iching-primary-result"></div>
+      <div class="iching-result-box" id="iching-secondary-result" style="border-color: #ff3c8e;"></div>
+    </div>
+  </div>
+</div>
+
+<div id="numo-data-store">
+  <div id="data-zone-0"><h3>Zone Zero</h3><h4>The Numeral 0</h4><p>Designates the number zero, anterior to the distinction odd/even.</p><h4>The Zeroth Planet: Sol</h4><p>The Sun is the source of all terrestrial energy.</p></div>
+  <div id="data-zone-1"><h3>Zone One</h3><h4>The Numeral 1</h4><p>First odd number. Mercury.</p></div>
+  <div id="data-zone-2"><h3>Zone Two</h3><h4>The Numeral 2</h4><p>Venus. First even number.</p></div>
+  <div id="data-zone-3"><h3>Zone Three</h3><h4>The Numeral 3</h4><p>Earth. Second odd number.</p></div>
+  <div id="data-zone-4"><h3>Zone Four</h3><h4>The Numeral 4</h4><p>Mars. First non-prime.</p></div>
+  <div id="data-zone-5"><h3>Zone Five</h3><h4>The Numeral 5</h4><p>Jupiter. Inner-eye of the spiral.</p></div>
+  <div id="data-zone-6"><h3>Zone Six</h3><h4>The Numeral 6</h4><p>Saturn. Ulterior Vortex.</p></div>
+  <div id="data-zone-7"><h3>Zone Seven</h3><h4>The Numeral 7</h4><p>Uranus. Tractor-Zone of Surge.</p></div>
+  <div id="data-zone-8"><h3>Zone Eight</h3><h4>The Numeral 8</h4><p>Neptune. Murmur.</p></div>
+  <div id="data-zone-9"><h3>Zone Nine</h3><h4>The Numeral 9</h4><p>Pluto. The terminal Plex.</p></div>
+</div>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
