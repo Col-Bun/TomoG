@@ -1,14 +1,362 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Moe-Chan & The Oracle</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moe-Chan & The Oracle</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Nunito:wght@400;700;900&family=Baloo+2:wght@700;800&family=Press+Start+2P&display=swap');
+  :root {
+    --sky1: 
+#0099ff; --sky2: 
+#00d4ff; --sky3: 
+#66e0ff;
+    --green1: 
+#7ec832; --green2: 
+#a8e84c;
+    --orange: 
+#ff8a00; --pink: 
+#ff3c8e; --purple: 
+#8b5cf6;
+    --glass: rgba(255,255,255,0.18); --glass2: rgba(255,255,255,0.10);
+    --glass-border: rgba(255,255,255,0.30);
+    --text: 
+#1a2744; --text-light: #fff;
+    --shadow: rgba(0,60,120,0.18);
+    --metro-bg1: 
+#ff1e78; --metro-bg2: 
+#ff3c8e;
+  }
+  body.dark-mode {
+    --metro-bg1: 
+#121215; --metro-bg2: 
+#1e1e24; --text: 
+#f0f0f0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Nunito', sans-serif; min-height: 100vh; overflow-x: hidden; color: var(--text); transition: color 0.3s; }
+  /* ===== FRUTIGER METRO / Y2K VECTOR BACKGROUND ===== */
+  .metro-bg { position: fixed; inset: 0; z-index: -1; background-color: var(--metro-bg1); overflow: hidden; transition: background-color 0.4s; }
+  .metro-sunburst { position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: repeating-conic-gradient(var(--metro-bg1) 0 12deg, var(--metro-bg2) 12deg 24deg); transition: background 0.4s; }
+  .metro-halftone { position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.2) 2.5px, transparent 2.5px); background-size: 20px 20px; opacity: 0.8; }
+  body.dark-mode .metro-halftone { background-image: radial-gradient(rgba(0,0,0,0.4) 2.5px, transparent 2.5px); }
+  .metro-vectors { position: absolute; inset: 0; }
+  .metro-vectors svg { width: 100%; height: 100%; }
+  .y2k-flower { transform-origin: center; transform-box: fill-box; }
+  /* ===== GLASS PANEL STYLE ===== */
+  .glass { background: var(--glass); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1.5px solid var(--glass-border); border-radius: 24px; box-shadow: 0 8px 32px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.25); transition: background 0.4s, border-color 0.4s; }
+  .glass-strong { background: rgba(255,255,255,0.30); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1.5px solid rgba(255,255,255,0.45); border-radius: 24px; box-shadow: 0 8px 32px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.4); }
+  .glass-dark { background: rgba(0,40,80,0.35); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1.5px solid rgba(255,255,255,0.15); border-radius: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); color: #fff; }
+  body.dark-mode .glass { background: rgba(20, 20, 30, 0.45); border-color: rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05); }
+  body.dark-mode .glass-strong { background: rgba(20, 20, 30, 0.65); border-color: rgba(255,255,255,0.1); }
+  body.dark-mode .glass-dark { background: rgba(0, 0, 0, 0.5); border-color: rgba(255,255,255,0.1); }
+  body.dark-mode .speech-bubble { background: rgba(30, 30, 40, 0.85); border-color: rgba(255,255,255,0.1); }
+  body.dark-mode .speech-bubble::before { border-bottom-color: rgba(30, 30, 40, 0.85); }
+  body.dark-mode .speech-line { color: #fff; }
+  /* ===== GLOSSY BUTTON ===== */
+  .btn-glossy { border: none; padding: 10px 24px; border-radius: 50px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.9rem; cursor: pointer; color: #fff; background: linear-gradient(180deg, 
+#ff8a00 0%, 
+#e06500 100%); box-shadow: 0 4px 14px rgba(255,138,0,0.35), inset 0 1px 0 rgba(255,255,255,0.35); transition: all 0.2s; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+  .btn-glossy:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,138,0,0.4); }
+  .btn-glossy:active { transform: translateY(0); }
+  .btn-green { background: linear-gradient(180deg, 
+#7ec832 0%, 
+#5ea020 100%); box-shadow: 0 4px 14px rgba(126,200,50,0.35), inset 0 1px 0 rgba(255,255,255,0.35); }
+  .btn-pink { background: linear-gradient(180deg, 
+#ff3c8e 0%, 
+#d42070 100%); box-shadow: 0 4px 14px rgba(255,60,142,0.35), inset 0 1px 0 rgba(255,255,255,0.35); }
+  .btn-theme { background: rgba(0,0,0,0.2); box-shadow: none; padding: 6px 14px; font-size: 1rem; cursor: pointer; color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+  .btn-theme:hover { background: rgba(0,0,0,0.4); }
+  body.dark-mode .btn-theme { background: rgba(255,255,255,0.1); }
+  body.dark-mode .btn-theme:hover { background: rgba(255,255,255,0.2); }
+  /* ===== PASSWORD SCREEN ===== */
+  #password-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; gap: 20px; position: relative; z-index: 1; }
+  .pw-creature { width: 200px; height: 300px; display: flex; align-items: flex-end; justify-content: center; filter: drop-shadow(0 12px 24px rgba(0,0,0,0.15)); }
+  .pw-creature img { width: 100%; height: 100%; object-fit: contain; }
+  #password-screen h1 { font-family: 'Baloo 2', cursive; font-size: 2.2rem; color: #fff; text-shadow: 0 2px 8px rgba(0,60,120,0.3); text-align: center; line-height: 1.4; }
+  .pw-hint { font-size: 0.9rem; color: rgba(255,255,255,0.7); }
+  #password-screen input { background: rgba(255,255,255,0.25); backdrop-filter: blur(12px); border: 2px solid rgba(255,255,255,0.4); color: #fff; padding: 14px 24px; border-radius: 50px; font-size: 1.1rem; text-align: center; width: 240px; font-family: 'Nunito', sans-serif; font-weight: 700; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+  #password-screen input::placeholder { color: rgba(255,255,255,0.5); }
+  #password-screen input:focus { outline: none; border-color: #fff; background: rgba(255,255,255,0.35); }
+  .pw-error { color: 
+#ffcc00; font-size: 0.85rem; font-weight: 700; min-height: 1.2em; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  /* ===== MAIN APP ===== */
+  #app { display: none; max-width: 900px; margin: 0 auto; padding: 20px; min-height: 100vh; position: relative; z-index: 1; }
+  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding: 12px 20px; flex-wrap: wrap; gap: 10px; }
+  .top-bar h2 { font-family: 'Baloo 2', cursive; font-size: 1.6rem; color: #fff; text-shadow: 0 2px 6px rgba(0,40,100,0.3); }
+  .top-controls { display: flex; align-items: center; gap: 10px; }
+  .streak-badge { display: inline-flex; align-items: center; gap: 4px; background: linear-gradient(135deg, 
+#ff8a00, 
+#ffcc00); color: 
+#7a3800; padding: 6px 14px; border-radius: 50px; font-weight: 900; font-size: 0.8rem; box-shadow: 0 3px 10px rgba(255,138,0,0.3); }
+  .date-display { font-size: 0.8rem; color: rgba(255,255,255,0.7); }
+  .tabs { display: flex; gap: 6px; margin-bottom: 16px; padding: 0 4px; flex-wrap: wrap; }
+  .tab-btn { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.85); padding: 10px 20px; border-radius: 16px 16px 4px 4px; cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.85rem; transition: all 0.25s; backdrop-filter: blur(8px); }
+  .tab-btn.active { background: rgba(255,255,255,0.35); border-color: rgba(255,255,255,0.5); color: #fff; box-shadow: 0 4px 16px rgba(0,100,200,0.15); }
+  body.dark-mode .tab-btn { color: rgba(255,255,255,0.6); }
+  body.dark-mode .tab-btn.active { background: rgba(255,255,255,0.15); color: #fff; }
+  .tab-btn:hover { background: rgba(255,255,255,0.25); color: #fff; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  /* ===== CREATURE AREA ===== */
+  .creature-area { padding: 28px; text-align: center; margin-bottom: 16px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; min-height: 720px; }
+  .creature-area::before { content: ''; position: absolute; top: -60px; right: -60px; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%); pointer-events: none; }
+  .creature-area::after { content: ''; position: absolute; bottom: -40px; left: -40px; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, rgba(126,200,50,0.1) 0%, transparent 70%); pointer-events: none; }
+  .creature-sprite { width: 400px; height: 600px; margin: 0 auto 20px; position: relative; display: flex; align-items: flex-end; justify-content: center; flex-shrink: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .creature-sprite img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15)); }
+  @keyframes bounce-up { 0% { transform: translateY(0); } 50% { transform: translateY(-30px); } 100% { transform: translateY(0); } }
+  .animate-bounce { animation: bounce-up 0.4s cubic-bezier(0.28, 0.84, 0.42, 1); }
+  .heart-particle { position: absolute; font-size: 2rem; pointer-events: none; animation: float-heart 0.8s ease-out forwards; z-index: 10; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
+  @keyframes float-heart { 0% { transform: translate(0, 0) scale(0.5); opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) scale(1.2); opacity: 0; } }
+  .speech-bubble { background: rgba(255,255,255,0.5); backdrop-filter: blur(16px); border: 1.5px solid rgba(255,255,255,0.6); border-radius: 20px; padding: 18px; margin: 0 auto; width: 100%; max-width: 520px; position: relative; text-align: left; box-shadow: 0 6px 24px rgba(0,60,120,0.1); z-index: 2; transition: background 0.4s, border-color 0.4s; }
+  .speech-bubble::before { content: ''; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); border-left: 14px solid transparent; border-right: 14px solid transparent; border-bottom: 14px solid rgba(255,255,255,0.5); transition: border-color 0.4s; }
+  .speech-line { display: flex; gap: 10px; padding: 5px 0; font-size: 0.9rem; align-items: flex-start; color: var(--text); }
+  .lang-tag { font-size: 0.55rem; font-weight: 900; padding: 3px 8px; border-radius: 50px; min-width: 32px; text-align: center; flex-shrink: 0; margin-top: 3px; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
+  .lang-en { background: linear-gradient(135deg, 
+#0099ff, 
+#0066cc); } .lang-jp { background: linear-gradient(135deg, 
+#ff3c8e, 
+#cc2060); } .lang-es { background: linear-gradient(135deg, 
+#7ec832, 
+#5ea020); }
+  .mood-bar { display: flex; align-items: center; gap: 10px; margin-top: 16px; justify-content: center; z-index: 2; }
+  .mood-label { font-size: 0.75rem; color: rgba(255,255,255,0.7); font-weight: 700; }
+  .mood-track { width: 160px; height: 12px; background: rgba(0,0,0,0.15); border-radius: 50px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+  .mood-fill { height: 100%; border-radius: 50px; transition: width 0.5s, background 0.5s; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.4); }
+  .tasks-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  .task-card { padding: 22px; text-align: center; transition: all 0.3s; position: relative; overflow: hidden; }
+  .task-card::before { content: ''; position: absolute; top: -30px; right: -30px; width: 80px; height: 80px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); pointer-events: none; }
+  .task-card.done { border-color: rgba(126,200,50,0.5); background: rgba(126,200,50,0.15); }
+  .task-card h3 { font-family: 'Baloo 2', cursive; font-size: 1.1rem; margin-bottom: 4px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+  .task-card .tri-label { font-size: 0.65rem; color: rgba(255,255,255,0.65); margin-bottom: 14px; }
+  .task-input-row { display: flex; gap: 8px; align-items: center; justify-content: center; }
+  .task-input-row input { background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.3); color: #fff; padding: 10px 12px; border-radius: 14px; width: 80px; text-align: center; font-size: 1rem; font-family: 'Nunito', sans-serif; font-weight: 800; }
+  .task-input-row input::placeholder { color: rgba(255,255,255,0.4); }
+  .task-input-row input:focus { outline: none; border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.3); }
+  .task-input-row span { font-size: 0.8rem; color: rgba(255,255,255,0.7); font-weight: 700; }
+  .log-btn { margin-top: 12px; }
+  .task-done-check { font-size: 1.6rem; margin-top: 8px; }
+  .task-done-text { color: rgba(255,255,255,0.9) !important; }
+  .stats-strip { display: flex; gap: 10px; margin-bottom: 16px; }
+  .stat-box { flex: 1; padding: 14px; text-align: center; position: relative; overflow: hidden; }
+  .stat-box::after { content: ''; position: absolute; top: -20px; right: -20px; width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.08); pointer-events: none; }
+  .stat-box .num { font-family: 'Baloo 2', cursive; font-size: 1.8rem; color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,0.15); line-height: 1; }
+  .stat-box .label { font-size: 0.65rem; color: rgba(255,255,255,0.65); margin-top: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  /* ===== CALENDAR ===== */
+  .calendar-section { padding: 22px; }
+  .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .cal-header h2 { font-family: 'Baloo 2', cursive; font-size: 1.6rem; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.15); margin: 0; }
+  .cal-jp-date { text-align: center; color: 
+#ff3c8e; font-weight: 800; margin-bottom: 20px; font-family: 'Noto Sans JP', sans-serif; font-size: 1.1rem; text-shadow: 0 1px 3px rgba(0,0,0,0.3); background: rgba(255,255,255,0.1); display: inline-block; padding: 6px 16px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); }
+  .cal-grid-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: 800; color: 
+#a8e84c; font-size: 0.85rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .cal-day { background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.15); border-radius: 8px; min-height: 80px; padding: 6px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; }
+  .cal-day:hover { background: rgba(255,255,255,0.2); transform: scale(1.02); }
+  .cal-day.today { border-color: 
+#ff3c8e; box-shadow: inset 0 0 10px rgba(255,60,142,0.3); }
+  .cal-day.empty { background: transparent; border: none; cursor: default; }
+  .cal-day.empty:hover { transform: none; background: transparent; }
+  .cal-date-num { font-weight: 900; font-size: 0.9rem; margin-bottom: 4px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+  .cal-event-badge { background: linear-gradient(135deg, 
+#0099ff, 
+#0066cc); font-size: 0.65rem; color: #fff; padding: 3px 6px; border-radius: 4px; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+  .cal-event-editor { background: rgba(0,0,0,0.2); padding: 16px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.2); margin-top: 16px; }
+  .cal-event-editor h4 { color: #fff; font-family: 'Baloo 2', cursive; margin-bottom: 10px; font-size: 1.2rem; }
+  .cal-input-wrapper { display: flex; gap: 10px; }
+  .cal-input-wrapper input { flex: 1; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.3); color: #fff; padding: 10px 14px; border-radius: 14px; font-size: 1rem; font-family: 'Nunito', sans-serif; font-weight: 700; }
+  .cal-input-wrapper input::placeholder { color: rgba(255,255,255,0.4); }
+  .cal-input-wrapper input:focus { outline: none; border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.3); }
+  /* ===== DICTIONARY ===== */
+  .dict-section { padding: 22px; }
+  .dict-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+  .dict-header h3 { font-family: 'Baloo 2', cursive; font-size: 1.2rem; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+  .dict-count { font-size: 0.75rem; color: #fff; background: linear-gradient(135deg, var(--purple), 
+#6d3fd6); padding: 4px 12px; border-radius: 50px; font-weight: 800; box-shadow: 0 2px 8px rgba(139,92,246,0.3); }
+  .dict-add-form { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; margin-bottom: 16px; }
+  .dict-add-form input { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.25); color: #fff; padding: 10px 12px; border-radius: 14px; font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700; }
+  .dict-add-form input::placeholder { color: rgba(255,255,255,0.4); }
+  .dict-add-form input:focus { outline: none; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.25); }
+  .add-word-btn { background: linear-gradient(180deg, 
+#7ec832, 
+#5ea020); border: none; color: #fff; padding: 10px 18px; border-radius: 14px; cursor: pointer; font-weight: 900; font-size: 1.2rem; box-shadow: 0 3px 10px rgba(126,200,50,0.3), inset 0 1px 0 rgba(255,255,255,0.3); transition: all 0.2s; }
+  .add-word-btn:hover { transform: translateY(-2px); }
+  .dict-filter { display: flex; gap: 6px; margin-bottom: 14px; }
+  .dict-filter input { flex: 1; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.2); color: #fff; padding: 10px 14px; border-radius: 50px; font-family: 'Nunito', sans-serif; font-weight: 700; }
+  .dict-filter input::placeholder { color: rgba(255,255,255,0.4); }
+  .dict-filter input:focus { outline: none; border-color: rgba(255,255,255,0.4); }
+  .dict-list { max-height: 400px; overflow-y: auto; }
+  .dict-list::-webkit-scrollbar { width: 6px; }
+  .dict-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+  .dict-entry { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); align-items: center; font-size: 0.85rem; font-weight: 700; }
+  .dict-entry:hover { background: rgba(255,255,255,0.05); border-radius: 10px; }
+  .dict-entry .en { color: 
+#88ccff; } .dict-entry .jp { color: 
+#ff88bb; font-family: 'Noto Sans JP', sans-serif; } .dict-entry .es { color: 
+#b8ff8b; }
+  .del-word { background: none; border: none; color: rgba(255,255,255,0.3); cursor: pointer; font-size: 1rem; transition: color 0.2s; }
+  .del-word:hover { color: 
+#ff3c8e; }
+  /* ===== DIARY ===== */
+  .diary-section { padding: 22px; }
+  .diary-section h3 { font-family: 'Baloo 2', cursive; font-size: 1.4rem; color: #fff; margin-bottom: 16px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+  .diary-input-area { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+  .diary-textarea { width: 100%; height: 120px; background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.25); color: #fff; border-radius: 16px; padding: 16px; font-family: 'Nunito', sans-serif; font-size: 0.95rem; resize: none; box-shadow: inset 0 2px 8px rgba(0,0,0,0.1); }
+  .diary-textarea:focus { outline: none; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.2); }
+  .diary-textarea::placeholder { color: rgba(255,255,255,0.5); }
+  .diary-controls { display: flex; justify-content: flex-end; }
+  .diary-btn { background: linear-gradient(135deg, 
+#8b5cf6, 
+#6d3fd6); color: #fff; border: none; padding: 10px 24px; border-radius: 14px; cursor: pointer; font-weight: 800; font-family: 'Nunito', sans-serif; box-shadow: 0 4px 12px rgba(139,92,246,0.3); transition: all 0.2s; }
+  .diary-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(139,92,246,0.4); }
+  .diary-list { display: flex; flex-direction: column; gap: 16px; max-height: 500px; overflow-y: auto; padding-right: 8px; }
+  .diary-list::-webkit-scrollbar { width: 6px; } .diary-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+  .diary-entry { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 16px; position: relative; }
+  .diary-entry-date { font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-bottom: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+  .diary-entry-text { font-size: 0.95rem; line-height: 1.6; color: rgba(255,255,255,0.9); white-space: pre-wrap; }
+  .diary-del-btn { position: absolute; top: 12px; right: 16px; background: none; border: none; color: rgba(255,255,255,0.3); cursor: pointer; font-size: 1.2rem; transition: color 0.2s; }
+  .diary-del-btn:hover { color: 
+#ff3c8e; }
+  /* ===== HISTORY ===== */
+  .history-section { padding: 22px; }
+  .history-section h3 { font-family: 'Baloo 2', cursive; color: #fff; font-size: 1.2rem; margin-bottom: 16px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+  .history-grid { display: grid; gap: 8px; }
+  .history-day { display: grid; grid-template-columns: 110px 1fr 1fr 60px; gap: 10px; padding: 12px 14px; background: rgba(255,255,255,0.06); border-radius: 14px; font-size: 0.8rem; font-weight: 700; align-items: center; }
+  .history-day .day-date { color: rgba(255,255,255,0.6); }
+  .history-day .day-stat { color: 
+#88ccff; }
+  .history-day .day-streak { color: 
+#ffcc00; font-weight: 900; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
+  /* ===== NES PASSWORD SYSTEM ===== */
+  .nes-container { background-color: #000; color: #fff; font-family: 'Press Start 2P', monospace; padding: 20px; border: 4px solid #fff; box-shadow: 4px 4px 0px rgba(0,0,0,0.5), inset -4px -4px 0px #333; margin-top: 24px; text-align: center; }
+  .nes-container h3 { color: 
+#e52521; font-size: 0.85rem; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0 #000; }
+  .nes-container p { font-size: 0.55rem; line-height: 1.6; color: #aaa; margin-bottom: 16px; }
+  .nes-textarea { width: 100%; height: 120px; background: #111; color: 
+#33ff33; border: 2px solid #fff; font-family: 'Press Start 2P', monospace; font-size: 0.65rem; line-height: 1.4; padding: 12px; margin-bottom: 16px; resize: none; word-wrap: break-word; }
+  .nes-textarea:focus { outline: none; border-color: 
+#e52521; background: #222; }
+  .nes-btn { background: 
+#e52521; color: #fff; border: 2px solid #fff; font-family: 'Press Start 2P', monospace; font-size: 0.6rem; padding: 12px 16px; cursor: pointer; text-transform: uppercase; margin: 4px; transition: all 0.1s; }
+  .nes-btn:hover { background: 
+#ff3c8e; }
+  .nes-btn:active { box-shadow: inset 4px 4px 0px rgba(0,0,0,0.5); transform: translateY(2px); }
+  /* ===== RANDOM PHRASE BUBBLE ===== */
+  .random-bubble { margin: 18px auto 0; max-width: 420px; padding: 12px 18px; text-align: center; font-size: 0.95rem; font-weight: 700; color: var(--text); position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; transition: opacity 0.4s; z-index: 2; }
+  .random-bubble::before { content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 10px solid rgba(255,255,255,0.30); }
+  .random-lang-tag { font-size: 0.55rem; font-weight: 900; padding: 2px 8px; border-radius: 50px; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
+  .random-lang-tag.rolo { background: linear-gradient(135deg, 
+#ff8a00, 
+#e06500); }
+  .random-lang-tag.nihongo { background: linear-gradient(135deg, 
+#ff3c8e, 
+#cc2060); }
+  /* ===== IFRAME CONTAINER ===== */
+  .iframe-container { width: 100%; height: 75vh; border-radius: 16px; overflow: hidden; position: relative; }
+  .iframe-container iframe { width: 100%; height: 100%; border: none; background: transparent; }
+  /* ===== NUMOGRAM COMPONENT ===== */
+  .numogram-wrapper { display: grid; grid-template-columns: 1fr 350px; gap: 20px; align-items: start; }
+  @media (max-width: 768px) { .numogram-wrapper { grid-template-columns: 1fr; } }
+  
+  .svg-numogram-container { background: #000; border-radius: 20px; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.8); border: 2px solid rgba(255,50,50,0.3); overflow: hidden; width: 100%; }
+  .svg-numogram-container svg { width: 100%; height: auto; display: block; max-height: 95vh; }
+  .label-region { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 28px; fill: #fff; text-decoration: underline; }
+  .label-sub { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 18px; fill: 
+#a8e84c; }
+  .label-sub-italic { font-style: italic; }
+  .label-current { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 24px; fill: #fff; }
+  .label-sound { font-family: 'Nunito', sans-serif; font-weight: 800; font-style: italic; font-size: 16px; }
+  .zone-text { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 32px; pointer-events: none; }
+  .zone-polarity { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 18px; fill: #fff; pointer-events: none; }
+  .gate-text { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; fill: #fff; }
+  
+  .dot-base { fill: none; stroke: 
+#ffffff; stroke-linecap: round; }
+  .dot-wide { stroke-width: 40; stroke-dasharray: 0 25; opacity: 0.15; }
+  .dot-mid  { stroke-width: 20; stroke-dasharray: 0 12; opacity: 0.3; }
+  .dot-core { stroke-width: 6; stroke-dasharray: 0 8; opacity: 0.6; }
+  .glow { filter: drop-shadow(0 0 10px rgba(255,255,255,0.8)); }
+  .zone-group { cursor: pointer; transition: all 0.3s ease; }
+  .zone-group:hover circle:first-child, .zone-group.active circle:first-child { fill: 
+#1a1a1a; stroke: 
+#ff3c8e; filter: drop-shadow(0 0 15px rgba(255, 60, 142, 0.8)); }
+  .numo-tools-col { display: flex; flex-direction: column; gap: 16px; }
+  .numo-calc { background: rgba(20, 0, 0, 0.6); border: 2px solid 
+#ff3333; border-radius: 16px; padding: 16px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
+  .numo-calc h4 { font-family: 'Baloo 2', cursive; color: 
+#ff3c8e; margin-bottom: 6px; font-size: 1.2rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+  .numo-calc p { font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-bottom: 12px; line-height: 1.4; }
+  .numo-calc-explanation { font-size: 0.7rem; color: 
+#a8e84c; font-style: italic; border-left: 2px solid 
+#a8e84c; padding-left: 8px; margin-bottom: 12px; background: rgba(168,232,76,0.1); padding: 8px; border-radius: 0 8px 8px 0; }
+  .numo-input-row { display: flex; gap: 10px; margin-bottom: 8px; }
+  .numo-input-row input { flex: 1; background: #000; color: 
+#00e5ff; border: 1px solid rgba(255,255,255,0.3); padding: 10px 14px; font-family: 'Press Start 2P', monospace; font-size: 0.7rem; border-radius: 8px; width: 100%; }
+  .numo-input-row input:focus { outline: none; border-color: 
+#00e5ff; box-shadow: 0 0 10px rgba(0,229,255,0.3); }
+  .numo-input-row button { background: 
+#d92626; color: #fff; border: none; font-weight: 800; padding: 0 16px; border-radius: 8px; cursor: pointer; font-family: 'Nunito', sans-serif; transition: background 0.2s; }
+  .numo-input-row button:hover { background: 
+#ff1111; box-shadow: 0 0 10px rgba(255,17,17,0.5); }
+  .numo-info-panel { padding: 20px; max-height: 400px; overflow-y: auto; }
+  .numo-info-panel::-webkit-scrollbar { width: 6px; } .numo-info-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+  .numo-info-panel h3 { font-family: 'Baloo 2', cursive; font-size: 1.6rem; margin-bottom: 10px; color: 
+#ff3c8e; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  .numo-info-panel h4 { margin-top: 16px; margin-bottom: 8px; font-size: 1.1rem; color: 
+#00e5ff; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px; }
+  .numo-info-panel p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 12px; color: rgba(255,255,255,0.9); }
+  .numo-info-panel ul { margin-left: 20px; margin-bottom: 12px; font-size: 0.85rem; color: rgba(255,255,255,0.9); }
+  #numo-data-store { display: none; }
+  /* ===== I-CHING ===== */
+  .iching-section { padding: 22px; display: flex; flex-direction: column; align-items: center; }
+  .iching-header { font-family: 'Baloo 2', cursive; font-size: 1.8rem; color: #fff; margin-bottom: 10px; text-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+  .iching-desc { font-size: 0.9rem; color: rgba(255,255,255,0.8); text-align: center; max-width: 600px; margin-bottom: 24px; line-height: 1.5; }
+  
+  /* Daily Yojijukugo Panel */
+  .daily-oracle-panel { background: rgba(255,60,142,0.15); border: 2px solid rgba(255,60,142,0.4); border-radius: 20px; padding: 24px; width: 100%; max-width: 600px; margin-bottom: 30px; text-align: center; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+  .daily-oracle-title { font-family: 'Baloo 2', cursive; color: 
+#ffcc00; font-size: 1.4rem; margin-bottom: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  .yoji-display { background: rgba(0,0,0,0.3); border-radius: 16px; padding: 16px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.1); }
+  .yoji-kanji { font-family: 'Noto Sans JP', sans-serif; font-size: 2.5rem; font-weight: 900; color: #fff; letter-spacing: 4px; text-shadow: 0 4px 8px rgba(0,0,0,0.4); margin-bottom: 8px; }
+  .yoji-meaning { font-size: 0.95rem; color: 
+#a8e84c; font-weight: 700; line-height: 1.4; }
+  .daily-hexagram-preview { display: flex; gap: 20px; justify-content: center; align-items: center; flex-wrap: wrap; }
+  .preview-box { background: rgba(255,255,255,0.1); padding: 10px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); }
+  .preview-title { font-size: 0.75rem; color: rgba(255,255,255,0.7); text-transform: uppercase; font-weight: 800; margin-bottom: 4px; }
+  .preview-name { font-size: 1rem; color: #fff; font-weight: 700; }
+  .hexagram-container { display: flex; gap: 40px; justify-content: center; margin-bottom: 30px; min-height: 180px; flex-wrap: wrap; }
+  .hexagram-box { display: flex; flex-direction: column; align-items: center; }
+  .hexagram-title { font-weight: 800; color: 
+#a8e84c; margin-bottom: 12px; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
+  .hexagram-visual { display: flex; flex-direction: column-reverse; gap: 8px; }
+  .hex-line { width: 120px; height: 16px; display: flex; justify-content: space-between; align-items: center; }
+  .hex-line.yang .seg { width: 100%; height: 100%; background: #fff; border-radius: 4px; box-shadow: 0 0 8px rgba(255,255,255,0.5); }
+  .hex-line.yin .seg { width: 45%; height: 100%; background: #fff; border-radius: 4px; box-shadow: 0 0 8px rgba(255,255,255,0.5); }
+  .hex-line-marker { position: absolute; margin-left: 130px; font-weight: 900; color: 
+#ff3c8e; font-size: 14px; }
+  .iching-result-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 20px; max-width: 600px; width: 100%; margin-top: 20px; display: none; }
+  .iching-result-box h3 { color: 
+#ffcc00; font-family: 'Baloo 2', cursive; font-size: 1.4rem; margin-bottom: 8px; }
+  .iching-result-box p { font-size: 0.95rem; color: #fff; line-height: 1.6; margin-bottom: 10px; }
+  
+  /* Shared custom scrollbar for inner panels */
+  .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+  @media (max-width: 700px) {
+    .creature-sprite { width: 280px; height: 420px; }
+    .pw-creature { width: 180px; height: 270px; }
+    .creature-area { min-height: 520px; }
+    .tasks-panel { grid-template-columns: 1fr; }
+    .dict-add-form { grid-template-columns: 1fr; }
+    .stats-strip { flex-wrap: wrap; }
+    .top-bar h2 { font-size: 1.2rem; }
+    .cal-grid-header, .cal-grid { gap: 2px; }
+    .cal-day { min-height: 60px; padding: 4px; }
+  }
+</style>
 </head>
 <body>
 <script>if (localStorage.getItem('studyBuddyTheme') === 'dark') document.body.classList.add('dark-mode');</script>
-
 <div class="metro-bg">
   <div class="metro-sunburst"></div><div class="metro-halftone"></div>
   <div class="metro-vectors">
@@ -24,7 +372,6 @@
     </svg>
   </div>
 </div>
-
 <div id="password-screen">
   <div class="pw-creature" id="pw-creature"><img src="./sleep.png" alt="sleeping"></div>
   <h1>Moe-Chan<br>is sleeping...</h1>
@@ -32,7 +379,6 @@
   <input type="password" id="pw-input" placeholder="• • • •" autofocus>
   <p class="pw-error" id="pw-error"></p>
 </div>
-
 <div id="app">
   <div class="top-bar glass">
     <h2>Moe-Chan</h2>
@@ -42,7 +388,6 @@
       <span class="date-display" id="date-display"></span>
     </div>
   </div>
-
   <div class="tabs">
     <button class="tab-btn active" data-tab="home">🏠 Home</button>
     <button class="tab-btn" data-tab="calendar">📅 Calendar</button>
@@ -53,7 +398,6 @@
     <button class="tab-btn" data-tab="numogram">🌀 Numogram</button>
     <button class="tab-btn" data-tab="iching">☯️ I-Ching</button>
   </div>
-
   <!-- HOME TAB -->
   <div class="tab-content active" id="tab-home">
     <div class="creature-area glass">
@@ -65,33 +409,27 @@
       </div>
       <div class="mood-bar">
         <span class="mood-label">Mood:</span>
-        <div class="mood-track"><div class="mood-fill" id="mood-fill" style="width:50%;background:linear-gradient(90deg,#ffcc00,#ff8a00)"></div></div>
+        <div class="mood-track"><div class="mood-fill" id="mood-fill" style="width:50%;background:linear-gradient(90deg,
+#ffcc00,
+#ff8a00)"></div></div>
         <span class="mood-label" id="mood-text">Neutral</span>
       </div>
       <div class="random-bubble glass-strong" id="random-bubble"><span id="random-phrase"></span><span class="random-lang-tag" id="random-lang-tag"></span></div>
     </div>
-
     <div class="tasks-panel">
       <div class="task-card glass-dark" id="card-flash">
         <h3>📇 Flashcards</h3>
         <div class="tri-label">Study flashcards! / フラッシュカード！ / ¡Tarjetas!</div>
-        <div id="flash-input-area">
-          <div class="task-input-row"><input type="number" id="flash-minutes" min="1" max="999" placeholder="0"><span>min</span></div>
-          <button class="btn-glossy log-btn" onclick="logFlashcards()">Log Study Time</button>
-        </div>
+        <div id="flash-input-area"><div class="task-input-row"><input type="number" id="flash-minutes" min="1" max="999" placeholder="0"><span>min</span></div><button class="btn-glossy log-btn" onclick="logFlashcards()">Log Study Time</button></div>
         <div id="flash-done" style="display:none"><div class="task-done-check">✅</div><p class="task-done-text" style="font-size:0.8rem;margin-top:4px" id="flash-done-text"></p></div>
       </div>
       <div class="task-card glass-dark" id="card-read">
         <h3>📚 Reading</h3>
         <div class="tri-label">Reading time! / 読書タイム！ / ¡Hora de leer!</div>
-        <div id="read-input-area">
-          <div class="task-input-row"><input type="number" id="read-hours" min="0.25" max="24" step="0.25" placeholder="0"><span>hrs</span></div>
-          <button class="btn-glossy btn-pink log-btn" onclick="logReading()">Log Reading Time</button>
-        </div>
+        <div id="read-input-area"><div class="task-input-row"><input type="number" id="read-hours" min="0.25" max="24" step="0.25" placeholder="0"><span>hrs</span></div><button class="btn-glossy btn-pink log-btn" onclick="logReading()">Log Reading Time</button></div>
         <div id="read-done" style="display:none"><div class="task-done-check">✅</div><p class="task-done-text" style="font-size:0.8rem;margin-top:4px" id="read-done-text"></p></div>
       </div>
     </div>
-
     <div class="stats-strip">
       <div class="stat-box glass"><div class="num" id="stat-total-flash">0</div><div class="label">Flashcard Min</div></div>
       <div class="stat-box glass"><div class="num" id="stat-total-read">0</div><div class="label">Reading Hrs</div></div>
@@ -99,18 +437,22 @@
       <div class="stat-box glass"><div class="num" id="stat-days">0</div><div class="label">Days Tracked</div></div>
     </div>
   </div>
-
   <!-- CALENDAR TAB -->
   <div class="tab-content" id="tab-calendar">
     <div class="calendar-section glass-dark">
-      <div style="text-align: center;"><div class="cal-jp-date" id="cal-jp-date"></div></div>
+      <div style="text-align: center;">
+        <div class="cal-jp-date" id="cal-jp-date"></div>
+      </div>
       <div class="cal-header">
         <button class="btn-theme" style="border-radius: 50%; width: 40px; height: 40px; padding: 0;" onclick="changeMonth(-1)">◀</button>
-        <h2 id="cal-month-year"></h2>
+        <h2 id="cal-month-year">March 2026</h2>
         <button class="btn-theme" style="border-radius: 50%; width: 40px; height: 40px; padding: 0;" onclick="changeMonth(1)">▶</button>
       </div>
-      <div class="cal-grid-header"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+      <div class="cal-grid-header">
+        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+      </div>
       <div class="cal-grid" id="cal-grid"></div>
+      
       <div id="cal-event-editor" class="cal-event-editor" style="display:none;">
         <h4 id="cal-edit-date"></h4>
         <div class="cal-input-wrapper">
@@ -120,22 +462,15 @@
       </div>
     </div>
   </div>
-
   <!-- DICTIONARY TAB -->
   <div class="tab-content" id="tab-dictionary">
     <div class="dict-section glass-dark">
       <div class="dict-header"><h3>📖 My Dictionary</h3><span class="dict-count" id="dict-count">0 words</span></div>
-      <div class="dict-add-form">
-        <input type="text" id="dict-en" placeholder="English">
-        <input type="text" id="dict-jp" placeholder="日本語">
-        <input type="text" id="dict-es" placeholder="Español">
-        <button class="add-word-btn" onclick="addWord()">+</button>
-      </div>
+      <div class="dict-add-form"><input type="text" id="dict-en" placeholder="English"><input type="text" id="dict-jp" placeholder="日本語"><input type="text" id="dict-es" placeholder="Español"><button class="add-word-btn" onclick="addWord()">+</button></div>
       <div class="dict-filter"><input type="text" id="dict-search" placeholder="🔍 Search words..." oninput="renderDictionary()"></div>
       <div class="dict-list" id="dict-list"></div>
     </div>
   </div>
-
   <!-- DIARY TAB -->
   <div class="tab-content" id="tab-diary">
     <div class="diary-section glass-dark">
@@ -147,7 +482,6 @@
       <div class="diary-list" id="diary-list"></div>
     </div>
   </div>
-
   <!-- HISTORY TAB -->
   <div class="tab-content" id="tab-history">
     <div class="history-section glass-dark">
@@ -165,23 +499,27 @@
       </div>
     </div>
   </div>
-
   <!-- CALC TAB -->
   <div class="tab-content" id="tab-calc">
     <div class="glass-dark" style="padding: 10px; height: 75vh;">
       <div class="iframe-container"><iframe src="https://col-bun.github.io/COLcalc.github.io/" title="COLcalc"></iframe></div>
     </div>
   </div>
-
   <!-- NUMOGRAM TAB -->
   <div class="tab-content" id="tab-numogram">
     <div class="numogram-wrapper">
       <div class="svg-numogram-container">
+        <!-- Expanded ViewBox height to 1250 to prevent Zone 0 cutoff -->
         <svg viewBox="0 0 1000 1250" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <marker id="arrow-white" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#fff" /></marker>
-              <marker id="arrow-black" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#000" /></marker>
+              <marker id="arrow-white" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#fff" />
+              </marker>
+              <marker id="arrow-black" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#000" />
+              </marker>
             </defs>
+            <!-- 1:1 STIPPLED CURRENTS (DOTS) -->
             <g class="dot-base">
                 <path d="M 330 350 Q 280 410 290 440" class="dot-wide"/><path d="M 330 350 Q 280 410 290 440" class="dot-mid"/><path d="M 330 350 Q 280 410 290 440" class="dot-core"/>
                 <path d="M 320 510 Q 380 570 450 600" class="dot-wide"/><path d="M 320 510 Q 380 570 450 600" class="dot-mid"/><path d="M 320 510 Q 380 570 450 600" class="dot-core"/>
@@ -193,54 +531,168 @@
                 <path d="M 500 820 L 500 880" class="dot-wide"/><path d="M 500 820 L 500 880" class="dot-mid"/><path d="M 500 820 L 500 880" class="dot-core"/>
                 <path d="M 500 960 Q 550 1010 500 1020" class="dot-wide"/><path d="M 500 960 Q 550 1010 500 1020" class="dot-mid"/><path d="M 500 960 Q 550 1010 500 1020" class="dot-core"/>
             </g>
-            <polygon points="415,150 385,140 385,160" fill="#fff" /><polygon points="585,150 615,140 615,160" fill="#fff" /><polygon points="635,300 665,290 665,310" fill="#fff" /><polygon points="365,320 335,310 335,330" fill="#fff" /><polygon points="310,495 290,465 320,475" fill="#fff" /><polygon points="685,480 715,470 715,490" fill="#fff" /><polygon points="500,645 485,615 515,615" fill="#000" /><polygon points="500,755 485,785 515,785" fill="#fff" /><polygon points="500,945 485,915 515,915" fill="#fff" /><polygon points="500,1035 485,1065 515,1065" fill="#fff" />
+            <!-- CURRENT ARROWS -->
+            <polygon points="415,150 385,140 385,160" fill="#fff" />
+            <polygon points="585,150 615,140 615,160" fill="#fff" />
+            <polygon points="635,300 665,290 665,310" fill="#fff" />
+            <polygon points="365,320 335,310 335,330" fill="#fff" />
+            <polygon points="310,495 290,465 320,475" fill="#fff" />
+            <polygon points="685,480 715,470 715,490" fill="#fff" />
+            <polygon points="500,645 485,615 515,615" fill="#000" />
+            <polygon points="500,755 485,785 515,785" fill="#fff" />
+            <polygon points="500,945 485,915 515,915" fill="#fff" />
+            <polygon points="500,1035 485,1065 515,1065" fill="#fff" />
+            <!-- SOLID TRACTS -->
             <g stroke="#fff" stroke-width="2" fill="none">
-              <path d="M 650 300 Q 500 350 350 320" /><path d="M 650 300 Q 525 225 400 150" /><path d="M 400 150 Q 500 50 600 150" /><path d="M 400 150 Q 500 250 600 150" /><path d="M 350 320 C 300 -50 700 -50 600 150" />
-              <line x1="300" y1="480" x2="500" y2="620" /><line x1="700" y1="480" x2="500" y2="620" /><line x1="500" y1="780" x2="500" y2="920" />
-              <path d="M 500 620 C 400 500 600 500 500 620" /><path d="M 500 920 C 400 920 400 820 500 920" />
+              <path d="M 650 300 Q 500 350 350 320" />
+              <path d="M 650 300 Q 525 225 400 150" />
+              <path d="M 400 150 Q 500 50 600 150" />
+              <path d="M 400 150 Q 500 250 600 150" />
+              <path d="M 350 320 C 300 -50 700 -50 600 150" />
+              <line x1="300" y1="480" x2="500" y2="620" />
+              <line x1="700" y1="480" x2="500" y2="620" />
+              <line x1="500" y1="780" x2="500" y2="920" />
+              <path d="M 500 620 C 400 500 600 500 500 620" />
+              <path d="M 500 920 C 400 920 400 820 500 920" />
             </g>
+            <!-- GATE CIRCLES -->
             <g stroke="#fff" stroke-width="2" fill="#000">
-              <circle cx="515" cy="18" r="15" /> <circle cx="500" cy="100" r="15" /> <circle cx="500" cy="200" r="15" /> <circle cx="525" cy="225" r="15" /> <circle cx="400" cy="550" r="15" /> <circle cx="600" cy="550" r="15" /> <circle cx="500" cy="530" r="15" /> <circle cx="500" cy="850" r="15" /> <circle cx="435" cy="880" r="15" /> 
+              <circle cx="515" cy="18" r="15" /> <circle cx="500" cy="100" r="15" /> <circle cx="500" cy="200" r="15" /> 
+              <circle cx="525" cy="225" r="15" /> <circle cx="400" cy="550" r="15" /> <circle cx="600" cy="550" r="15" /> 
+              <circle cx="500" cy="530" r="15" /> <circle cx="500" cy="850" r="15" /> <circle cx="435" cy="880" r="15" /> 
             </g>
             <g class="gate-text" text-anchor="middle" dominant-baseline="central">
-              <text x="515" y="18">15</text> <text x="500" y="100">6</text> <text x="500" y="200">21</text> <text x="525" y="225">3</text> <text x="400" y="550">10</text> <text x="600" y="550">28</text> <text x="500" y="530">1</text> <text x="500" y="850">36</text> <text x="435" y="880">45</text>
+              <text x="515" y="18">15</text> <text x="500" y="100">6</text> <text x="500" y="200">21</text> 
+              <text x="525" y="225">3</text> <text x="400" y="550">10</text> <text x="600" y="550">28</text> 
+              <text x="500" y="530">1</text> <text x="500" y="850">36</text> <text x="435" y="880">45</text>
             </g>
-            <g class="zone-group" id="btn-zone-3" onclick="selectZone(3)"><circle cx="400" cy="150" r="40" fill="#000" stroke="#fff" stroke-width="3" /><text x="390" y="150" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">3</text><text x="420" y="130" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text></g>
-            <g class="zone-group" id="btn-zone-6" onclick="selectZone(6)"><circle cx="600" cy="150" r="40" fill="#000" stroke="#fff" stroke-width="3" /><text x="590" y="150" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">6</text><text x="620" y="130" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text></g>
-            <g class="zone-group" id="btn-zone-2" onclick="selectZone(2)"><circle cx="650" cy="300" r="40" fill="#000" stroke="#fff" stroke-width="3" /><text x="640" y="300" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">2</text><text x="670" y="280" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text></g>
-            <g class="zone-group" id="btn-zone-5" onclick="selectZone(5)"><circle cx="350" cy="320" r="40" fill="#000" stroke="#fff" stroke-width="3" /><text x="340" y="320" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">5</text><text x="370" y="300" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text></g>
-            <g class="zone-group" id="btn-zone-4" onclick="selectZone(4)"><circle cx="300" cy="480" r="40" fill="#000" stroke="#ff0000" stroke-width="3"/><text x="290" y="480" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">4</text><text x="320" y="460" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text></g>
-            <g class="zone-group" id="btn-zone-7" onclick="selectZone(7)"><circle cx="700" cy="480" r="40" fill="#000" class="glow" stroke="#ff3366" stroke-width="3"/><text x="690" y="480" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">7</text><text x="720" y="460" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text></g>
-            <g class="zone-group" id="btn-zone-1" onclick="selectZone(1)"><circle cx="500" cy="620" r="50" fill="#fff" class="glow" stroke="#fff" stroke-width="3"/><text x="485" y="620" fill="#000" class="zone-text" text-anchor="middle" dominant-baseline="central">1</text><text x="525" y="600" fill="#000" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text></g>
-            <g class="zone-group" id="btn-zone-8" onclick="selectZone(8)"><circle cx="500" cy="780" r="40" fill="#000" stroke="#fff" stroke-width="3" /><text x="490" y="780" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">8</text><text x="520" y="760" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text></g>
-            <g class="zone-group" id="btn-zone-9" onclick="selectZone(9)"><circle cx="500" cy="920" r="40" fill="#000" stroke="#fff" stroke-width="3" /><text x="490" y="920" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">9</text><text x="520" y="900" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text></g>
-            <g class="zone-group" id="btn-zone-0" onclick="selectZone(0)"><circle cx="500" cy="1060" r="40" fill="#000" stroke="#fff" stroke-width="3" /><text x="490" y="1060" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">0</text><text x="520" y="1040" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text></g>
+            <!-- ZONES -->
+            <g class="zone-group" id="btn-zone-3" onclick="selectZone(3)">
+              <circle cx="400" cy="150" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="390" y="150" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">3</text>
+              <text x="420" y="130" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text>
+            </g>
+            <g class="zone-group" id="btn-zone-6" onclick="selectZone(6)">
+              <circle cx="600" cy="150" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="590" y="150" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">6</text>
+              <text x="620" y="130" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text>
+            </g>
+            <g class="zone-group" id="btn-zone-2" onclick="selectZone(2)">
+              <circle cx="650" cy="300" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="640" y="300" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">2</text>
+              <text x="670" y="280" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text>
+            </g>
+            <g class="zone-group" id="btn-zone-5" onclick="selectZone(5)">
+              <circle cx="350" cy="320" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="340" y="320" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">5</text>
+              <text x="370" y="300" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text>
+            </g>
+            <g class="zone-group" id="btn-zone-4" onclick="selectZone(4)">
+              <circle cx="300" cy="480" r="40" fill="#000" stroke="
+#ff0000" stroke-width="3"/>
+              <text x="290" y="480" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">4</text>
+              <text x="320" y="460" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text>
+            </g>
+            <g class="zone-group" id="btn-zone-7" onclick="selectZone(7)">
+              <circle cx="700" cy="480" r="40" fill="#000" class="glow" stroke="
+#ff3366" stroke-width="3"/>
+              <text x="690" y="480" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">7</text>
+              <text x="720" y="460" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text>
+            </g>
+            <g class="zone-group" id="btn-zone-1" onclick="selectZone(1)">
+              <circle cx="500" cy="620" r="50" fill="#fff" class="glow" stroke="#fff" stroke-width="3"/>
+              <text x="485" y="620" fill="#000" class="zone-text" text-anchor="middle" dominant-baseline="central">1</text>
+              <text x="525" y="600" fill="#000" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text>
+            </g>
+            <g class="zone-group" id="btn-zone-8" onclick="selectZone(8)">
+              <circle cx="500" cy="780" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="490" y="780" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">8</text>
+              <text x="520" y="760" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text>
+            </g>
+            <g class="zone-group" id="btn-zone-9" onclick="selectZone(9)">
+              <circle cx="500" cy="920" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="490" y="920" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">9</text>
+              <text x="520" y="900" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text>
+            </g>
+            <g class="zone-group" id="btn-zone-0" onclick="selectZone(0)">
+              <circle cx="500" cy="1060" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="490" y="1060" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">0</text>
+              <text x="520" y="1040" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text>
+            </g>
+            <!-- SOUNDS -->
             <g class="label-sound">
-              <text x="330" y="130" fill="#22dd22">"zx"</text> <text x="630" y="190" fill="#dddd00">"tch"</text> <text x="690" y="270" fill="#4488ff">"dt"</text> <text x="280" y="360" fill="#ffaa00">"ktt"</text> <text x="220" y="520" fill="#ff3333">"skr"</text> <text x="750" y="470" fill="#4488ff">"pb"</text> <text x="480" y="700" fill="#ddaa00">"gl"</text> <text x="430" y="770" fill="#22dd22">"mnm"</text> <text x="550" y="910" fill="#dddd00">"tn"</text> <text x="410" y="1110" fill="#22dd22">"eiaoung"</text>
+              <text x="330" y="130" fill="
+#22dd22">"zx"</text> <text x="630" y="190" fill="
+#dddd00">"tch"</text> 
+              <text x="690" y="270" fill="
+#4488ff">"dt"</text> <text x="280" y="360" fill="
+#ffaa00">"ktt"</text> 
+              <text x="220" y="520" fill="
+#ff3333">"skr"</text> <text x="750" y="470" fill="
+#4488ff">"pb"</text> 
+              <text x="480" y="700" fill="
+#ddaa00">"gl"</text> <text x="430" y="770" fill="
+#22dd22">"mnm"</text> 
+              <text x="550" y="910" fill="
+#dddd00">"tn"</text> <text x="410" y="1110" fill="
+#22dd22">"eiaoung"</text>
             </g>
-            <text x="50" y="80" class="label-region">Warp</text><text x="50" y="110" class="label-sub label-sub-italic">Hyper-Reality</text><text x="50" y="135" class="label-sub">Djynxx 6::3</text>
-            <text x="50" y="450" class="label-region">e-Circuit</text><text x="50" y="480" class="label-sub label-sub-italic">breakthrough</text><text x="50" y="850" class="label-region">Plex</text><text x="50" y="880" class="label-sub label-sub-italic">Eiriel (Tchukululok)</text><text x="50" y="905" class="label-sub">Dissociative Void</text>
-            <text x="650" y="110" class="label-current">Warp</text><text x="500" y="370" class="label-current">Hold</text><text x="800" y="300" class="label-current">Rise</text><text x="380" y="570" class="label-current">Sink</text><text x="560" y="980" class="label-current">Plex</text>
+            <!-- LABELS -->
+            <text x="50" y="80" class="label-region">Warp</text>
+            <text x="50" y="110" class="label-sub label-sub-italic">Hyper-Reality</text>
+            <text x="50" y="135" class="label-sub">Djynxx 6::3</text>
+            
+            <text x="50" y="450" class="label-region">e-Circuit</text>
+            <text x="50" y="480" class="label-sub label-sub-italic">breakthrough</text>
+            <text x="50" y="505" class="label-sub label-sub-italic">connected</text>
+            <text x="50" y="530" class="label-sub label-sub-italic">psychoactives</text>
+            
+            <text x="50" y="850" class="label-region">Plex</text>
+            <text x="50" y="880" class="label-sub label-sub-italic">Eiriel (Tchukululok)</text>
+            <text x="50" y="905" class="label-sub">Dissociative Void</text>
+            <text x="50" y="930" class="label-sub">Uttunul 9::0</text>
+            <text x="650" y="110" class="label-current">Warp</text>
+            <text x="650" y="135" font-family="Nunito" font-weight="700" fill="#fff" font-size="16">(Current)</text>
+            
+            <text x="500" y="370" class="label-current">Hold</text>
+            <text x="800" y="300" class="label-current">Rise</text>
+            <text x="380" y="570" class="label-current">Sink</text>
+            
+            <text x="560" y="980" class="label-current">Plex</text>
+            <text x="560" y="1005" font-family="Nunito" font-weight="700" fill="#fff" font-size="16">(Current)</text>
         </svg>
       </div>
       <div class="numo-tools-col">
-        <div class="numo-calc" style="border-color: #00e5ff;">
-          <h4 style="color: #00e5ff;">📜 How to Use the Numogram</h4>
+        <div class="numo-calc" style="border-color: 
+#00e5ff;">
+          <h4 style="color: 
+#00e5ff;">📜 How to Use the Numogram</h4>
           <div style="max-height: 220px; overflow-y: auto; padding-right: 8px; font-size: 0.8rem; color: rgba(255,255,255,0.85); line-height: 1.5;" class="custom-scrollbar">
-            <p><strong>The Decimal Labyrinth</strong> is a map of Lemurian time-sorcery.</p>
-            <ul style="margin-left: 16px;">
-              <li><strong>Interactive Map:</strong> Click any numbered Zone (0-9).</li>
-              <li><strong>Gematria:</strong> Converts words to base-9 roots.</li>
+            <p style="margin-bottom: 8px;"><strong>The Decimal Labyrinth</strong> is a map of Lemurian time-sorcery driven by <em>Barkerian Arithmetic</em>.</p>
+            <ul style="margin-left: 16px; margin-bottom: 8px;">
+              <li><strong>Syzygies:</strong> Zones pair up to mutually sum to 9 (e.g., 8+1, 7+2).</li>
+              <li><strong>Currents:</strong> The arithmetic difference of a Syzygy twin directs its flow to a Tractor Zone (e.g., 7 - 2 = 5, producing the Hold current).</li>
+            </ul>
+            <p style="margin-bottom: 8px; color: 
+#ff3c8e;"><strong>Using the Dashboard:</strong></p>
+            <ul style="margin-left: 16px; margin-bottom: 8px;">
+              <li style="margin-bottom: 6px;"><strong>Interactive Map:</strong> Click any numbered Zone (0-9) to reveal its esoteric planetary data below.</li>
+              <li style="margin-bottom: 6px;"><strong>Gematria:</strong> Type a word to find its alphanumeric Digital Root, linking it directly to a specific Zone's energy.</li>
+              <li style="margin-bottom: 6px;"><strong>Demon Finder:</strong> Enter any two Zones (the "Net-Span") to classify the class of entity that bridges those two points in the matrix.</li>
+              <li><strong>Encyclopedia:</strong> Search the comprehensive archives below for any term (like "Tic-Systems" or "A-Death").</li>
             </ul>
           </div>
         </div>
         <div class="numo-calc">
           <h4>Gematria Time-Sorcery</h4>
+          <div class="numo-calc-explanation"><strong>In CCRU Theory:</strong> Converts words to base-9 roots.</div>
           <div class="numo-input-row"><input type="text" id="numo-gematria-input" placeholder="e.g. CYBERNETICS"><button onclick="calculateNumogram()">EVAL</button></div>
-          <div id="numo-result-display" style="font-size: 0.85rem; color: #a8e84c; font-family: 'Baloo 2', cursive;"></div>
+          <div id="numo-result-display" style="font-size: 0.85rem; color: 
+#a8e84c; font-family: 'Baloo 2', cursive;"></div>
         </div>
         <div class="numo-calc">
           <h4>Net-Span Demon Finder</h4>
+          <div class="numo-calc-explanation"><strong>In CCRU Theory:</strong> Locates entities bridging zones.</div>
           <div class="numo-input-row"><input type="number" id="demon-z1" min="0" max="9" placeholder="Z1"><input type="number" id="demon-z2" min="0" max="9" placeholder="Z2"><button onclick="findDemon()">FIND</button></div>
           <div id="demon-result" style="font-size: 0.85rem; color: #fff; margin-top: 10px; line-height: 1.4;"></div>
         </div>
@@ -253,48 +705,430 @@
       </div>
     </div>
   </div>
-
   <!-- I-CHING TAB -->
   <div class="tab-content" id="tab-iching">
     <div class="iching-section glass-dark">
       <h2 class="iching-header">☯️ The I-Ching Oracle</h2>
-      <p class="iching-desc">Concentrate on your question and cast the coins.</p>
+      <p class="iching-desc">Concentrate on your question and cast the coins. The first reading of the day is saved to your history alongside a daily Japanese idiom.</p>
+      
+      <!-- DAILY SAVED ORACLE PANEL -->
       <div id="daily-oracle-panel" class="daily-oracle-panel">
-        <div class="daily-oracle-title">✨ Today's Reading ✨</div>
+        <div class="daily-oracle-title">✨ Today's Reading & Idiom ✨</div>
         <div class="yoji-display">
           <div class="yoji-kanji" id="daily-yoji-kanji"></div>
           <div class="yoji-meaning" id="daily-yoji-meaning"></div>
         </div>
         <div class="daily-hexagram-preview">
-          <div class="preview-box"><div class="preview-title">Primary</div><div class="preview-name" id="daily-pri-name"></div></div>
-          <div class="preview-box" id="daily-sec-box" style="display:none;"><div class="preview-title">Changing</div><div class="preview-name" id="daily-sec-name"></div></div>
+          <div class="preview-box">
+            <div class="preview-title">Primary</div>
+            <div class="preview-name" id="daily-pri-name"></div>
+          </div>
+          <div class="preview-box" id="daily-sec-box" style="display:none;">
+            <div class="preview-title">Changing</div>
+            <div class="preview-name" id="daily-sec-name"></div>
+          </div>
         </div>
       </div>
-      <button class="btn-glossy btn-purple" style="background: linear-gradient(180deg, #8b5cf6 0%, #6d3fd6 100%); margin-bottom: 30px; font-size: 1.1rem; padding: 14px 32px;" onclick="castOracle()">Cast Coins</button>
+      <button class="btn-glossy btn-purple" style="background: linear-gradient(180deg, 
+#8b5cf6 0%, 
+#6d3fd6 100%); margin-bottom: 30px; font-size: 1.1rem; padding: 14px 32px;" onclick="castOracle()">Cast Coins (Generate Hexagram)</button>
+      
       <div class="hexagram-container" id="iching-hex-container" style="display:none;">
-        <div class="hexagram-box"><div class="hexagram-title">Primary Hexagram</div><div class="hexagram-visual" id="iching-primary-vis"></div></div>
-        <div class="hexagram-box" id="iching-secondary-box" style="display:none;"><div class="hexagram-title">Changing Hexagram</div><div class="hexagram-visual" id="iching-secondary-vis"></div></div>
+        <div class="hexagram-box">
+          <div class="hexagram-title">Primary Hexagram</div>
+          <div class="hexagram-visual" id="iching-primary-vis"></div>
+        </div>
+        <div class="hexagram-box" id="iching-secondary-box" style="display:none;">
+          <div class="hexagram-title">Changing Hexagram</div>
+          <div class="hexagram-visual" id="iching-secondary-vis"></div>
+        </div>
       </div>
       <div class="iching-result-box" id="iching-primary-result"></div>
-      <div class="iching-result-box" id="iching-secondary-result" style="border-color: #ff3c8e;"></div>
+      <div class="iching-result-box" id="iching-secondary-result" style="border-color: 
+#ff3c8e;"></div>
     </div>
   </div>
 </div>
-
+<!-- DATA STORE FOR NUMOGRAM TEXT -->
 <div id="numo-data-store">
-  <div id="data-zone-0"><h3>Zone Zero</h3><h4>The Numeral 0</h4><p>Designates the number zero, anterior to the distinction odd/even.</p><h4>The Zeroth Planet: Sol</h4><p>The Sun is the source of all terrestrial energy.</p></div>
-  <div id="data-zone-1"><h3>Zone One</h3><h4>The Numeral 1</h4><p>First odd number. Mercury.</p></div>
-  <div id="data-zone-2"><h3>Zone Two</h3><h4>The Numeral 2</h4><p>Venus. First even number.</p></div>
-  <div id="data-zone-3"><h3>Zone Three</h3><h4>The Numeral 3</h4><p>Earth. Second odd number.</p></div>
-  <div id="data-zone-4"><h3>Zone Four</h3><h4>The Numeral 4</h4><p>Mars. First non-prime.</p></div>
-  <div id="data-zone-5"><h3>Zone Five</h3><h4>The Numeral 5</h4><p>Jupiter. Inner-eye of the spiral.</p></div>
-  <div id="data-zone-6"><h3>Zone Six</h3><h4>The Numeral 6</h4><p>Saturn. Ulterior Vortex.</p></div>
-  <div id="data-zone-7"><h3>Zone Seven</h3><h4>The Numeral 7</h4><p>Uranus. Tractor-Zone of Surge.</p></div>
-  <div id="data-zone-8"><h3>Zone Eight</h3><h4>The Numeral 8</h4><p>Neptune. Murmur.</p></div>
-  <div id="data-zone-9"><h3>Zone Nine</h3><h4>The Numeral 9</h4><p>Pluto. The terminal Plex.</p></div>
+  <div id="data-zone-0"><h3>Zone Zero</h3><h4>The Numeral 0</h4><p>The figure ‘0' designates the number zero, anterior to the distinction odd/even, and also to the determination of primes (zeroth prime = 1). Zero is the only natural number that is indivisible by one. Zero digitally cumulates to zero. Numeric Keypad direction: anomalous.</p><h4>The Zeroth Planet: Sol</h4><p>The Sun (Sol-0) is by far the largest body in the Solar-system. The Sun is approximately 4.5 billion years old, roughly half-way through it's normal existence (or main-sequence of hydrogen-to-helium nucleosynthesis).</p><h4>System Notes</h4><p>Zone-0 is the first of two zones mutually composing the Plex-region of the Numogram. Its Syzygetic-twin is Zone-9. This 9+0 Syzygy is carried by the demon Uttunul. Zone-0 provides the terminus for a single Plex-channel (the 0th).</p></div>
+  <div id="data-zone-1"><h3>Zone One</h3><h4>The Numeral 1</h4><p>The figure ‘1' designates the number one, first odd number (with odditude of aleph-null), and the zeroth prime (first prime = 2). One digitally cumulates to one. Numeric Keypad direction: South-West.</p><h4>The First Planet: Mercury</h4><p>Mercury is the innermost planet of the Solar-system (with a mean orbital distance from the sun of approx. 58 000 000 km). In Lemurian Planetwork Mercury is astrozygonomously paired with Neptune.</p><h4>System Notes</h4><p>Zone-1 is the first of the six Torque-region Zones of the Numogram, and Tractor-Zone of the 5-4 (or 'Sink') Current. Its Syzygetic-twin is Zone-8. This 8+1 Syzygy is carried by the demon Murmur. Zone-1 provides the terminus for three Torque-channels (the 1st, 4th, and 7th).</p></div>
+  <div id="data-zone-2"><h3>Zone Two</h3><h4>The Numeral 2</h4><p>The figure ‘2' designates the number two, the first and definitive even number, and the first prime (second prime = 3). Two digitally cumulates to three. Numeric Keypad direction: South.</p><h4>The Second Planet: Venus</h4><p>Venus (or Sol-2) has a mean orbital distance from sun of 108.2 million km. In Lemurian Planetwork Venus is astrozygonomously paired with Uranus.</p><h4>System Notes</h4><p>Zone-2 is the second of the six Torque-region Zones of the Numogram. Its Syzygetic-twin is Zone-7. This 7+2 Syzygy is carried by the demon Oddubb.</p></div>
+  <div id="data-zone-3"><h3>Zone Three</h3><h4>The Numeral 3</h4><p>The figure ‘3' designates the number three, the second odd number (with odditude of 1), and second prime (third prime = 5). Three digitally cumulates to six. Numeric Keypad direction: South-East.</p><h4>The Third Planet: Earth</h4><p>Earth (or Sol-3) has a mean orbital distance from the sun of approx. 149 600 000 km, defining the standard Astronomical Unit (AU). In Lemurian Planetwork the Earth is astrozygonomously paired with Saturn.</p><h4>System Notes</h4><p>Zone-3 is the first of the two Warp-region Zones of the Numogram, and Tractor-Zone of the 6-3 (or 'Warp') Current. Its Syzygetic-twin is Zone-6. This 6+3 Syzygy is carried by the demon Djynxx. Zone-3 provides the terminus for two channels, one each from the Torque (the 2nd), and the Warp (the 6th).</p></div>
+  <div id="data-zone-4"><h3>Zone Four</h3><h4>The Numeral 4</h4><p>The figure ‘4' designates the number four, the second even number, and first non-prime (or complex) natural number, with prime factors of 2 x 2. Four digitally cumulates to ten. Numeric Keypad direction: West.</p><h4>The Fourth Planet: Mars</h4><p>Mars (or Sol-4) has a mean orbital distance from the sun of approx. 228 000 000 km. In Lemurian Planetwork Mars is astrozygonomously paired Jupiter.</p><h4>System Notes</h4><p>Zone-4 is the third of the six Torque-region Zones of the Numogram. Its Syzygetic-twin is Zone-5. The 5+4 Syzygy is carried by the demon Katak.</p></div>
+  <div id="data-zone-5"><h3>Zone Five</h3><h4>The Numeral 5</h4><p>The figure ‘5' designates the number five, the third odd number (with odditude of 2), and the third prime (fifth prime = 11). Five digitally cumulates to fifteen. Numeric Keypad direction: Centre.</p><h4>The Fifth Planet: Jupiter</h4><p>Jupiter (or Sol-5) has a mean orbital distance from the sun of approx. 778 330 000 km. In Lemurian Planetwork Jupiter is astrozygonomously paired with Mars.</p><h4>System Notes</h4><p>Zone-5 is the sixth of the six Torque-region Zones of the Numogram, and Tractor-Zone of the 7-2 (or 'Hold') Current. Its Syzygetic-twin is Zone-4. This 5+4 Syzygy (carried by the demon Katak) draws the innermost curve of the Barker-spiral, with Zone-5 itself marking its central and terminal node (or 'inner-eye').</p></div>
+  <div id="data-zone-6"><h3>Zone Six</h3><h4>The Numeral 6</h4><p>The figure ‘6' designates the number six, third even number, and second non-prime (with prime-factors 2 and 3). Six digitally cumulates to twenty-one. Numeric Keypad direction: East.</p><h4>The Sixth Planet: Saturn</h4><p>Saturn (or Sol-6) has a mean orbital distance from the sun of approx. 1 429 400 000 km. In Lemurian Planetwork Saturn is astrozygonomously paired with Earth.</p><h4>System Notes</h4><p>Zone-6 is the second of the two Warp-region Zones of the Numogram. Its Warp-complement and Syzygetic-twin is Zone-3. It is this 6+3 Syzygy (carried by the demon Djynxx) which draws the 'Ulterior Vortex' of Outer-Time. Zone-6 provides the terminus for two channels, one each from the Torque (the 5th), and the Warp (the 3rd).</p></div>
+  <div id="data-zone-7"><h3>Zone Seven</h3><h4>The Numeral 7</h4><p>The figure ‘7' designates the number seven, the fourth odd number (with odditude of one), and the fourth prime (seventh prime = 17). Seven digitally cumulates to twenty-eight. Numeric Keypad direction: North-West.</p><h4>The Seventh Planet: Uranus</h4><p>Uranus (or Sol-7) has a mean orbital distance from the sun of approx. 2 870 990 000 km. In Lemurian Planetwork Uranus is astrozygonomously paired with Venus.</p><h4>System Notes</h4><p>Zone-7 is the fifth of the six Torque-region Zones of the Numogram, and Tractor-Zone of the 8-1 (or 'Surge') Current. Its Syzygetic-twin is Zone-2. The 7+2 Syzygy is carried by the demon Oddubb, whose associations with hyperstitious doublings reinforces its twin character.</p></div>
+  <div id="data-zone-8"><h3>Zone Eight</h3><h4>The Numeral 8</h4><p>The figure ‘8' designates the number eight, the fourth even number, and the third non-prime (with prime factors 2 x 2 x 2). Eight digitally cumulates to thirty-six. Numeric Keypad direction: North.</p><h4>The Eighth Planet: Neptune</h4><p>Neptune (or Sol-8) is the outermost gas-giant, with a mean orbital distance from the sun of approx. 4 504 000 000 km. In Lemurian Planetwork Neptune is astrozygonomously paired with Mercury.</p><h4>System Notes</h4><p>Zone-8 is the fourth of the six Torque-region Zones of the Numogram. Its Syzygetic-twin is Zone-1. The 8+1 Syzygy is carried by the demon Murmur (known to Muvian sorcerors as 'the nethermost denizen of time').</p></div>
+  <div id="data-zone-9"><h3>Zone Nine</h3><h4>The Numeral 9</h4><p>The figure ‘9' designates the number nine, the fifth odd number (with odditude of three), and the fourth non-prime (with prime factors 3 x 3). Nine digitally cumulates to forty-five. Numeric Keypad direction: North-East.</p><h4>The Ninth Planet: Pluto</h4><p>Pluto (or Sol-9) has the most highly elliptical orbital trajectory of any planet in the Solar-system, with a (highly variable) mean orbital distance from the sun of approx. 5 913 520 000 km. In Lemurian Planetwork Pluto is astrozygonomously paired with the Sun.</p><h4>System Notes</h4><p>Zone-9 is the second of the two zones mutually composing the Plex-region of the Numogram, and Tractor-Zone for the 9-0 (or 'Plex') current. Its Plex-complement and Syzygetic-twin is Zone-0. This 9+0 Syzygy (carried by the demon Uttunul) draws the outermost curve of the Barker-spiral, which coincides with the limit ordinal-span in Barkerian arithmetic. Zone-9 provides the terminus for two channels, one each from the Torque (the 8th), and the Plex (the 9th).</p></div>
 </div>
-
-<script src="data.js"></script>
-<script src="script.js"></script>
+<script>
+// ===== UTILS =====
+function todayStr() { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function formatDate(s) { const [y,m,d]=s.split('-'); const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return mo[parseInt(m)-1]+' '+parseInt(d)+', '+y; }
+function formatDateTime(d) { return formatDate(todayStr()) + ' at ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); }
+function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function updateThemeIcon() { document.getElementById('theme-btn').textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙'; }
+updateThemeIcon();
+function toggleTheme() { document.body.classList.toggle('dark-mode'); localStorage.setItem('studyBuddyTheme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); updateThemeIcon(); }
+// ===== STARTER DECK =====
+const starterDeck = [ { en: "To read", jp: "読む", es: "Leer" }, { en: "Street", jp: "通り", es: "Calle" }, { en: "Store", jp: "店", es: "Tienda" } ];
+const STORAGE_KEY = 'studyBuddyData';
+function getDefaultData() { return { days: {}, dictionary: [], diary: [], calendar: {}, streak: 0, lastActiveDate: null, starterLoaded: false }; }
+function loadData() { 
+  try { 
+    const r = localStorage.getItem(STORAGE_KEY); 
+    if (r) { 
+      let loaded = JSON.parse(r); 
+      if (!loaded.diary) loaded.diary = []; 
+      if (!loaded.calendar) loaded.calendar = {};
+      return loaded; 
+    } 
+  } catch(e) {} 
+  return getDefaultData(); 
+}
+function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+let data = loadData();
+if (!data.starterLoaded) {
+  starterDeck.forEach(word => { if (!data.dictionary.some(w => w.en === word.en)) data.dictionary.push({ en: word.en, jp: word.jp, es: word.es, addedDate: todayStr() }); });
+  data.starterLoaded = true; saveData();
+}
+// ===== NES PASSWORD =====
+function generatePassword() { document.getElementById('nes-password-box').value = btoa(encodeURIComponent(JSON.stringify(data))).match(/.{1,8}/g).join('-'); }
+function loadPassword() {
+  const input = document.getElementById('nes-password-box').value.trim(); if (!input) return alert("ENTER PASSWORD.");
+  try {
+    let imported = JSON.parse(decodeURIComponent(atob(input.replace(/[-\s]/g, ''))));
+    if (imported.days && imported.dictionary) { 
+      if (!imported.diary) imported.diary = []; 
+      if (!imported.calendar) imported.calendar = {};
+      data = imported; saveData(); initApp(); alert("RESTORED!"); document.getElementById('nes-password-box').value = ''; 
+    } else alert("INVALID DATA.");
+  } catch (err) { alert("INVALID FORMAT."); }
+}
+function copyPassword() { const pwBox = document.getElementById('nes-password-box'); if (!pwBox.value) return; pwBox.select(); document.execCommand('copy'); alert("COPIED!"); }
+function calcStreak() {
+  const sortedDays=Object.keys(data.days).sort().reverse(); if(!sortedDays.length){data.streak=0;return;}
+  let streak=0, cd=new Date(); if(!data.days[todayStr()])cd.setDate(cd.getDate()-1);
+  while(true){ const ds=cd.getFullYear()+'-'+String(cd.getMonth()+1).padStart(2,'0')+'-'+String(cd.getDate()).padStart(2,'0'); const day=data.days[ds]; if(day&&(day.flash>0||day.read>0)){streak++;cd.setDate(cd.getDate()-1);}else break; }
+  data.streak=streak;
+}
+const speeches={ greeting:{en:"Hello! Let's study today!",jp:"こんにちは！今日も勉強しよう！",es:"¡Hola! ¡Estudiemos hoy!"}, bothDone:{en:"Amazing work today!",jp:"今日はすごい！",es:"¡Increíble hoy!"}, flashDone:{en:"Great flashcards! Now read!",jp:"次は読書だよ！",es:"¡Bien! ¡Ahora a leer!"}, readDone:{en:"Nice reading!",jp:"読書お疲れ！",es:"¡Buena lectura!"}, streakHigh:{en:"🔥 Incredible streak!",jp:"🔥 すごい連続記録！",es:"🔥 ¡Racha increíble!"}, newWord:{en:"New word learned!",jp:"新しい単語を覚えた！",es:"¡Nueva palabra!"} };
+function setSpeech(k){const s=speeches[k];if(!s)return;document.getElementById('speech-en').textContent=s.en;document.getElementById('speech-jp').textContent=s.jp;document.getElementById('speech-es').textContent=s.es;}
+function updateMood(){
+  const today=data.days[todayStr()]||{};let mood=30; if(today.flash>0)mood+=30;if(today.read>0)mood+=30;if(data.streak>=3)mood+=10; mood=Math.min(100,mood);
+  const fill=document.getElementById('mood-fill'),text=document.getElementById('mood-text'); fill.style.width=mood+'%';
+  if(mood>=90){fill.style.background='linear-gradient(90deg,
+#7ec832,
+#a8e84c)';text.textContent='Ecstatic!';setCreatureState('happy');}
+  else if(mood>=60){fill.style.background='linear-gradient(90deg,
+#ffcc00,
+#ff8a00)';text.textContent='Happy';setCreatureState('idle');}
+  else if(mood>=40){fill.style.background='linear-gradient(90deg,
+#ff8a00,
+#e06500)';text.textContent='Neutral';setCreatureState('idle');}
+  else{fill.style.background='linear-gradient(90deg,
+#ff3c8e,
+#d42070)';text.textContent='Needs attention';setCreatureState('sad');}
+}
+const spriteMap={ idle:'./idle.png', happy:'./happy.png', sad:'./sad.png', sleep:'./sleep.png', study:'./study.png', read:'./read.png', celebrate:'./celebrate.png' };
+function setCreatureState(state){ const el=document.getElementById('sprite-img');if(!el)return; el.src=spriteMap[state]||spriteMap.idle; }
+let isBouncing = false;
+document.getElementById('creature-sprite').addEventListener('click', function(e) {
+  if(isBouncing) return; isBouncing = true; const img = document.getElementById('sprite-img'); const prevSrc = img.src; img.src = spriteMap.happy; this.classList.add('animate-bounce');
+  for(let i = 0; i < Math.floor(Math.random() * 3) + 3; i++) {
+    const heart = document.createElement('div'); heart.textContent = ['💖', '✨', '💕', '💗'][Math.floor(Math.random()*4)]; heart.className = 'heart-particle';
+    heart.style.setProperty('--tx', (Math.random() - 0.5) * 120 + 'px'); heart.style.setProperty('--ty', -(Math.random() * 120 + 60) + 'px'); heart.style.left = '45%'; heart.style.top = '45%';
+    this.appendChild(heart); setTimeout(() => heart.remove(), 800);
+  }
+  setTimeout(() => { this.classList.remove('animate-bounce'); if(img.src.includes('happy.png')) img.src = prevSrc; isBouncing = false; }, 400);
+});
+document.getElementById('pw-input').addEventListener('keydown',function(e){
+  if(e.key==='Enter'){
+    if(btoa(this.value.toLowerCase().trim()) === 'Y2FrZQ=='){
+      document.getElementById('password-screen').style.display='none'; document.getElementById('app').style.display='block'; initApp();
+    }else{ document.getElementById('pw-error').textContent='Wrong password... try again!'; this.value=''; }
+  }
+});
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active'); document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  });
+});
+function logFlashcards(){
+  const val=parseInt(document.getElementById('flash-minutes').value);if(!val||val<=0)return;
+  const today=todayStr();if(!data.days[today])data.days[today]={flash:0,read:0}; data.days[today].flash=(data.days[today].flash||0)+val;
+  document.getElementById('flash-input-area').style.display='none'; document.getElementById('flash-done').style.display='block'; document.getElementById('flash-done-text').textContent=data.days[today].flash+' min today!';
+  document.getElementById('card-flash').classList.add('done'); setCreatureState('study');
+  const readDone=(data.days[today].read||0)>0;setSpeech(readDone?'bothDone':'flashDone'); calcStreak();saveData();updateStats();updateMood(); if(readDone)setTimeout(()=>setCreatureState('celebrate'),300);
+}
+function logReading(){
+  const val=parseFloat(document.getElementById('read-hours').value);if(!val||val<=0)return;
+  const today=todayStr();if(!data.days[today])data.days[today]={flash:0,read:0}; data.days[today].read=(data.days[today].read||0)+val;
+  document.getElementById('read-input-area').style.display='none'; document.getElementById('read-done').style.display='block'; document.getElementById('read-done-text').textContent=data.days[today].read+' hrs today!';
+  document.getElementById('card-read').classList.add('done'); setCreatureState('read');
+  const flashDone=(data.days[today].flash||0)>0;setSpeech(flashDone?'bothDone':'readDone'); calcStreak();saveData();updateStats();updateMood(); if(flashDone)setTimeout(()=>setCreatureState('celebrate'),300);
+}
+function addWord(){
+  const en=document.getElementById('dict-en').value.trim(),jp=document.getElementById('dict-jp').value.trim(),es=document.getElementById('dict-es').value.trim(); if(!en&&!jp&&!es)return;
+  data.dictionary.push({en:en||'—',jp:jp||'—',es:es||'—',addedDate:todayStr()});
+  document.getElementById('dict-en').value='';document.getElementById('dict-jp').value='';document.getElementById('dict-es').value=''; saveData();renderDictionary();updateStats();setSpeech('newWord');setCreatureState('happy');
+}
+['dict-en','dict-jp','dict-es'].forEach(id=>{document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')addWord();});});
+function deleteWord(i){data.dictionary.splice(i,1);saveData();renderDictionary();updateStats();}
+function renderDictionary(){
+  const search=(document.getElementById('dict-search').value||'').toLowerCase(); const list=document.getElementById('dict-list');list.innerHTML='';
+  const filtered=data.dictionary.filter(w=>{if(!search)return true;return w.en.toLowerCase().includes(search)||w.jp.toLowerCase().includes(search)||w.es.toLowerCase().includes(search);});
+  filtered.slice().reverse().forEach((w)=>{ const realIndex=data.dictionary.lastIndexOf(w); const row=document.createElement('div');row.className='dict-entry';
+    row.innerHTML=<span class="en">${escHtml(w.en)}</span><span class="jp">${escHtml(w.jp)}</span><span class="es">${escHtml(w.es)}</span><button class="del-word" onclick="deleteWord(${realIndex})">×</button>; list.appendChild(row); });
+  document.getElementById('dict-count').textContent=data.dictionary.length+' words'; document.getElementById('dict-tab-count').textContent='('+data.dictionary.length+')';
+}
+function renderHistory(){
+  const grid=document.getElementById('history-grid');grid.innerHTML=''; const sortedDays=Object.keys(data.days).sort().reverse();
+  if(!sortedDays.length){grid.innerHTML='<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px">No study days yet!</p>';return;}
+  sortedDays.forEach(day=>{
+    const d=data.days[day];const row=document.createElement('div');row.className='history-day'; 
+    const streakIcon = (d.flash>0||d.read>0)?'✓':'—';
+    const oracleIcon = (d.iching) ? '<span title="Oracle Cast" style="font-size:1.1rem;color:
+#ff3c8e;margin-right:4px;">☯️</span>' : '';
+    row.innerHTML=<span class="day-date">${formatDate(day)}</span><span class="day-stat">📇 ${d.flash||0} min</span><span class="day-stat">📚 ${d.read||0} hrs</span><span class="day-streak">${oracleIcon} ${streakIcon}</span>; 
+    grid.appendChild(row);
+  });
+}
+function updateStats(){
+  let tf=0,tr=0;Object.values(data.days).forEach(d=>{tf+=d.flash||0;tr+=d.read||0;});
+  document.getElementById('stat-total-flash').textContent=tf; document.getElementById('stat-total-read').textContent=tr;
+  document.getElementById('stat-words').textContent=data.dictionary.length; document.getElementById('stat-days').textContent=Object.keys(data.days).length;
+  document.getElementById('streak-badge').textContent='🔥 '+data.streak+' day streak'; renderHistory();
+}
+// ===== DIARY =====
+function addDiaryEntry() { const text = document.getElementById('diary-input').value.trim(); if(!text) return; data.diary.push({ date: formatDateTime(new Date()), text: text }); document.getElementById('diary-input').value = ''; saveData(); renderDiary(); }
+function deleteDiaryEntry(i) { data.diary.splice(i, 1); saveData(); renderDiary(); }
+function renderDiary() {
+  const list = document.getElementById('diary-list'); list.innerHTML = '';
+  if(!data.diary.length) return list.innerHTML = '<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px">No diary entries yet.</p>';
+  data.diary.slice().reverse().forEach(entry => { const realIndex = data.diary.lastIndexOf(entry); const row = document.createElement('div'); row.className = 'diary-entry'; row.innerHTML = <div class="diary-entry-date">${escHtml(entry.date)}</div><div class="diary-entry-text">${escHtml(entry.text)}</div><button class="diary-del-btn" onclick="deleteDiaryEntry(${realIndex})">×</button>; list.appendChild(row); });
+}
+// ===== CALENDAR =====
+let currentCalDate = new Date();
+let selectedCalDateStr = null;
+function getJapaneseDateStr(date) {
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    return ${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 (${days[date.getDay()]});
+}
+function renderCalendar() {
+    const year = currentCalDate.getFullYear(); const month = currentCalDate.getMonth();
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    document.getElementById('cal-month-year').textContent = ${monthNames[month]} ${year};
+    document.getElementById('cal-jp-date').textContent = "本日: " + getJapaneseDateStr(new Date());
+    const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const grid = document.getElementById('cal-grid'); grid.innerHTML = '';
+    
+    for(let i = 0; i < firstDay; i++) { const emptyDate = document.createElement('div'); emptyDate.className = 'cal-day empty'; grid.appendChild(emptyDate); }
+    
+    const today = new Date();
+    for(let i = 1; i <= daysInMonth; i++) {
+        const dayDiv = document.createElement('div'); dayDiv.className = 'cal-day';
+        if (year === today.getFullYear() && month === today.getMonth() && i === today.getDate()) dayDiv.classList.add('today');
+        
+        const dateStr = ${year}-${String(month+1).padStart(2,'0')}-${String(i).padStart(2,'0')};
+        dayDiv.innerHTML = <div class="cal-date-num">${i}</div>;
+        
+        if (data.calendar && data.calendar[dateStr]) {
+            const evt = document.createElement('div'); evt.className = 'cal-event-badge'; evt.textContent = data.calendar[dateStr]; dayDiv.appendChild(evt);
+        }
+        dayDiv.onclick = () => openCalEditor(dateStr, i, monthNames[month], year);
+        grid.appendChild(dayDiv);
+    }
+}
+function changeMonth(dir) { currentCalDate.setMonth(currentCalDate.getMonth() + dir); renderCalendar(); document.getElementById('cal-event-editor').style.display = 'none'; }
+function openCalEditor(dateStr, day, monthName, year) {
+    selectedCalDateStr = dateStr;
+    document.getElementById('cal-edit-date').textContent = Editing: ${monthName} ${day}, ${year};
+    document.getElementById('cal-event-input').value = (data.calendar && data.calendar[dateStr]) ? data.calendar[dateStr] : '';
+    document.getElementById('cal-event-editor').style.display = 'block';
+}
+function saveCalendarEvent() {
+    if (!selectedCalDateStr) return; if (!data.calendar) data.calendar = {};
+    const val = document.getElementById('cal-event-input').value.trim();
+    if (val) data.calendar[selectedCalDateStr] = val; else delete data.calendar[selectedCalDateStr];
+    saveData(); renderCalendar(); document.getElementById('cal-event-editor').style.display = 'none';
+}
+// ===== RANDOM PHRASES =====
+const randomPhrases = [ { text: "¡Qué nota, parcero! ¡A estudiar se dijo!", lang: "rolo", label: "ROLO" }, { text: "No sea tan ñero, póngase las pilas.", lang: "rolo", label: "ROLO" }, { text: "¡Uy, hermano, qué chimba de racha!", lang: "rolo", label: "ROLO" }, { text: "Mijo, no joda, estudie que le conviene.", lang: "rolo", label: "ROLO" }, { text: "よっしゃ！今日もがんばろう！", lang: "nihongo", label: "日本語" }, { text: "すごいじゃん！その調子！", lang: "nihongo", label: "日本語" }, { text: "勉強は大事だよ、ファイト！", lang: "nihongo", label: "日本語" } ];
+let lastPhraseIndex = -1;
+function showRandomPhrase() {
+  const bubble = document.getElementById('random-bubble'); if (!bubble) return; let idx; do { idx = Math.floor(Math.random() * randomPhrases.length); } while (idx === lastPhraseIndex && randomPhrases.length > 1); lastPhraseIndex = idx;
+  const p = randomPhrases[idx]; bubble.style.opacity = '0'; setTimeout(() => { document.getElementById('random-phrase').textContent = p.text; document.getElementById('random-lang-tag').textContent = p.label; document.getElementById('random-lang-tag').className = 'random-lang-tag ' + p.lang; bubble.style.opacity = '1'; }, 400);
+}
+function startPhraseCycle() { showRandomPhrase(); setInterval(showRandomPhrase, 8000); }
+// ===== NUMOGRAM =====
+function selectZone(zoneNum) { 
+  document.querySelectorAll('.zone-group').forEach(n => n.classList.remove('active')); 
+  const btn = document.getElementById('btn-zone-' + zoneNum); if(btn) btn.classList.add('active'); 
+  document.getElementById('numo-display').innerHTML = document.getElementById('data-zone-' + zoneNum).innerHTML; 
+}
+function calculateNumogram() {
+  const input = document.getElementById('numo-gematria-input').value.trim().toUpperCase(); const display = document.getElementById('numo-result-display'); if (!input) return display.textContent = "Please enter data.";
+  let totalSum = 0; for (let i = 0; i < input.length; i++) { const char = input[i]; if (/[A-Z]/.test(char)) totalSum += char.charCodeAt(0) - 64; else if (/[0-9]/.test(char)) totalSum += parseInt(char); }
+  if (totalSum === 0) return display.textContent = "Invalid entry.";
+  let digitalRoot = totalSum % 9; if (digitalRoot === 0 && totalSum > 0) digitalRoot = 9;
+  display.innerHTML = Sum: <span style="color:#fff">${totalSum}</span> ➔ Digital Root: <span style="color:#fff; font-size:1.5rem">${digitalRoot}</span>; selectZone(digitalRoot);
+}
+function findDemon() {
+   const z1Str = document.getElementById('demon-z1').value; const z2Str = document.getElementById('demon-z2').value; if(z1Str === "" || z2Str === "") return;
+   const z1 = parseInt(z1Str); const z2 = parseInt(z2Str); const max = Math.max(z1, z2); const min = Math.min(z1, z2);
+   const warpPlex = [0, 3, 6, 9]; const torque = [1, 2, 4, 5, 7, 8];
+   let classification = (warpPlex.includes(max) && warpPlex.includes(min)) ? "Xenodemon (Outside Time)" : (torque.includes(max) && torque.includes(min)) ? "Chronodemon (Chronic Time)" : "Amphidemon (Crossing)";
+   const planets = ["Sol", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"];
+   document.getElementById('demon-result').innerHTML = <strong>Net-Span [${max}::${min}]</strong><br>Class: <span style="color:#00e5ff">${classification}</span><br>Planetary Bridge: ${planets[max]} ↔ ${planets[min]};
+}
+const ccruLexicon = [
+  { term: "Abomenon", def: "Postulated substrate of absolute horror (the worst thing in the world)." }, { term: "A-Death", def: "Neuroelectronic flatline, based upon Sarkonian mesh-engineering." }, { term: "Ccru", def: "Cryptic hyperstitional entity." }, { term: "Cthelll", def: "Earth's iron ocean, comprising one third of terrestrial mass." }, { term: "Lemuria", def: "Hypergeographical terrestrial arrangement." }, { term: "Numogram", def: "Diagrammatization of decimal numeracy, providing the key to Lemurian culture." }, { term: "Pandemonium", def: "Utterminus of Cthelll. Comprehensive system of the demons." }, { term: "Time-Sorcery", def: "Counterchronic effectuation of the Numogram." }, { term: "Tic-Systems", def: "Consistent microstimular assemblages dismantling semiotic regimes onto a flat machinic plane." }
+];
+function searchLexicon() {
+   const q = document.getElementById('lexicon-search').value.toLowerCase(); const resDiv = document.getElementById('lexicon-results'); resDiv.innerHTML = ''; if(!q) return;
+   const matches = ccruLexicon.filter(item => item.term.toLowerCase().includes(q) || item.def.toLowerCase().includes(q));
+   if(matches.length === 0) return resDiv.innerHTML = '<p style="color:rgba(255,255,255,0.5)">No archives found.</p>';
+   matches.forEach(m => { resDiv.innerHTML += <div style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1)"><strong style="color: #ff3c8e; font-size:0.95rem;">${m.term}</strong><p style="margin-top: 4px;">${m.def}</p></div>; });
+}
+// ===== YOJIJUKUGO DICTIONARY =====
+const yojijukugoList = [
+  { k: "一石二鳥", m: "Killing two birds with one stone" }, { k: "一刀両断", m: "Cutting in two with a single stroke; Taking decisive action" }, { k: "一期一会", m: "Once-in-a-lifetime encounter; Treasure every meeting" }, { k: "一心不乱", m: "With heart and soul; Intently and focused" }, { k: "一念発起", m: "Being resolved to do something; Turning over a new leaf" }, { k: "一長一短", m: "Merits and demerits; Having both strong and weak points" }, { k: "一朝一夕", m: "In a single day; Overnight (usually 'cannot be done overnight')" }, { k: "一喜一憂", m: "Alternating between joy and sorrow; Emotional rollercoaster" }, { k: "一蓮托生", m: "Sharing the same fate; Being in the same boat" }, { k: "一触即発", m: "Volatile situation; Touch-and-go" }, { k: "一進一退", m: "One step forward, one step back; Ebbing and flowing" }, { k: "一致団結", m: "Solidarity; Uniting as one" }, { k: "一日千秋", m: "Waiting impatiently; One day feels like a thousand years" }, { k: "一笑千金", m: "A smile worth a thousand pieces of gold; Captivating smile" }, { k: "一言一句", m: "Every single word and phrase" }, { k: "一挙両得", m: "Serving two purposes; Two birds with one stone" }, { k: "一挙一動", m: "Every single move and action" }, { k: "一夜漬け", m: "Cramming overnight for an exam" }, { k: "一世一代", m: "Once in a lifetime event or performance" }, { k: "一目瞭然", m: "Apparent at a glance; Obvious" }, { k: "二人三脚", m: "Two people acting as one; Three-legged race" }, { k: "二束三文", m: "Dirt cheap; A dime a dozen" }, { k: "三位一体", m: "Trinity; Three things coming together as one" }, { k: "三寒四温", m: "Three cold days followed by four warm days (early spring weather)" }, { k: "三十六計", m: "Of the 36 strategies, fleeing is best (Retreat is a valid option)" }, { k: "三日坊主", m: "One who gives up easily; A monk for three days" }, { k: "四面楚歌", m: "Surrounded by enemies on all sides; Total isolation" }, { k: "四苦八苦", m: "Being in dire distress; Agonizing" }, { k: "四字熟語", m: "Four-character idiom" }, { k: "五里霧中", m: "Lost in a fog; Totally bewildered" }, { k: "五臓六腑", m: "The internal organs; From the bottom of one's heart" }, { k: "七転八倒", m: "Writhing in agony; Tumbling and falling" }, { k: "七転び八起き", m: "Fall down seven times, stand up eight; Resilience" }, { k: "八方美人", m: "Trying to please everyone; Everybody's friend" }, { k: "八面六臂", m: "To be highly versatile; Having eight faces and six arms" }, { k: "十人十色", m: "Ten people, ten colors; To each their own" }, { k: "百花繚乱", m: "A hundred flowers blooming; Gathering of beautiful/talented people" }, { k: "百戦錬磨", m: "Veteran of a hundred battles; Highly experienced" }, { k: "百発百中", m: "On target every time; Infallible" }, { k: "百聞は一見", m: "Seeing is believing; A picture is worth a thousand words" }, { k: "千変万化", m: "Innumerable changes; Kaleidoscopic" }, { k: "千差万別", m: "An infinite variety of differences; Apples and oranges" }, { k: "千載一遇", m: "Once in a thousand years opportunity" }, { k: "千客万来", m: "A constant stream of customers" }, { k: "万里の長城", m: "The Great Wall of China" }, { k: "万事休す", m: "All is lost; There is nothing more to be done" }, { k: "万骨枯る", m: "Thousands perish so one general can achieve fame" }, { k: "万全の策", m: "A foolproof plan; A perfect strategy" }, { k: "以心伝心", m: "Telepathy; Heart-to-heart communication" }, { k: "異口同音", m: "Unanimously; Speaking with one voice" }, { k: "異端邪説", m: "Heresy and false doctrines" }, { k: "意気投合", m: "Hitting it off; Finding a kindred spirit" }, { k: "意気消沈", m: "Depressed; Downhearted" }, { k: "意気軒昂", m: "In high spirits; Triumphant" }, { k: "意味深長", m: "Profound meaning; Full of implications" }, { k: "因果応報", m: "Karma; What goes around comes around" }, { k: "隠忍自重", m: "Putting up with things patiently" }, { k: "有象無象", m: "The masses; The rabble; Mob" }, { k: "右往左往", m: "Going back and forth in confusion; Panicking" }, { k: "有名無実", m: "In name only; Existing only in name" }, { k: "紆余曲折", m: "Twists and turns; Meandering" }, { k: "海千山千", m: "A sly old dog; Someone who knows the ways of the world" }, { k: "快刀乱麻", m: "Cutting the Gordian knot; Solving a complex problem decisively" }, { k: "外柔内剛", m: "Gentle on the outside, tough on the inside" }, { k: "臥薪嘗胆", m: "Enduring unspeakable hardships for the sake of vengeance or success" }, { k: "我田引水", m: "Seeking one's own interests; Drawing water to one's own field" }, { k: "夏炉冬扇", m: "Useless things (Summer heater, Winter fan)" }, { k: "花鳥風月", m: "The beauties of nature; Flower, Bird, Wind, Moon" }, { k: "花鳥諷詠", m: "Composing poetry on the beauties of nature" }, { k: "画竜点睛", m: "Finishing touch; Putting the pupils in the painted dragon's eyes" }, { k: "換骨奪胎", m: "Adapting an old idea/work and creating something new from it" }, { k: "勧善懲悪", m: "Rewarding good and punishing evil" }, { k: "感慨無量", m: "Deeply moved; Filled with deep emotion" }, { k: "冠婚葬祭", m: "Important ceremonial occasions (Coming of age, marriage, funeral, ancestral worship)" }, { k: "危機一髪", m: "Hanging by a thread; A hair's breadth from danger" }, { k: "喜怒哀楽", m: "Human emotions; Joy, anger, sorrow, and pleasure" }, { k: "奇想天外", m: "Fantastic; Bizarre; Completely unexpected" }, { k: "玉石混交", m: "A mixture of wheat and chaff; Good and bad mixed together" }, { k: "旧態依然", m: "Remaining unchanged; Stuck in the old ways" }, { k: "九牛一毛", m: "A drop in the bucket; A single hair from nine cows" }, { k: "共存共栄", m: "Coexistence and coprosperity" }, { k: "虚心坦懐", m: "With an open and calm mind; Without prejudice" }, { k: "欣喜雀躍", m: "Jumping for joy" }, { k: "空前絶後", m: "Unprecedented and never to be repeated" }, { k: "軽挙妄動", m: "Rash and blind action; Acting without thinking" }, { k: "継往開来", m: "Inheriting the past and ushering in the future" }, { k: "鶏口牛後", m: "Better to be the head of a chicken than the tail of a cow" }, { k: "形而上学", m: "Metaphysics" }, { k: "傾国傾城", m: "A woman of matchless beauty (who could cause the ruin of a nation)" }, { k: "激励鼓舞", m: "Encouragement and inspiration" }, { k: "堅忍不抜", m: "Indomitable perseverance; Unshakable resolve" }, { k: "乾坤一擲", m: "Staking everything on a single throw; All or nothing" }, { k: "言語道断", m: "Outrageous; Absurd; Unspeakable" }, { k: "孤軍奮闘", m: "Fighting a lone battle" }, { k: "虎視眈眈", m: "Glaring like a tiger; Watching vigilantly for an opportunity" }, { k: "誇大妄想", m: "Megalomania; Delusions of grandeur" }, { k: "五穀豊穣", m: "Huge harvest of grains; Bountiful harvest" }, { k: "山紫水明", m: "Scenic beauty of mountains and rivers" }, { k: "獅子奮迅", m: "Furious activity; Fighting like a raging lion" }, { k: "四分五裂", m: "Torn to pieces; Completely fragmented" }, { k: "自業自得", m: "Reaping what you sow; You asked for it" }, { k: "自給自足", m: "Self-sufficiency" }, { k: "自画自賛", m: "Singing one's own praises" }, { k: "自暴自棄", m: "Desperation; Abandoning oneself to despair" }, { k: "自由奔放", m: "Free and unrestrained; Free-spirited" }, { k: "自縄自縛", m: "Being caught in one's own trap" }, { k: "疾風迅雷", m: "With lightning speed; Swift and violent" }, { k: "質実剛健", m: "Unaffected and sincere, with fortitude and vigor" }, { k: "捲土重来", m: "Making a comeback with redoubled efforts" }, { k: "遮二無二", m: "Recklessly; Frantically" }, { k: "弱肉強食", m: "Survival of the fittest; Law of the jungle" }, { k: "取捨選択", m: "Making a choice; Rejecting the bad and taking the good" }, { k: "首尾一貫", m: "Consistency; Logical from beginning to end" }, { k: "縦横無尽", m: "Freely; Without restriction; In all directions" }, { k: "熟慮断行", m: "Deliberate carefully and act decisively" }, { k: "春夏秋冬", m: "The four seasons; Spring, Summer, Autumn, Winter" }, { k: "純情可憐", m: "Pure and innocent; Sweet and lovely" }, { k: "諸行無常", m: "All worldly things are transitory; Impermanence" }, { k: "初志貫徹", m: "Carrying out one's original intention to the end" }, { k: "心機一転", m: "Changing one's attitude; Turning over a new leaf" }, { k: "針小棒大", m: "Exaggeration; Making a mountain out of a molehill" }, { k: "森羅万象", m: "All creation; The universe; All things in nature" }, { k: "深謀遠慮", m: "Deep foresight and careful planning" }, { k: "神出鬼没", m: "Elusive; Appearing and disappearing like a phantom" }, { k: "晴耕雨読", m: "Working in the field in fair weather, reading at home in the rain" }, { k: "生殺与奪", m: "Having the power of life and death over someone" }, { k: "正真正銘", m: "Genuine; Authentic; True" }, { k: "清廉潔白", m: "Pure and innocent; Upright and clean-handed" }, { k: "絶体絶命", m: "Driven into a corner; Desperate situation" }, { k: "前代未聞", m: "Unprecedented; Unheard-of" }, { k: "前途洋洋", m: "Having a promising future" }, { k: "前途多難", m: "Having many difficulties ahead" }, { k: "創意工夫", m: "Being imaginative and creative" }, { k: "相思相愛", m: "Mutual love" }, { k: "大器晩成", m: "Great talents mature late; Late bloomer" }, { k: "大言壮語", m: "Talking big; Boasting" }, { k: "大義名分", m: "Just cause; Legitimate reason" }, { k: "単刀直入", m: "Cutting to the chase; Getting straight to the point" }, { k: "知行合一", m: "Action and knowledge are one" }, { k: "中途半端", m: "Halfway; Incomplete" }, { k: "朝令暮改", m: "Issuing an order in the morning and changing it in the evening; Inconsistent policies" }, { k: "直情径行", m: "Acting on impulse; Straightforward action" }, { k: "沈思黙考", m: "Deep in thought; Musing" }, { k: "天下泰平", m: "Peace in the world; Tranquility" }, { k: "天真爛漫", m: "Innocent and naive; Simple and pure" }, { k: "天変地異", m: "Natural disasters; Cataclysms" }, { k: "天衣無縫", m: "Flawless; Perfect beauty with no trace of artifice" }, { k: "天地無用", m: "Do not turn upside down (on packages)" }, { k: "電光石火", m: "As fast as lightning" }, { k: "徹頭徹尾", m: "Thoroughly; Through and through" }, { k: "転禍為福", m: "Turning misfortune into a blessing" }, { k: "唯唯諾諾", m: "Being a yes-man; Readily agreeing to everything" }, { k: "同床異夢", m: "Sleeping in the same bed, dreaming different dreams (different goals)" }, { k: "道聴塗説", m: "Gossip; Hearsay" }, { k: "独立独歩", m: "Independence; Standing on one's own two feet" }, { k: "読書三昧", m: "Being entirely engrossed in reading" }, { k: "内憂外患", m: "Troubles at home and abroad" }, { k: "難攻不落", m: "Impregnable; Invincible" }, { k: "二者択一", m: "Choosing between two options" }, { k: "日進月歩", m: "Rapid and steady progress" }, { k: "入木三分", m: "Leaving a deep impression; Profound writing" }, { k: "忍之一字", m: "Endurance is everything" }, { k: "馬耳東風", m: "Talking to a brick wall; Praying to deaf ears" }, { k: "波乱万丈", m: "Full of ups and downs; Stormy and dramatic" }, { k: "博覧強記", m: "Extensive reading and retentive memory" }, { k: "白砂青松", m: "White sand and green pines (beautiful coastal scenery)" }, { k: "抜山蓋世", m: "Overwhelming strength and unmatched spirit" }, { k: "八面玲瓏", m: "Flawless from all angles; Perfect clarity" }, { k: "発憤興起", m: "Rousing oneself to action" }, { k: "美辞麗句", m: "Flowery words; Rhetoric" }, { k: "非常識的", m: "Lacking common sense; Absurd" }, { k: "付和雷同", m: "Blindly following others; Jumping on the bandwagon" }, { k: "不老不死", m: "Immortality; Perpetual youth and longevity" }, { k: "不言実行", m: "Actions speak louder than words" }, { k: "不撓不屈", m: "Indomitable; Unyielding" }, { k: "不眠不休", m: "Without sleep or rest; Working day and night" }, { k: "物見遊山", m: "Going on a pleasure trip; Sightseeing" }, { k: "粉骨砕身", m: "Doing one's utmost; Working oneself to the bone" }, { k: "平身低頭", m: "Bowing deeply and humbly apologizing" }, { k: "平和共存", m: "Peaceful coexistence" }, { k: "傍若無人", m: "Arrogance; Acting outrageously as if no one were there" }, { k: "暴飲暴食", m: "Eating and drinking to excess" }, { k: "本末転倒", m: "Putting the cart before the horse; Mistaking the minor for the major" }, { k: "満場一致", m: "Unanimity; All in agreement" }, { k: "無我夢中", m: "Being completely absorbed in something; Losing oneself" }, { k: "無味乾燥", m: "Dull and uninteresting; Dry as dust" }, { k: "無理難題", m: "Unreasonable demands" }, { k: "明鏡止水", m: "A mind as clear and calm as a polished mirror or still water" }, { k: "明明白白", m: "Perfectly obvious; Clear as day" }, { k: "面目躍如", m: "Living up to one's reputation" }, { k: "門外不出", m: "A closely guarded secret; Kept within the family" }, { k: "唯我独尊", m: "Self-conceit; Thinking oneself the greatest" }, { k: "勇往邁進", m: "Dashing forward bravely" }, { k: "勇気凛々", m: "Full of courage" }, { k: "油断大敵", m: "Unpreparedness is one's greatest enemy; Carelessness costs dearly" }, { k: "悠悠自適", m: "Living a life of quiet retirement" }, { k: "容姿端麗", m: "Attractive face and figure" }, { k: "羊頭狗肉", m: "Crying wine and selling vinegar; False advertising" }, { k: "用意周到", m: "Careful preparation; Thoroughness" }, { k: "落花流水", m: "Mutual love; Falling flowers and flowing water" }, { k: "理路整然", m: "Logical; Well-reasoned" }, { k: "竜頭蛇尾", m: "Anti-climax; Strong start but weak finish" }, { k: "臨機応変", m: "Adapting to circumstances; Playing it by ear" }, { k: "臨戦態勢", m: "Readiness for action; Battle-ready" }, { k: "冷静沈着", m: "Calm and collected" }, { k: "和洋折衷", m: "Blending of Japanese and Western styles" }, { k: "和気藹々", m: "Harmonious; Friendly atmosphere" }, { k: "我慢強い", m: "Very patient; Enduring" }, { k: "玩物喪志", m: "Losing one's ambition by playing with toys" }, { k: "起死回生", m: "Reviving from the brink of death; A miraculous recovery" }, { k: "吉凶禍福", m: "Fortunes and misfortunes; Ups and downs of life" }, { k: "興味津々", m: "Having a keen interest; Very intriguing" }, { k: "喜色満面", m: "Beaming with joy" }, { k: "疑心暗鬼", m: "Suspicion breeds dark demons; Jumping at shadows" }, { k: "空理空論", m: "Empty theory; Armchair arguments" }, { k: "形影相伴", m: "Inseparable (like form and shadow)" }, { k: "言行一致", m: "Practicing what one preaches; Consistency between words and deeds" }, { k: "荒唐無稽", m: "Nonsense; Absurd" }, { k: "行雲流水", m: "Floating clouds and flowing water; Taking life as it comes" }, { k: "古今東西", m: "All times and places; In all ages and countries" }, { k: "誇り高き", m: "Highly proud" }, { k: "呉越同舟", m: "Bitter enemies placed in the same boat" }, { k: "向学心旺", m: "Having a strong desire to learn" }, { k: "剛毅朴訥", m: "Fortitude and simplicity; Sturdy and unpretentious" }, { k: "合従連衡", m: "Diplomatic maneuvering; Alliances and coalitions" }, { k: "固定観念", m: "Fixed idea; Stereotype" }, { k: "孤立無援", m: "Isolated and helpless" }, { k: "豪放磊落", m: "Broad-minded and big-hearted" }, { k: "才色兼備", m: "A woman gifted with both intelligence and beauty" }, { k: "三者三様", m: "Three people, three different ways" }, { k: "散歩逍遥", m: "Taking a leisurely stroll" }, { k: "四海兄弟", m: "Universal brotherhood; All men are brothers" }, { k: "死屍累累", m: "Heaps of corpses" }, { k: "士魂商才", m: "Samurai spirit and merchant's talent" }, { k: "拾遺補闕", m: "Correcting omissions and making up for defects" }, { k: "春風駘蕩", m: "Warm spring breeze; Mild and genial character" }, { k: "焦眉の急", m: "Imminent danger; Urgent situation" }, { k: "小心翼翼", m: "Very timid and cautious" }, { k: "笑裏蔵刀", m: "Hiding a dagger behind a smile" }, { k: "人面獣心", m: "Having the face of a human but the heart of a beast" }, { k: "随機応変", m: "Adapting to the situation at hand" }, { k: "寸鉄殺人", m: "A short, sharp remark that strikes home" }, { k: "積善余慶", m: "Good deeds bring rewards to one's descendants" }, { k: "絶世の美", m: "Matchless beauty" }, { k: "千思万考", m: "Deep meditation; Deep thought" }, { k: "創造破壊", m: "Creative destruction" }, { k: "大同小異", m: "Essentially the same with minor differences" }, { k: "大欲は無欲", m: "Great avarice is like unselfishness (as it fails to attain its object)" }, { k: "断崖絶壁", m: "A sheer cliff; A desperate situation" }, { k: "沈魚落雁", m: "Beauty so great that fish sink and geese fall from the sky" }, { k: "手前勝手", m: "Selfishness; Having one's own way" }, { k: "天壌無窮", m: "Eternal as heaven and earth" }, { k: "同工異曲", m: "Different execution, same result; Essentially the same" }, { k: "独断専行", m: "Acting on one's own authority; Arbitrary action" }, { k: "南船北馬", m: "Constant traveling (Boats in the south, horses in the north)" }
+];
+// ===== I-CHING DATABASE =====
+const iChingDatabase = {
+  "111111": { num: 1, name: "Qian (The Creative)", meaning: "Strong, dynamic action. Time to initiate, lead, and persevere with inner strength." },
+  "000000": { num: 2, name: "Kun (The Receptive)", meaning: "Yielding, passive support. Wait and follow the current rather than forcing change." },
+  "100010": { num: 3, name: "Chun (Difficulty at the Beginning)", meaning: "Chaos before order. A time of painful but necessary growth. Seek guidance." },
+  "010001": { num: 4, name: "Meng (Youthful Folly)", meaning: "Inexperience. Learn from mistakes and respect the guidance of a teacher." },
+  "111010": { num: 5, name: "Xu (Waiting)", meaning: "Patience. Bide your time, gather your strength, and wait for the right moment." },
+  "010111": { num: 6, name: "Song (Conflict)", meaning: "Disagreement and friction. Compromise is better than pushing for a total victory." },
+  "010000": { num: 7, name: "Shi (The Army)", meaning: "Discipline and organization. Align yourself with a strong purpose and leadership." },
+  "000010": { num: 8, name: "Bi (Holding Together)", meaning: "Union and alliance. True connection is found in sincere cooperation." },
+  "111011": { num: 9, name: "Xiao Chu (The Taming Power of the Small)", meaning: "Gentle restraint. Minor obstacles delay progress; use gentle persuasion." },
+  "110111": { num: 10, name: "Lu (Treading)", meaning: "Walking cautiously. Proceed with extreme care and respect for those in power." },
+  "111000": { num: 11, name: "Tai (Peace)", meaning: "Harmony and prosperity. A perfect balance of energies bringing success." },
+  "000111": { num: 12, name: "Pi (Standstill)", meaning: "Stagnation. Energies are disconnected. Retreat into yourself and wait." },
+  "101111": { num: 13, name: "Tong Ren (Fellowship with Men)", meaning: "Community. Success comes through cooperation and shared goals." },
+  "111101": { num: 14, name: "Da You (Possession in Great Measure)", meaning: "Abundance. You have the resources and power; use them generously." },
+  "001000": { num: 15, name: "Qian (Modesty)", meaning: "Humility. Balance is achieved by not boasting or overextending." },
+  "000100": { num: 16, name: "Yu (Enthusiasm)", meaning: "Inspiration and movement. Channel your excitement into constructive action." },
+  "100110": { num: 17, name: "Sui (Following)", meaning: "Adaptation. True leadership requires knowing when to follow and adapt." },
+  "011001": { num: 18, name: "Gu (Work on what has been spoiled)", meaning: "Decay. It is time to fix past mistakes and clean out the rot." },
+  "110000": { num: 19, name: "Lin (Approach)", meaning: "Advancement. Spring is coming; take advantage of the favorable timing." },
+  "000011": { num: 20, name: "Guan (Contemplation)", meaning: "Observation. Step back and look at the big picture before making a move." },
+  "100101": { num: 21, name: "Shi He (Biting Through)", meaning: "Overcoming obstacles. Force may be necessary to remove a blockage." },
+  "101001": { num: 22, name: "Bi (Grace)", meaning: "Aesthetics and form. Superficial beauty is pleasant but lacks deep substance." },
+  "000001": { num: 23, name: "Bo (Splitting Apart)", meaning: "Deterioration. Things are falling apart. Do not act; wait out the collapse." },
+  "100000": { num: 24, name: "Fu (Return)", meaning: "Renewal. A turning point. The darkness has passed, and light is returning." },
+  "100111": { num: 25, name: "Wu Wang (Innocence)", meaning: "Natural action. Act without ulterior motives; let things flow organically." },
+  "111001": { num: 26, name: "Da Chu (The Taming Power of the Great)", meaning: "Accumulation of energy. Hold your power back until the perfect moment." },
+  "100001": { num: 27, name: "Yi (The Corners of the Mouth)", meaning: "Nourishment. Pay attention to what you consume, both food and words." },
+  "011110": { num: 28, name: "Da Guo (Preponderance of the Great)", meaning: "Overload. The structure is buckling under extreme pressure; act decisively." },
+  "010010": { num: 29, name: "Kan (The Abysmal/Water)", meaning: "Danger. You are in deep water. Stay calm, keep moving, and be sincere." },
+  "101101": { num: 30, name: "Li (The Clinging/Fire)", meaning: "Clarity and dependence. Fire needs fuel; attach yourself to what is good." },
+  "001110": { num: 31, name: "Xian (Influence)", meaning: "Mutual attraction. Open yourself to the influence of others and connect." },
+  "011100": { num: 32, name: "Heng (Duration)", meaning: "Consistency. Success comes through steady, unchanging persistence." },
+  "001111": { num: 33, name: "Dun (Retreat)", meaning: "Strategic withdrawal. Pull back from a losing battle to preserve your strength." },
+  "111100": { num: 34, name: "Da Zhuang (The Power of the Great)", meaning: "Immense power. Use your strength justly and avoid reckless aggression." },
+  "000101": { num: 35, name: "Jin (Progress)", meaning: "Rapid advancement. The sun is rising; step into the light and succeed." },
+  "101000": { num: 36, name: "Ming I (Darkening of the Light)", meaning: "Adversity. Hide your light and lay low while surrounded by darkness." },
+  "101011": { num: 37, name: "Jia Ren (The Family)", meaning: "Inner structures. Focus on domestic harmony and the roles within a group." },
+  "110101": { num: 38, name: "Kui (Opposition)", meaning: "Misunderstanding. People are working at cross-purposes. Find small agreements." },
+  "001010": { num: 39, name: "Jian (Obstruction)", meaning: "Impassable blockage. Do not push forward; retreat and ask for advice." },
+  "010100": { num: 40, name: "Xie (Deliverance)", meaning: "Relief. The tension has broken. Forgive, forget, and move on swiftly." },
+  "110001": { num: 41, name: "Sun (Decrease)", meaning: "Letting go. Give up the non-essential to achieve a greater simplicity." },
+  "100011": { num: 42, name: "Yi (Increase)", meaning: "Expansion. A time of great opportunity and blessing. Act boldly." },
+  "111110": { num: 43, name: "Guai (Breakthrough)", meaning: "Resolution. Firmly but carefully remove corrupt influences." },
+  "011111": { num: 44, name: "Gou (Coming to Meet)", meaning: "Unexpected encounters. Beware of seemingly harmless but dangerous temptations." },
+  "000110": { num: 45, name: "Cui (Gathering Together)", meaning: "Massing. Bring people and resources together for a common cause." },
+  "011000": { num: 46, name: "Sheng (Pushing Upward)", meaning: "Steady growth. Like a tree growing from the earth, rise slowly and surely." },
+  "010110": { num: 47, name: "Kun (Oppression)", meaning: "Exhaustion. Resources are drained. Hold on to your inner truth and wait." },
+  "011010": { num: 48, name: "Jing (The Well)", meaning: "Source. The fundamental needs of life remain unchanged. Go to the source." },
+  "101110": { num: 49, name: "Ge (Revolution)", meaning: "Radical change. Shed the old skin; a necessary overthrow of the old order." },
+  "011101": { num: 50, name: "Ding (The Caldron)", meaning: "Transformation. A spiritual and cultural refinement bringing high success." },
+  "100100": { num: 51, name: "Zhen (The Arousing/Thunder)", meaning: "Shock. A sudden, terrifying event that brings necessary awakening." },
+  "001001": { num: 52, name: "Gen (Keeping Still/Mountain)", meaning: "Stillness. Stop all movement. Quiet your mind and find inner peace." },
+  "001011": { num: 53, name: "Jian (Development/Gradual Progress)", meaning: "Slow progress. Do not rush; let things unfold at their natural pace." },
+  "110100": { num: 54, name: "Gui Mei (The Marrying Maiden)", meaning: "Subordination. You are in a disadvantageous position. Accept your limits." },
+  "101100": { num: 55, name: "Feng (Abundance)", meaning: "Zenith. Peak prosperity, but recognize that peaks are followed by declines." },
+  "001101": { num: 56, name: "Lu (The Wanderer)", meaning: "Travel. You are an outsider. Be cautious, adaptable, and respectful." },
+  "011011": { num: 57, name: "Xun (The Gentle/Wind)", meaning: "Penetration. Gentle, persistent effort over time yields massive results." },
+  "110110": { num: 58, name: "Dui (The Joyous/Lake)", meaning: "Joy. True happiness comes through open communication and shared pleasure." },
+  "010011": { num: 59, name: "Huan (Dispersion)", meaning: "Dissolving. Illusions and blockages are clearing. Let things flow apart naturally." },
+  "110010": { num: 60, name: "Jie (Limitation)", meaning: "Boundaries. Set healthy limits and stick to a defined budget or structure." },
+  "110011": { num: 61, name: "Zhong Fu (Inner Truth)", meaning: "Sincerity. Profound trust and honesty have the power to influence even the hardest hearts." },
+  "001100": { num: 62, name: "Xiao Guo (Preponderance of the Small)", meaning: "Small measures. Keep a low profile and focus on minor, practical details." },
+  "101010": { num: 63, name: "Ji Ji (After Completion)", meaning: "Order achieved. Everything is in its place, but stay alert to prevent future decay." },
+  "010101": { num: 64, name: "Wei Ji (Before Completion)", meaning: "Threshold. The transition is incomplete. Proceed with extreme caution." }
+};
+function getHexagramData(binary) { return iChingDatabase[binary]; }
+function renderHexagram(containerId, lines) {
+  const container = document.getElementById(containerId); container.innerHTML = '';
+  lines.forEach((val) => {
+    const isYang = (val === 7 || val === 9); const isChanging = (val === 6 || val === 9);
+    const div = document.createElement('div'); div.className = hex-line ${isYang ? 'yang' : 'yin'};
+    let innerHTML = isYang ? <div class="seg"></div> : <div class="seg"></div><div class="seg"></div>;
+    if (isChanging) innerHTML += <span class="hex-line-marker">${val === 9 ? '(O)' : '(X)'}</span>;
+    div.innerHTML = innerHTML; container.appendChild(div);
+  });
+}
+function getBinaryFromLines(lines) { return lines.map(v => (v === 7 || v === 9) ? '1' : '0').join(''); }
+function displayDailyOracle() {
+  const today = todayStr(); if (!data.days[today] || !data.days[today].iching) return;
+  const daily = data.days[today].iching; const panel = document.getElementById('daily-oracle-panel'); panel.style.display = 'block';
+  document.getElementById('daily-yoji-kanji').textContent = daily.yojijukugo.k; document.getElementById('daily-yoji-meaning').textContent = daily.yojijukugo.m;
+  document.getElementById('daily-pri-name').textContent = Hex ${daily.primary.num}: ${daily.primary.name.split(' ')[0]};
+  if (daily.secondary) {
+    document.getElementById('daily-sec-box').style.display = 'block'; document.getElementById('daily-sec-name').textContent = Hex ${daily.secondary.num}: ${daily.secondary.name.split(' ')[0]};
+  } else { document.getElementById('daily-sec-box').style.display = 'none'; }
+}
+function castOracle() {
+  document.getElementById('iching-hex-container').style.display = 'flex';
+  const primaryLines = []; const secondaryLines = []; let hasChanging = false;
+  
+  for(let i = 0; i < 6; i++) {
+    const sum = (Math.random() < 0.5 ? 2 : 3) + (Math.random() < 0.5 ? 2 : 3) + (Math.random() < 0.5 ? 2 : 3);
+    primaryLines.push(sum);
+    if (sum === 6) { hasChanging = true; secondaryLines.push(7); } else if (sum === 9) { hasChanging = true; secondaryLines.push(8); } else { secondaryLines.push(sum); }
+  }
+  
+  renderHexagram('iching-primary-vis', primaryLines);
+  const primaryData = getHexagramData(getBinaryFromLines(primaryLines));
+  const priBox = document.getElementById('iching-primary-result');
+  priBox.style.display = 'block'; priBox.innerHTML = <h3>Hexagram ${primaryData.num}: ${primaryData.name}</h3><p>${primaryData.meaning}</p>;
+  
+  const secBoxUI = document.getElementById('iching-secondary-box'); const secResultBox = document.getElementById('iching-secondary-result');
+  let secondaryData = null;
+  if (hasChanging) {
+    secBoxUI.style.display = 'flex'; renderHexagram('iching-secondary-vis', secondaryLines);
+    secondaryData = getHexagramData(getBinaryFromLines(secondaryLines));
+    secResultBox.style.display = 'block'; secResultBox.innerHTML = <h3>Changes to Hexagram ${secondaryData.num}: ${secondaryData.name}</h3><p>${secondaryData.meaning}</p>;
+  } else { secBoxUI.style.display = 'none'; secResultBox.style.display = 'none'; }
+  // --- DAILY SAVE LOGIC ---
+  const today = todayStr(); if (!data.days[today]) data.days[today] = { flash: 0, read: 0 };
+  if (!data.days[today].iching) {
+    const randomYoji = yojijukugoList[Math.floor(Math.random() * yojijukugoList.length)];
+    data.days[today].iching = {
+      primary: { num: primaryData.num, name: primaryData.name }, secondary: secondaryData ? { num: secondaryData.num, name: secondaryData.name } : null, yojijukugo: randomYoji
+    };
+    saveData(); renderHistory(); displayDailyOracle();
+  }
+}
+function initApp(){
+  document.getElementById('date-display').textContent=formatDate(todayStr()); calcStreak();
+  const td=data.days[todayStr()]; 
+  if(td){ 
+    if(td.flash>0){document.getElementById('flash-input-area').style.display='none';document.getElementById('flash-done').style.display='block';document.getElementById('flash-done-text').textContent=td.flash+' min today!';document.getElementById('card-flash').classList.add('done');} 
+    if(td.read>0){document.getElementById('read-input-area').style.display='none';document.getElementById('read-done').style.display='block';document.getElementById('read-done-text').textContent=td.read+' hrs today!';document.getElementById('card-read').classList.add('done');} 
+    if(td.flash>0&&td.read>0)setSpeech('bothDone');else if(td.flash>0)setSpeech('flashDone');else if(td.read>0)setSpeech('readDone');else setSpeech('greeting'); 
+  }else setSpeech('greeting');
+  
+  if(data.streak>=5)setSpeech('streakHigh'); 
+  renderDictionary(); renderDiary(); renderCalendar(); updateStats(); updateMood(); saveData(); startPhraseCycle(); displayDailyOracle();
+}
+</script>
 </body>
 </html>
