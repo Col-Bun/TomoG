@@ -58,11 +58,7 @@
   </div>
 
   <div class="tab-content active" id="tab-home">
-    
-    <!-- THE NEW 3-COLUMN LAYOUT -->
     <div class="home-main-row">
-      
-      <!-- LEFT: Flashcards -->
       <div class="task-card glass-dark" id="card-flash">
         <h3>📇 Flashcards</h3>
         <div class="tri-label">Study flashcards! / フラッシュカード！ / ¡Tarjetas!</div>
@@ -70,7 +66,6 @@
         <div id="flash-done" style="display:none"><div class="task-done-check">✅</div><p class="task-done-text" style="font-size:0.8rem;margin-top:4px" id="flash-done-text"></p></div>
       </div>
 
-      <!-- MIDDLE: Moe-Chan -->
       <div class="creature-area glass" id="moe-container">
         <div class="creature-sprite" id="creature-sprite"><img src="./idle.png" id="sprite-img" alt="creature"></div>
         <div class="speech-bubble">
@@ -86,14 +81,12 @@
         <div class="random-bubble glass-strong" id="random-bubble"><span id="random-phrase"></span><span class="random-lang-tag" id="random-lang-tag"></span></div>
       </div>
 
-      <!-- RIGHT: Reading -->
       <div class="task-card glass-dark" id="card-read">
         <h3>📚 Reading</h3>
         <div class="tri-label">Reading time! / 読書タイム！ / ¡Hora de leer!</div>
         <div id="read-input-area"><div class="task-input-row"><input type="number" id="read-hours" min="0.25" max="24" step="0.25" placeholder="0"><span>hrs</span></div><button class="btn-glossy btn-pink log-btn" onclick="logReading()">Log Reading Time</button></div>
         <div id="read-done" style="display:none"><div class="task-done-check">✅</div><p class="task-done-text" style="font-size:0.8rem;margin-top:4px" id="read-done-text"></p></div>
       </div>
-
     </div>
 
     <div class="stats-strip">
@@ -106,25 +99,17 @@
 
   <div class="tab-content" id="tab-calendar">
     <div class="calendar-section glass-dark">
-      <div style="text-align: center;">
-        <div class="cal-jp-date" id="cal-jp-date"></div>
-      </div>
+      <div style="text-align: center;"><div class="cal-jp-date" id="cal-jp-date"></div></div>
       <div class="cal-header">
         <button class="btn-theme" style="border-radius: 50%; width: 40px; height: 40px; padding: 0;" onclick="changeMonth(-1)">◀</button>
         <h2 id="cal-month-year">March 2026</h2>
         <button class="btn-theme" style="border-radius: 50%; width: 40px; height: 40px; padding: 0;" onclick="changeMonth(1)">▶</button>
       </div>
-      <div class="cal-grid-header">
-        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
-      </div>
+      <div class="cal-grid-header"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
       <div class="cal-grid" id="cal-grid"></div>
-      
       <div id="cal-event-editor" class="cal-event-editor" style="display:none;">
         <h4 id="cal-edit-date"></h4>
-        <div class="cal-input-wrapper">
-          <input type="text" id="cal-event-input" placeholder="Enter event or note...">
-          <button class="btn-glossy btn-green" onclick="saveCalendarEvent()">Save</button>
-        </div>
+        <div class="cal-input-wrapper"><input type="text" id="cal-event-input" placeholder="Enter event or note..."><button class="btn-glossy btn-green" onclick="saveCalendarEvent()">Save</button></div>
       </div>
     </div>
   </div>
@@ -141,10 +126,7 @@
   <div class="tab-content" id="tab-diary">
     <div class="diary-section glass-dark">
       <h3>📓 Personal Diary</h3>
-      <div class="diary-input-area">
-        <textarea id="diary-input" class="diary-textarea" placeholder="Write your thoughts here..."></textarea>
-        <div class="diary-controls"><button class="diary-btn" onclick="addDiaryEntry()">Save Entry</button></div>
-      </div>
+      <div class="diary-input-area"><textarea id="diary-input" class="diary-textarea" placeholder="Write your thoughts here..."></textarea><div class="diary-controls"><button class="diary-btn" onclick="addDiaryEntry()">Save Entry</button></div></div>
       <div class="diary-list" id="diary-list"></div>
     </div>
   </div>
@@ -177,14 +159,9 @@
       <div class="svg-numogram-container">
         <svg viewBox="0 0 1000 1250" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <marker id="arrow-white" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#fff" />
-              </marker>
-              <marker id="arrow-black" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#000" />
-              </marker>
+              <marker id="arrow-white" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#fff" /></marker>
+              <marker id="arrow-black" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#000" /></marker>
             </defs>
-
             <g class="dot-base">
                 <path d="M 330 350 Q 280 410 290 440" class="dot-wide"/><path d="M 330 350 Q 280 410 290 440" class="dot-mid"/><path d="M 330 350 Q 280 410 290 440" class="dot-core"/>
                 <path d="M 320 510 Q 380 570 450 600" class="dot-wide"/><path d="M 320 510 Q 380 570 450 600" class="dot-mid"/><path d="M 320 510 Q 380 570 450 600" class="dot-core"/>
@@ -196,7 +173,6 @@
                 <path d="M 500 820 L 500 880" class="dot-wide"/><path d="M 500 820 L 500 880" class="dot-mid"/><path d="M 500 820 L 500 880" class="dot-core"/>
                 <path d="M 500 960 Q 550 1010 500 1020" class="dot-wide"/><path d="M 500 960 Q 550 1010 500 1020" class="dot-mid"/><path d="M 500 960 Q 550 1010 500 1020" class="dot-core"/>
             </g>
-
             <polygon points="415,150 385,140 385,160" fill="#fff" />
             <polygon points="585,150 615,140 615,160" fill="#fff" />
             <polygon points="635,300 665,290 665,310" fill="#fff" />
@@ -207,7 +183,6 @@
             <polygon points="500,755 485,785 515,785" fill="#fff" />
             <polygon points="500,945 485,915 515,915" fill="#fff" />
             <polygon points="500,1035 485,1065 515,1065" fill="#fff" />
-
             <g stroke="#fff" stroke-width="2" fill="none">
               <path d="M 650 300 Q 500 350 350 320" />
               <path d="M 650 300 Q 525 225 400 150" />
@@ -220,7 +195,6 @@
               <path d="M 500 620 C 400 500 600 500 500 620" />
               <path d="M 500 920 C 400 920 400 820 500 920" />
             </g>
-
             <g stroke="#fff" stroke-width="2" fill="#000">
               <circle cx="515" cy="18" r="15" /> <circle cx="500" cy="100" r="15" /> <circle cx="500" cy="200" r="15" /> 
               <circle cx="525" cy="225" r="15" /> <circle cx="400" cy="550" r="15" /> <circle cx="600" cy="550" r="15" /> 
@@ -231,7 +205,6 @@
               <text x="525" y="225">3</text> <text x="400" y="550">10</text> <text x="600" y="550">28</text> 
               <text x="500" y="530">1</text> <text x="500" y="850">36</text> <text x="435" y="880">45</text>
             </g>
-
             <g class="zone-group" id="btn-zone-3" onclick="selectZone(3)">
               <circle cx="400" cy="150" r="40" fill="#000" stroke="#fff" stroke-width="3" />
               <text x="390" y="150" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">3</text>
@@ -282,7 +255,6 @@
               <text x="490" y="1060" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">0</text>
               <text x="520" y="1040" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text>
             </g>
-
             <g class="label-sound">
               <text x="330" y="130" fill="#22dd22">"zx"</text> <text x="630" y="190" fill="#dddd00">"tch"</text> 
               <text x="690" y="270" fill="#4488ff">"dt"</text> <text x="280" y="360" fill="#ffaa00">"ktt"</text> 
@@ -290,30 +262,12 @@
               <text x="480" y="700" fill="#ddaa00">"gl"</text> <text x="430" y="770" fill="#22dd22">"mnm"</text> 
               <text x="550" y="910" fill="#dddd00">"tn"</text> <text x="410" y="1110" fill="#22dd22">"eiaoung"</text>
             </g>
-
-            <text x="50" y="80" class="label-region">Warp</text>
-            <text x="50" y="110" class="label-sub label-sub-italic">Hyper-Reality</text>
-            <text x="50" y="135" class="label-sub">Djynxx 6::3</text>
-            
-            <text x="50" y="450" class="label-region">e-Circuit</text>
-            <text x="50" y="480" class="label-sub label-sub-italic">breakthrough</text>
-            <text x="50" y="505" class="label-sub label-sub-italic">connected</text>
-            <text x="50" y="530" class="label-sub label-sub-italic">psychoactives</text>
-            
-            <text x="50" y="850" class="label-region">Plex</text>
-            <text x="50" y="880" class="label-sub label-sub-italic">Eiriel (Tchukululok)</text>
-            <text x="50" y="905" class="label-sub">Dissociative Void</text>
-            <text x="50" y="930" class="label-sub">Uttunul 9::0</text>
-
-            <text x="650" y="110" class="label-current">Warp</text>
-            <text x="650" y="135" font-family="Nunito" font-weight="700" fill="#fff" font-size="16">(Current)</text>
-            
-            <text x="500" y="370" class="label-current">Hold</text>
-            <text x="800" y="300" class="label-current">Rise</text>
-            <text x="380" y="570" class="label-current">Sink</text>
-            
-            <text x="560" y="980" class="label-current">Plex</text>
-            <text x="560" y="1005" font-family="Nunito" font-weight="700" fill="#fff" font-size="16">(Current)</text>
+            <text x="50" y="80" class="label-region">Warp</text><text x="50" y="110" class="label-sub label-sub-italic">Hyper-Reality</text><text x="50" y="135" class="label-sub">Djynxx 6::3</text>
+            <text x="50" y="450" class="label-region">e-Circuit</text><text x="50" y="480" class="label-sub label-sub-italic">breakthrough</text><text x="50" y="505" class="label-sub label-sub-italic">connected</text><text x="50" y="530" class="label-sub label-sub-italic">psychoactives</text>
+            <text x="50" y="850" class="label-region">Plex</text><text x="50" y="880" class="label-sub label-sub-italic">Eiriel (Tchukululok)</text><text x="50" y="905" class="label-sub">Dissociative Void</text><text x="50" y="930" class="label-sub">Uttunul 9::0</text>
+            <text x="650" y="110" class="label-current">Warp</text><text x="650" y="135" font-family="Nunito" font-weight="700" fill="#fff" font-size="16">(Current)</text>
+            <text x="500" y="370" class="label-current">Hold</text><text x="800" y="300" class="label-current">Rise</text><text x="380" y="570" class="label-current">Sink</text>
+            <text x="560" y="980" class="label-current">Plex</text><text x="560" y="1005" font-family="Nunito" font-weight="700" fill="#fff" font-size="16">(Current)</text>
         </svg>
       </div>
       <div class="numo-tools-col">
@@ -439,8 +393,18 @@
   <div id="data-zone-9"><h3>Zone Nine</h3><h4>The Numeral 9</h4><p>The figure ‘9' designates the number nine, the fifth odd number (with odditude of three), and the fourth non-prime (with prime factors 3 x 3). Nine digitally cumulates to forty-five. Numeric Keypad direction: North-East.</p><h4>The Ninth Planet: Pluto</h4><p>Pluto (or Sol-9) has the most highly elliptical orbital trajectory of any planet in the Solar-system, with a (highly variable) mean orbital distance from the sun of approx. 5 913 520 000 km. In Lemurian Planetwork Pluto is astrozygonomously paired with the Sun.</p><h4>System Notes</h4><p>Zone-9 is the second of the two zones mutually composing the Plex-region of the Numogram, and Tractor-Zone for the 9-0 (or 'Plex') current. Its Plex-complement and Syzygetic-twin is Zone-0. This 9+0 Syzygy (carried by the demon Uttunul) draws the outermost curve of the Barker-spiral, which coincides with the limit ordinal-span in Barkerian arithmetic. Zone-9 provides the terminus for two channels, one each from the Torque (the 8th), and the Plex (the 9th).</p></div>
 </div>
 
+<!-- DRAGGABLE JP DICTIONARY POPUP -->
+<div id="jisho-popup" class="glass-strong">
+  <div id="jisho-header">
+    <span style="font-weight: 800; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">📖 JP Quick-Search</span>
+    <button id="jisho-close" onclick="document.getElementById('jisho-popup').style.display='none'">✖</button>
+  </div>
+  <iframe id="jisho-iframe" src="https://www.japandict.com/" title="Japanese Dictionary"></iframe>
+</div>
+
 <script src="data.js"></script>
 <script src="script.js"></script>
-<script src="clipboard.js"></script> <!-- Link to the new modular script -->
+<script src="clipboard.js"></script>
+<script src="jisho.js"></script>
 </body>
 </html>
