@@ -102,9 +102,6 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
     const tabId = btn.dataset.tab;
     document.getElementById('tab-'+tabId).classList.add('active');
 
-    // Toggle drastic focus mode layout if Clipboard is clicked
-    document.body.classList.toggle('clipboard-mode', tabId === 'clipboard');
-
     // Dynamic Moe-Chan placement
     const moeContainer = document.getElementById('moe-container');
     if(moeContainer) {
