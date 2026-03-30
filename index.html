@@ -54,6 +54,7 @@
     <button class="tab-btn" data-tab="numogram">🌀 Numogram</button>
     <button class="tab-btn" data-tab="iching">☯️ I-Ching</button>
     <button class="tab-btn" data-tab="quotes">💬 Quotes</button>
+    <button class="tab-btn" data-tab="clipboard">📋 Clipboard</button>
   </div>
 
   <div class="tab-content active" id="tab-home">
@@ -410,6 +411,19 @@
     </div>
   </div>
 
+  <!-- THE NEW CLIPBOARD FOCUS TAB -->
+  <div class="tab-content" id="tab-clipboard">
+    <div class="clipboard-focus-container glass-dark">
+      <button class="btn-theme exit-btn" onclick="exitClipboardMode()">◀ Return to Hub</button>
+      <h2 style="font-family:'Baloo 2'; color:#00e5ff; font-size: 2.5rem; margin-bottom: 10px;">Clipboard Sync</h2>
+      <div class="clip-stats">TOTAL CHARACTERS PASTED: <span id="clip-char-count" style="color:#fff;">0</span></div>
+      
+      <button class="btn-glossy btn-purple huge-btn" onclick="autoPaste()">📋 AUTO-PASTE</button>
+      
+      <textarea id="clipboard-area" class="diary-textarea custom-scrollbar" placeholder="Awaiting clipboard data..."></textarea>
+    </div>
+  </div>
+
 </div>
 
 <div id="numo-data-store">
@@ -427,5 +441,6 @@
 
 <script src="data.js"></script>
 <script src="script.js"></script>
+<script src="clipboard.js"></script> <!-- Link to the new modular script -->
 </body>
 </html>
