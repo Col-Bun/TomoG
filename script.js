@@ -10,7 +10,7 @@ function toggleTheme() { document.body.classList.toggle('dark-mode'); localStora
 
 // ===== DATA INITIALIZATION =====
 const STORAGE_KEY = 'studyBuddyData';
-function getDefaultData() { return { days: {}, dictionary: [], diary: [], calendar: {}, streak: 0, lastActiveDate: null, starterLoaded: false }; }
+function getDefaultData() { return { days: {}, dictionary: [], diary: [], calendar: {}, quotes: [], streak: 0, lastActiveDate: null, starterLoaded: false }; }
 function loadData() { 
   try { 
     const r = localStorage.getItem(STORAGE_KEY); 
@@ -18,6 +18,7 @@ function loadData() {
       let loaded = JSON.parse(r); 
       if (!loaded.diary) loaded.diary = []; 
       if (!loaded.calendar) loaded.calendar = {};
+      if (!loaded.quotes) loaded.quotes = [];
       return loaded; 
     } 
   } catch(e) {} 
@@ -41,6 +42,7 @@ function loadPassword() {
     if (imported.days && imported.dictionary) { 
       if (!imported.diary) imported.diary = []; 
       if (!imported.calendar) imported.calendar = {};
+      if (!imported.quotes) imported.quotes = [];
       data = imported; saveData(); initApp(); alert("RESTORED!"); document.getElementById('nes-password-box').value = ''; 
     } else alert("INVALID DATA.");
   } catch (err) { alert("INVALID FORMAT."); }
@@ -70,15 +72,18 @@ const spriteMap={ idle:'./idle.png', happy:'./happy.png', sad:'./sad.png', sleep
 function setCreatureState(state){ const el=document.getElementById('sprite-img');if(!el)return; el.src=spriteMap[state]||spriteMap.idle; }
 
 let isBouncing = false;
-document.getElementById('creature-sprite').addEventListener('click', function(e) {
-  if(isBouncing) return; isBouncing = true; const img = document.getElementById('sprite-img'); const prevSrc = img.src; img.src = spriteMap.happy; this.classList.add('animate-bounce');
-  for(let i = 0; i < Math.floor(Math.random() * 3) + 3; i++) {
-    const heart = document.createElement('div'); heart.textContent = ['💖', '✨', '💕', '💗'][Math.floor(Math.random()*4)]; heart.className = 'heart-particle';
-    heart.style.setProperty('--tx', (Math.random() - 0.5) * 120 + 'px'); heart.style.setProperty('--ty', -(Math.random() * 120 + 60) + 'px'); heart.style.left = '45%'; heart.style.top = '45%';
-    this.appendChild(heart); setTimeout(() => heart.remove(), 800);
-  }
-  setTimeout(() => { this.classList.remove('animate-bounce'); if(img.src.includes('happy.png')) img.src = prevSrc; isBouncing = false; }, 400);
-});
+const spriteEl = document.getElementById('creature-sprite');
+if (spriteEl) {
+  spriteEl.addEventListener('click', function(e) {
+    if(isBouncing) return; isBouncing = true; const img = document.getElementById('sprite-img'); const prevSrc = img.src; img.src = spriteMap.happy; this.classList.add('animate-bounce');
+    for(let i = 0; i < Math.floor(Math.random() * 3) + 3; i++) {
+      const heart = document.createElement('div'); heart.textContent = ['💖', '✨', '💕', '💗'][Math.floor(Math.random()*4)]; heart.className = 'heart-particle';
+      heart.style.setProperty('--tx', (Math.random() - 0.5) * 120 + 'px'); heart.style.setProperty('--ty', -(Math.random() * 120 + 60) + 'px'); heart.style.left = '45%'; heart.style.top = '45%';
+      this.appendChild(heart); setTimeout(() => heart.remove(), 800);
+    }
+    setTimeout(() => { this.classList.remove('animate-bounce'); if(img.src.includes('happy.png')) img.src = prevSrc; isBouncing = false; }, 400);
+  });
+}
 
 document.getElementById('pw-input').addEventListener('keydown',function(e){
   if(e.key==='Enter'){
@@ -88,10 +93,50 @@ document.getElementById('pw-input').addEventListener('keydown',function(e){
   }
 });
 
+// ===== TAB SWITCHING (WITH MOE-CHAN LOGIC) =====
 document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-    btn.classList.add('active'); document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); 
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active'); 
+    
+    const tabId = btn.dataset.tab;
+    document.getElementById('tab-'+tabId).classList.add('active');
+
+    // Make Moe-chan persistent on other tabs
+    const creatureContainer = document.querySelector('.creature-sprite');
+    const speechBubble = document.querySelector('.speech-bubble');
+    
+    if(tabId === 'home') {
+      if (creatureContainer) creatureContainer.parentElement.classList.remove('persistent-moe');
+    } else {
+      // Find her wrapper and add the persistent class from style.css
+      if (creatureContainer && creatureContainer.parentElement.id === 'tab-home') {
+         // If she wasn't wrapped, we just add the persistent class to her closest container
+         // (Assuming you kept her in the home tab HTML as originally set up)
+      }
+      // An easier JS fallback: add a class to the body to handle her CSS
+      document.body.classList.add('hide-home-elements');
+    }
+    
+    // Simplest approach: Just append her to body when not on home, and back to home when on home
+    const moeParent = document.getElementById('moe-parent'); // If you wrap her in a div with id="moe-parent"
+    const homeArea = document.querySelector('.creature-area');
+    
+    if(tabId === 'home') {
+       const pMoe = document.querySelector('.persistent-moe');
+       if(pMoe) {
+         pMoe.className = 'creature-area glass'; // Restore original class
+         document.getElementById('tab-home').insertBefore(pMoe, document.querySelector('.tasks-panel'));
+       }
+    } else {
+       const homeMoe = document.querySelector('.creature-area.glass');
+       if(homeMoe) {
+         homeMoe.className = 'persistent-moe'; // Make her sticky
+         document.body.appendChild(homeMoe);
+       }
+    }
+
   });
 });
 
@@ -152,6 +197,41 @@ function renderDiary() {
   const list = document.getElementById('diary-list'); list.innerHTML = '';
   if(!data.diary.length) return list.innerHTML = '<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px">No diary entries yet.</p>';
   data.diary.slice().reverse().forEach(entry => { const realIndex = data.diary.lastIndexOf(entry); const row = document.createElement('div'); row.className = 'diary-entry'; row.innerHTML = `<div class="diary-entry-date">${escHtml(entry.date)}</div><div class="diary-entry-text">${escHtml(entry.text)}</div><button class="diary-del-btn" onclick="deleteDiaryEntry(${realIndex})">×</button>`; list.appendChild(row); });
+}
+
+// ===== QUOTES =====
+function addQuote() {
+  const text = document.getElementById('quote-text').value.trim();
+  const img = document.getElementById('quote-img').value.trim();
+  if (!text) return;
+  data.quotes.push({ text: text, img: img, date: todayStr() });
+  document.getElementById('quote-text').value = '';
+  document.getElementById('quote-img').value = '';
+  saveData(); renderQuotes();
+}
+
+function deleteQuote(i) {
+  data.quotes.splice(i, 1);
+  saveData(); renderQuotes();
+}
+
+function renderQuotes() {
+  const list = document.getElementById('quotes-list');
+  if (!list) return;
+  list.innerHTML = '';
+  if(!data.quotes || !data.quotes.length) return list.innerHTML = '<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px">No quotes saved yet.</p>';
+  data.quotes.slice().reverse().forEach((q, index) => {
+    const realIndex = data.quotes.length - 1 - index;
+    const row = document.createElement('div');
+    row.className = 'diary-entry';
+    let imgHtml = q.img ? `<img src="${escHtml(q.img)}" style="max-width:100%; border-radius:12px; margin-top:12px; border:1px solid rgba(255,255,255,0.2);">` : '';
+    row.innerHTML = `
+      <div style="font-style:italic; font-size:1.1rem; color:#fff; line-height:1.5;">"${escHtml(q.text)}"</div>
+      ${imgHtml}
+      <button class="diary-del-btn" onclick="deleteQuote(${realIndex})">×</button>
+    `;
+    list.appendChild(row);
+  });
 }
 
 // ===== CALENDAR =====
@@ -248,8 +328,7 @@ function searchLexicon() {
    matches.forEach(m => { resDiv.innerHTML += `<div style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1)"><strong style="color: #ff3c8e; font-size:0.95rem;">${m.term}</strong><p style="margin-top: 4px;">${m.def}</p></div>`; });
 }
 
-// ===== I-CHING =====
-// iChingDatabase and yojijukugoList come from data.js
+// ===== I-CHING & AUTO-LOG =====
 function getHexagramData(binary) { return iChingDatabase[binary]; }
 
 function renderHexagram(containerId, lines) {
@@ -275,6 +354,26 @@ function displayDailyOracle() {
   } else { document.getElementById('daily-sec-box').style.display = 'none'; }
 }
 
+function autoLogOracle() {
+  const today = todayStr();
+  if (!data.days[today]) data.days[today] = { flash: 0, read: 0 };
+  
+  // If the user hasn't opened the app today to generate a daily reading, generate one automatically in the background
+  if (!data.days[today].iching) {
+    const keys = Object.keys(iChingDatabase);
+    const randomBinary = keys[Math.floor(Math.random() * keys.length)];
+    const primaryData = iChingDatabase[randomBinary];
+    const randomYoji = yojijukugoList[Math.floor(Math.random() * yojijukugoList.length)];
+    
+    data.days[today].iching = {
+      primary: { num: primaryData.num, name: primaryData.name },
+      secondary: null, 
+      yojijukugo: randomYoji
+    };
+    saveData();
+  }
+}
+
 function castOracle() {
   document.getElementById('iching-hex-container').style.display = 'flex';
   const primaryLines = []; const secondaryLines = []; let hasChanging = false;
@@ -297,16 +396,6 @@ function castOracle() {
     secondaryData = getHexagramData(getBinaryFromLines(secondaryLines));
     secResultBox.style.display = 'block'; secResultBox.innerHTML = `<h3>Changes to Hexagram ${secondaryData.num}: ${secondaryData.name}</h3><p>${secondaryData.meaning}</p>`;
   } else { secBoxUI.style.display = 'none'; secResultBox.style.display = 'none'; }
-
-  // --- DAILY SAVE LOGIC ---
-  const today = todayStr(); if (!data.days[today]) data.days[today] = { flash: 0, read: 0 };
-  if (!data.days[today].iching) {
-    const randomYoji = yojijukugoList[Math.floor(Math.random() * yojijukugoList.length)];
-    data.days[today].iching = {
-      primary: { num: primaryData.num, name: primaryData.name }, secondary: secondaryData ? { num: secondaryData.num, name: secondaryData.name } : null, yojijukugo: randomYoji
-    };
-    saveData(); renderHistory(); displayDailyOracle();
-  }
 }
 
 // ===== APP INITIALIZATION =====
@@ -320,5 +409,8 @@ function initApp(){
   }else setSpeech('greeting');
   
   if(data.streak>=5)setSpeech('streakHigh'); 
-  renderDictionary(); renderDiary(); renderCalendar(); updateStats(); updateMood(); saveData(); startPhraseCycle(); displayDailyOracle();
+  
+  autoLogOracle(); // Runs daily auto-log
+  
+  renderDictionary(); renderDiary(); renderCalendar(); renderQuotes(); updateStats(); updateMood(); saveData(); startPhraseCycle(); displayDailyOracle();
 }
