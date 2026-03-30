@@ -57,34 +57,42 @@
   </div>
 
   <div class="tab-content active" id="tab-home">
-    <div class="creature-area glass">
-      <div class="creature-sprite" id="creature-sprite"><img src="./idle.png" id="sprite-img" alt="creature"></div>
-      <div class="speech-bubble">
-        <div class="speech-line"><span class="lang-tag lang-en">EN</span><span id="speech-en">Hello! Let's study today!</span></div>
-        <div class="speech-line"><span class="lang-tag lang-jp">JP</span><span id="speech-jp" style="font-family:'Noto Sans JP',sans-serif">こんにちは！今日も勉強しよう！</span></div>
-        <div class="speech-line"><span class="lang-tag lang-es">ES</span><span id="speech-es">¡Hola! ¡Estudiemos hoy!</span></div>
-      </div>
-      <div class="mood-bar">
-        <span class="mood-label">Mood:</span>
-        <div class="mood-track"><div class="mood-fill" id="mood-fill" style="width:50%;background:linear-gradient(90deg,#ffcc00,#ff8a00)"></div></div>
-        <span class="mood-label" id="mood-text">Neutral</span>
-      </div>
-      <div class="random-bubble glass-strong" id="random-bubble"><span id="random-phrase"></span><span class="random-lang-tag" id="random-lang-tag"></span></div>
-    </div>
-
-    <div class="tasks-panel">
+    
+    <!-- THE NEW 3-COLUMN LAYOUT -->
+    <div class="home-main-row">
+      
+      <!-- LEFT: Flashcards -->
       <div class="task-card glass-dark" id="card-flash">
         <h3>📇 Flashcards</h3>
         <div class="tri-label">Study flashcards! / フラッシュカード！ / ¡Tarjetas!</div>
         <div id="flash-input-area"><div class="task-input-row"><input type="number" id="flash-minutes" min="1" max="999" placeholder="0"><span>min</span></div><button class="btn-glossy log-btn" onclick="logFlashcards()">Log Study Time</button></div>
         <div id="flash-done" style="display:none"><div class="task-done-check">✅</div><p class="task-done-text" style="font-size:0.8rem;margin-top:4px" id="flash-done-text"></p></div>
       </div>
+
+      <!-- MIDDLE: Moe-Chan -->
+      <div class="creature-area glass" id="moe-container">
+        <div class="creature-sprite" id="creature-sprite"><img src="./idle.png" id="sprite-img" alt="creature"></div>
+        <div class="speech-bubble">
+          <div class="speech-line"><span class="lang-tag lang-en">EN</span><span id="speech-en">Hello! Let's study today!</span></div>
+          <div class="speech-line"><span class="lang-tag lang-jp">JP</span><span id="speech-jp" style="font-family:'Noto Sans JP',sans-serif">こんにちは！今日も勉強しよう！</span></div>
+          <div class="speech-line"><span class="lang-tag lang-es">ES</span><span id="speech-es">¡Hola! ¡Estudiemos hoy!</span></div>
+        </div>
+        <div class="mood-bar">
+          <span class="mood-label">Mood:</span>
+          <div class="mood-track"><div class="mood-fill" id="mood-fill" style="width:50%;background:linear-gradient(90deg,#ffcc00,#ff8a00)"></div></div>
+          <span class="mood-label" id="mood-text">Neutral</span>
+        </div>
+        <div class="random-bubble glass-strong" id="random-bubble"><span id="random-phrase"></span><span class="random-lang-tag" id="random-lang-tag"></span></div>
+      </div>
+
+      <!-- RIGHT: Reading -->
       <div class="task-card glass-dark" id="card-read">
         <h3>📚 Reading</h3>
         <div class="tri-label">Reading time! / 読書タイム！ / ¡Hora de leer!</div>
         <div id="read-input-area"><div class="task-input-row"><input type="number" id="read-hours" min="0.25" max="24" step="0.25" placeholder="0"><span>hrs</span></div><button class="btn-glossy btn-pink log-btn" onclick="logReading()">Log Reading Time</button></div>
         <div id="read-done" style="display:none"><div class="task-done-check">✅</div><p class="task-done-text" style="font-size:0.8rem;margin-top:4px" id="read-done-text"></p></div>
       </div>
+
     </div>
 
     <div class="stats-strip">
