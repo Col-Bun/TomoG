@@ -27,8 +27,7 @@ function loadData() {
 function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 let data = loadData();
 
-if (!data.starterLoaded) {
-  // starterDeck comes from data.js
+if (!data.starterLoaded && typeof starterDeck !== 'undefined') {
   starterDeck.forEach(word => { if (!data.dictionary.some(w => w.en === word.en)) data.dictionary.push({ en: word.en, jp: word.jp, es: word.es, addedDate: todayStr() }); });
   data.starterLoaded = true; saveData();
 }
@@ -93,7 +92,7 @@ document.getElementById('pw-input').addEventListener('keydown',function(e){
   }
 });
 
-// ===== TAB SWITCHING (WITH MOE-CHAN LOGIC) =====
+// ===== TAB SWITCHING & MOE-CHAN CENTER LOGIC =====
 document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); 
@@ -103,40 +102,19 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
     const tabId = btn.dataset.tab;
     document.getElementById('tab-'+tabId).classList.add('active');
 
-    // Make Moe-chan persistent on other tabs
-    const creatureContainer = document.querySelector('.creature-sprite');
-    const speechBubble = document.querySelector('.speech-bubble');
-    
-    if(tabId === 'home') {
-      if (creatureContainer) creatureContainer.parentElement.classList.remove('persistent-moe');
-    } else {
-      // Find her wrapper and add the persistent class from style.css
-      if (creatureContainer && creatureContainer.parentElement.id === 'tab-home') {
-         // If she wasn't wrapped, we just add the persistent class to her closest container
-         // (Assuming you kept her in the home tab HTML as originally set up)
+    // Dynamic Moe-Chan placement
+    const moeContainer = document.getElementById('moe-container');
+    if(moeContainer) {
+      if(tabId === 'home') {
+         moeContainer.className = 'creature-area glass';
+         const mainRow = document.querySelector('.home-main-row');
+         const readCard = document.getElementById('card-read');
+         if(mainRow && readCard) mainRow.insertBefore(moeContainer, readCard);
+      } else {
+         moeContainer.className = 'persistent-moe';
+         document.body.appendChild(moeContainer);
       }
-      // An easier JS fallback: add a class to the body to handle her CSS
-      document.body.classList.add('hide-home-elements');
     }
-    
-    // Simplest approach: Just append her to body when not on home, and back to home when on home
-    const moeParent = document.getElementById('moe-parent'); // If you wrap her in a div with id="moe-parent"
-    const homeArea = document.querySelector('.creature-area');
-    
-    if(tabId === 'home') {
-       const pMoe = document.querySelector('.persistent-moe');
-       if(pMoe) {
-         pMoe.className = 'creature-area glass'; // Restore original class
-         document.getElementById('tab-home').insertBefore(pMoe, document.querySelector('.tasks-panel'));
-       }
-    } else {
-       const homeMoe = document.querySelector('.creature-area.glass');
-       if(homeMoe) {
-         homeMoe.className = 'persistent-moe'; // Make her sticky
-         document.body.appendChild(homeMoe);
-       }
-    }
-
   });
 });
 
@@ -289,8 +267,7 @@ function saveCalendarEvent() {
 // ===== RANDOM PHRASES =====
 let lastPhraseIndex = -1;
 function showRandomPhrase() {
-  const bubble = document.getElementById('random-bubble'); if (!bubble) return; let idx; 
-  // randomPhrases comes from data.js
+  const bubble = document.getElementById('random-bubble'); if (!bubble || typeof randomPhrases === 'undefined') return; let idx; 
   do { idx = Math.floor(Math.random() * randomPhrases.length); } while (idx === lastPhraseIndex && randomPhrases.length > 1); lastPhraseIndex = idx;
   const p = randomPhrases[idx]; bubble.style.opacity = '0'; setTimeout(() => { document.getElementById('random-phrase').textContent = p.text; document.getElementById('random-lang-tag').textContent = p.label; document.getElementById('random-lang-tag').className = 'random-lang-tag ' + p.lang; bubble.style.opacity = '1'; }, 400);
 }
@@ -321,15 +298,14 @@ function findDemon() {
 }
 
 function searchLexicon() {
-   const q = document.getElementById('lexicon-search').value.toLowerCase(); const resDiv = document.getElementById('lexicon-results'); resDiv.innerHTML = ''; if(!q) return;
-   // ccruLexicon comes from data.js
+   const q = document.getElementById('lexicon-search').value.toLowerCase(); const resDiv = document.getElementById('lexicon-results'); resDiv.innerHTML = ''; if(!q || typeof ccruLexicon === 'undefined') return;
    const matches = ccruLexicon.filter(item => item.term.toLowerCase().includes(q) || item.def.toLowerCase().includes(q));
    if(matches.length === 0) return resDiv.innerHTML = '<p style="color:rgba(255,255,255,0.5)">No archives found.</p>';
    matches.forEach(m => { resDiv.innerHTML += `<div style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1)"><strong style="color: #ff3c8e; font-size:0.95rem;">${m.term}</strong><p style="margin-top: 4px;">${m.def}</p></div>`; });
 }
 
 // ===== I-CHING & AUTO-LOG =====
-function getHexagramData(binary) { return iChingDatabase[binary]; }
+function getHexagramData(binary) { return typeof iChingDatabase !== 'undefined' ? iChingDatabase[binary] : null; }
 
 function renderHexagram(containerId, lines) {
   const container = document.getElementById(containerId); container.innerHTML = '';
@@ -355,10 +331,10 @@ function displayDailyOracle() {
 }
 
 function autoLogOracle() {
+  if (typeof iChingDatabase === 'undefined' || typeof yojijukugoList === 'undefined') return;
   const today = todayStr();
   if (!data.days[today]) data.days[today] = { flash: 0, read: 0 };
   
-  // If the user hasn't opened the app today to generate a daily reading, generate one automatically in the background
   if (!data.days[today].iching) {
     const keys = Object.keys(iChingDatabase);
     const randomBinary = keys[Math.floor(Math.random() * keys.length)];
@@ -375,6 +351,7 @@ function autoLogOracle() {
 }
 
 function castOracle() {
+  if (typeof iChingDatabase === 'undefined') return alert("Oracle database missing.");
   document.getElementById('iching-hex-container').style.display = 'flex';
   const primaryLines = []; const secondaryLines = []; let hasChanging = false;
   
