@@ -11,7 +11,17 @@ function toggleTheme() { document.body.classList.toggle('dark-mode'); localStora
 // ===== DATA INITIALIZATION =====
 const STORAGE_KEY = 'studyBuddyData';
 function getDefaultData() { 
-  return { days: {}, dictionary: [], diary: [], streak: 0, lastActiveDate: null, starterLoaded: false, schedule: {}, calendar: {} }; 
+  return { 
+    days: {}, 
+    dictionary: [], 
+    diary: [], 
+    streak: 0, 
+    lastActiveDate: null, 
+    starterLoaded: false, 
+    schedule: {}, 
+    calendar: {},
+    quotes: [] // <--- Added this!
+  }; 
 }
 
 function loadData() { 
@@ -22,10 +32,14 @@ function loadData() {
       if (!loaded.diary) loaded.diary = []; 
       if (!loaded.schedule) loaded.schedule = {};
       if (!loaded.calendar) loaded.calendar = {};
+      if (!loaded.quotes) loaded.quotes = []; // <--- Added this!
       return loaded; 
     } 
   } catch(e) {} 
   return getDefaultData(); 
+}
+function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+let data = loadData();
 }
 function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 let data = loadData();
