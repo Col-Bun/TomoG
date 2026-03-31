@@ -178,13 +178,53 @@ function renderCalendar() {
 }
 function changeMonth(delta) { currentDate.setMonth(currentDate.getMonth() + delta); renderCalendar(); }
 
-// ===== APP INITIALIZATION =====
+// ===== APP INITIALIZATION (DATE-SMART VERSION) =====
 function initApp(){
-  document.getElementById('date-display').textContent=formatDate(todayStr()); 
+  const realToday = todayStr(); // Get the actual date from the computer clock
+  document.getElementById('date-display').textContent = formatDate(realToday); 
+
+  // 1. MANDATORY UI RESET
+  // This clears any "Done" states left over from a previous session or old save
+  document.getElementById('flash-input-area').style.display = 'block';
+  document.getElementById('flash-done').style.display = 'none';
+  document.getElementById('card-flash').classList.remove('done');
+
+  document.getElementById('read-input-area').style.display = 'block';
+  document.getElementById('read-done').style.display = 'none';
+  document.getElementById('card-read').classList.remove('done');
+
+  // 2. CHECK DATA FOR THE ACTUAL CURRENT DAY
+  const td = data.days[realToday]; 
+  
+  if(td) { 
+    // If the data shows work was already done TODAY, update the UI
+    if(td.flash > 0){
+      document.getElementById('flash-input-area').style.display = 'none';
+      document.getElementById('flash-done').style.display = 'block';
+      document.getElementById('flash-done-text').textContent = td.flash + ' min today!';
+      document.getElementById('card-flash').classList.add('done');
+    } 
+    if(td.read > 0){
+      document.getElementById('read-input-area').style.display = 'none';
+      document.getElementById('read-done').style.display = 'block';
+      document.getElementById('read-done-text').textContent = td.read + ' hrs today!';
+      document.getElementById('card-read').classList.add('done');
+    } 
+  } else {
+    // If no data exists for the current date, create a fresh entry
+    data.days[realToday] = { flash: 0, read: 0 };
+  }
+
+  // 3. REFRESH COMPONENTS
   updateThemeIcon();
   renderSchedule();
   renderCalendar();
   renderQuotes();
-  // Add other render functions here as needed (Dictionary, Diary, etc.)
+  
+  // Optional: Run these if they are defined in your script
+  if(typeof calcStreak === 'function') calcStreak();
+  if(typeof updateStats === 'function') updateStats();
+  if(typeof updateMood === 'function') updateMood();
+  
   saveData();
 }
