@@ -11,7 +11,7 @@ function toggleTheme() { document.body.classList.toggle('dark-mode'); localStora
 // ===== DATA INITIALIZATION =====
 const STORAGE_KEY = 'studyBuddyData';
 function getDefaultData() { 
-  return { days: {}, dictionary: [], diary: [], streak: 0, lastActiveDate: null, starterLoaded: false, schedule: {}, calendar: {} }; 
+  return { days: {}, dictionary: [], diary: [], streak: 0, lastActiveDate: null, starterLoaded: false, schedule: {}, calendar: {}, quotes: [] }; 
 }
 
 function loadData() { 
@@ -22,6 +22,7 @@ function loadData() {
       if (!loaded.diary) loaded.diary = []; 
       if (!loaded.schedule) loaded.schedule = {};
       if (!loaded.calendar) loaded.calendar = {};
+      if (!loaded.quotes) loaded.quotes = []; 
       return loaded; 
     } 
   } catch(e) {} 
@@ -40,7 +41,11 @@ function generatePassword() { document.getElementById('nes-password-box').value 
 function loadPassword() {
   const input = document.getElementById('nes-password-box').value.trim(); if (!input) return alert("ENTER PASSWORD.");
   try {
-    let imported = JSON.parse(decodeURIComponent(atob(input.replace(/[-\s]/g, ''))));
+    let cleanInput = input.replace(/[-\s]/g, '');
+    let imported;
+    try { imported = JSON.parse(decodeURIComponent(atob(cleanInput))); } 
+    catch(e) { imported = JSON.parse(decodeURIComponent(escape(atob(cleanInput)))); }
+
     if (imported.days && imported.dictionary) { 
       if (!imported.diary) imported.diary = []; 
       if (!imported.calendar) imported.calendar = {};
@@ -87,11 +92,18 @@ if (spriteEl) {
   });
 }
 
+// ===== PASSWORD SCREEN (HARDCODED TEXT CHECK) =====
 document.getElementById('pw-input').addEventListener('keydown',function(e){
   if(e.key==='Enter'){
-    if(btoa(this.value.toLowerCase().trim()) === 'Y2FrZQ=='){
-      document.getElementById('password-screen').style.display='none'; document.getElementById('app').style.display='block'; initApp();
-    }else{ document.getElementById('pw-error').textContent='Wrong password... try again!'; this.value=''; }
+    const val = this.value.toLowerCase().trim();
+    if(val === 'cake' || val === 'moe' || btoa(val) === 'Y2FrZQ=='){
+      document.getElementById('password-screen').style.display='none'; 
+      document.getElementById('app').style.display='block'; 
+      initApp();
+    } else { 
+      document.getElementById('pw-error').textContent='Wrong password... try again!'; 
+      this.value=''; 
+    }
   }
 });
 
@@ -180,11 +192,12 @@ function renderDiary() {
   data.diary.slice().reverse().forEach(entry => { const realIndex = data.diary.lastIndexOf(entry); const row = document.createElement('div'); row.className = 'diary-entry'; row.innerHTML = `<div class="diary-entry-date">${escHtml(entry.date)}</div><div class="diary-entry-text">${escHtml(entry.text)}</div><button class="diary-del-btn" onclick="deleteDiaryEntry(${realIndex})">×</button>`; list.appendChild(row); });
 }
 
-// ===== QUOTES =====
+// ===== QUOTES (FIXED) =====
 function addQuote() {
   const text = document.getElementById('quote-text').value.trim();
   const img = document.getElementById('quote-img').value.trim();
   if (!text) return;
+  if (!data.quotes) data.quotes = []; // Safety check
   data.quotes.push({ text: text, img: img, date: todayStr() });
   document.getElementById('quote-text').value = '';
   document.getElementById('quote-img').value = '';
@@ -213,58 +226,6 @@ function renderQuotes() {
     `;
     list.appendChild(row);
   });
-}
-
-// ===== CALENDAR =====
-let currentCalDate = new Date();
-let selectedCalDateStr = null;
-
-function getJapaneseDateStr(date) {
-    const days = ['日', '月', '火', '水', '木', '金', '土'];
-    return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 (${days[date.getDay()]})`;
-}
-
-function renderCalendar() {
-    const year = currentCalDate.getFullYear(); const month = currentCalDate.getMonth();
-    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    document.getElementById('cal-month-year').textContent = `${monthNames[month]} ${year}`;
-    document.getElementById('cal-jp-date').textContent = "本日: " + getJapaneseDateStr(new Date());
-
-    const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const grid = document.getElementById('cal-grid'); grid.innerHTML = '';
-    
-    for(let i = 0; i < firstDay; i++) { const emptyDate = document.createElement('div'); emptyDate.className = 'cal-day empty'; grid.appendChild(emptyDate); }
-    
-    const today = new Date();
-    for(let i = 1; i <= daysInMonth; i++) {
-        const dayDiv = document.createElement('div'); dayDiv.className = 'cal-day';
-        if (year === today.getFullYear() && month === today.getMonth() && i === today.getDate()) dayDiv.classList.add('today');
-        
-        const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-        dayDiv.innerHTML = `<div class="cal-date-num">${i}</div>`;
-        
-        if (data.calendar && data.calendar[dateStr]) {
-            const evt = document.createElement('div'); evt.className = 'cal-event-badge'; evt.textContent = data.calendar[dateStr]; dayDiv.appendChild(evt);
-        }
-        dayDiv.onclick = () => openCalEditor(dateStr, i, monthNames[month], year);
-        grid.appendChild(dayDiv);
-    }
-}
-
-function changeMonth(dir) { currentCalDate.setMonth(currentCalDate.getMonth() + dir); renderCalendar(); document.getElementById('cal-event-editor').style.display = 'none'; }
-
-function openCalEditor(dateStr, day, monthName, year) {
-    selectedCalDateStr = dateStr;
-    document.getElementById('cal-edit-date').textContent = `Editing: ${monthName} ${day}, ${year}`;
-    document.getElementById('cal-event-input').value = (data.calendar && data.calendar[dateStr]) ? data.calendar[dateStr] : '';
-    document.getElementById('cal-event-editor').style.display = 'block';
-}
-
-function saveCalendarEvent() {
-    if (!selectedCalDateStr) return; if (!data.calendar) data.calendar = {};
-    const val = document.getElementById('cal-event-input').value.trim();
-    if (val) data.calendar[selectedCalDateStr] = val; else delete data.calendar[selectedCalDateStr];
-    saveData(); renderCalendar(); document.getElementById('cal-event-editor').style.display = 'none';
 }
 
 // ===== RANDOM PHRASES =====
@@ -377,6 +338,7 @@ function castOracle() {
     secResultBox.style.display = 'block'; secResultBox.innerHTML = `<h3>Changes to Hexagram ${secondaryData.num}: ${secondaryData.name}</h3><p>${secondaryData.meaning}</p>`;
   } else { secBoxUI.style.display = 'none'; secResultBox.style.display = 'none'; }
 }
+
 // ===== SCHEDULE LOGIC =====
 function renderSchedule() {
   const list = document.getElementById('schedule-list');
@@ -404,7 +366,7 @@ function saveSchedule() {
   setTimeout(() => btn.textContent = "Save Schedule", 2000);
 }
 
-// ===== CALENDAR LOGIC =====
+// ===== CALENDAR LOGIC (DEDUPLICATED & CLEANED) =====
 let currentDate = new Date();
 let selectedDateStr = "";
 
@@ -422,7 +384,6 @@ function renderCalendar() {
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   daysOfWeek.forEach(d => grid.innerHTML += `<div class="cal-header">${d}</div>`);
   
-  // Empty slots for previous month
   for(let i=0; i<firstDay; i++) { grid.innerHTML += `<div></div>`; }
   
   const today = new Date();
@@ -431,7 +392,6 @@ function renderCalendar() {
     const tasks = data.calendar[dateStr] || [];
     let taskHTML = '';
     
-    // Render up to 3 tasks on the grid, show "+X more" if exceeded
     tasks.slice(0, 3).forEach(t => taskHTML += `<div class="cal-task">${escHtml(t)}</div>`);
     if(tasks.length > 3) taskHTML += `<div class="cal-task more">+${tasks.length - 3} more</div>`;
     
@@ -486,12 +446,24 @@ function delCalTask(idx) {
   saveData();
   renderCalModal();
 }
-// ===== APP INITIALIZATION =====
+
+// ===== APP INITIALIZATION (DATE-SMART) =====
 function initApp(){
-  document.getElementById('date-display').textContent=formatDate(todayStr()); 
+  const realToday = todayStr();
+  document.getElementById('date-display').textContent = formatDate(realToday); 
   calcStreak();
 
-  const td = data.days[todayStr()]; 
+  // 1. Mandatory UI Reset
+  document.getElementById('flash-input-area').style.display = 'block';
+  document.getElementById('flash-done').style.display = 'none';
+  document.getElementById('card-flash').classList.remove('done');
+
+  document.getElementById('read-input-area').style.display = 'block';
+  document.getElementById('read-done').style.display = 'none';
+  document.getElementById('card-read').classList.remove('done');
+
+  // 2. Check Data for Actual Current Day
+  const td = data.days[realToday]; 
   if(td){ 
     if(td.flash > 0){
       document.getElementById('flash-input-area').style.display = 'none';
@@ -510,22 +482,24 @@ function initApp(){
     else if(td.read > 0) setSpeech('readDone');
     else setSpeech('greeting'); 
   } else {
+    data.days[realToday] = { flash: 0, read: 0 };
     setSpeech('greeting');
   }
   
   if(data.streak >= 5) setSpeech('streakHigh'); 
   
-  autoLogOracle(); // Runs daily auto-log for the I-Ching
+  if(typeof autoLogOracle === 'function') autoLogOracle();
 
-  // Initialize all UI components
-  renderSchedule(); // New Hourly Schedule
-  renderCalendar(); // New Advanced Calendar
+  // Initialize UI components
+  renderSchedule(); 
+  renderCalendar(); 
   renderDictionary(); 
   renderDiary(); 
   renderQuotes(); 
   updateStats(); 
   updateMood(); 
   saveData(); 
-  startPhraseCycle(); 
-  displayDailyOracle();
+  
+  if(typeof startPhraseCycle === 'function') startPhraseCycle(); 
+  if(typeof displayDailyOracle === 'function') displayDailyOracle();
 }
