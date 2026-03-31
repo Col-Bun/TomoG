@@ -488,17 +488,44 @@ function delCalTask(idx) {
 }
 // ===== APP INITIALIZATION =====
 function initApp(){
-  document.getElementById('date-display').textContent=formatDate(todayStr()); calcStreak();
-  const td=data.days[todayStr()]; 
+  document.getElementById('date-display').textContent=formatDate(todayStr()); 
+  calcStreak();
+
+  const td = data.days[todayStr()]; 
   if(td){ 
-    if(td.flash>0){document.getElementById('flash-input-area').style.display='none';document.getElementById('flash-done').style.display='block';document.getElementById('flash-done-text').textContent=td.flash+' min today!';document.getElementById('card-flash').classList.add('done');} 
-    if(td.read>0){document.getElementById('read-input-area').style.display='none';document.getElementById('read-done').style.display='block';document.getElementById('read-done-text').textContent=td.read+' hrs today!';document.getElementById('card-read').classList.add('done');} 
-    if(td.flash>0&&td.read>0)setSpeech('bothDone');else if(td.flash>0)setSpeech('flashDone');else if(td.read>0)setSpeech('readDone');else setSpeech('greeting'); 
-  }else setSpeech('greeting');
+    if(td.flash > 0){
+      document.getElementById('flash-input-area').style.display = 'none';
+      document.getElementById('flash-done').style.display = 'block';
+      document.getElementById('flash-done-text').textContent = td.flash + ' min today!';
+      document.getElementById('card-flash').classList.add('done');
+    } 
+    if(td.read > 0){
+      document.getElementById('read-input-area').style.display = 'none';
+      document.getElementById('read-done').style.display = 'block';
+      document.getElementById('read-done-text').textContent = td.read + ' hrs today!';
+      document.getElementById('card-read').classList.add('done');
+    } 
+    if(td.flash > 0 && td.read > 0) setSpeech('bothDone');
+    else if(td.flash > 0) setSpeech('flashDone');
+    else if(td.read > 0) setSpeech('readDone');
+    else setSpeech('greeting'); 
+  } else {
+    setSpeech('greeting');
+  }
   
-  if(data.streak>=5)setSpeech('streakHigh'); 
+  if(data.streak >= 5) setSpeech('streakHigh'); 
   
-  autoLogOracle(); // Runs daily auto-log
-  
-  renderDictionary(); renderDiary(); renderCalendar(); renderQuotes(); updateStats(); updateMood(); saveData(); startPhraseCycle(); displayDailyOracle();
+  autoLogOracle(); // Runs daily auto-log for the I-Ching
+
+  // Initialize all UI components
+  renderSchedule(); // New Hourly Schedule
+  renderCalendar(); // New Advanced Calendar
+  renderDictionary(); 
+  renderDiary(); 
+  renderQuotes(); 
+  updateStats(); 
+  updateMood(); 
+  saveData(); 
+  startPhraseCycle(); 
+  displayDailyOracle();
 }
