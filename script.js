@@ -517,72 +517,7 @@ function initApp(){
   
   autoLogOracle(); // Runs daily auto-log for the I-Ching
 
-// ===== APP INITIALIZATION (DATE-SMART & MOOD-INTEGRATED) =====
-function initApp(){
-  const realToday = todayStr(); // Always uses current computer clock
-  document.getElementById('date-display').textContent = formatDate(realToday); 
-
-  // 1. MANDATORY UI RESET
-  // This clears the "Done" screens so loading a save doesn't look "stuck"
-  document.getElementById('flash-input-area').style.display = 'block';
-  document.getElementById('flash-done').style.display = 'none';
-  document.getElementById('card-flash').classList.remove('done');
-
-  document.getElementById('read-input-area').style.display = 'block';
-  document.getElementById('read-done').style.display = 'none';
-  document.getElementById('card-read').classList.remove('done');
-
-  // 2. CHECK DATA FOR THE ACTUAL CURRENT DAY
-  const td = data.days[realToday]; 
-  
-  if(td) { 
-    // If work was done TODAY, update the UI to show progress
-    if(td.flash > 0){
-      document.getElementById('flash-input-area').style.display = 'none';
-      document.getElementById('flash-done').style.display = 'block';
-      document.getElementById('flash-done-text').textContent = td.flash + ' min today!';
-      document.getElementById('card-flash').classList.add('done');
-    } 
-    if(td.read > 0){
-      document.getElementById('read-input-area').style.display = 'none';
-      document.getElementById('read-done').style.display = 'block';
-      document.getElementById('read-done-text').textContent = td.read + ' hrs today!';
-      document.getElementById('card-read').classList.add('done');
-    } 
-
-    // Character Speech Logic
-    if(td.flash > 0 && td.read > 0) setSpeech('bothDone');
-    else if(td.flash > 0) setSpeech('flashDone');
-    else if(td.read > 0) setSpeech('readDone');
-    else setSpeech('greeting'); 
-
-  } else {
-    // If it's a brand new day (or an old save from a different day), start fresh
-    data.days[realToday] = { flash: 0, read: 0 };
-    setSpeech('greeting');
-  }
-
-  if(data.streak >= 5) setSpeech('streakHigh'); 
-
-  // 3. INITIALIZE ALL UI COMPONENTS
-  updateThemeIcon();
-  renderSchedule();   // Hourly Schedule
-  renderCalendar();   // Advanced Calendar
-  renderDictionary(); 
-  renderDiary(); 
-  renderQuotes(); 
-  updateStats(); 
-  updateMood();       // Character image logic
-  calcStreak();
-  saveData();
-
-  // 4. RUN BACKGROUND CYCLES
-  if(typeof startPhraseCycle === 'function') startPhraseCycle();
-  if(typeof displayDailyOracle === 'function') displayDailyOracle();
-  if(typeof autoLogOracle === 'function') autoLogOracle();
-}
-
-// Ensure these two functions exist so initApp doesn't crash:
+// ===== CORE CHARACTER FUNCTIONS =====
 function updateMood() {
   const moeImg = document.getElementById('moe-img');
   if (!moeImg) return;
@@ -608,4 +543,69 @@ function setSpeech(type) {
   };
   const choices = lines[type] || lines['greeting'];
   bubble.textContent = choices[Math.floor(Math.random() * choices.length)];
+}
+
+// ===== INTEGRATED APP INITIALIZATION =====
+function initApp() {
+  const realToday = todayStr();
+  document.getElementById('date-display').textContent = formatDate(realToday);
+  calcStreak();
+
+  // 1. MANDATORY UI RESET
+  // Clears "Done" states so loading old saves doesn't look "stuck"
+  document.getElementById('flash-input-area').style.display = 'block';
+  document.getElementById('flash-done').style.display = 'none';
+  document.getElementById('card-flash').classList.remove('done');
+
+  document.getElementById('read-input-area').style.display = 'block';
+  document.getElementById('read-done').style.display = 'none';
+  document.getElementById('card-read').classList.remove('done');
+
+  // 2. CHECK DATA FOR THE ACTUAL CURRENT DAY
+  const td = data.days[realToday];
+
+  if (td) {
+    // Re-apply progress if work was already done TODAY
+    if (td.flash > 0) {
+      document.getElementById('flash-input-area').style.display = 'none';
+      document.getElementById('flash-done').style.display = 'block';
+      document.getElementById('flash-done-text').textContent = td.flash + ' min today!';
+      document.getElementById('card-flash').classList.add('done');
+    }
+    if (td.read > 0) {
+      document.getElementById('read-input-area').style.display = 'none';
+      document.getElementById('read-done').style.display = 'block';
+      document.getElementById('read-done-text').textContent = td.read + ' hrs today!';
+      document.getElementById('card-read').classList.add('done');
+    }
+
+    // Character Speech Logic based on daily progress
+    if (td.flash > 0 && td.read > 0) setSpeech('bothDone');
+    else if (td.flash > 0) setSpeech('flashDone');
+    else if (td.read > 0) setSpeech('readDone');
+    else setSpeech('greeting');
+  } else {
+    // New day setup
+    data.days[realToday] = { flash: 0, read: 0 };
+    setSpeech('greeting');
+  }
+
+  // 3. SPECIAL TRIGGERS & BACKGROUND LOGIC
+  if (data.streak >= 5) setSpeech('streakHigh');
+  if (typeof autoLogOracle === 'function') autoLogOracle();
+
+  // 4. INITIALIZE ALL UI COMPONENTS
+  updateThemeIcon();
+  renderSchedule();   // Hourly Schedule
+  renderCalendar();   // Advanced Calendar
+  renderDictionary();
+  renderDiary();
+  renderQuotes();
+  updateStats();
+  updateMood();       // Sets character image
+  saveData();
+
+  // 5. RUN CYCLES
+  if (typeof startPhraseCycle === 'function') startPhraseCycle();
+  if (typeof displayDailyOracle === 'function') displayDailyOracle();
 }
