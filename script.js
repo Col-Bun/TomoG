@@ -10,15 +10,18 @@ function toggleTheme() { document.body.classList.toggle('dark-mode'); localStora
 
 // ===== DATA INITIALIZATION =====
 const STORAGE_KEY = 'studyBuddyData';
-function getDefaultData() { return { days: {}, dictionary: [], diary: [], calendar: {}, quotes: [], streak: 0, lastActiveDate: null, starterLoaded: false }; }
+function getDefaultData() { 
+  return { days: {}, dictionary: [], diary: [], streak: 0, lastActiveDate: null, starterLoaded: false, schedule: {}, calendar: {} }; 
+}
+
 function loadData() { 
   try { 
     const r = localStorage.getItem(STORAGE_KEY); 
     if (r) { 
       let loaded = JSON.parse(r); 
       if (!loaded.diary) loaded.diary = []; 
+      if (!loaded.schedule) loaded.schedule = {};
       if (!loaded.calendar) loaded.calendar = {};
-      if (!loaded.quotes) loaded.quotes = [];
       return loaded; 
     } 
   } catch(e) {} 
