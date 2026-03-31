@@ -40,9 +40,6 @@ function loadData() {
 }
 function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 let data = loadData();
-}
-function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
-let data = loadData();
 
 if (!data.starterLoaded && typeof starterDeck !== 'undefined') {
   starterDeck.forEach(word => { if (!data.dictionary.some(w => w.en === word.en)) data.dictionary.push({ en: word.en, jp: word.jp, es: word.es, addedDate: todayStr() }); });
