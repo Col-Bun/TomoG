@@ -609,3 +609,20 @@ function initApp() {
   if (typeof startPhraseCycle === 'function') startPhraseCycle();
   if (typeof displayDailyOracle === 'function') displayDailyOracle();
 }
+// ===== HARDCODED PASSWORD BYPASS (ADD TO BOTTOM) =====
+document.getElementById('pw-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    const input = this.value.toLowerCase().trim();
+    
+    // If the input is 'cake', manually trigger the app entry
+    if (input === 'cake' || input === 'moe') {
+      document.getElementById('password-screen').style.display = 'none'; 
+      document.getElementById('app').style.display = 'block'; 
+      
+      // Ensure the app initializes correctly
+      if (typeof initApp === 'function') {
+        initApp();
+      }
+    }
+  }
+});
