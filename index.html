@@ -46,6 +46,7 @@
 
   <div class="tabs">
     <button class="tab-btn active" data-tab="home">🏠 Home</button>
+    <button class="tab-btn" data-tab="schedule">🕒 Schedule</button>
     <button class="tab-btn" data-tab="calendar">📅 Calendar</button>
     <button class="tab-btn" data-tab="dictionary">📖 Dictionary <span id="dict-tab-count"></span></button>
     <button class="tab-btn" data-tab="diary">📓 Diary</button>
@@ -97,19 +98,36 @@
     </div>
   </div>
 
+  <div class="tab-content" id="tab-schedule">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 16px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 1.4rem;">🕒 Hourly Schedule</h3>
+      <div id="schedule-list" style="background: rgba(0,0,0,0.2); border-radius: 16px; padding: 10px; max-height: 55vh; overflow-y: auto;">
+        </div>
+      <button class="btn-glossy btn-green" style="margin-top: 20px; width: 100%; font-size: 1.1rem; padding: 14px;" onclick="saveSchedule()">Save Schedule</button>
+    </div>
+  </div>
+
   <div class="tab-content" id="tab-calendar">
-    <div class="calendar-section glass-dark">
-      <div style="text-align: center;"><div class="cal-jp-date" id="cal-jp-date"></div></div>
-      <div class="cal-header">
-        <button class="btn-theme" style="border-radius: 50%; width: 40px; height: 40px; padding: 0;" onclick="changeMonth(-1)">◀</button>
-        <h2 id="cal-month-year">March 2026</h2>
-        <button class="btn-theme" style="border-radius: 50%; width: 40px; height: 40px; padding: 0;" onclick="changeMonth(1)">▶</button>
+    <div class="glass-dark" style="padding: 22px; position: relative;">
+      <div style="text-align: center;"><div class="cal-jp-date" id="cal-jp-date" style="font-size: 0.9rem; color: #a8e84c; margin-bottom: 10px;"></div></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <button class="btn-theme" style="border-radius: 50px; padding: 8px 16px;" onclick="changeMonth(-1)">◀ Prev</button>
+        <h3 id="cal-month-year" style="font-family: 'Baloo 2', cursive; color: #fff; margin: 0; font-size: 1.4rem; text-shadow: 0 1px 4px rgba(0,0,0,0.15);"></h3>
+        <button class="btn-theme" style="border-radius: 50px; padding: 8px 16px;" onclick="changeMonth(1)">Next ▶</button>
       </div>
-      <div class="cal-grid-header"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
-      <div class="cal-grid" id="cal-grid"></div>
-      <div id="cal-event-editor" class="cal-event-editor" style="display:none;">
-        <h4 id="cal-edit-date"></h4>
-        <div class="cal-input-wrapper"><input type="text" id="cal-event-input" placeholder="Enter event or note..."><button class="btn-glossy btn-green" onclick="saveCalendarEvent()">Save</button></div>
+      <div class="cal-grid" id="cal-grid">
+        </div>
+      
+      <div id="cal-modal" style="position: absolute; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px;">
+        <div class="cal-modal-content" style="background: var(--metro-bg1); border: 2px solid rgba(255,255,255,0.3); border-radius: 24px; padding: 24px; width: 100%; max-width: 400px;">
+          <div class="cal-modal-header" id="cal-modal-date" style="font-family: 'Baloo 2'; font-size: 1.4rem; color: #fff; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2);">Date</div>
+          <div class="cal-modal-add" style="display: flex; gap: 8px; margin-bottom: 16px;">
+            <input type="text" id="cal-modal-input" placeholder="New task..." style="flex:1; border-radius:12px; padding:10px;" onkeydown="if(event.key==='Enter') addCalTask()">
+            <button class="btn-glossy btn-pink" onclick="addCalTask()">+</button>
+          </div>
+          <div class="cal-modal-list" id="cal-modal-list" style="max-height: 200px; overflow-y: auto; margin-bottom: 15px;"></div>
+          <button class="cal-modal-close btn-theme" style="width:100%; padding:10px; border-radius:50px;" onclick="closeCalModal()">Close</button>
+        </div>
       </div>
     </div>
   </div>
@@ -365,35 +383,18 @@
     </div>
   </div>
 
-  <!-- THE NEW CLIPBOARD FOCUS TAB -->
   <div class="tab-content" id="tab-clipboard">
     <div class="clipboard-focus-container glass-dark">
       <button class="btn-theme exit-btn" onclick="exitClipboardMode()">◀ Return to Hub</button>
       <h2 style="font-family:'Baloo 2'; color:#00e5ff; font-size: 2.5rem; margin-bottom: 10px;">Clipboard Sync</h2>
       <div class="clip-stats">TOTAL CHARACTERS PASTED: <span id="clip-char-count" style="color:#fff;">0</span></div>
-      
       <button class="btn-glossy btn-purple huge-btn" onclick="autoPaste()">📋 AUTO-PASTE</button>
-      
       <textarea id="clipboard-area" class="diary-textarea custom-scrollbar" placeholder="Awaiting clipboard data..."></textarea>
     </div>
   </div>
 
 </div>
 
-<div id="numo-data-store">
-  <div id="data-zone-0"><h3>Zone Zero</h3><h4>The Numeral 0</h4><p>The figure ‘0' designates the number zero, anterior to the distinction odd/even, and also to the determination of primes (zeroth prime = 1). Zero is the only natural number that is indivisible by one. Zero digitally cumulates to zero. Numeric Keypad direction: anomalous.</p><h4>The Zeroth Planet: Sol</h4><p>The Sun (Sol-0) is by far the largest body in the Solar-system. The Sun is approximately 4.5 billion years old, roughly half-way through it's normal existence (or main-sequence of hydrogen-to-helium nucleosynthesis).</p><h4>System Notes</h4><p>Zone-0 is the first of two zones mutually composing the Plex-region of the Numogram. Its Syzygetic-twin is Zone-9. This 9+0 Syzygy is carried by the demon Uttunul. Zone-0 provides the terminus for a single Plex-channel (the 0th).</p></div>
-  <div id="data-zone-1"><h3>Zone One</h3><h4>The Numeral 1</h4><p>The figure ‘1' designates the number one, first odd number (with odditude of aleph-null), and the zeroth prime (first prime = 2). One digitally cumulates to one. Numeric Keypad direction: South-West.</p><h4>The First Planet: Mercury</h4><p>Mercury is the innermost planet of the Solar-system (with a mean orbital distance from the sun of approx. 58 000 000 km). In Lemurian Planetwork Mercury is astrozygonomously paired with Neptune.</p><h4>System Notes</h4><p>Zone-1 is the first of the six Torque-region Zones of the Numogram, and Tractor-Zone of the 5-4 (or 'Sink') Current. Its Syzygetic-twin is Zone-8. This 8+1 Syzygy is carried by the demon Murmur. Zone-1 provides the terminus for three Torque-channels (the 1st, 4th, and 7th).</p></div>
-  <div id="data-zone-2"><h3>Zone Two</h3><h4>The Numeral 2</h4><p>The figure ‘2' designates the number two, the first and definitive even number, and the first prime (second prime = 3). Two digitally cumulates to three. Numeric Keypad direction: South.</p><h4>The Second Planet: Venus</h4><p>Venus (or Sol-2) has a mean orbital distance from sun of 108.2 million km. In Lemurian Planetwork Venus is astrozygonomously paired with Uranus.</p><h4>System Notes</h4><p>Zone-2 is the second of the six Torque-region Zones of the Numogram. Its Syzygetic-twin is Zone-7. This 7+2 Syzygy is carried by the demon Oddubb.</p></div>
-  <div id="data-zone-3"><h3>Zone Three</h3><h4>The Numeral 3</h4><p>The figure ‘3' designates the number three, the second odd number (with odditude of 1), and second prime (third prime = 5). Three digitally cumulates to six. Numeric Keypad direction: South-East.</p><h4>The Third Planet: Earth</h4><p>Earth (or Sol-3) has a mean orbital distance from the sun of approx. 149 600 000 km, defining the standard Astronomical Unit (AU). In Lemurian Planetwork the Earth is astrozygonomously paired with Saturn.</p><h4>System Notes</h4><p>Zone-3 is the first of the two Warp-region Zones of the Numogram, and Tractor-Zone of the 6-3 (or 'Warp') Current. Its Syzygetic-twin is Zone-6. This 6+3 Syzygy is carried by the demon Djynxx. Zone-3 provides the terminus for two channels, one each from the Torque (the 2nd), and the Warp (the 6th).</p></div>
-  <div id="data-zone-4"><h3>Zone Four</h3><h4>The Numeral 4</h4><p>The figure ‘4' designates the number four, the second even number, and first non-prime (or complex) natural number, with prime factors of 2 x 2. Four digitally cumulates to ten. Numeric Keypad direction: West.</p><h4>The Fourth Planet: Mars</h4><p>Mars (or Sol-4) has a mean orbital distance from the sun of approx. 228 000 000 km. In Lemurian Planetwork Mars is astrozygonomously paired Jupiter.</p><h4>System Notes</h4><p>Zone-4 is the third of the six Torque-region Zones of the Numogram. Its Syzygetic-twin is Zone-5. The 5+4 Syzygy is carried by the demon Katak.</p></div>
-  <div id="data-zone-5"><h3>Zone Five</h3><h4>The Numeral 5</h4><p>The figure ‘5' designates the number five, the third odd number (with odditude of 2), and the third prime (fifth prime = 11). Five digitally cumulates to fifteen. Numeric Keypad direction: Centre.</p><h4>The Fifth Planet: Jupiter</h4><p>Jupiter (or Sol-5) has a mean orbital distance from the sun of approx. 778 330 000 km. In Lemurian Planetwork Jupiter is astrozygonomously paired with Mars.</p><h4>System Notes</h4><p>Zone-5 is the sixth of the six Torque-region Zones of the Numogram, and Tractor-Zone of the 7-2 (or 'Hold') Current. Its Syzygetic-twin is Zone-4. This 5+4 Syzygy (carried by the demon Katak) draws the innermost curve of the Barker-spiral, with Zone-5 itself marking its central and terminal node (or 'inner-eye').</p></div>
-  <div id="data-zone-6"><h3>Zone Six</h3><h4>The Numeral 6</h4><p>The figure ‘6' designates the number six, third even number, and second non-prime (with prime-factors 2 and 3). Six digitally cumulates to twenty-one. Numeric Keypad direction: East.</p><h4>The Sixth Planet: Saturn</h4><p>Saturn (or Sol-6) has a mean orbital distance from the sun of approx. 1 429 400 000 km. In Lemurian Planetwork Saturn is astrozygonomously paired with Earth.</p><h4>System Notes</h4><p>Zone-6 is the second of the two Warp-region Zones of the Numogram. Its Warp-complement and Syzygetic-twin is Zone-3. It is this 6+3 Syzygy (carried by the demon Djynxx) which draws the 'Ulterior Vortex' of Outer-Time. Zone-6 provides the terminus for two channels, one each from the Torque (the 5th), and the Warp (the 3rd).</p></div>
-  <div id="data-zone-7"><h3>Zone Seven</h3><h4>The Numeral 7</h4><p>The figure ‘7' designates the number seven, the fourth odd number (with odditude of one), and the fourth prime (seventh prime = 17). Seven digitally cumulates to twenty-eight. Numeric Keypad direction: North-West.</p><h4>The Seventh Planet: Uranus</h4><p>Uranus (or Sol-7) has a mean orbital distance from the sun of approx. 2 870 990 000 km. In Lemurian Planetwork Uranus is astrozygonomously paired with Venus.</p><h4>System Notes</h4><p>Zone-7 is the fifth of the six Torque-region Zones of the Numogram, and Tractor-Zone of the 8-1 (or 'Surge') Current. Its Syzygetic-twin is Zone-2. The 7+2 Syzygy is carried by the demon Oddubb, whose associations with hyperstitious doublings reinforces its twin character.</p></div>
-  <div id="data-zone-8"><h3>Zone Eight</h3><h4>The Numeral 8</h4><p>The figure ‘8' designates the number eight, the fourth even number, and the third non-prime (with prime factors 2 x 2 x 2). Eight digitally cumulates to thirty-six. Numeric Keypad direction: North.</p><h4>The Eighth Planet: Neptune</h4><p>Neptune (or Sol-8) is the outermost gas-giant, with a mean orbital distance from the sun of approx. 4 504 000 000 km. In Lemurian Planetwork Neptune is astrozygonomously paired with Mercury.</p><h4>System Notes</h4><p>Zone-8 is the fourth of the six Torque-region Zones of the Numogram. Its Syzygetic-twin is Zone-1. The 8+1 Syzygy is carried by the demon Murmur (known to Muvian sorcerors as 'the nethermost denizen of time').</p></div>
-  <div id="data-zone-9"><h3>Zone Nine</h3><h4>The Numeral 9</h4><p>The figure ‘9' designates the number nine, the fifth odd number (with odditude of three), and the fourth non-prime (with prime factors 3 x 3). Nine digitally cumulates to forty-five. Numeric Keypad direction: North-East.</p><h4>The Ninth Planet: Pluto</h4><p>Pluto (or Sol-9) has the most highly elliptical orbital trajectory of any planet in the Solar-system, with a (highly variable) mean orbital distance from the sun of approx. 5 913 520 000 km. In Lemurian Planetwork Pluto is astrozygonomously paired with the Sun.</p><h4>System Notes</h4><p>Zone-9 is the second of the two zones mutually composing the Plex-region of the Numogram, and Tractor-Zone for the 9-0 (or 'Plex') current. Its Plex-complement and Syzygetic-twin is Zone-0. This 9+0 Syzygy (carried by the demon Uttunul) draws the outermost curve of the Barker-spiral, which coincides with the limit ordinal-span in Barkerian arithmetic. Zone-9 provides the terminus for two channels, one each from the Torque (the 8th), and the Plex (the 9th).</p></div>
-</div>
-
-<!-- DRAGGABLE JP DICTIONARY POPUP -->
 <div id="jisho-popup" class="glass-strong">
   <div id="jisho-header">
     <span style="font-weight: 800; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">📖 JP Quick-Search</span>
