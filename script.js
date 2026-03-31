@@ -391,3 +391,21 @@ function initApp(){
   
   renderDictionary(); renderDiary(); renderCalendar(); renderQuotes(); updateStats(); updateMood(); saveData(); startPhraseCycle(); displayDailyOracle();
 }
+
+function getDefaultData() { 
+  return { days: {}, dictionary: [], diary: [], streak: 0, lastActiveDate: null, starterLoaded: false, schedule: {}, calendar: {} }; 
+}
+
+function loadData() { 
+  try { 
+    const r = localStorage.getItem(STORAGE_KEY); 
+    if (r) { 
+      let loaded = JSON.parse(r); 
+      if (!loaded.diary) loaded.diary = []; 
+      if (!loaded.schedule) loaded.schedule = {};
+      if (!loaded.calendar) loaded.calendar = {};
+      return loaded; 
+    } 
+  } catch(e) {} 
+  return getDefaultData(); 
+}
