@@ -10,15 +10,18 @@ function toggleTheme() { document.body.classList.toggle('dark-mode'); localStora
 
 // ===== DATA INITIALIZATION =====
 const STORAGE_KEY = 'studyBuddyData';
-function getDefaultData() { return { days: {}, dictionary: [], diary: [], calendar: {}, quotes: [], streak: 0, lastActiveDate: null, starterLoaded: false }; }
+function getDefaultData() { 
+  return { days: {}, dictionary: [], diary: [], streak: 0, lastActiveDate: null, starterLoaded: false, schedule: {}, calendar: {} }; 
+}
+
 function loadData() { 
   try { 
     const r = localStorage.getItem(STORAGE_KEY); 
     if (r) { 
       let loaded = JSON.parse(r); 
       if (!loaded.diary) loaded.diary = []; 
+      if (!loaded.schedule) loaded.schedule = {};
       if (!loaded.calendar) loaded.calendar = {};
-      if (!loaded.quotes) loaded.quotes = [];
       return loaded; 
     } 
   } catch(e) {} 
@@ -374,7 +377,115 @@ function castOracle() {
     secResultBox.style.display = 'block'; secResultBox.innerHTML = `<h3>Changes to Hexagram ${secondaryData.num}: ${secondaryData.name}</h3><p>${secondaryData.meaning}</p>`;
   } else { secBoxUI.style.display = 'none'; secResultBox.style.display = 'none'; }
 }
+// ===== SCHEDULE LOGIC =====
+function renderSchedule() {
+  const list = document.getElementById('schedule-list');
+  list.innerHTML = '';
+  // Loop 24 hours
+  for(let i=0; i<24; i++) {
+    let hour = i === 0 ? 12 : (i > 12 ? i - 12 : i);
+    let ampm = i < 12 ? "AM" : "PM";
+    let timeLabel = `${hour} ${ampm}`;
+    let val = data.schedule[i] || "";
+    list.innerHTML += `<div class="schedule-row">
+      <div class="schedule-time">${timeLabel}</div>
+      <input type="text" class="schedule-input" id="sched-input-${i}" value="${escHtml(val)}" placeholder="Plan something...">
+    </div>`;
+  }
+}
 
+function saveSchedule() {
+  for(let i=0; i<24; i++) {
+    data.schedule[i] = document.getElementById(`sched-input-${i}`).value;
+  }
+  saveData();
+  const btn = document.querySelector('#tab-schedule .btn-green');
+  btn.textContent = "Saved! ✔️";
+  setTimeout(() => btn.textContent = "Save Schedule", 2000);
+}
+
+// ===== CALENDAR LOGIC =====
+let currentDate = new Date();
+let selectedDateStr = "";
+
+function renderCalendar() {
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  document.getElementById('cal-month-year').textContent = `${months[month]} ${year}`;
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+  
+  const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  daysOfWeek.forEach(d => grid.innerHTML += `<div class="cal-header">${d}</div>`);
+  
+  // Empty slots for previous month
+  for(let i=0; i<firstDay; i++) { grid.innerHTML += `<div></div>`; }
+  
+  const today = new Date();
+  for(let i=1; i<=daysInMonth; i++) {
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+    const tasks = data.calendar[dateStr] || [];
+    let taskHTML = '';
+    
+    // Render up to 3 tasks on the grid, show "+X more" if exceeded
+    tasks.slice(0, 3).forEach(t => taskHTML += `<div class="cal-task">${escHtml(t)}</div>`);
+    if(tasks.length > 3) taskHTML += `<div class="cal-task more">+${tasks.length - 3} more</div>`;
+    
+    let isToday = (year === today.getFullYear() && month === today.getMonth() && i === today.getDate()) ? 'today' : '';
+    grid.innerHTML += `<div class="cal-day ${isToday}" onclick="openCalModal('${dateStr}')"><div class="cal-day-num">${i}</div>${taskHTML}</div>`;
+  }
+}
+
+function changeMonth(delta) {
+  currentDate.setMonth(currentDate.getMonth() + delta);
+  renderCalendar();
+}
+
+function openCalModal(dateStr) {
+  selectedDateStr = dateStr;
+  document.getElementById('cal-modal').style.display = 'flex';
+  renderCalModal();
+}
+
+function closeCalModal() {
+  document.getElementById('cal-modal').style.display = 'none';
+  renderCalendar(); 
+}
+
+function renderCalModal() {
+  document.getElementById('cal-modal-date').textContent = formatDate(selectedDateStr);
+  const tasks = data.calendar[selectedDateStr] || [];
+  const list = document.getElementById('cal-modal-list');
+  list.innerHTML = '';
+  if(tasks.length === 0) list.innerHTML = '<p style="color:rgba(255,255,255,0.5);text-align:center;font-size:0.85rem;margin:10px 0;">No tasks for this day.</p>';
+  tasks.forEach((t, idx) => {
+    list.innerHTML += `<div class="cal-modal-task">
+      <span>${escHtml(t)}</span>
+      <button class="del-word" onclick="delCalTask(${idx})">×</button>
+    </div>`;
+  });
+}
+
+function addCalTask() {
+  const input = document.getElementById('cal-modal-input');
+  const val = input.value.trim();
+  if(!val) return;
+  if(!data.calendar[selectedDateStr]) data.calendar[selectedDateStr] = [];
+  data.calendar[selectedDateStr].push(val);
+  saveData();
+  input.value = '';
+  renderCalModal();
+}
+
+function delCalTask(idx) {
+  data.calendar[selectedDateStr].splice(idx, 1);
+  saveData();
+  renderCalModal();
+}
 // ===== APP INITIALIZATION =====
 function initApp(){
   document.getElementById('date-display').textContent=formatDate(todayStr()); calcStreak();
