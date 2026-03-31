@@ -517,112 +517,15 @@ function initApp(){
   
   autoLogOracle(); // Runs daily auto-log for the I-Ching
 
-// ===== CORE CHARACTER FUNCTIONS =====
-function updateMood() {
-  const moeImg = document.getElementById('moe-img');
-  if (!moeImg) return;
-  const td = data.days[todayStr()];
-  if (!td || (td.flash === 0 && td.read === 0)) {
-    moeImg.src = "https://i.postimg.cc/7Z9yZz4y/moe-neutral.png"; 
-  } else if (td.flash > 0 && td.read > 0) {
-    moeImg.src = "https://i.postimg.cc/9M3P098P/moe-happy.png"; 
-  } else {
-    moeImg.src = "https://i.postimg.cc/Bv9yZz4y/moe-study.png";
-  }
+  // Initialize all UI components
+  renderSchedule(); // New Hourly Schedule
+  renderCalendar(); // New Advanced Calendar
+  renderDictionary(); 
+  renderDiary(); 
+  renderQuotes(); 
+  updateStats(); 
+  updateMood(); 
+  saveData(); 
+  startPhraseCycle(); 
+  displayDailyOracle();
 }
-
-function setSpeech(type) {
-  const bubble = document.getElementById('moe-speech');
-  if (!bubble) return;
-  const lines = {
-    greeting: ["Ready to study?", "Let's get to work!"],
-    flashDone: ["Flashcards complete!", "Your memory is getting better!"],
-    readDone: ["Finished reading? Nice!", "Knowledge is power!"],
-    bothDone: ["You finished everything today! ✨", "Amazing work!"],
-    streakHigh: ["Look at that streak!", "Don't stop now!"]
-  };
-  const choices = lines[type] || lines['greeting'];
-  bubble.textContent = choices[Math.floor(Math.random() * choices.length)];
-}
-
-// ===== INTEGRATED APP INITIALIZATION =====
-function initApp() {
-  const realToday = todayStr();
-  document.getElementById('date-display').textContent = formatDate(realToday);
-  calcStreak();
-
-  // 1. MANDATORY UI RESET
-  // Clears "Done" states so loading old saves doesn't look "stuck"
-  document.getElementById('flash-input-area').style.display = 'block';
-  document.getElementById('flash-done').style.display = 'none';
-  document.getElementById('card-flash').classList.remove('done');
-
-  document.getElementById('read-input-area').style.display = 'block';
-  document.getElementById('read-done').style.display = 'none';
-  document.getElementById('card-read').classList.remove('done');
-
-  // 2. CHECK DATA FOR THE ACTUAL CURRENT DAY
-  const td = data.days[realToday];
-
-  if (td) {
-    // Re-apply progress if work was already done TODAY
-    if (td.flash > 0) {
-      document.getElementById('flash-input-area').style.display = 'none';
-      document.getElementById('flash-done').style.display = 'block';
-      document.getElementById('flash-done-text').textContent = td.flash + ' min today!';
-      document.getElementById('card-flash').classList.add('done');
-    }
-    if (td.read > 0) {
-      document.getElementById('read-input-area').style.display = 'none';
-      document.getElementById('read-done').style.display = 'block';
-      document.getElementById('read-done-text').textContent = td.read + ' hrs today!';
-      document.getElementById('card-read').classList.add('done');
-    }
-
-    // Character Speech Logic based on daily progress
-    if (td.flash > 0 && td.read > 0) setSpeech('bothDone');
-    else if (td.flash > 0) setSpeech('flashDone');
-    else if (td.read > 0) setSpeech('readDone');
-    else setSpeech('greeting');
-  } else {
-    // New day setup
-    data.days[realToday] = { flash: 0, read: 0 };
-    setSpeech('greeting');
-  }
-
-  // 3. SPECIAL TRIGGERS & BACKGROUND LOGIC
-  if (data.streak >= 5) setSpeech('streakHigh');
-  if (typeof autoLogOracle === 'function') autoLogOracle();
-
-  // 4. INITIALIZE ALL UI COMPONENTS
-  updateThemeIcon();
-  renderSchedule();   // Hourly Schedule
-  renderCalendar();   // Advanced Calendar
-  renderDictionary();
-  renderDiary();
-  renderQuotes();
-  updateStats();
-  updateMood();       // Sets character image
-  saveData();
-
-  // 5. RUN CYCLES
-  if (typeof startPhraseCycle === 'function') startPhraseCycle();
-  if (typeof displayDailyOracle === 'function') displayDailyOracle();
-}
-// ===== HARDCODED PASSWORD BYPASS (ADD TO BOTTOM) =====
-document.getElementById('pw-input').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') {
-    const input = this.value.toLowerCase().trim();
-    
-    // If the input is 'cake', manually trigger the app entry
-    if (input === 'cake' || input === 'moe') {
-      document.getElementById('password-screen').style.display = 'none'; 
-      document.getElementById('app').style.display = 'block'; 
-      
-      // Ensure the app initializes correctly
-      if (typeof initApp === 'function') {
-        initApp();
-      }
-    }
-  }
-});
