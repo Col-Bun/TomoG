@@ -22,9 +22,16 @@ function loadData() {
       if (!loaded.diary) loaded.diary = []; 
       if (!loaded.schedule) loaded.schedule = {};
       if (!loaded.calendar) loaded.calendar = {};
+      
+      // === ADD THIS LINE BELOW ===
+      if (!loaded.quotes) loaded.quotes = []; 
+      // ===========================
+
       return loaded; 
     } 
   } catch(e) {} 
+  return getDefaultData(); 
+}
   return getDefaultData(); 
 }
 function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
