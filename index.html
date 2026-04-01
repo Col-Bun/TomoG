@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Moe-Chan & The Oracle</title>
 <link rel="stylesheet" href="style.css">
+<style>
+  .polling-active { animation: pulse-glow 1.2s ease-in-out infinite; background: linear-gradient(180deg,#ff6348 0%,#ee5a24 100%) !important; }
+  @keyframes pulse-glow { 0%,100% { box-shadow: 0 0 8px rgba(255,99,72,0.4); } 50% { box-shadow: 0 0 20px rgba(255,99,72,0.8); } }
+</style>
 </head>
 <body>
 
@@ -402,10 +406,36 @@
   <div class="tab-content" id="tab-clipboard">
     <div class="clipboard-focus-container glass-dark">
       <button class="btn-theme exit-btn" onclick="exitClipboardMode()">◀ Return to Hub</button>
-      <h2 style="font-family:'Baloo 2'; color:#00e5ff; font-size: 2.5rem; margin-bottom: 10px;">Clipboard Sync</h2>
-      <div class="clip-stats">TOTAL CHARACTERS PASTED: <span id="clip-char-count" style="color:#fff;">0</span></div>
-      <button class="btn-glossy btn-purple huge-btn" onclick="autoPaste()">📋 AUTO-PASTE</button>
-      <textarea id="clipboard-area" class="diary-textarea custom-scrollbar" placeholder="Awaiting clipboard data..."></textarea>
+      <h2 style="font-family:'Baloo 2'; color:#00e5ff; font-size: 2.2rem; margin-bottom: 4px;">📋 VN Text Hook</h2>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.8rem; margin-bottom:14px;">Captures text from Textractor / Agent / clipboard. Counts Japanese characters only (kanji + kana).</p>
+
+      <div class="clip-stats" style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-bottom:16px;">
+        <div class="glass" style="padding:10px 18px; border-radius:14px; text-align:center; min-width:100px;">
+          <div style="font-size:1.6rem; font-weight:800; color:#a8e84c;" id="clip-jp-session">0</div>
+          <div style="font-size:0.7rem; color:rgba(255,255,255,0.6);">Session JP Chars</div>
+        </div>
+        <div class="glass" style="padding:10px 18px; border-radius:14px; text-align:center; min-width:100px;">
+          <div style="font-size:1.6rem; font-weight:800; color:#00e5ff;" id="clip-jp-total">0</div>
+          <div style="font-size:0.7rem; color:rgba(255,255,255,0.6);">All-Time JP Chars</div>
+        </div>
+        <div class="glass" style="padding:10px 18px; border-radius:14px; text-align:center; min-width:80px;">
+          <div style="font-size:1.6rem; font-weight:800; color:#ff3c8e;" id="clip-line-count">0</div>
+          <div style="font-size:0.7rem; color:rgba(255,255,255,0.6);">Lines</div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:14px;">
+        <button class="btn-glossy btn-purple huge-btn" onclick="autoPaste()">📋 AUTO-PASTE</button>
+        <button class="btn-glossy btn-green huge-btn" id="clip-poll-btn" onclick="toggleAutoPoll()" style="background:linear-gradient(180deg,#2ed573 0%,#1aaf5d 100%);">▶ START AUTO-CAPTURE</button>
+      </div>
+
+      <textarea id="clipboard-area" class="diary-textarea custom-scrollbar" placeholder="Hooked text appears here (newest at top)..." style="font-family:'Noto Sans JP','Nunito',sans-serif; font-size:1.05rem; line-height:1.8; min-height:40vh;" readonly></textarea>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:14px;">
+        <button class="btn-theme" style="padding:8px 16px; border-radius:50px; font-size:0.85rem;" onclick="exportClipLog()">💾 Export Log</button>
+        <button class="btn-theme" style="padding:8px 16px; border-radius:50px; font-size:0.85rem;" onclick="clearClipSession()">🗑 Clear Session</button>
+        <button class="btn-theme" style="padding:8px 16px; border-radius:50px; font-size:0.85rem; color:#ff3c8e;" onclick="resetClipLifetime()">Reset Lifetime</button>
+      </div>
     </div>
   </div>
 
