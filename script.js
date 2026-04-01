@@ -1,5 +1,9 @@
 // ===== JAPANESE WEEKDAY THEMES =====
 function setDailyTheme() {
+  // Skip if a non-moe theme is active — those themes control their own colors
+  const activeTheme = localStorage.getItem('studyBuddyTheme_v2');
+  if (activeTheme && activeTheme !== 'moe') return;
+
   const day = new Date().getDay(); 
   // Elements: 0:Sun(Red/Pink), 1:Moon(Purple/Silver), 2:Fire(Crimson), 3:Water(Blue), 4:Wood(Green), 5:Gold(Gold/Yellow), 6:Earth(Sand/Brown)
   const themes = [
