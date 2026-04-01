@@ -1,3 +1,22 @@
+// ===== JAPANESE WEEKDAY THEMES =====
+function setDailyTheme() {
+  const day = new Date().getDay(); 
+  // Elements: 0:Sun(Red/Pink), 1:Moon(Purple/Silver), 2:Fire(Crimson), 3:Water(Blue), 4:Wood(Green), 5:Gold(Gold/Yellow), 6:Earth(Sand/Brown)
+  const themes = [
+    { bg1: '#ff4757', bg2: '#ff6b81' }, // Sunday (日)
+    { bg1: '#70a1ff', bg2: '#5352ed' }, // Monday (月)
+    { bg1: '#ff6348', bg2: '#eccc68' }, // Tuesday (火)
+    { bg1: '#1e90ff', bg2: '#00a8ff' }, // Wednesday (水)
+    { bg1: '#2ed573', bg2: '#7bed9f' }, // Thursday (木)
+    { bg1: '#ffa502', bg2: '#ffb142' }, // Friday (金)
+    { bg1: '#c8d6e5', bg2: '#8395a7' }  // Saturday (土)
+  ];
+  const currentTheme = themes[day];
+  document.documentElement.style.setProperty('--metro-bg1', currentTheme.bg1);
+  document.documentElement.style.setProperty('--metro-bg2', currentTheme.bg2);
+}
+setDailyTheme(); // Run immediately on load
+
 // ===== UTILS =====
 function todayStr() { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function formatDate(s) { const [y,m,d]=s.split('-'); const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return mo[parseInt(m)-1]+' '+parseInt(d)+', '+y; }
@@ -7,27 +26,7 @@ function escHtml(s){const d=document.createElement('div');d.textContent=s;return
 function updateThemeIcon() { document.getElementById('theme-btn').textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙'; }
 updateThemeIcon();
 function toggleTheme() { document.body.classList.toggle('dark-mode'); localStorage.setItem('studyBuddyTheme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); updateThemeIcon(); }
-// ===== JAPANESE WEEKDAY THEMES =====
-function setDailyTheme() {
-  const day = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
-  
-  // Elements: 0:Sun(Red/Pink), 1:Moon(Purple/Silver), 2:Fire(Crimson), 3:Water(Blue), 4:Wood(Green), 5:Gold(Gold/Yellow), 6:Earth(Sand/Brown)
-  const themes = [
-    { bg1: '#ff4757', bg2: '#ff6b81' }, // Sunday (日 - Sun)
-    { bg1: '#70a1ff', bg2: '#5352ed' }, // Monday (月 - Moon)
-    { bg1: '#ff6348', bg2: '#eccc68' }, // Tuesday (火 - Fire)
-    { bg1: '#1e90ff', bg2: '#00a8ff' }, // Wednesday (水 - Water)
-    { bg1: '#2ed573', bg2: '#7bed9f' }, // Thursday (木 - Wood)
-    { bg1: '#ffa502', bg2: '#ffb142' }, // Friday (金 - Gold)
-    { bg1: '#c8d6e5', bg2: '#8395a7' }  // Saturday (土 - Earth)
-  ];
-  
-  const currentTheme = themes[day];
-  // We apply this to the :root element so Dark Mode on the body can safely override it when toggled
-  document.documentElement.style.setProperty('--metro-bg1', currentTheme.bg1);
-  document.documentElement.style.setProperty('--metro-bg2', currentTheme.bg2);
-}
-setDailyTheme(); // Run immediately on load
+
 // ===== DATA INITIALIZATION =====
 const STORAGE_KEY = 'studyBuddyData';
 function getDefaultData() { 
@@ -226,7 +225,8 @@ function setQuoteTab(lang) {
 
 function addQuote() {
   const text = document.getElementById('quote-text').value.trim();
-  const meaning = document.getElementById('quote-meaning') ? document.getElementById('quote-meaning').value.trim() : '';
+  const meaningEl = document.getElementById('quote-meaning');
+  const meaning = meaningEl ? meaningEl.value.trim() : '';
   const img = document.getElementById('quote-img').value.trim();
   const lang = document.getElementById('quote-lang').value;
   
@@ -286,53 +286,6 @@ function renderQuotes() {
       ${toggleBtn}
       ${imgHtml}
       <button class="diary-del-btn" style="position:absolute; top:12px; right:12px; background:rgba(0,0,0,0.4); border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; padding:0;" onclick="deleteQuote(${q.originalIndex})">×</button>
-    `;
-    list.appendChild(row);
-  });
-}
-
-  // Filter quotes by current language but keep their true index for safe deletion
-  const filteredQuotes = data.quotes.map((q, index) => ({ ...q, originalIndex: index }))
-                                    .filter(q => (q.lang || 'en') === currentQuoteLang);
-
-  if(filteredQuotes.length === 0) {
-    list.innerHTML = `<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px;font-style:italic;">No passages saved in this language yet.</p>`;
-    return;
-  }
-
-  // Border colors based on language
-  const borderColors = { 'en': '#0099ff', 'es': '#7ec832', 'jp': '#ff3c8e' };
-
-  filteredQuotes.slice().reverse().forEach((q) => {
-    const row = document.createElement('div');
-    row.className = 'quote-passage';
-    row.style.borderLeftColor = borderColors[currentQuoteLang] || '#ff3c8e';
-
-    let imgHtml = q.img ? `<img src="${escHtml(q.img)}" alt="Passage Image" style="max-width:100%; border-radius:12px; margin-top:16px; border:1px solid rgba(255,255,255,0.2);">` : '';
-    
-    row.innerHTML = `
-      <div style="font-size:1.05rem; color:#fff; line-height:1.6; white-space: pre-wrap;">${escHtml(q.text)}</div>
-      ${imgHtml}
-      <button class="diary-del-btn" style="position:absolute; top:12px; right:12px; background:rgba(0,0,0,0.4); border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; padding:0;" onclick="deleteQuote(${q.originalIndex})">×</button>
-    `;
-    list.appendChild(row);
-  });
-}
-
-function renderQuotes() {
-  const list = document.getElementById('quotes-list');
-  if (!list) return;
-  list.innerHTML = '';
-  if(!data.quotes || !data.quotes.length) return list.innerHTML = '<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px">No quotes saved yet.</p>';
-  data.quotes.slice().reverse().forEach((q, index) => {
-    const realIndex = data.quotes.length - 1 - index;
-    const row = document.createElement('div');
-    row.className = 'diary-entry';
-    let imgHtml = q.img ? `<img src="${escHtml(q.img)}" style="max-width:100%; border-radius:12px; margin-top:12px; border:1px solid rgba(255,255,255,0.2);">` : '';
-    row.innerHTML = `
-      <div style="font-style:italic; font-size:1.1rem; color:#fff; line-height:1.5;">"${escHtml(q.text)}"</div>
-      ${imgHtml}
-      <button class="diary-del-btn" onclick="deleteQuote(${realIndex})">×</button>
     `;
     list.appendChild(row);
   });
