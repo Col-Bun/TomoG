@@ -1,18 +1,20 @@
 // commissions.js — Art Commission Tracker for Moe-Chan
 
 // ===== INITIALIZATION =====
-// Wait for the main app (script.js / data.js) to load first, then render these cards
-window.addEventListener('DOMContentLoaded', renderCommissions);
+// Wait for the main app to load first, then render these cards
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(renderCommissions, 100); // Small delay to ensure script.js finishes loading
+});
 
-// ===== UTILITIES =====
-function escHtml(str) {
+// ===== UTILITIES (Renamed to avoid colliding with script.js) =====
+function commEscHtml(str) {
   if (!str) return '';
   const div = document.createElement('div');
   div.innerText = str;
   return div.innerHTML;
 }
 
-function formatDate(dateString) {
+function commFormatDate(dateString) {
   if (!dateString) return '';
   const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' };
   return new Date(dateString).toLocaleDateString(undefined, options);
@@ -28,12 +30,11 @@ const COMM_STAGES = [
   { key: 'shade_fx',     label: 'Shade+Effects', short: 'Sh+FX' }
 ];
 
-// Which stage index is the FINAL stage for each commission type
 const COMM_FINAL_STAGE = {
-  sketch:    1,  // Sketch Phase
-  colored:   3,  // Color
-  grayscale: 4,  // Shade
-  shaded:    5   // Shade+Effects
+  sketch:    1,
+  colored:   3,
+  grayscale: 4,
+  shaded:    5
 };
 
 const COMM_TYPE_LABELS = {
@@ -44,7 +45,7 @@ const COMM_TYPE_LABELS = {
 };
 
 // ===== FILTER STATE =====
-let commFilterMode = 'active'; // 'active' | 'done' | 'all'
+let commFilterMode = 'active';
 
 function setCommFilter(mode) {
   commFilterMode = mode;
@@ -56,6 +57,12 @@ function setCommFilter(mode) {
 
 // ===== SAVE / ADD / EDIT =====
 function saveCommission() {
+  // 1. Check if global data exists yet
+  if (typeof data === 'undefined' || !data) {
+    alert('Error: System data not loaded yet. Please wait a moment or reload.');
+    return;
+  }
+
   const editId = document.getElementById('comm-edit-id').value;
   const client = document.getElementById('comm-client').value.trim();
   if (!client) return alert('Enter the client name!');
@@ -80,13 +87,11 @@ function saveCommission() {
     finished:        false
   };
 
-  // Check the global data object provided by your main script.js/data.js
   if (!data.commissions || !Array.isArray(data.commissions)) {
     data.commissions = [];
   }
 
   if (editId) {
-    // Editing existing — preserve stage + finished status
     const idx = data.commissions.findIndex(c => c.id === parseInt(editId));
     if (idx !== -1) {
       entry.stage = data.commissions[idx].stage;
@@ -97,8 +102,14 @@ function saveCommission() {
     data.commissions.push(entry);
   }
 
-  // Calls your main app's save function
-  saveData(); 
+  // 2. Call the master save function from script.js
+  if (typeof saveData === 'function') {
+    saveData(); 
+  } else {
+    alert('Error: Could not find the master save function!');
+    return;
+  }
+  
   clearCommForm();
   renderCommissions();
 }
@@ -126,6 +137,7 @@ function cancelCommEdit() {
 }
 
 function editCommission(id) {
+  if (typeof data === 'undefined' || !data || !data.commissions) return;
   const c = data.commissions.find(x => x.id === id);
   if (!c) return;
 
@@ -151,63 +163,69 @@ function editCommission(id) {
 
 // ===== STAGE ADVANCEMENT =====
 function advanceStage(id) {
+  if (typeof data === 'undefined' || !data || !data.commissions) return;
   const c = data.commissions.find(x => x.id === id);
   if (!c || c.finished) return;
 
-  const finalStage = COMM_FINAL_STAGE[c.type] ?? 5;
+  const finalStage = COMM_FINAL_STAGE[c.type] || 5;
   if (c.stage < finalStage) {
     c.stage++;
     if (c.stage >= finalStage) {
       c.finished = true;
     }
-    saveData();
+    if (typeof saveData === 'function') saveData();
     renderCommissions();
   }
 }
 
 function revertStage(id) {
+  if (typeof data === 'undefined' || !data || !data.commissions) return;
   const c = data.commissions.find(x => x.id === id);
   if (!c) return;
   if (c.stage > 0) {
     c.stage--;
     c.finished = false;
-    saveData();
+    if (typeof saveData === 'function') saveData();
     renderCommissions();
   }
 }
 
 function toggleFinished(id) {
+  if (typeof data === 'undefined' || !data || !data.commissions) return;
   const c = data.commissions.find(x => x.id === id);
   if (!c) return;
   c.finished = !c.finished;
   if (c.finished) {
-    c.stage = COMM_FINAL_STAGE[c.type] ?? 5;
+    c.stage = COMM_FINAL_STAGE[c.type] || 5;
   }
-  saveData();
+  if (typeof saveData === 'function') saveData();
   renderCommissions();
 }
 
 function deleteCommission(id) {
+  if (typeof data === 'undefined' || !data || !data.commissions) return;
   if (!confirm('Delete this commission permanently?')) return;
   data.commissions = data.commissions.filter(c => c.id !== id);
-  saveData();
+  if (typeof saveData === 'function') saveData();
   renderCommissions();
 }
 
-// ===== QUICK UPDATE TIME/PRICE FROM CARD =====
 function quickUpdateTime(id) {
+  if (typeof data === 'undefined' || !data || !data.commissions) return;
   const c = data.commissions.find(x => x.id === id);
   if (!c) return;
   const val = prompt('Update hours spent:', c.timeSpent || 0);
   if (val === null) return;
   c.timeSpent = parseFloat(val) || 0;
-  saveData();
+  if (typeof saveData === 'function') saveData();
   renderCommissions();
 }
 
 // ===== RENDER =====
 function renderCommissions() {
-  if (!data || !data.commissions || !Array.isArray(data.commissions)) {
+  // Safety checks to prevent crashes
+  if (typeof data === 'undefined' || !data) return;
+  if (!data.commissions || !Array.isArray(data.commissions)) {
     data.commissions = [];
   }
 
@@ -249,13 +267,13 @@ function renderCommissions() {
     const card = document.createElement('div');
     card.className = 'comm-card' + (c.finished ? ' is-finished' : '');
 
-    const finalStage = COMM_FINAL_STAGE[c.type] ?? 5;
+    const finalStage = COMM_FINAL_STAGE[c.type] || 5;
 
     let socialsHtml = '';
     const soc = c.socials || {};
-    if (soc.twitter) socialsHtml += `<span class="comm-social-link">🐦 ${escHtml(soc.twitter)}</span>`;
-    if (soc.bluesky) socialsHtml += `<span class="comm-social-link">🦋 ${escHtml(soc.bluesky)}</span>`;
-    if (soc.furaffinity) socialsHtml += `<span class="comm-social-link">🐾 ${escHtml(soc.furaffinity)}</span>`;
+    if (soc.twitter) socialsHtml += `<span class="comm-social-link">🐦 ${commEscHtml(soc.twitter)}</span>`;
+    if (soc.bluesky) socialsHtml += `<span class="comm-social-link">🦋 ${commEscHtml(soc.bluesky)}</span>`;
+    if (soc.furaffinity) socialsHtml += `<span class="comm-social-link">🐾 ${commEscHtml(soc.furaffinity)}</span>`;
 
     let extrasHtml = '';
     if (c.characters > 1) extrasHtml += `<span class="comm-extra-tag">👥 ${c.characters} chars</span>`;
@@ -263,8 +281,8 @@ function renderCommissions() {
     if (c.hasBackground) extrasHtml += `<span class="comm-extra-tag">🏞 Background</span>`;
 
     let metaHtml = '';
-    if (c.dateAccepted) metaHtml += `<span>📥 Accepted: ${formatDate(c.dateAccepted)}</span>`;
-    if (c.datePayment) metaHtml += `<span>💰 Paid: ${formatDate(c.datePayment)}</span>`;
+    if (c.dateAccepted) metaHtml += `<span>📥 Accepted: ${commFormatDate(c.dateAccepted)}</span>`;
+    if (c.datePayment) metaHtml += `<span>💰 Paid: ${commFormatDate(c.datePayment)}</span>`;
     if (!c.datePayment) metaHtml += `<span style="color:#ff6b6b;">⚠ Unpaid</span>`;
 
     let pipelineHtml = '<div class="comm-pipeline"><div class="comm-pipeline-track"><div class="comm-pipeline-fill" style="width:' + (finalStage > 0 ? ((c.stage / finalStage) * 100) : 0) + '%"></div></div>';
@@ -324,7 +342,7 @@ function renderCommissions() {
     card.innerHTML = `
       <div class="comm-card-header">
         <div>
-          <div class="comm-client-name">${escHtml(c.client)}</div>
+          <div class="comm-client-name">${commEscHtml(c.client)}</div>
           ${socialsHtml ? `<div class="comm-socials">${socialsHtml}</div>` : ''}
         </div>
         <span class="comm-type-badge comm-type-${c.type}">${COMM_TYPE_LABELS[c.type] || c.type}</span>
