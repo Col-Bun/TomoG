@@ -522,3 +522,62 @@ body.clipboard-mode #app {
 .cal-modal-add button { padding: 0 16px; font-size: 1.2rem; }
 .cal-modal-close { background: rgba(255,255,255,0.1); color: #fff; border: 1.5px solid rgba(255,255,255,0.2); padding: 10px; border-radius: 50px; cursor: pointer; width: 100%; font-weight: 800; transition: background 0.2s; }
 .cal-modal-close:hover { background: rgba(255,255,255,0.2); }
+
+/* ===== QUOTES / PASSAGES ===== */
+.quotes-layout { 
+  display: grid; 
+  grid-template-columns: 320px 1fr; 
+  gap: 20px; 
+  padding: 22px; 
+  align-items: start; 
+}
+
+@media (max-width: 800px) { 
+  .quotes-layout { grid-template-columns: 1fr; } 
+}
+
+.quotes-form { padding: 20px; }
+.quotes-display { padding: 20px; display: flex; flex-direction: column; height: 100%; }
+
+.quote-mini-tabs { 
+  display: flex; 
+  gap: 10px; 
+  margin-bottom: 20px; 
+  border-bottom: 2px solid rgba(255,255,255,0.1); 
+  padding-bottom: 12px; 
+  flex-wrap: wrap;
+}
+
+.mini-tab { 
+  background: rgba(255,255,255,0.1); 
+  border: 1px solid rgba(255,255,255,0.2); 
+  color: rgba(255,255,255,0.7); 
+  padding: 8px 18px; 
+  border-radius: 50px; 
+  cursor: pointer; 
+  font-family: 'Nunito', sans-serif; 
+  font-weight: 800; 
+  font-size: 0.9rem; 
+  transition: all 0.2s; 
+}
+
+.mini-tab:hover {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+}
+
+.mini-tab.active { 
+  background: linear-gradient(135deg, #ff3c8e, #d42070); 
+  border-color: transparent; 
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(255,60,142,0.4); 
+}
+
+.quote-passage { 
+  background: rgba(0,0,0,0.3); 
+  border-left: 5px solid #ff3c8e; 
+  padding: 20px; 
+  border-radius: 16px; 
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
