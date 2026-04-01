@@ -611,4 +611,4 @@ function initApp(){
   
   if(typeof startPhraseCycle === 'function') startPhraseCycle(); 
   if(typeof displayDailyOracle === 'function') displayDailyOracle();
-                    }
+}
