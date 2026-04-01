@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Moe-Chan & The Oracle</title>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="themes.css">
 <style>
   .polling-active { animation: pulse-glow 1.2s ease-in-out infinite; background: linear-gradient(180deg,#ff6348 0%,#ee5a24 100%) !important; }
   @keyframes pulse-glow { 0%,100% { box-shadow: 0 0 8px rgba(255,99,72,0.4); } 50% { box-shadow: 0 0 20px rgba(255,99,72,0.8); } }
@@ -132,7 +133,10 @@
 </head>
 <body>
 
-<script>if (localStorage.getItem('studyBuddyTheme') === 'dark') document.body.classList.add('dark-mode');</script>
+<script>
+if (localStorage.getItem('studyBuddyTheme') === 'dark') document.body.classList.add('dark-mode');
+var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') document.body.classList.add('theme-' + _t);
+</script>
 
 <div class="metro-bg">
   <div class="metro-sunburst"></div><div class="metro-halftone"></div>
@@ -678,6 +682,7 @@
 
 <script src="data.js"></script>
 <script src="script.js"></script>
+<script src="themes.js"></script>
 <script src="commissions.js"></script>
 <script src="clipboard.js"></script>
 <script src="jisho.js"></script>
