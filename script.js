@@ -38,16 +38,33 @@ function loadData() {
     const r = localStorage.getItem(STORAGE_KEY); 
     if (r) { 
       let loaded = JSON.parse(r); 
-      if (!loaded.diary) loaded.diary = []; 
-      if (!loaded.schedule) loaded.schedule = {};
-      if (!loaded.calendar) loaded.calendar = {};
-      if (!loaded.quotes) loaded.quotes = []; 
+      // Ensure all expected fields exist (data migration)
+      if (!loaded.days || typeof loaded.days !== 'object') loaded.days = {};
+      if (!Array.isArray(loaded.dictionary)) loaded.dictionary = [];
+      if (!Array.isArray(loaded.diary)) loaded.diary = []; 
+      if (!loaded.schedule || typeof loaded.schedule !== 'object') loaded.schedule = {};
+      if (!loaded.calendar || typeof loaded.calendar !== 'object') loaded.calendar = {};
+      if (!Array.isArray(loaded.quotes)) loaded.quotes = [];
+      if (typeof loaded.streak !== 'number') loaded.streak = 0;
       return loaded; 
     } 
-  } catch(e) {} 
+  } catch(e) { console.error('loadData error:', e); } 
   return getDefaultData(); 
 }
-function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+function saveData() { 
+  try {
+    const json = JSON.stringify(data);
+    localStorage.setItem(STORAGE_KEY, json);
+    // Verify the save actually took
+    const check = localStorage.getItem(STORAGE_KEY);
+    if (!check || check.length !== json.length) {
+      console.error('Save verification failed! Data may not have persisted.');
+    }
+  } catch(e) {
+    console.error('saveData FAILED:', e);
+    alert('⚠️ Save failed! Storage may be full. Use the NES Password backup in History to export your data.');
+  }
+}
 let data = loadData();
 
 if (!data.starterLoaded && typeof starterDeck !== 'undefined') {
@@ -65,13 +82,17 @@ function loadPassword() {
     try { imported = JSON.parse(decodeURIComponent(atob(cleanInput))); } 
     catch(e) { imported = JSON.parse(decodeURIComponent(escape(atob(cleanInput)))); }
 
-    if (imported.days && imported.dictionary) { 
-      if (!imported.diary) imported.diary = []; 
-      if (!imported.calendar) imported.calendar = {};
-      if (!imported.quotes) imported.quotes = [];
+    if (imported && typeof imported === 'object' && imported.days) { 
+      // Migrate all fields to ensure nothing is lost
+      if (!Array.isArray(imported.dictionary)) imported.dictionary = [];
+      if (!Array.isArray(imported.diary)) imported.diary = []; 
+      if (!imported.calendar || typeof imported.calendar !== 'object') imported.calendar = {};
+      if (!imported.schedule || typeof imported.schedule !== 'object') imported.schedule = {};
+      if (!Array.isArray(imported.quotes)) imported.quotes = [];
+      if (typeof imported.streak !== 'number') imported.streak = 0;
       data = imported; saveData(); initApp(); alert("RESTORED!"); document.getElementById('nes-password-box').value = ''; 
     } else alert("INVALID DATA.");
-  } catch (err) { alert("INVALID FORMAT."); }
+  } catch (err) { console.error('Password restore error:', err); alert("INVALID FORMAT."); }
 }
 function copyPassword() { const pwBox = document.getElementById('nes-password-box'); if (!pwBox.value) return; pwBox.select(); document.execCommand('copy'); alert("COPIED!"); }
 
@@ -169,17 +190,27 @@ function logReading(){
 
 function addWord(){
   const en=document.getElementById('dict-en').value.trim(),jp=document.getElementById('dict-jp').value.trim(),es=document.getElementById('dict-es').value.trim(); if(!en&&!jp&&!es)return;
+  if (!Array.isArray(data.dictionary)) data.dictionary = [];
   data.dictionary.push({en:en||'—',jp:jp||'—',es:es||'—',addedDate:todayStr()});
-  document.getElementById('dict-en').value='';document.getElementById('dict-jp').value='';document.getElementById('dict-es').value=''; saveData();renderDictionary();updateStats();setSpeech('newWord');setCreatureState('happy');
+  document.getElementById('dict-en').value='';document.getElementById('dict-jp').value='';document.getElementById('dict-es').value=''; 
+  saveData();
+  // Verify the word persisted
+  try {
+    const verify = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (!verify.dictionary || verify.dictionary.length !== data.dictionary.length) {
+      console.error('Dictionary save verification failed!');
+    }
+  } catch(e) { console.error('Dict verify error:', e); }
+  renderDictionary();updateStats();setSpeech('newWord');setCreatureState('happy');
 }
 ['dict-en','dict-jp','dict-es'].forEach(id=>{document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')addWord();});});
-function deleteWord(i){data.dictionary.splice(i,1);saveData();renderDictionary();updateStats();}
+function deleteWord(i){if(!Array.isArray(data.dictionary) || i < 0 || i >= data.dictionary.length) return; data.dictionary.splice(i,1);saveData();renderDictionary();updateStats();}
 
 function renderDictionary(){
   const search=(document.getElementById('dict-search').value||'').toLowerCase(); const list=document.getElementById('dict-list');list.innerHTML='';
-  const filtered=data.dictionary.filter(w=>{if(!search)return true;return w.en.toLowerCase().includes(search)||w.jp.toLowerCase().includes(search)||w.es.toLowerCase().includes(search);});
-  filtered.slice().reverse().forEach((w)=>{ const realIndex=data.dictionary.lastIndexOf(w); const row=document.createElement('div');row.className='dict-entry';
-    row.innerHTML=`<span class="en">${escHtml(w.en)}</span><span class="jp">${escHtml(w.jp)}</span><span class="es">${escHtml(w.es)}</span><button class="del-word" onclick="deleteWord(${realIndex})">×</button>`; list.appendChild(row); });
+  const filtered=data.dictionary.map((w, idx) => ({...w, _idx: idx})).filter(w=>{if(!search)return true;return w.en.toLowerCase().includes(search)||w.jp.toLowerCase().includes(search)||w.es.toLowerCase().includes(search);});
+  filtered.slice().reverse().forEach((w)=>{ const row=document.createElement('div');row.className='dict-entry';
+    row.innerHTML=`<span class="en">${escHtml(w.en)}</span><span class="jp">${escHtml(w.jp)}</span><span class="es">${escHtml(w.es)}</span><button class="del-word" onclick="deleteWord(${w._idx})">×</button>`; list.appendChild(row); });
   document.getElementById('dict-count').textContent=data.dictionary.length+' words'; document.getElementById('dict-tab-count').textContent='('+data.dictionary.length+')';
 }
 
@@ -208,7 +239,7 @@ function deleteDiaryEntry(i) { data.diary.splice(i, 1); saveData(); renderDiary(
 function renderDiary() {
   const list = document.getElementById('diary-list'); list.innerHTML = '';
   if(!data.diary.length) return list.innerHTML = '<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px">No diary entries yet.</p>';
-  data.diary.slice().reverse().forEach(entry => { const realIndex = data.diary.lastIndexOf(entry); const row = document.createElement('div'); row.className = 'diary-entry'; row.innerHTML = `<div class="diary-entry-date">${escHtml(entry.date)}</div><div class="diary-entry-text">${escHtml(entry.text)}</div><button class="diary-del-btn" onclick="deleteDiaryEntry(${realIndex})">×</button>`; list.appendChild(row); });
+  data.diary.slice().reverse().forEach((entry, revIdx) => { const realIndex = data.diary.length - 1 - revIdx; const row = document.createElement('div'); row.className = 'diary-entry'; row.innerHTML = `<div class="diary-entry-date">${escHtml(entry.date)}</div><div class="diary-entry-text">${escHtml(entry.text)}</div><button class="diary-del-btn" onclick="deleteDiaryEntry(${realIndex})">×</button>`; list.appendChild(row); });
 }
 
 // ===== QUOTES (MULTI-LANG & PASSAGE) =====
@@ -231,18 +262,30 @@ function addQuote() {
   const lang = document.getElementById('quote-lang').value;
   
   if (!text) return;
-  if (!data.quotes) data.quotes = []; 
+  if (!Array.isArray(data.quotes)) data.quotes = []; 
   
-  data.quotes.push({ text: text, meaning: meaning, img: img, lang: lang, date: todayStr() });
+  const newQuote = { text: text, meaning: meaning, img: img, lang: lang, date: todayStr() };
+  data.quotes.push(newQuote);
   
   document.getElementById('quote-text').value = '';
-  if(document.getElementById('quote-meaning')) document.getElementById('quote-meaning').value = '';
+  if(meaningEl) meaningEl.value = '';
   document.getElementById('quote-img').value = '';
+  
   saveData(); 
-  setQuoteTab(lang); // Auto-switch to the tab you just added to
+  
+  // Verify the quote persisted
+  try {
+    const verify = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (!verify.quotes || verify.quotes.length !== data.quotes.length) {
+      console.error('Quote save verification failed!');
+    }
+  } catch(e) { console.error('Quote verify error:', e); }
+  
+  setQuoteTab(lang);
 }
 
 function deleteQuote(originalIndex) {
+  if (!Array.isArray(data.quotes) || originalIndex < 0 || originalIndex >= data.quotes.length) return;
   data.quotes.splice(originalIndex, 1);
   saveData(); 
   renderQuotes();
@@ -257,7 +300,7 @@ function renderQuotes() {
   const list = document.getElementById('quotes-list');
   if (!list) return;
   list.innerHTML = '';
-  if (!data.quotes) data.quotes = [];
+  if (!Array.isArray(data.quotes)) data.quotes = [];
 
   const filteredQuotes = data.quotes.map((q, index) => ({ ...q, originalIndex: index }))
                                     .filter(q => (q.lang || 'en') === currentQuoteLang);
