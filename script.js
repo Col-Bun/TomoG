@@ -192,21 +192,72 @@ function renderDiary() {
   data.diary.slice().reverse().forEach(entry => { const realIndex = data.diary.lastIndexOf(entry); const row = document.createElement('div'); row.className = 'diary-entry'; row.innerHTML = `<div class="diary-entry-date">${escHtml(entry.date)}</div><div class="diary-entry-text">${escHtml(entry.text)}</div><button class="diary-del-btn" onclick="deleteDiaryEntry(${realIndex})">×</button>`; list.appendChild(row); });
 }
 
-// ===== QUOTES (FIXED) =====
+// ===== QUOTES (MULTI-LANG & PASSAGE) =====
+let currentQuoteLang = 'en';
+
+function setQuoteTab(lang) {
+  currentQuoteLang = lang;
+  document.querySelectorAll('.mini-tab').forEach(btn => {
+    if (btn.dataset.lang === lang) btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+  renderQuotes();
+}
+
 function addQuote() {
   const text = document.getElementById('quote-text').value.trim();
   const img = document.getElementById('quote-img').value.trim();
+  const lang = document.getElementById('quote-lang').value;
+  
   if (!text) return;
-  if (!data.quotes) data.quotes = []; // Safety check
-  data.quotes.push({ text: text, img: img, date: todayStr() });
+  if (!data.quotes) data.quotes = []; 
+  
+  data.quotes.push({ text: text, img: img, lang: lang, date: todayStr() });
+  
   document.getElementById('quote-text').value = '';
   document.getElementById('quote-img').value = '';
-  saveData(); renderQuotes();
+  saveData(); 
+  setQuoteTab(lang); // Auto-switch to the tab you just added to
 }
 
-function deleteQuote(i) {
-  data.quotes.splice(i, 1);
-  saveData(); renderQuotes();
+function deleteQuote(originalIndex) {
+  data.quotes.splice(originalIndex, 1);
+  saveData(); 
+  renderQuotes();
+}
+
+function renderQuotes() {
+  const list = document.getElementById('quotes-list');
+  if (!list) return;
+  list.innerHTML = '';
+  if (!data.quotes) data.quotes = [];
+
+  // Filter quotes by current language but keep their true index for safe deletion
+  const filteredQuotes = data.quotes.map((q, index) => ({ ...q, originalIndex: index }))
+                                    .filter(q => (q.lang || 'en') === currentQuoteLang);
+
+  if(filteredQuotes.length === 0) {
+    list.innerHTML = `<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px;font-style:italic;">No passages saved in this language yet.</p>`;
+    return;
+  }
+
+  // Border colors based on language
+  const borderColors = { 'en': '#0099ff', 'es': '#7ec832', 'jp': '#ff3c8e' };
+
+  filteredQuotes.slice().reverse().forEach((q) => {
+    const row = document.createElement('div');
+    row.className = 'quote-passage';
+    row.style.borderLeftColor = borderColors[currentQuoteLang] || '#ff3c8e';
+
+    let imgHtml = q.img ? `<img src="${escHtml(q.img)}" alt="Passage Image" style="max-width:100%; border-radius:12px; margin-top:16px; border:1px solid rgba(255,255,255,0.2);">` : '';
+    
+    row.innerHTML = `
+      <div style="font-size:1.05rem; color:#fff; line-height:1.6; white-space: pre-wrap;">${escHtml(q.text)}</div>
+      ${imgHtml}
+      <button class="diary-del-btn" style="position:absolute; top:12px; right:12px; background:rgba(0,0,0,0.4); border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; padding:0;" onclick="deleteQuote(${q.originalIndex})">×</button>
+    `;
+    list.appendChild(row);
+  });
 }
 
 function renderQuotes() {
