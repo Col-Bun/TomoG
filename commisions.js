@@ -1,13 +1,45 @@
 // commissions.js — Art Commission Tracker for Moe-Chan
 
+// ===== DATA MANAGEMENT =====
+let data = { commissions: [] };
+
+function saveData() {
+  localStorage.setItem('moeCommissionsData', JSON.stringify(data));
+}
+
+function loadData() {
+  const saved = localStorage.getItem('moeCommissionsData');
+  if (saved) {
+    data = JSON.parse(saved);
+  }
+  renderCommissions();
+}
+
+window.addEventListener('DOMContentLoaded', loadData);
+
+// ===== UTILITIES =====
+function escHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.innerText = str;
+  return div.innerHTML;
+}
+
+function formatDate(dateString) {
+  if (!dateString) return '';
+  // Added timeZone: 'UTC' so dates don't accidentally shift backward by a day
+  const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' };
+  return new Date(dateString).toLocaleDateString(undefined, options);
+}
+
 // ===== CONSTANTS =====
 const COMM_STAGES = [
-  { key: 'early_sketch', label: 'Early Sketch',    short: 'E.Sk' },
-  { key: 'sketch',       label: 'Sketch Phase',    short: 'Sktch' },
-  { key: 'lineart',      label: 'Lineart',         short: 'Line' },
-  { key: 'color',        label: 'Color',           short: 'Color' },
-  { key: 'shade',        label: 'Shade',           short: 'Shade' },
-  { key: 'shade_fx',     label: 'Shade+Effects',   short: 'Sh+FX' }
+  { key: 'early_sketch', label: 'Early Sketch',  short: 'E.Sk' },
+  { key: 'sketch',       label: 'Sketch Phase',  short: 'Sktch' },
+  { key: 'lineart',      label: 'Lineart',       short: 'Line' },
+  { key: 'color',        label: 'Color',         short: 'Color' },
+  { key: 'shade',        label: 'Shade',         short: 'Shade' },
+  { key: 'shade_fx',     label: 'Shade+Effects', short: 'Sh+FX' }
 ];
 
 // Which stage index is the FINAL stage for each commission type
