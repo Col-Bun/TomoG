@@ -1,0 +1,626 @@
+/* themes.css — 5 Selectable Themes for Moe-Chan */
+/* Loaded AFTER style.css to override */
+
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=UnifrakturCook:wght@700&family=VT323&family=Pixelify+Sans:wght@400;700&display=swap');
+
+/* ===== THEME PICKER UI ===== */
+.theme-picker-wrap {
+  position: relative;
+  display: inline-block;
+}
+.theme-picker-btn {
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.theme-picker-btn:hover { background: rgba(0,0,0,0.4); }
+
+.theme-dropdown {
+  display: none;
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: rgba(10,10,20,0.95);
+  backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: 14px;
+  padding: 6px;
+  z-index: 9999;
+  min-width: 180px;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.6);
+}
+.theme-dropdown.open { display: block; }
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.75);
+  font-family: 'Nunito', sans-serif;
+  transition: all 0.15s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.theme-option:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.theme-option.active { color: #a8e84c; background: rgba(168,232,76,0.1); }
+.theme-option-dot {
+  width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+
+/* =====================================================================
+   THEME 1: SILVER CASE  
+   Grasshopper Manufacture. Film grain. Geometric. Green on black.
+   ===================================================================== */
+
+body.theme-silver {
+  font-family: 'Share Tech Mono', monospace;
+  color: #c0c0c0;
+}
+
+/* Kill the bubbly background */
+body.theme-silver .metro-bg { background-color: #050505 !important; }
+body.theme-silver .metro-sunburst { display: none; }
+body.theme-silver .metro-halftone {
+  background-image: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,255,65,0.02) 0px,
+    transparent 1px,
+    transparent 3px
+  );
+  opacity: 1;
+}
+body.theme-silver .metro-vectors { opacity: 0.04; filter: grayscale(1); }
+
+/* Film grain overlay */
+body.theme-silver::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 99998;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  opacity: 0.5;
+}
+
+/* Panels: sharp edges, thin green borders */
+body.theme-silver .glass,
+body.theme-silver .glass-dark,
+body.theme-silver .glass-strong {
+  background: rgba(0,10,0,0.6) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  border: 1px solid rgba(0,255,65,0.2) !important;
+  border-radius: 2px !important;
+  box-shadow: 0 0 15px rgba(0,255,65,0.05), inset 0 0 30px rgba(0,0,0,0.4) !important;
+  color: #c0c0c0;
+}
+
+/* Tabs */
+body.theme-silver .tab-btn {
+  background: rgba(0,255,65,0.05);
+  border: 1px solid rgba(0,255,65,0.15);
+  border-radius: 0;
+  color: rgba(0,255,65,0.5);
+  font-family: 'Share Tech Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.72rem;
+  padding: 8px 14px;
+}
+body.theme-silver .tab-btn.active {
+  background: rgba(0,255,65,0.12);
+  border-color: rgba(0,255,65,0.6);
+  color: #00ff41;
+  box-shadow: 0 0 10px rgba(0,255,65,0.15);
+}
+
+/* Top bar */
+body.theme-silver .top-bar { border-radius: 2px !important; }
+body.theme-silver .top-bar h2 { color: #00ff41; font-family: 'Share Tech Mono', monospace; text-shadow: 0 0 10px rgba(0,255,65,0.4); }
+body.theme-silver .streak-badge { background: rgba(0,255,65,0.15); color: #00ff41; border: 1px solid rgba(0,255,65,0.3); box-shadow: none; border-radius: 2px; }
+body.theme-silver .date-display { color: rgba(0,255,65,0.4); }
+
+/* Buttons */
+body.theme-silver .btn-glossy {
+  background: rgba(0,255,65,0.1) !important;
+  border: 1px solid rgba(0,255,65,0.4) !important;
+  border-radius: 2px;
+  box-shadow: none !important;
+  color: #00ff41 !important;
+  text-shadow: 0 0 6px rgba(0,255,65,0.4);
+  font-family: 'Share Tech Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+body.theme-silver .btn-glossy:hover { background: rgba(0,255,65,0.2) !important; }
+body.theme-silver .btn-theme {
+  border-color: rgba(0,255,65,0.3);
+  color: #00ff41;
+  border-radius: 2px;
+}
+
+/* Accents */
+body.theme-silver .task-card h3 { color: #00ff41; font-family: 'Share Tech Mono', monospace; }
+body.theme-silver .stat-box .num { color: #00ff41; text-shadow: 0 0 8px rgba(0,255,65,0.5); font-family: 'Share Tech Mono', monospace; }
+body.theme-silver .stat-box .label { color: rgba(0,255,65,0.4); }
+body.theme-silver .speech-bubble { background: rgba(0,10,0,0.85) !important; border-color: rgba(0,255,65,0.2) !important; border-radius: 2px !important; }
+body.theme-silver .speech-bubble::before { border-bottom-color: rgba(0,10,0,0.85) !important; }
+body.theme-silver .speech-line { color: #c0c0c0; }
+body.theme-silver .lang-tag { border-radius: 2px; }
+body.theme-silver .lang-en { background: rgba(0,255,65,0.3); }
+body.theme-silver .lang-jp { background: rgba(0,200,255,0.3); }
+body.theme-silver .lang-es { background: rgba(255,200,0,0.3); }
+
+body.theme-silver input, body.theme-silver textarea, body.theme-silver select {
+  font-family: 'Share Tech Mono', monospace !important;
+  border-radius: 2px !important;
+}
+body.theme-silver h3, body.theme-silver h4 { font-family: 'Share Tech Mono', monospace !important; color: #00ff41 !important; }
+
+/* Password screen */
+body.theme-silver #password-screen h1 { color: #00ff41; font-family: 'Share Tech Mono', monospace; text-shadow: 0 0 20px rgba(0,255,65,0.5); }
+body.theme-silver .pw-hint { color: rgba(0,255,65,0.4); }
+body.theme-silver #password-screen input { background: rgba(0,10,0,0.6); border: 1px solid rgba(0,255,65,0.4); color: #00ff41; border-radius: 2px; }
+
+
+/* =====================================================================
+   THEME 2: WINDOWS 98
+   Teal desktop. Beveled borders. Blue title bars. Chicago.
+   ===================================================================== */
+
+body.theme-win98 {
+  font-family: 'Pixelify Sans', 'Trebuchet MS', 'MS Sans Serif', sans-serif;
+  color: #000;
+}
+
+body.theme-win98 .metro-bg { background-color: #008080 !important; }
+body.theme-win98 .metro-sunburst { display: none; }
+body.theme-win98 .metro-halftone { display: none; }
+body.theme-win98 .metro-vectors { display: none; }
+
+body.theme-win98::after { display: none; }
+
+/* Panels: Win98 raised panels */
+body.theme-win98 .glass,
+body.theme-win98 .glass-dark,
+body.theme-win98 .glass-strong {
+  background: #c0c0c0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: inset -1px -1px 0 #000, inset 1px 1px 0 #fff, inset -2px -2px 0 #808080, inset 2px 2px 0 #dfdfdf !important;
+  color: #000;
+}
+
+body.theme-win98 .tab-btn {
+  background: #c0c0c0;
+  border: none;
+  border-radius: 0;
+  box-shadow: inset -1px -1px 0 #000, inset 1px 1px 0 #fff, inset -2px -2px 0 #808080, inset 2px 2px 0 #dfdfdf;
+  color: #000;
+  font-family: 'Pixelify Sans', 'Trebuchet MS', sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 6px 14px;
+}
+body.theme-win98 .tab-btn.active {
+  background: #dfdfdf;
+  color: #000;
+  box-shadow: inset -1px -1px 0 #808080, inset 1px 1px 0 #fff;
+}
+
+/* Top bar: Title bar blue */
+body.theme-win98 .top-bar {
+  background: linear-gradient(90deg, #000080, #1084d0) !important;
+  border-radius: 0 !important;
+  box-shadow: inset -1px -1px 0 #000, inset 1px 1px 0 #fff !important;
+  border: none !important;
+  backdrop-filter: none !important;
+  padding: 4px 10px;
+}
+body.theme-win98 .top-bar h2 { color: #fff; font-family: 'Pixelify Sans', 'Trebuchet MS', sans-serif; text-shadow: 1px 1px 0 #000; font-size: 1.1rem; }
+body.theme-win98 .streak-badge { background: #c0c0c0; color: #000; box-shadow: inset -1px -1px 0 #808080, inset 1px 1px 0 #fff; border-radius: 0; font-size: 0.7rem; }
+body.theme-win98 .date-display { color: #fff; }
+
+/* Buttons: classic raised */
+body.theme-win98 .btn-glossy {
+  background: #c0c0c0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: inset -1px -1px 0 #000, inset 1px 1px 0 #fff, inset -2px -2px 0 #808080, inset 2px 2px 0 #dfdfdf !important;
+  color: #000 !important;
+  text-shadow: none !important;
+  font-family: 'Pixelify Sans', 'Trebuchet MS', sans-serif;
+  font-size: 0.85rem;
+  padding: 6px 16px;
+}
+body.theme-win98 .btn-glossy:hover { background: #d4d0c8 !important; transform: none; }
+body.theme-win98 .btn-glossy:active { box-shadow: inset 1px 1px 0 #000, inset -1px -1px 0 #fff, inset 2px 2px 0 #808080, inset -2px -2px 0 #dfdfdf !important; }
+body.theme-win98 .btn-theme {
+  background: #c0c0c0;
+  color: #000;
+  border: none;
+  box-shadow: inset -1px -1px 0 #000, inset 1px 1px 0 #fff, inset -2px -2px 0 #808080, inset 2px 2px 0 #dfdfdf;
+  border-radius: 0;
+}
+
+/* Text */
+body.theme-win98 .task-card h3 { color: #000080; font-family: 'Pixelify Sans', 'Trebuchet MS', sans-serif; text-shadow: none; }
+body.theme-win98 .task-card .tri-label { color: #808080; }
+body.theme-win98 .stat-box .num { color: #000080; text-shadow: none; font-family: 'Pixelify Sans', sans-serif; }
+body.theme-win98 .stat-box .label { color: #000; }
+body.theme-win98 h3, body.theme-win98 h4 { font-family: 'Pixelify Sans', 'Trebuchet MS', sans-serif !important; color: #000080 !important; text-shadow: none !important; }
+
+/* Speech */
+body.theme-win98 .speech-bubble { background: #ffffcc !important; border: 2px solid #000 !important; border-radius: 0 !important; box-shadow: 2px 2px 0 #000 !important; }
+body.theme-win98 .speech-bubble::before { border-bottom-color: #ffffcc !important; }
+body.theme-win98 .speech-line { color: #000; }
+body.theme-win98 .lang-tag { border-radius: 0; }
+
+/* Inputs */
+body.theme-win98 input, body.theme-win98 textarea, body.theme-win98 select {
+  background: #fff !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: inset 1px 1px 0 #000, inset -1px -1px 0 #fff, inset 2px 2px 0 #808080, inset -2px -2px 0 #dfdfdf !important;
+  color: #000 !important;
+  font-family: 'Pixelify Sans', 'Trebuchet MS', sans-serif !important;
+}
+body.theme-win98 input::placeholder, body.theme-win98 textarea::placeholder { color: #808080 !important; }
+
+/* Password */
+body.theme-win98 #password-screen h1 { color: #fff; font-family: 'Pixelify Sans', sans-serif; text-shadow: 2px 2px 0 #000; }
+body.theme-win98 .pw-hint { color: #c0c0c0; }
+body.theme-win98 #password-screen input { background: #fff !important; color: #000 !important; border: 2px solid #000 !important; box-shadow: inset 1px 1px 0 #808080 !important; }
+
+/* Dict, Diary text */
+body.theme-win98 .dict-entry .en { color: #000080; }
+body.theme-win98 .dict-entry .jp { color: #800080; }
+body.theme-win98 .dict-entry .es { color: #008000; }
+body.theme-win98 .dict-entry { border-bottom-color: #808080; }
+body.theme-win98 .diary-entry { background: #fff; border: 1px solid #808080; border-radius: 0; }
+body.theme-win98 .diary-entry-date { color: #808080; }
+body.theme-win98 .diary-entry-text { color: #000; }
+body.theme-win98 .mood-label { color: #000; }
+
+/* Calendar, History */
+body.theme-win98 .cal-day { background: #fff; border: 1px solid #808080; border-radius: 0; }
+body.theme-win98 .cal-day-num { color: #000; }
+body.theme-win98 .cal-task { background: #000080; border-radius: 0; }
+body.theme-win98 .history-day { background: #dfdfdf; border-radius: 0; }
+body.theme-win98 .history-day .day-date { color: #000; }
+body.theme-win98 .history-day .day-stat { color: #000080; }
+
+
+/* =====================================================================
+   THEME 3: TERMINAL
+   Phosphor green on black. Scanlines. CRT. Monospace everything.
+   ===================================================================== */
+
+body.theme-terminal {
+  font-family: 'VT323', 'Share Tech Mono', 'Courier New', monospace;
+  color: #00ff41;
+}
+
+body.theme-terminal .metro-bg { background-color: #000 !important; }
+body.theme-terminal .metro-sunburst { display: none; }
+body.theme-terminal .metro-vectors { display: none; }
+body.theme-terminal .metro-halftone {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(0,255,65,0.03) 0px,
+    rgba(0,255,65,0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  opacity: 1;
+  background-size: 100% 2px;
+}
+
+/* Scanline + CRT vignette */
+body.theme-terminal::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 99998;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, transparent 1px, transparent 2px, rgba(0,0,0,0.15) 3px),
+    radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.5) 100%);
+}
+
+body.theme-terminal .glass,
+body.theme-terminal .glass-dark,
+body.theme-terminal .glass-strong {
+  background: rgba(0,20,0,0.7) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(0,255,65,0.25) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 0 20px rgba(0,255,65,0.05) !important;
+  color: #00ff41;
+}
+
+body.theme-terminal .tab-btn {
+  background: transparent;
+  border: 1px solid rgba(0,255,65,0.2);
+  border-radius: 0;
+  color: rgba(0,255,65,0.4);
+  font-family: 'VT323', monospace;
+  font-size: 1rem;
+  padding: 6px 12px;
+  text-transform: uppercase;
+}
+body.theme-terminal .tab-btn.active {
+  background: rgba(0,255,65,0.1);
+  border-color: #00ff41;
+  color: #00ff41;
+  box-shadow: 0 0 8px rgba(0,255,65,0.2);
+}
+body.theme-terminal .tab-btn::before { content: '> '; }
+
+body.theme-terminal .top-bar {
+  border-radius: 0 !important;
+  border-color: rgba(0,255,65,0.2) !important;
+}
+body.theme-terminal .top-bar h2 { color: #00ff41; font-family: 'VT323', monospace; text-shadow: 0 0 10px rgba(0,255,65,0.6); font-size: 1.8rem; }
+body.theme-terminal .streak-badge { background: transparent; border: 1px solid rgba(0,255,65,0.3); color: #00ff41; box-shadow: none; border-radius: 0; }
+body.theme-terminal .date-display { color: rgba(0,255,65,0.5); font-family: 'VT323', monospace; }
+
+body.theme-terminal .btn-glossy {
+  background: transparent !important;
+  border: 1px solid #00ff41 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: #00ff41 !important;
+  text-shadow: 0 0 6px rgba(0,255,65,0.5);
+  font-family: 'VT323', monospace;
+  text-transform: uppercase;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+}
+body.theme-terminal .btn-glossy:hover { background: rgba(0,255,65,0.1) !important; }
+body.theme-terminal .btn-theme { border-color: rgba(0,255,65,0.3); color: #00ff41; border-radius: 0; font-family: 'VT323', monospace; }
+
+body.theme-terminal .task-card h3 { color: #00ff41; font-family: 'VT323', monospace; text-shadow: 0 0 6px rgba(0,255,65,0.4); }
+body.theme-terminal .stat-box .num { color: #00ff41; text-shadow: 0 0 10px rgba(0,255,65,0.6); font-family: 'VT323', monospace; font-size: 2.4rem; }
+body.theme-terminal .stat-box .label { color: rgba(0,255,65,0.4); font-family: 'VT323', monospace; }
+
+body.theme-terminal .speech-bubble { background: rgba(0,15,0,0.9) !important; border: 1px solid rgba(0,255,65,0.3) !important; border-radius: 0 !important; }
+body.theme-terminal .speech-bubble::before { border-bottom-color: rgba(0,15,0,0.9) !important; }
+body.theme-terminal .speech-line { color: #00ff41; }
+body.theme-terminal .lang-tag { border-radius: 0; background: rgba(0,255,65,0.2) !important; }
+
+body.theme-terminal input, body.theme-terminal textarea, body.theme-terminal select {
+  font-family: 'VT323', monospace !important;
+  background: rgba(0,10,0,0.8) !important;
+  border: 1px solid rgba(0,255,65,0.3) !important;
+  border-radius: 0 !important;
+  color: #00ff41 !important;
+  font-size: 1.1rem !important;
+}
+body.theme-terminal input::placeholder, body.theme-terminal textarea::placeholder { color: rgba(0,255,65,0.3) !important; }
+body.theme-terminal h3, body.theme-terminal h4 { font-family: 'VT323', monospace !important; color: #00ff41 !important; }
+
+body.theme-terminal .dict-entry .en, body.theme-terminal .dict-entry .jp, body.theme-terminal .dict-entry .es { color: #00ff41; }
+body.theme-terminal .diary-entry-text { color: #00ff41; }
+body.theme-terminal .mood-label { color: #00ff41; }
+body.theme-terminal .cal-day { background: rgba(0,20,0,0.5); border-color: rgba(0,255,65,0.15); border-radius: 0; }
+body.theme-terminal .cal-day-num { color: #00ff41; }
+body.theme-terminal .history-day { background: rgba(0,20,0,0.3); border-radius: 0; }
+body.theme-terminal .history-day .day-date, body.theme-terminal .history-day .day-stat { color: #00ff41; }
+
+body.theme-terminal #password-screen h1 { color: #00ff41; font-family: 'VT323', monospace; text-shadow: 0 0 20px rgba(0,255,65,0.6); }
+body.theme-terminal .pw-hint { color: rgba(0,255,65,0.4); }
+body.theme-terminal #password-screen input { background: rgba(0,10,0,0.8) !important; border: 1px solid rgba(0,255,65,0.4) !important; color: #00ff41 !important; border-radius: 0 !important; box-shadow: none !important; }
+
+
+/* =====================================================================
+   THEME 4: MOE-STYLE (DEFAULT)
+   This is the existing theme. No overrides needed — it's the base CSS.
+   We just make sure nothing from other themes persists.
+   ===================================================================== */
+
+body.theme-moe::after { display: none; }
+
+
+/* =====================================================================
+   THEME 5: ULTRAKILL / KEYGEN GOTHIC
+   Blood red, gold, blackletter headers, cracked energy, maximum edge.
+   ===================================================================== */
+
+body.theme-ultrakill {
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  color: #ddd;
+}
+
+body.theme-ultrakill .metro-bg { background-color: #0a0000 !important; }
+body.theme-ultrakill .metro-sunburst {
+  background: repeating-conic-gradient(
+    #0a0000 0 15deg,
+    #120000 15deg 30deg
+  ) !important;
+  opacity: 0.5;
+}
+body.theme-ultrakill .metro-halftone { display: none; }
+body.theme-ultrakill .metro-vectors { display: none; }
+
+/* Blood drip / noise overlay */
+body.theme-ultrakill::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 99998;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255,0,0,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%);
+}
+
+body.theme-ultrakill .glass,
+body.theme-ultrakill .glass-dark,
+body.theme-ultrakill .glass-strong {
+  background: rgba(15,0,0,0.75) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  border: 1px solid rgba(255,0,0,0.25) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 0 20px rgba(255,0,0,0.05), inset 0 0 40px rgba(0,0,0,0.5) !important;
+  color: #ddd;
+}
+
+body.theme-ultrakill .tab-btn {
+  background: rgba(255,0,0,0.05);
+  border: 1px solid rgba(255,0,0,0.2);
+  border-radius: 0;
+  color: rgba(255,180,0,0.5);
+  font-family: 'Share Tech Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 0.72rem;
+  padding: 8px 14px;
+}
+body.theme-ultrakill .tab-btn.active {
+  background: rgba(255,0,0,0.12);
+  border-color: #ff0000;
+  color: #ffcc00;
+  box-shadow: 0 0 12px rgba(255,0,0,0.25);
+  text-shadow: 0 0 8px rgba(255,204,0,0.5);
+}
+
+body.theme-ultrakill .top-bar {
+  border-radius: 0 !important;
+  border-color: rgba(255,0,0,0.3) !important;
+  background: rgba(10,0,0,0.8) !important;
+  backdrop-filter: none !important;
+}
+body.theme-ultrakill .top-bar h2 {
+  font-family: 'UnifrakturCook', cursive;
+  color: #ff0000;
+  text-shadow: 0 0 15px rgba(255,0,0,0.6), 0 2px 0 #600;
+  font-size: 1.6rem;
+  letter-spacing: 2px;
+}
+body.theme-ultrakill .streak-badge {
+  background: rgba(255,0,0,0.15);
+  border: 1px solid rgba(255,0,0,0.4);
+  color: #ffcc00;
+  box-shadow: 0 0 8px rgba(255,0,0,0.2);
+  border-radius: 0;
+}
+body.theme-ultrakill .date-display { color: rgba(255,100,0,0.5); }
+
+body.theme-ultrakill .btn-glossy {
+  background: linear-gradient(180deg, #cc0000 0%, #800000 100%) !important;
+  border: 1px solid rgba(255,204,0,0.3) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 4px 20px rgba(255,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1) !important;
+  color: #ffcc00 !important;
+  text-shadow: 0 0 6px rgba(255,204,0,0.5);
+  font-family: 'Share Tech Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+body.theme-ultrakill .btn-glossy:hover { background: linear-gradient(180deg, #ee0000 0%, #990000 100%) !important; box-shadow: 0 6px 30px rgba(255,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.15) !important; }
+body.theme-ultrakill .btn-theme { border-color: rgba(255,0,0,0.3); color: #ff4444; border-radius: 0; }
+
+/* Headers in Blackletter */
+body.theme-ultrakill .task-card h3,
+body.theme-ultrakill .top-bar h2 {
+  font-family: 'UnifrakturCook', cursive !important;
+}
+body.theme-ultrakill .task-card h3 { color: #ff0000; text-shadow: 0 0 10px rgba(255,0,0,0.4); }
+body.theme-ultrakill h3 { font-family: 'UnifrakturCook', cursive !important; color: #ff0000 !important; text-shadow: 0 0 8px rgba(255,0,0,0.3) !important; }
+body.theme-ultrakill h4 { font-family: 'Share Tech Mono', monospace !important; color: #ffcc00 !important; }
+
+body.theme-ultrakill .stat-box .num { color: #ff0000; text-shadow: 0 0 12px rgba(255,0,0,0.6); font-family: 'UnifrakturCook', cursive; }
+body.theme-ultrakill .stat-box .label { color: rgba(255,100,0,0.5); }
+
+body.theme-ultrakill .speech-bubble { background: rgba(20,0,0,0.9) !important; border: 1px solid rgba(255,0,0,0.3) !important; border-radius: 0 !important; }
+body.theme-ultrakill .speech-bubble::before { border-bottom-color: rgba(20,0,0,0.9) !important; }
+body.theme-ultrakill .speech-line { color: #ddd; }
+body.theme-ultrakill .lang-tag { border-radius: 0; }
+body.theme-ultrakill .lang-en { background: linear-gradient(135deg, #cc0000, #800000); }
+body.theme-ultrakill .lang-jp { background: linear-gradient(135deg, #ffcc00, #cc9900); color: #000; }
+body.theme-ultrakill .lang-es { background: linear-gradient(135deg, #ff6600, #cc4400); }
+
+body.theme-ultrakill input, body.theme-ultrakill textarea, body.theme-ultrakill select {
+  font-family: 'Share Tech Mono', monospace !important;
+  background: rgba(15,0,0,0.8) !important;
+  border: 1px solid rgba(255,0,0,0.25) !important;
+  border-radius: 0 !important;
+  color: #ddd !important;
+}
+body.theme-ultrakill input::placeholder, body.theme-ultrakill textarea::placeholder { color: rgba(255,100,0,0.3) !important; }
+
+body.theme-ultrakill .dict-entry .en { color: #ff6666; }
+body.theme-ultrakill .dict-entry .jp { color: #ffcc00; }
+body.theme-ultrakill .dict-entry .es { color: #ff8844; }
+body.theme-ultrakill .diary-entry { background: rgba(30,0,0,0.5); border-color: rgba(255,0,0,0.15); border-radius: 0; }
+body.theme-ultrakill .diary-entry-text { color: #ddd; }
+body.theme-ultrakill .mood-label { color: #ff4444; }
+body.theme-ultrakill .cal-day { background: rgba(15,0,0,0.5); border-color: rgba(255,0,0,0.12); border-radius: 0; }
+body.theme-ultrakill .cal-day-num { color: #ffcc00; }
+body.theme-ultrakill .cal-task { background: rgba(255,0,0,0.3); border-radius: 0; }
+body.theme-ultrakill .history-day { background: rgba(20,0,0,0.4); border-radius: 0; }
+body.theme-ultrakill .history-day .day-date { color: rgba(255,100,0,0.6); }
+body.theme-ultrakill .history-day .day-stat { color: #ff6666; }
+
+body.theme-ultrakill #password-screen h1 { color: #ff0000; font-family: 'UnifrakturCook', cursive; text-shadow: 0 0 30px rgba(255,0,0,0.6), 0 4px 0 #600; }
+body.theme-ultrakill .pw-hint { color: rgba(255,100,0,0.5); }
+body.theme-ultrakill #password-screen input { background: rgba(15,0,0,0.8) !important; border: 1px solid rgba(255,0,0,0.4) !important; color: #ffcc00 !important; border-radius: 0 !important; box-shadow: none !important; }
+
+/* Commission card overrides for all themes */
+body.theme-silver .comm-client-name { color: #00ff41; }
+body.theme-silver .comm-type-badge { border-radius: 0; }
+body.theme-silver .comm-card { border-radius: 2px; border-color: rgba(0,255,65,0.15); }
+body.theme-silver .comm-act-btn { border-radius: 0; }
+body.theme-silver .comm-stage-label { color: rgba(0,255,65,0.4); }
+body.theme-silver .comm-stage-label.active-label { color: #00ff41; }
+body.theme-silver .comm-money { color: #00ff41; }
+
+body.theme-win98 .comm-card { border-radius: 0; background: #c0c0c0; box-shadow: inset -1px -1px 0 #000, inset 1px 1px 0 #fff, inset -2px -2px 0 #808080, inset 2px 2px 0 #dfdfdf; border: none; }
+body.theme-win98 .comm-client-name { color: #000080; }
+body.theme-win98 .comm-type-badge { border-radius: 0; }
+body.theme-win98 .comm-act-btn { border-radius: 0; background: #c0c0c0; box-shadow: inset -1px -1px 0 #000, inset 1px 1px 0 #fff; color: #000; border: none; }
+body.theme-win98 .comm-meta-row span { color: #000; }
+body.theme-win98 .comm-money { color: #008000; }
+body.theme-win98 .comm-stage-label { color: #808080; }
+body.theme-win98 .comm-stage-label.active-label { color: #000080; }
+body.theme-win98 .comm-pipeline-fill { background: linear-gradient(90deg, #000080, #1084d0); }
+body.theme-win98 .comm-stage-dot.current { background: #000080; border-color: #000080; }
+body.theme-win98 .comm-stage-dot.reached { background: rgba(0,0,128,0.3); border-color: #000080; }
+
+body.theme-terminal .comm-client-name { color: #00ff41; }
+body.theme-terminal .comm-card { border-radius: 0; border-color: rgba(0,255,65,0.15); }
+body.theme-terminal .comm-type-badge { border-radius: 0; }
+body.theme-terminal .comm-act-btn { border-radius: 0; color: #00ff41; border-color: rgba(0,255,65,0.3); }
+body.theme-terminal .comm-money { color: #00ff41; }
+
+body.theme-ultrakill .comm-client-name { color: #ffcc00; }
+body.theme-ultrakill .comm-card { border-radius: 0; border-color: rgba(255,0,0,0.2); }
+body.theme-ultrakill .comm-type-badge { border-radius: 0; }
+body.theme-ultrakill .comm-act-btn { border-radius: 0; color: #ff4444; border-color: rgba(255,0,0,0.3); }
+body.theme-ultrakill .comm-act-btn.advance-btn { color: #ffcc00; border-color: rgba(255,204,0,0.3); }
+body.theme-ultrakill .comm-money { color: #ffcc00; }
+body.theme-ultrakill .comm-pipeline-fill { background: linear-gradient(90deg, #ff0000, #cc0000); }
+body.theme-ultrakill .comm-stage-dot.current { background: #ff0000; border-color: #ff0000; }
+body.theme-ultrakill .comm-stage-dot.reached { background: rgba(255,0,0,0.3); border-color: #ff0000; }
