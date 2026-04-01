@@ -206,15 +206,17 @@ function setQuoteTab(lang) {
 
 function addQuote() {
   const text = document.getElementById('quote-text').value.trim();
+  const meaning = document.getElementById('quote-meaning') ? document.getElementById('quote-meaning').value.trim() : '';
   const img = document.getElementById('quote-img').value.trim();
   const lang = document.getElementById('quote-lang').value;
   
   if (!text) return;
   if (!data.quotes) data.quotes = []; 
   
-  data.quotes.push({ text: text, img: img, lang: lang, date: todayStr() });
+  data.quotes.push({ text: text, meaning: meaning, img: img, lang: lang, date: todayStr() });
   
   document.getElementById('quote-text').value = '';
+  if(document.getElementById('quote-meaning')) document.getElementById('quote-meaning').value = '';
   document.getElementById('quote-img').value = '';
   saveData(); 
   setQuoteTab(lang); // Auto-switch to the tab you just added to
@@ -226,11 +228,48 @@ function deleteQuote(originalIndex) {
   renderQuotes();
 }
 
+function toggleMeaning(idx) {
+  const el = document.getElementById(`quote-card-${idx}`);
+  if(el) el.classList.toggle('show-meaning');
+}
+
 function renderQuotes() {
   const list = document.getElementById('quotes-list');
   if (!list) return;
   list.innerHTML = '';
   if (!data.quotes) data.quotes = [];
+
+  const filteredQuotes = data.quotes.map((q, index) => ({ ...q, originalIndex: index }))
+                                    .filter(q => (q.lang || 'en') === currentQuoteLang);
+
+  if(filteredQuotes.length === 0) {
+    list.innerHTML = `<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px;font-style:italic;">No passages saved in this language yet.</p>`;
+    return;
+  }
+
+  const borderColors = { 'en': '#0099ff', 'es': '#7ec832', 'jp': '#ff3c8e' };
+
+  filteredQuotes.slice().reverse().forEach((q) => {
+    const row = document.createElement('div');
+    row.className = 'quote-passage';
+    row.id = `quote-card-${q.originalIndex}`;
+    row.style.borderLeftColor = borderColors[currentQuoteLang] || '#ff3c8e';
+
+    let imgHtml = q.img ? `<img src="${escHtml(q.img)}" alt="Passage Image" style="max-width:100%; border-radius:12px; margin-top:16px; border:1px solid rgba(255,255,255,0.2);">` : '';
+    let toggleBtn = q.meaning ? `<button class="btn-theme" style="margin-top:12px; font-size:0.85rem; padding: 6px 14px; border-radius: 50px;" onclick="toggleMeaning(${q.originalIndex})">📖 View Meaning</button>` : '';
+
+    row.innerHTML = `
+      <div class="quote-content-wrapper">
+          <div class="quote-text-main" style="font-size:1.05rem; color:#fff; line-height:1.6; white-space: pre-wrap;">${escHtml(q.text)}</div>
+          ${q.meaning ? `<div class="quote-meaning-panel" style="font-size:0.95rem; color:#ddd; line-height:1.6; white-space: pre-wrap;"><strong>Meaning / Translation:</strong><br><span style="color:#a8e84c;">${escHtml(q.meaning)}</span></div>` : ''}
+      </div>
+      ${toggleBtn}
+      ${imgHtml}
+      <button class="diary-del-btn" style="position:absolute; top:12px; right:12px; background:rgba(0,0,0,0.4); border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; padding:0;" onclick="deleteQuote(${q.originalIndex})">×</button>
+    `;
+    list.appendChild(row);
+  });
+}
 
   // Filter quotes by current language but keep their true index for safe deletion
   const filteredQuotes = data.quotes.map((q, index) => ({ ...q, originalIndex: index }))
