@@ -1,21 +1,8 @@
 // commissions.js — Art Commission Tracker for Moe-Chan
 
-// ===== DATA MANAGEMENT =====
-let data = { commissions: [] };
-
-function saveData() {
-  localStorage.setItem('moeCommissionsData', JSON.stringify(data));
-}
-
-function loadData() {
-  const saved = localStorage.getItem('moeCommissionsData');
-  if (saved) {
-    data = JSON.parse(saved);
-  }
-  renderCommissions();
-}
-
-window.addEventListener('DOMContentLoaded', loadData);
+// ===== INITIALIZATION =====
+// Wait for the main app (script.js / data.js) to load first, then render these cards
+window.addEventListener('DOMContentLoaded', renderCommissions);
 
 // ===== UTILITIES =====
 function escHtml(str) {
@@ -27,7 +14,6 @@ function escHtml(str) {
 
 function formatDate(dateString) {
   if (!dateString) return '';
-  // Added timeZone: 'UTC' so dates don't accidentally shift backward by a day
   const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' };
   return new Date(dateString).toLocaleDateString(undefined, options);
 }
@@ -94,7 +80,10 @@ function saveCommission() {
     finished:        false
   };
 
-  if (!Array.isArray(data.commissions)) data.commissions = [];
+  // Check the global data object provided by your main script.js/data.js
+  if (!data.commissions || !Array.isArray(data.commissions)) {
+    data.commissions = [];
+  }
 
   if (editId) {
     // Editing existing — preserve stage + finished status
@@ -108,7 +97,8 @@ function saveCommission() {
     data.commissions.push(entry);
   }
 
-  saveData();
+  // Calls your main app's save function
+  saveData(); 
   clearCommForm();
   renderCommissions();
 }
@@ -156,7 +146,6 @@ function editCommission(id) {
   document.getElementById('comm-form-title').textContent = 'Edit: ' + c.client;
   document.getElementById('comm-cancel-btn').style.display = 'inline-block';
 
-  // Scroll form into view on mobile
   document.getElementById('comm-form-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -168,7 +157,6 @@ function advanceStage(id) {
   const finalStage = COMM_FINAL_STAGE[c.type] ?? 5;
   if (c.stage < finalStage) {
     c.stage++;
-    // Auto-finish if reached final stage
     if (c.stage >= finalStage) {
       c.finished = true;
     }
@@ -193,7 +181,6 @@ function toggleFinished(id) {
   if (!c) return;
   c.finished = !c.finished;
   if (c.finished) {
-    // Snap stage to final
     c.stage = COMM_FINAL_STAGE[c.type] ?? 5;
   }
   saveData();
@@ -220,18 +207,18 @@ function quickUpdateTime(id) {
 
 // ===== RENDER =====
 function renderCommissions() {
-  if (!Array.isArray(data.commissions)) data.commissions = [];
+  if (!data || !data.commissions || !Array.isArray(data.commissions)) {
+    data.commissions = [];
+  }
 
   const list = document.getElementById('comm-card-list');
   if (!list) return;
   list.innerHTML = '';
 
-  // Filter
   let filtered = data.commissions;
   if (commFilterMode === 'active') filtered = filtered.filter(c => !c.finished);
   else if (commFilterMode === 'done') filtered = filtered.filter(c => c.finished);
 
-  // Stats
   const activeCount = data.commissions.filter(c => !c.finished).length;
   const doneComms = data.commissions.filter(c => c.finished);
   const totalEarned = doneComms.reduce((s, c) => s + (c.price || 0), 0);
@@ -253,7 +240,6 @@ function renderCommissions() {
     return;
   }
 
-  // Sort: active first (by date accepted desc), then done
   filtered.sort((a, b) => {
     if (a.finished !== b.finished) return a.finished ? 1 : -1;
     return (b.dateAccepted || '').localeCompare(a.dateAccepted || '');
@@ -265,26 +251,22 @@ function renderCommissions() {
 
     const finalStage = COMM_FINAL_STAGE[c.type] ?? 5;
 
-    // --- Socials ---
     let socialsHtml = '';
     const soc = c.socials || {};
     if (soc.twitter) socialsHtml += `<span class="comm-social-link">🐦 ${escHtml(soc.twitter)}</span>`;
     if (soc.bluesky) socialsHtml += `<span class="comm-social-link">🦋 ${escHtml(soc.bluesky)}</span>`;
     if (soc.furaffinity) socialsHtml += `<span class="comm-social-link">🐾 ${escHtml(soc.furaffinity)}</span>`;
 
-    // --- Extras ---
     let extrasHtml = '';
     if (c.characters > 1) extrasHtml += `<span class="comm-extra-tag">👥 ${c.characters} chars</span>`;
     if (c.hasColoredLineart) extrasHtml += `<span class="comm-extra-tag">🖊 Colored Lineart</span>`;
     if (c.hasBackground) extrasHtml += `<span class="comm-extra-tag">🏞 Background</span>`;
 
-    // --- Meta row ---
     let metaHtml = '';
     if (c.dateAccepted) metaHtml += `<span>📥 Accepted: ${formatDate(c.dateAccepted)}</span>`;
     if (c.datePayment) metaHtml += `<span>💰 Paid: ${formatDate(c.datePayment)}</span>`;
     if (!c.datePayment) metaHtml += `<span style="color:#ff6b6b;">⚠ Unpaid</span>`;
 
-    // --- Pipeline ---
     let pipelineHtml = '<div class="comm-pipeline"><div class="comm-pipeline-track"><div class="comm-pipeline-fill" style="width:' + (finalStage > 0 ? ((c.stage / finalStage) * 100) : 0) + '%"></div></div>';
     COMM_STAGES.forEach((stg, idx) => {
       const pastFinal = idx > finalStage;
@@ -309,7 +291,6 @@ function renderCommissions() {
     });
     pipelineHtml += '</div>';
 
-    // --- Money / Time ---
     let moneyTimeHtml = '<div class="comm-money-time">';
     if (c.price) moneyTimeHtml += `<span class="comm-money">$${c.price.toFixed(2)}</span>`;
     if (c.timeSpent) {
@@ -320,7 +301,6 @@ function renderCommissions() {
     }
     moneyTimeHtml += '</div>';
 
-    // --- Action buttons ---
     let actionsHtml = '<div class="comm-card-actions">';
     if (!c.finished && c.stage < finalStage) {
       actionsHtml += `<button class="comm-act-btn advance-btn" onclick="advanceStage(${c.id})">▶ Advance</button>`;
