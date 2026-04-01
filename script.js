@@ -30,7 +30,7 @@ function toggleTheme() { document.body.classList.toggle('dark-mode'); localStora
 // ===== DATA INITIALIZATION =====
 const STORAGE_KEY = 'studyBuddyData';
 function getDefaultData() { 
-  return { days: {}, dictionary: [], diary: [], streak: 0, lastActiveDate: null, starterLoaded: false, schedule: {}, calendar: {}, quotes: [] }; 
+  return { days: {}, dictionary: [], diary: [], streak: 0, lastActiveDate: null, starterLoaded: false, schedule: {}, calendar: {}, quotes: [], commissions: [] }; 
 }
 
 function loadData() { 
@@ -45,6 +45,7 @@ function loadData() {
       if (!loaded.schedule || typeof loaded.schedule !== 'object') loaded.schedule = {};
       if (!loaded.calendar || typeof loaded.calendar !== 'object') loaded.calendar = {};
       if (!Array.isArray(loaded.quotes)) loaded.quotes = [];
+      if (!Array.isArray(loaded.commissions)) loaded.commissions = [];
       if (typeof loaded.streak !== 'number') loaded.streak = 0;
       return loaded; 
     } 
@@ -89,6 +90,7 @@ function loadPassword() {
       if (!imported.calendar || typeof imported.calendar !== 'object') imported.calendar = {};
       if (!imported.schedule || typeof imported.schedule !== 'object') imported.schedule = {};
       if (!Array.isArray(imported.quotes)) imported.quotes = [];
+      if (!Array.isArray(imported.commissions)) imported.commissions = [];
       if (typeof imported.streak !== 'number') imported.streak = 0;
       data = imported; saveData(); initApp(); alert("RESTORED!"); document.getElementById('nes-password-box').value = ''; 
     } else alert("INVALID DATA.");
@@ -602,10 +604,11 @@ function initApp(){
   renderDictionary(); 
   renderDiary(); 
   renderQuotes(); 
+  if(typeof renderCommissions === 'function') renderCommissions();
   updateStats(); 
   updateMood(); 
   saveData(); 
   
   if(typeof startPhraseCycle === 'function') startPhraseCycle(); 
   if(typeof displayDailyOracle === 'function') displayDailyOracle();
-}
+                    }
