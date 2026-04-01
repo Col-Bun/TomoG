@@ -8,6 +8,126 @@
 <style>
   .polling-active { animation: pulse-glow 1.2s ease-in-out infinite; background: linear-gradient(180deg,#ff6348 0%,#ee5a24 100%) !important; }
   @keyframes pulse-glow { 0%,100% { box-shadow: 0 0 8px rgba(255,99,72,0.4); } 50% { box-shadow: 0 0 20px rgba(255,99,72,0.8); } }
+
+  /* ===== COMMISSIONS TAB ===== */
+  .comm-layout { display: grid; grid-template-columns: 340px 1fr; gap: 20px; }
+  @media (max-width: 860px) { .comm-layout { grid-template-columns: 1fr; } }
+
+  .comm-form { padding: 20px; border-radius: 20px; }
+  .comm-label { display: block; font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.6); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .comm-field-group { margin-bottom: 12px; }
+  .comm-input {
+    background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.2); color: #fff;
+    padding: 10px 12px; border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 0.9rem;
+    width: 100%; outline: none; transition: border-color 0.2s;
+  }
+  .comm-input:focus { border-color: rgba(255,255,255,0.5); }
+  .comm-input-sm { flex: 1; min-width: 0; }
+  .comm-input option { color: #000; }
+  .comm-checkbox-label {
+    display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: rgba(255,255,255,0.8);
+    cursor: pointer; user-select: none;
+  }
+  .comm-checkbox-label input[type="checkbox"] { accent-color: #a8e84c; width: 16px; height: 16px; cursor: pointer; }
+
+  .comm-filter-btn {
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.6);
+    padding: 5px 12px; border-radius: 50px; font-size: 0.75rem; font-family: 'Nunito', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .comm-filter-btn.active { background: rgba(255,255,255,0.2); color: #fff; border-color: rgba(255,255,255,0.35); }
+  .comm-filter-btn:hover { background: rgba(255,255,255,0.15); }
+
+  .comm-summary-strip { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+
+  .comm-card-list { display: flex; flex-direction: column; gap: 14px; max-height: 70vh; overflow-y: auto; padding-right: 4px; }
+
+  .comm-card {
+    background: rgba(0,0,0,0.35); border: 1.5px solid rgba(255,255,255,0.12); border-radius: 18px;
+    padding: 18px; position: relative; transition: border-color 0.25s, transform 0.15s;
+  }
+  .comm-card:hover { border-color: rgba(255,255,255,0.25); transform: translateY(-1px); }
+  .comm-card.is-finished { border-color: rgba(168,232,76,0.3); opacity: 0.75; }
+  .comm-card.is-finished:hover { opacity: 1; }
+
+  .comm-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .comm-client-name { font-family: 'Baloo 2', cursive; font-size: 1.15rem; color: #fff; line-height: 1.2; }
+  .comm-type-badge {
+    font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 50px; text-transform: uppercase;
+    letter-spacing: 0.5px; white-space: nowrap;
+  }
+  .comm-type-sketch { background: rgba(255,255,255,0.15); color: #ddd; }
+  .comm-type-colored { background: rgba(0,153,255,0.25); color: #66ccff; }
+  .comm-type-grayscale { background: rgba(180,180,180,0.2); color: #ccc; }
+  .comm-type-shaded { background: rgba(255,60,142,0.2); color: #ff6ea8; }
+
+  .comm-socials { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .comm-social-link {
+    font-size: 0.72rem; color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.06);
+    padding: 2px 8px; border-radius: 8px; text-decoration: none; transition: color 0.2s;
+  }
+  .comm-social-link:hover { color: #fff; }
+
+  .comm-meta-row { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.78rem; color: rgba(255,255,255,0.55); margin-bottom: 10px; }
+  .comm-meta-row span { white-space: nowrap; }
+
+  .comm-extras-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .comm-extra-tag {
+    font-size: 0.7rem; padding: 2px 9px; border-radius: 50px;
+    background: rgba(168,232,76,0.15); color: #a8e84c; border: 1px solid rgba(168,232,76,0.2);
+  }
+
+  /* === STAGE PIPELINE === */
+  .comm-pipeline { display: flex; align-items: center; gap: 0; margin: 14px 0 10px; position: relative; }
+  .comm-stage {
+    display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; z-index: 1;
+  }
+  .comm-stage-dot {
+    width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center;
+    font-size: 0.55rem; color: rgba(255,255,255,0.3); font-weight: 800; transition: all 0.3s;
+    position: relative;
+  }
+  .comm-stage-dot.reached { background: rgba(168,232,76,0.3); border-color: #a8e84c; color: #a8e84c; }
+  .comm-stage-dot.current { background: #a8e84c; border-color: #a8e84c; color: #000; box-shadow: 0 0 10px rgba(168,232,76,0.5); }
+  .comm-stage-dot.is-final { border-color: #ff3c8e; }
+  .comm-stage-dot.current.is-final { background: #ff3c8e; border-color: #ff3c8e; box-shadow: 0 0 10px rgba(255,60,142,0.5); }
+  .comm-stage-dot.reached.is-final { background: rgba(255,60,142,0.3); border-color: #ff3c8e; color: #ff3c8e; }
+  .comm-stage-dot.past-final { opacity: 0.2; }
+  .comm-stage-label {
+    font-size: 0.55rem; color: rgba(255,255,255,0.4); margin-top: 4px; text-align: center;
+    line-height: 1.1; max-width: 55px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .comm-stage-label.active-label { color: #a8e84c; font-weight: 700; }
+  .comm-stage-label.past-final { opacity: 0.2; }
+
+  .comm-pipeline-track {
+    position: absolute; top: 11px; left: 8%; right: 8%; height: 2px;
+    background: rgba(255,255,255,0.1); z-index: 0;
+  }
+  .comm-pipeline-fill {
+    height: 100%; background: linear-gradient(90deg, #a8e84c, #7ec832);
+    border-radius: 2px; transition: width 0.4s ease;
+  }
+
+  .comm-card-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .comm-act-btn {
+    font-size: 0.72rem; padding: 5px 12px; border-radius: 50px; cursor: pointer; font-family: 'Nunito', sans-serif;
+    border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7);
+    transition: all 0.2s;
+  }
+  .comm-act-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+  .comm-act-btn.advance-btn { border-color: rgba(168,232,76,0.3); color: #a8e84c; }
+  .comm-act-btn.advance-btn:hover { background: rgba(168,232,76,0.15); }
+  .comm-act-btn.finish-btn { border-color: rgba(0,229,255,0.3); color: #00e5ff; }
+  .comm-act-btn.done-btn { border-color: rgba(168,232,76,0.3); color: #a8e84c; background: rgba(168,232,76,0.1); }
+  .comm-act-btn.del-btn { border-color: rgba(255,60,142,0.2); color: #ff3c8e; }
+  .comm-act-btn.del-btn:hover { background: rgba(255,60,142,0.15); }
+
+  .comm-money-time { display: flex; gap: 12px; align-items: center; font-size: 0.82rem; margin-top: 6px; }
+  .comm-money { color: #a8e84c; font-weight: 700; }
+  .comm-time { color: rgba(255,255,255,0.5); }
+  .comm-hourly { color: #ffcc00; font-size: 0.72rem; }
 </style>
 </head>
 <body>
@@ -59,6 +179,7 @@
     <button class="tab-btn" data-tab="numogram">🌀 Numogram</button>
     <button class="tab-btn" data-tab="iching">☯️ I-Ching</button>
     <button class="tab-btn" data-tab="quotes">💬 Quotes</button>
+    <button class="tab-btn" data-tab="commissions">🎨 Commissions</button>
     <button class="tab-btn" data-tab="clipboard">📋 Clipboard</button>
   </div>
 
@@ -403,6 +524,112 @@
     </div>
   </div>
 
+  <!-- ===== COMMISSIONS TAB ===== -->
+  <div class="tab-content" id="tab-commissions">
+    <div class="comm-layout">
+
+      <!-- ADD / EDIT FORM -->
+      <div class="comm-form glass-dark" id="comm-form-panel">
+        <h3 style="font-family:'Baloo 2',cursive; font-size:1.4rem; color:#fff; margin-bottom:14px;">🎨 <span id="comm-form-title">New Commission</span></h3>
+
+        <div class="comm-field-group">
+          <label class="comm-label">Client Name</label>
+          <input type="text" id="comm-client" placeholder="Who's commissioning?" class="comm-input">
+        </div>
+
+        <div class="comm-field-group">
+          <label class="comm-label">Socials <span style="opacity:0.5">(optional)</span></label>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <input type="text" id="comm-twitter" placeholder="🐦 Twitter / X" class="comm-input comm-input-sm">
+            <input type="text" id="comm-bluesky" placeholder="🦋 Bluesky" class="comm-input comm-input-sm">
+            <input type="text" id="comm-fa" placeholder="🐾 FurAffinity" class="comm-input comm-input-sm">
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <div class="comm-field-group" style="flex:1; min-width:120px;">
+            <label class="comm-label">Characters</label>
+            <input type="number" id="comm-chars" min="1" value="1" class="comm-input">
+          </div>
+          <div class="comm-field-group" style="flex:2; min-width:160px;">
+            <label class="comm-label">Commission Type</label>
+            <select id="comm-type" class="comm-input">
+              <option value="sketch">✏️ Sketch</option>
+              <option value="colored">🎨 Colored</option>
+              <option value="grayscale">🩶 Grayscale</option>
+              <option value="shaded">✨ Full Shaded</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="comm-field-group">
+          <label class="comm-label">Extras</label>
+          <div style="display:flex; gap:14px; flex-wrap:wrap;">
+            <label class="comm-checkbox-label"><input type="checkbox" id="comm-lineart"> Colored Lineart</label>
+            <label class="comm-checkbox-label"><input type="checkbox" id="comm-bg"> Background</label>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <div class="comm-field-group" style="flex:1; min-width:140px;">
+            <label class="comm-label">Price ($)</label>
+            <input type="number" id="comm-price" min="0" step="0.01" placeholder="0.00" class="comm-input">
+          </div>
+          <div class="comm-field-group" style="flex:1; min-width:140px;">
+            <label class="comm-label">Time Spent (hrs)</label>
+            <input type="number" id="comm-time" min="0" step="0.25" placeholder="0" class="comm-input">
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <div class="comm-field-group" style="flex:1; min-width:140px;">
+            <label class="comm-label">Date Accepted</label>
+            <input type="date" id="comm-date-accepted" class="comm-input">
+          </div>
+          <div class="comm-field-group" style="flex:1; min-width:140px;">
+            <label class="comm-label">Date Payment Received</label>
+            <input type="date" id="comm-date-payment" class="comm-input">
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:6px;">
+          <button class="btn-glossy btn-green" style="flex:1; padding:13px;" onclick="saveCommission()">💾 Save</button>
+          <button class="btn-theme" style="padding:13px 20px; border-radius:50px;" onclick="cancelCommEdit()" id="comm-cancel-btn" style="display:none;">Cancel</button>
+        </div>
+        <input type="hidden" id="comm-edit-id" value="">
+      </div>
+
+      <!-- COMMISSION CARDS LIST -->
+      <div class="comm-list-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+          <h3 style="font-family:'Baloo 2',cursive; font-size:1.3rem; color:#fff; margin:0;">Active Commissions <span id="comm-active-count" style="color:#a8e84c;"></span></h3>
+          <div style="display:flex; gap:6px;">
+            <button class="comm-filter-btn active" data-filter="active" onclick="setCommFilter('active')">🔥 Active</button>
+            <button class="comm-filter-btn" data-filter="done" onclick="setCommFilter('done')">✅ Done</button>
+            <button class="comm-filter-btn" data-filter="all" onclick="setCommFilter('all')">📋 All</button>
+          </div>
+        </div>
+
+        <div class="comm-summary-strip" id="comm-summary-strip">
+          <div class="glass" style="padding:8px 14px; border-radius:12px; text-align:center;">
+            <div style="font-size:1.3rem; font-weight:800; color:#a8e84c;" id="comm-stat-active">0</div>
+            <div style="font-size:0.65rem; color:rgba(255,255,255,0.5);">Active</div>
+          </div>
+          <div class="glass" style="padding:8px 14px; border-radius:12px; text-align:center;">
+            <div style="font-size:1.3rem; font-weight:800; color:#00e5ff;" id="comm-stat-earned">$0</div>
+            <div style="font-size:0.65rem; color:rgba(255,255,255,0.5);">Earned (Done)</div>
+          </div>
+          <div class="glass" style="padding:8px 14px; border-radius:12px; text-align:center;">
+            <div style="font-size:1.3rem; font-weight:800; color:#ff3c8e;" id="comm-stat-hours">0h</div>
+            <div style="font-size:0.65rem; color:rgba(255,255,255,0.5);">Total Hours</div>
+          </div>
+        </div>
+
+        <div id="comm-card-list" class="comm-card-list custom-scrollbar"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="tab-content" id="tab-clipboard">
     <div class="clipboard-focus-container glass-dark">
       <button class="btn-theme exit-btn" onclick="exitClipboardMode()">◀ Return to Hub</button>
@@ -451,6 +678,7 @@
 
 <script src="data.js"></script>
 <script src="script.js"></script>
+<script src="commissions.js"></script>
 <script src="clipboard.js"></script>
 <script src="jisho.js"></script>
 </body>
