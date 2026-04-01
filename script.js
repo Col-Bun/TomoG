@@ -7,7 +7,27 @@ function escHtml(s){const d=document.createElement('div');d.textContent=s;return
 function updateThemeIcon() { document.getElementById('theme-btn').textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙'; }
 updateThemeIcon();
 function toggleTheme() { document.body.classList.toggle('dark-mode'); localStorage.setItem('studyBuddyTheme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); updateThemeIcon(); }
-
+// ===== JAPANESE WEEKDAY THEMES =====
+function setDailyTheme() {
+  const day = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
+  
+  // Elements: 0:Sun(Red/Pink), 1:Moon(Purple/Silver), 2:Fire(Crimson), 3:Water(Blue), 4:Wood(Green), 5:Gold(Gold/Yellow), 6:Earth(Sand/Brown)
+  const themes = [
+    { bg1: '#ff4757', bg2: '#ff6b81' }, // Sunday (日 - Sun)
+    { bg1: '#70a1ff', bg2: '#5352ed' }, // Monday (月 - Moon)
+    { bg1: '#ff6348', bg2: '#eccc68' }, // Tuesday (火 - Fire)
+    { bg1: '#1e90ff', bg2: '#00a8ff' }, // Wednesday (水 - Water)
+    { bg1: '#2ed573', bg2: '#7bed9f' }, // Thursday (木 - Wood)
+    { bg1: '#ffa502', bg2: '#ffb142' }, // Friday (金 - Gold)
+    { bg1: '#c8d6e5', bg2: '#8395a7' }  // Saturday (土 - Earth)
+  ];
+  
+  const currentTheme = themes[day];
+  // We apply this to the :root element so Dark Mode on the body can safely override it when toggled
+  document.documentElement.style.setProperty('--metro-bg1', currentTheme.bg1);
+  document.documentElement.style.setProperty('--metro-bg2', currentTheme.bg2);
+}
+setDailyTheme(); // Run immediately on load
 // ===== DATA INITIALIZATION =====
 const STORAGE_KEY = 'studyBuddyData';
 function getDefaultData() { 
