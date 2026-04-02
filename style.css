@@ -621,3 +621,8 @@ body.clipboard-mode #app {
     padding: 0 0 0 16px;
   }
 }
+/* Hides Moe-Chan's speech bubbles whenever she is in the corner */
+.persistent-moe .speech-bubble,
+.persistent-moe .random-bubble {
+    display: none !important;
+}
