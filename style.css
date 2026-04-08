@@ -626,3 +626,236 @@ body.clipboard-mode #app {
 .persistent-moe .random-bubble {
     display: none !important;
 }
+
+/* ===== EXPEDITIONS TAB ===== */
+.exp-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 860px) { .exp-layout { grid-template-columns: 1fr; } }
+
+.exp-panel { padding: 22px; border-radius: 20px; }
+
+.exp-section-title {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.4rem;
+  color: #fff;
+  margin-bottom: 14px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
+.exp-hint {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 14px;
+  line-height: 1.4;
+}
+
+.exp-rarity-display {
+  margin-top: 14px;
+  padding: 10px 16px;
+  background: rgba(255,204,0,0.1);
+  border: 1px solid rgba(255,204,0,0.25);
+  border-radius: 12px;
+  font-size: 0.85rem;
+}
+.bonus-label { color: rgba(255,255,255,0.7); }
+.bonus-value { color: #ffcc00; font-weight: 800; font-size: 1.1rem; }
+.bonus-detail { color: rgba(255,255,255,0.4); font-size: 0.75rem; }
+
+/* Expedition Status */
+.exp-idle, .exp-in-progress {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 16px;
+}
+.exp-moe-sprite {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.exp-idle p { color: rgba(255,255,255,0.6); font-size: 0.9rem; }
+.exp-progress-info { flex: 1; }
+.exp-progress-info h4 { color: #fff; font-family: 'Baloo 2', cursive; margin-bottom: 8px; }
+.exp-progress-bar {
+  height: 10px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.exp-progress-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
+.exp-time-left { font-size: 0.8rem; color: rgba(255,255,255,0.5); }
+.exp-collect-btn { margin-top: 8px; padding: 10px 20px !important; }
+.exp-bounce { animation: exp-bounce-anim 0.6s ease infinite alternate; }
+@keyframes exp-bounce-anim { 0% { transform: translateY(0); } 100% { transform: translateY(-6px); } }
+
+/* Mission Cards */
+.exp-missions-list { display: flex; flex-direction: column; gap: 12px; }
+.exp-mission-card {
+  background: rgba(0,0,0,0.25);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  padding: 16px;
+  transition: all 0.2s;
+}
+.exp-mission-card:hover { border-color: rgba(255,255,255,0.25); transform: translateY(-1px); }
+.exp-mission-card.exp-active { border-color: rgba(0,229,255,0.4); background: rgba(0,229,255,0.08); }
+.exp-mission-card.exp-disabled { opacity: 0.4; pointer-events: none; }
+
+.exp-mission-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.exp-mission-emoji { font-size: 1.3rem; }
+.exp-mission-name { font-family: 'Baloo 2', cursive; font-size: 1.1rem; color: #fff; flex: 1; }
+.exp-mission-time { font-size: 0.8rem; color: #00e5ff; font-weight: 700; background: rgba(0,229,255,0.15); padding: 3px 10px; border-radius: 50px; }
+.exp-mission-desc { font-size: 0.78rem; color: rgba(255,255,255,0.5); margin-bottom: 8px; line-height: 1.3; }
+.exp-mission-footer { display: flex; align-items: center; justify-content: space-between; }
+.exp-mission-rarity { font-size: 0.72rem; color: rgba(255,255,255,0.4); }
+.exp-send-btn {
+  padding: 6px 16px !important;
+  font-size: 0.8rem !important;
+  background: linear-gradient(180deg, #00e5ff 0%, #0099cc 100%) !important;
+  border-radius: 50px !important;
+}
+.exp-badge-active {
+  font-size: 0.75rem;
+  color: #00e5ff;
+  background: rgba(0,229,255,0.15);
+  padding: 4px 12px;
+  border-radius: 50px;
+  animation: pulse-glow 1.2s ease-in-out infinite;
+}
+
+/* Expedition Log */
+.exp-log-entry {
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.exp-log-entry:last-child { border-bottom: none; }
+.exp-log-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.exp-log-header span:first-child { color: #fff; font-size: 0.85rem; font-weight: 600; }
+.exp-log-date { color: rgba(255,255,255,0.4); font-size: 0.72rem; }
+.exp-log-loot { color: rgba(255,255,255,0.55); font-size: 0.78rem; line-height: 1.4; }
+
+/* Loot Popup */
+.loot-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.loot-popup {
+  border-radius: 24px;
+  padding: 32px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+}
+.loot-title {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.8rem;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.loot-subtitle {
+  color: rgba(255,255,255,0.6);
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+.loot-bonus {
+  color: #ffcc00;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 14px;
+  padding: 6px 14px;
+  background: rgba(255,204,0,0.1);
+  border-radius: 50px;
+  display: inline-block;
+}
+.loot-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.loot-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1.5px solid;
+}
+.loot-emoji { font-size: 1.3rem; }
+.loot-name { flex: 1; text-align: left; font-weight: 600; font-size: 0.9rem; }
+.loot-qty { font-weight: 800; color: #fff; font-size: 1rem; }
+.loot-close-btn { width: 100%; padding: 14px !important; font-size: 1.1rem !important; }
+
+/* ===== MATERIALS TAB ===== */
+.mat-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.mat-page-title {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.5rem;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+.mat-summary { display: flex; gap: 10px; }
+.mat-stat-chip {
+  padding: 8px 16px;
+  border-radius: 14px;
+  text-align: center;
+  min-width: 80px;
+}
+.mat-stat-num { display: block; font-size: 1.3rem; font-weight: 800; color: #a8e84c; }
+.mat-stat-label { display: block; font-size: 0.65rem; color: rgba(255,255,255,0.5); }
+
+.mat-tier-header {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.1rem;
+  padding: 8px 0 6px;
+  margin: 20px 0 10px;
+  font-weight: 700;
+}
+.mat-tier-header:first-child { margin-top: 0; }
+
+.mat-tier-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.mat-card {
+  border: 1.5px solid;
+  border-radius: 14px;
+  padding: 14px 10px;
+  text-align: center;
+  transition: all 0.2s;
+}
+.mat-card:hover { transform: translateY(-2px); }
+.mat-card.mat-empty { opacity: 0.5; }
+.mat-card.mat-empty:hover { opacity: 0.7; }
+
+.mat-emoji { font-size: 1.8rem; margin-bottom: 4px; }
+.mat-name { font-size: 0.78rem; font-weight: 600; margin-bottom: 2px; }
+.mat-qty { font-size: 1.4rem; font-weight: 800; }
+.mat-rarity-stars { font-size: 0.6rem; color: rgba(255,204,0,0.6); letter-spacing: 1px; margin-top: 2px; }

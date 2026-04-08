@@ -33,8 +33,8 @@ function toggleTheme() { document.body.classList.toggle('dark-mode'); localStora
 
 // ===== DATA INITIALIZATION =====
 const STORAGE_KEY = 'studyBuddyData';
-function getDefaultData() { 
-  return { days: {}, dictionary: [], diary: [], streak: 0, lastActiveDate: null, starterLoaded: false, schedule: {}, calendar: {}, quotes: [], commissions: [] }; 
+function getDefaultData() {
+  return { days: {}, dictionary: [], diary: [], streak: 0, lastActiveDate: null, starterLoaded: false, schedule: {}, calendar: {}, quotes: [], commissions: [], materials: {}, expeditions: { active: null, log: [], lastAutoDate: null } };
 }
 
 function loadData() { 
@@ -50,6 +50,8 @@ function loadData() {
       if (!loaded.calendar || typeof loaded.calendar !== 'object') loaded.calendar = {};
       if (!Array.isArray(loaded.quotes)) loaded.quotes = [];
       if (!Array.isArray(loaded.commissions)) loaded.commissions = [];
+      if (!loaded.materials || typeof loaded.materials !== 'object') loaded.materials = {};
+      if (!loaded.expeditions || typeof loaded.expeditions !== 'object') loaded.expeditions = { active: null, log: [], lastAutoDate: null };
       if (typeof loaded.streak !== 'number') loaded.streak = 0;
       return loaded; 
     } 
@@ -95,6 +97,8 @@ function loadPassword() {
       if (!imported.schedule || typeof imported.schedule !== 'object') imported.schedule = {};
       if (!Array.isArray(imported.quotes)) imported.quotes = [];
       if (!Array.isArray(imported.commissions)) imported.commissions = [];
+      if (!imported.materials || typeof imported.materials !== 'object') imported.materials = {};
+      if (!imported.expeditions || typeof imported.expeditions !== 'object') imported.expeditions = { active: null, log: [], lastAutoDate: null };
       if (typeof imported.streak !== 'number') imported.streak = 0;
       data = imported; saveData(); initApp(); alert("RESTORED!"); document.getElementById('nes-password-box').value = ''; 
     } else alert("INVALID DATA.");
@@ -185,6 +189,7 @@ function logFlashcards(){
   document.getElementById('flash-input-area').style.display='none'; document.getElementById('flash-done').style.display='block'; document.getElementById('flash-done-text').textContent=data.days[today].flash+' min today!';
   document.getElementById('card-flash').classList.add('done'); setCreatureState('study');
   const readDone=(data.days[today].read||0)>0;setSpeech(readDone?'bothDone':'flashDone'); calcStreak();saveData();updateStats();updateMood(); if(readDone)setTimeout(()=>setCreatureState('celebrate'),300);
+  if(typeof updateRarityBonusDisplay === 'function') updateRarityBonusDisplay();
 }
 function logReading(){
   const val=parseFloat(document.getElementById('read-hours').value);if(!val||val<=0)return;
@@ -236,6 +241,7 @@ function updateStats(){
   let tf=0,tr=0;Object.values(data.days).forEach(d=>{tf+=d.flash||0;tr+=d.read||0;});
   document.getElementById('stat-total-flash').textContent=tf; document.getElementById('stat-total-read').textContent=tr;
   document.getElementById('stat-words').textContent=data.dictionary.length; document.getElementById('stat-days').textContent=Object.keys(data.days).length;
+  const matEl = document.getElementById('stat-materials'); if(matEl && data.materials) { matEl.textContent = Object.values(data.materials).reduce((a,b)=>a+b, 0); }
   document.getElementById('streak-badge').textContent='🔥 '+data.streak+' day streak'; renderHistory();
 }
 
@@ -613,6 +619,7 @@ function initApp(){
   updateMood(); 
   saveData(); 
   
-  if(typeof startPhraseCycle === 'function') startPhraseCycle(); 
+  if(typeof startPhraseCycle === 'function') startPhraseCycle();
   if(typeof displayDailyOracle === 'function') displayDailyOracle();
+  if(typeof initExpeditions === 'function') initExpeditions();
 }

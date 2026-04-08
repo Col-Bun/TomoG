@@ -183,6 +183,8 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     <button class="tab-btn" data-tab="numogram">🌀 Numogram</button>
     <button class="tab-btn" data-tab="iching">☯️ I-Ching</button>
     <button class="tab-btn" data-tab="quotes">💬 Quotes</button>
+    <button class="tab-btn" data-tab="expeditions">⚔️ Expeditions</button>
+    <button class="tab-btn" data-tab="materials">🎒 Materials</button>
     <button class="tab-btn" data-tab="commissions">🎨 Commissions</button>
     <button class="tab-btn" data-tab="clipboard">📋 Clipboard</button>
   </div>
@@ -224,6 +226,7 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
       <div class="stat-box glass"><div class="num" id="stat-total-read">0</div><div class="label">Reading Hrs</div></div>
       <div class="stat-box glass"><div class="num" id="stat-words">0</div><div class="label">Dict Words</div></div>
       <div class="stat-box glass"><div class="num" id="stat-days">0</div><div class="label">Days Tracked</div></div>
+      <div class="stat-box glass"><div class="num" id="stat-materials">0</div><div class="label">Materials</div></div>
     </div>
   </div>
 
@@ -528,6 +531,50 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     </div>
   </div>
 
+  <!-- ===== EXPEDITIONS TAB ===== -->
+  <div class="tab-content" id="tab-expeditions">
+    <div class="exp-layout">
+      <!-- Status Panel -->
+      <div class="glass-dark exp-panel">
+        <h3 class="exp-section-title">⚔️ Expedition Status</h3>
+        <div id="exp-status"></div>
+        <div class="exp-rarity-display" id="exp-rarity-bonus"></div>
+      </div>
+
+      <!-- Missions Panel -->
+      <div class="glass-dark exp-panel">
+        <h3 class="exp-section-title">🗺️ Available Missions</h3>
+        <p class="exp-hint">Send Moe-chan on timed expeditions to gather materials. Longer missions yield rarer loot!</p>
+        <div id="exp-missions-list" class="exp-missions-list"></div>
+      </div>
+
+      <!-- Expedition Log -->
+      <div class="glass-dark exp-panel">
+        <h3 class="exp-section-title">📜 Expedition Log</h3>
+        <div id="exp-log" class="exp-log custom-scrollbar" style="max-height: 40vh; overflow-y: auto;"></div>
+      </div>
+    </div>
+
+    <!-- Loot Popup Overlay -->
+    <div id="loot-popup-overlay" class="loot-popup-overlay" style="display:none;" onclick="if(event.target===this)closeLootPopup()">
+      <div class="loot-popup glass-strong" id="loot-popup-content"></div>
+    </div>
+  </div>
+
+  <!-- ===== MATERIALS TAB ===== -->
+  <div class="tab-content" id="tab-materials">
+    <div class="glass-dark" style="padding: 22px;">
+      <div class="mat-header-row">
+        <h3 class="mat-page-title">🎒 Material Inventory</h3>
+        <div class="mat-summary">
+          <div class="glass mat-stat-chip"><span class="mat-stat-num" id="mat-total-count">0</span><span class="mat-stat-label">Total Items</span></div>
+          <div class="glass mat-stat-chip"><span class="mat-stat-num" id="mat-unique-count">0/20</span><span class="mat-stat-label">Discovered</span></div>
+        </div>
+      </div>
+      <div id="materials-grid" class="materials-grid"></div>
+    </div>
+  </div>
+
   <!-- ===== COMMISSIONS TAB ===== -->
   <div class="tab-content" id="tab-commissions">
     <div class="comm-layout">
@@ -684,6 +731,7 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
 <script src="script.js"></script>
 <script src="themes.js"></script>
 <script src="commissions.js"></script>
+<script src="expeditions.js"></script>
 <script src="clipboard.js"></script>
 <script src="jisho.js"></script>
 </body>
