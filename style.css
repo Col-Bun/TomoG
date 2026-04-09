@@ -1012,6 +1012,273 @@ body.clipboard-mode #app {
   border-top: 1px solid rgba(255,255,255,0.1);
 }
 
+/* ===== MOE-CHAN LEVEL BAR ===== */
+.moe-level-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  margin-top: 4px;
+  background: rgba(0,0,0,0.15);
+  border-radius: 12px;
+}
+
+.moe-level-badge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  color: #FFD700;
+  background: rgba(255,215,0,0.15);
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,215,0,0.3);
+  white-space: nowrap;
+}
+
+.moe-level-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.8);
+  flex: 1;
+  min-width: 80px;
+}
+
+.moe-xp-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.moe-xp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7ec832, #a8e84c);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.moe-xp-text {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.45);
+  width: 100%;
+  text-align: right;
+}
+
+/* ===== ADVICE & DIRECTIONS TAB ===== */
+.advice-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.advice-page-title {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.4rem;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
+.advice-count-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.08);
+  padding: 4px 12px;
+  border-radius: 50px;
+}
+
+.advice-subtitle {
+  font-size: 0.83rem;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.advice-form {
+  padding: 14px;
+  border-radius: 16px;
+}
+
+.advice-form-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.advice-input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(0,0,0,0.2);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+}
+
+.advice-input::placeholder { color: rgba(255,255,255,0.3); }
+
+.advice-select {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(0,0,0,0.3);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.advice-select option {
+  background: #1e1e24;
+  color: #fff;
+}
+
+.advice-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(0,0,0,0.2);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.advice-textarea::placeholder { color: rgba(255,255,255,0.3); }
+
+.advice-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+
+.advice-filter-btn {
+  padding: 5px 10px;
+  border-radius: 50px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(0,0,0,0.2);
+  color: rgba(255,255,255,0.5);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Nunito', sans-serif;
+}
+
+.advice-filter-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
+.advice-filter-btn.active {
+  background: rgba(255,138,0,0.2);
+  border-color: rgba(255,138,0,0.4);
+  color: #ff8a00;
+}
+
+.advice-card {
+  background: rgba(0,0,0,0.15);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  border-left: 4px solid;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.advice-card:hover {
+  background: rgba(0,0,0,0.25);
+}
+
+.advice-card.advice-pinned {
+  background: rgba(255,215,0,0.05);
+  border-left-width: 4px;
+}
+
+.advice-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.advice-cat-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 50px;
+  text-transform: capitalize;
+}
+
+.advice-pin-badge {
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: #FFD700;
+  background: rgba(255,215,0,0.15);
+  padding: 2px 6px;
+  border-radius: 50px;
+  letter-spacing: 0.5px;
+}
+
+.advice-date {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.3);
+  margin-left: auto;
+}
+
+.advice-card-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.advice-card-text {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.advice-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  justify-content: flex-end;
+}
+
+.advice-action-btn {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Nunito', sans-serif;
+}
+
+.advice-action-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
+.advice-del-btn:hover {
+  background: rgba(255,60,142,0.2);
+  border-color: rgba(255,60,142,0.3);
+  color: #ff3c8e;
+}
+
 /* ===== CHIMERA PERSONALITY & REACTION ===== */
 .chimera-personality {
   font-size: 0.83rem;

@@ -34,7 +34,7 @@ function toggleTheme() { document.body.classList.toggle('dark-mode'); localStora
 // ===== DATA INITIALIZATION =====
 const STORAGE_KEY = 'studyBuddyData';
 function getDefaultData() {
-  return { days: {}, dictionary: [], diary: [], streak: 0, lastActiveDate: null, starterLoaded: false, schedule: {}, calendar: {}, quotes: [], commissions: [], materials: {}, expeditions: { active: null, log: [], lastAutoDate: null }, bestiary: {} };
+  return { days: {}, dictionary: [], diary: [], streak: 0, lastActiveDate: null, starterLoaded: false, schedule: {}, calendar: {}, quotes: [], commissions: [], materials: {}, expeditions: { active: null, log: [], lastAutoDate: null }, bestiary: {}, advice: [] };
 }
 
 function loadData() { 
@@ -53,9 +53,10 @@ function loadData() {
       if (!loaded.materials || typeof loaded.materials !== 'object') loaded.materials = {};
       if (!loaded.expeditions || typeof loaded.expeditions !== 'object') loaded.expeditions = { active: null, log: [], lastAutoDate: null };
       if (!loaded.bestiary || typeof loaded.bestiary !== 'object') loaded.bestiary = {};
+      if (!Array.isArray(loaded.advice)) loaded.advice = [];
       if (typeof loaded.streak !== 'number') loaded.streak = 0;
-      return loaded; 
-    } 
+      return loaded;
+    }
   } catch(e) { console.error('loadData error:', e); } 
   return getDefaultData(); 
 }
@@ -137,6 +138,7 @@ function handleSaveFileUpload(event) {
       if (!imported.materials || typeof imported.materials !== 'object') imported.materials = {};
       if (!imported.expeditions || typeof imported.expeditions !== 'object') imported.expeditions = { active: null, log: [], lastAutoDate: null };
       if (!imported.bestiary || typeof imported.bestiary !== 'object') imported.bestiary = {};
+      if (!Array.isArray(imported.advice)) imported.advice = [];
       if (typeof imported.streak !== 'number') imported.streak = 0;
 
       data = imported;
@@ -234,7 +236,7 @@ function logFlashcards(){
   const today=todayStr();if(!data.days[today])data.days[today]={flash:0,read:0}; data.days[today].flash=(data.days[today].flash||0)+val;
   document.getElementById('flash-input-area').style.display='none'; document.getElementById('flash-done').style.display='block'; document.getElementById('flash-done-text').textContent=data.days[today].flash+' min today!';
   document.getElementById('card-flash').classList.add('done'); setCreatureState('study');
-  const readDone=(data.days[today].read||0)>0;setSpeech(readDone?'bothDone':'flashDone'); calcStreak();saveData();updateStats();updateMood(); if(readDone)setTimeout(()=>setCreatureState('celebrate'),300);
+  const readDone=(data.days[today].read||0)>0;setSpeech(readDone?'bothDone':'flashDone'); calcStreak();saveData();updateStats();updateMood();updateLevelDisplay(); if(readDone)setTimeout(()=>setCreatureState('celebrate'),300);
   if(typeof updateRarityBonusDisplay === 'function') updateRarityBonusDisplay();
 }
 function logReading(){
@@ -242,7 +244,7 @@ function logReading(){
   const today=todayStr();if(!data.days[today])data.days[today]={flash:0,read:0}; data.days[today].read=(data.days[today].read||0)+val;
   document.getElementById('read-input-area').style.display='none'; document.getElementById('read-done').style.display='block'; document.getElementById('read-done-text').textContent=data.days[today].read+' hrs today!';
   document.getElementById('card-read').classList.add('done'); setCreatureState('read');
-  const flashDone=(data.days[today].flash||0)>0;setSpeech(flashDone?'bothDone':'readDone'); calcStreak();saveData();updateStats();updateMood(); if(flashDone)setTimeout(()=>setCreatureState('celebrate'),300);
+  const flashDone=(data.days[today].flash||0)>0;setSpeech(flashDone?'bothDone':'readDone'); calcStreak();saveData();updateStats();updateMood();updateLevelDisplay(); if(flashDone)setTimeout(()=>setCreatureState('celebrate'),300);
 }
 
 function addWord(){
@@ -258,7 +260,7 @@ function addWord(){
       console.error('Dictionary save verification failed!');
     }
   } catch(e) { console.error('Dict verify error:', e); }
-  renderDictionary();updateStats();setSpeech('newWord');setCreatureState('happy');
+  renderDictionary();updateStats();updateLevelDisplay();setSpeech('newWord');setCreatureState('happy');
 }
 ['dict-en','dict-jp','dict-es'].forEach(id=>{document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')addWord();});});
 function deleteWord(i){if(!Array.isArray(data.dictionary) || i < 0 || i >= data.dictionary.length) return; data.dictionary.splice(i,1);saveData();renderDictionary();updateStats();}
@@ -611,6 +613,267 @@ function delCalTask(idx) {
   renderCalModal();
 }
 
+// ===== MOE-CHAN LEVELING SYSTEM =====
+// XP sources: flashcard minutes, reading hours, words learned, streak days, chimera discoveries, materials collected
+const MOE_LEVEL_TITLES = [
+  { level: 1,  title: 'Sleepy Sprout',       emoji: '🌱' },
+  { level: 2,  title: 'Curious Seedling',     emoji: '🌿' },
+  { level: 3,  title: 'Eager Learner',        emoji: '📗' },
+  { level: 4,  title: 'Page Turner',          emoji: '📖' },
+  { level: 5,  title: 'Vocab Collector',       emoji: '📚' },
+  { level: 7,  title: 'Dedicated Student',     emoji: '✏️' },
+  { level: 10, title: 'Knowledge Seeker',      emoji: '🔍' },
+  { level: 13, title: 'Streak Warrior',        emoji: '🔥' },
+  { level: 16, title: 'Expedition Scout',      emoji: '🗺️' },
+  { level: 20, title: 'Chimera Whisperer',     emoji: '🐲' },
+  { level: 25, title: 'Scholar Adept',         emoji: '🎓' },
+  { level: 30, title: 'Polyglot Apprentice',   emoji: '🌐' },
+  { level: 35, title: 'Lore Keeper',           emoji: '📜' },
+  { level: 40, title: 'Crystal Sage',          emoji: '💎' },
+  { level: 45, title: 'Abyss Walker',          emoji: '🌌' },
+  { level: 50, title: 'Legendary Oracle',      emoji: '☯️' },
+  { level: 60, title: 'Transcendent Mind',     emoji: '✨' },
+  { level: 75, title: 'World Turtle\'s Pupil', emoji: '🌍' },
+  { level: 99, title: 'Moe-Chan Ascended',     emoji: '👑' },
+];
+
+function calculateMoeXP() {
+  let xp = 0;
+
+  // Flashcard minutes (1 XP per minute)
+  let totalFlash = 0;
+  let totalRead = 0;
+  Object.values(data.days).forEach(d => {
+    totalFlash += d.flash || 0;
+    totalRead += d.read || 0;
+  });
+  xp += totalFlash; // 1 XP per flashcard minute
+
+  // Reading hours (5 XP per hour)
+  xp += Math.floor(totalRead * 5);
+
+  // Dictionary words (3 XP each)
+  xp += (data.dictionary ? data.dictionary.length : 0) * 3;
+
+  // Days tracked (2 XP each)
+  xp += Object.keys(data.days).length * 2;
+
+  // Streak bonus (current streak * 5)
+  xp += (data.streak || 0) * 5;
+
+  // Chimera discoveries (10 XP each unique, 2 XP per repeat encounter)
+  if (data.bestiary) {
+    Object.values(data.bestiary).forEach(b => {
+      xp += 10; // First discovery
+      xp += (b.timesSeen - 1) * 2; // Repeat encounters
+    });
+  }
+
+  // Materials collected (1 XP per item)
+  if (data.materials) {
+    xp += Object.values(data.materials).reduce((a, b) => a + b, 0);
+  }
+
+  // Diary entries (2 XP each)
+  xp += (data.diary ? data.diary.length : 0) * 2;
+
+  // Quotes saved (2 XP each)
+  xp += (data.quotes ? data.quotes.length : 0) * 2;
+
+  // Advice entries (3 XP each — building your survival guide is valuable!)
+  xp += (data.advice ? data.advice.length : 0) * 3;
+
+  return xp;
+}
+
+function xpForLevel(level) {
+  // Exponential curve: level 1=0, level 2=25, level 5=200, level 10=800, level 20=4000, etc.
+  if (level <= 1) return 0;
+  return Math.floor(20 * Math.pow(level - 1, 1.8));
+}
+
+function getMoeLevel() {
+  const xp = calculateMoeXP();
+  let level = 1;
+  while (xpForLevel(level + 1) <= xp && level < 99) {
+    level++;
+  }
+  return { level, xp, xpForCurrent: xpForLevel(level), xpForNext: xpForLevel(level + 1) };
+}
+
+function getMoeLevelTitle(level) {
+  let title = MOE_LEVEL_TITLES[0];
+  for (let i = MOE_LEVEL_TITLES.length - 1; i >= 0; i--) {
+    if (level >= MOE_LEVEL_TITLES[i].level) {
+      title = MOE_LEVEL_TITLES[i];
+      break;
+    }
+  }
+  return title;
+}
+
+function updateLevelDisplay() {
+  const levelInfo = getMoeLevel();
+  const titleInfo = getMoeLevelTitle(levelInfo.level);
+
+  const levelEl = document.getElementById('moe-level-num');
+  const titleEl = document.getElementById('moe-level-title');
+  const xpBarFill = document.getElementById('moe-xp-fill');
+  const xpText = document.getElementById('moe-xp-text');
+
+  if (levelEl) levelEl.textContent = levelInfo.level;
+  if (titleEl) titleEl.textContent = `${titleInfo.emoji} ${titleInfo.title}`;
+
+  if (xpBarFill) {
+    if (levelInfo.level >= 99) {
+      xpBarFill.style.width = '100%';
+      xpBarFill.style.background = 'linear-gradient(90deg, #FFD700, #FF8000, #FF3C8E, #8B5CF6, #00CED1)';
+    } else {
+      const progress = ((levelInfo.xp - levelInfo.xpForCurrent) / (levelInfo.xpForNext - levelInfo.xpForCurrent)) * 100;
+      xpBarFill.style.width = Math.min(100, progress) + '%';
+    }
+  }
+
+  if (xpText) {
+    if (levelInfo.level >= 99) {
+      xpText.textContent = `${levelInfo.xp} XP (MAX)`;
+    } else {
+      xpText.textContent = `${levelInfo.xp} / ${levelInfo.xpForNext} XP`;
+    }
+  }
+}
+
+// ===== ADVICE & DIRECTIONS (Personal Survival Guide) =====
+function addAdvice() {
+  const titleEl = document.getElementById('advice-title');
+  const textEl = document.getElementById('advice-text');
+  const categoryEl = document.getElementById('advice-category');
+  const title = titleEl ? titleEl.value.trim() : '';
+  const text = textEl ? textEl.value.trim() : '';
+  const category = categoryEl ? categoryEl.value : 'general';
+
+  if (!text) return;
+  if (!Array.isArray(data.advice)) data.advice = [];
+
+  data.advice.push({
+    title: title || 'Untitled',
+    text: text,
+    category: category,
+    date: todayStr(),
+    pinned: false
+  });
+
+  if (titleEl) titleEl.value = '';
+  if (textEl) textEl.value = '';
+  saveData();
+  renderAdvice();
+  updateLevelDisplay();
+}
+
+function deleteAdvice(idx) {
+  if (!Array.isArray(data.advice) || idx < 0 || idx >= data.advice.length) return;
+  data.advice.splice(idx, 1);
+  saveData();
+  renderAdvice();
+  updateLevelDisplay();
+}
+
+function togglePinAdvice(idx) {
+  if (!data.advice || !data.advice[idx]) return;
+  data.advice[idx].pinned = !data.advice[idx].pinned;
+  saveData();
+  renderAdvice();
+}
+
+let currentAdviceFilter = 'all';
+
+function setAdviceFilter(filter) {
+  currentAdviceFilter = filter;
+  document.querySelectorAll('.advice-filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === filter);
+  });
+  renderAdvice();
+}
+
+function renderAdvice() {
+  const list = document.getElementById('advice-list');
+  if (!list) return;
+  if (!Array.isArray(data.advice)) data.advice = [];
+
+  const categoryEmojis = {
+    'general': '📌',
+    'study': '📚',
+    'life': '🌱',
+    'health': '💪',
+    'social': '🤝',
+    'career': '💼',
+    'creative': '🎨',
+    'tech': '💻',
+    'travel': '✈️',
+    'money': '💰',
+  };
+
+  const categoryColors = {
+    'general': '#ff8a00',
+    'study': '#0099ff',
+    'life': '#7ec832',
+    'health': '#ff3c8e',
+    'social': '#8b5cf6',
+    'career': '#FFD700',
+    'creative': '#00CED1',
+    'tech': '#708090',
+    'travel': '#FF6347',
+    'money': '#a8e84c',
+  };
+
+  // Sort: pinned first, then by date (newest first)
+  let entries = data.advice.map((a, idx) => ({ ...a, _idx: idx }));
+
+  if (currentAdviceFilter !== 'all') {
+    entries = entries.filter(a => a.category === currentAdviceFilter);
+  }
+
+  entries.sort((a, b) => {
+    if (a.pinned && !b.pinned) return -1;
+    if (!a.pinned && b.pinned) return 1;
+    return 0; // Maintain insertion order otherwise
+  });
+
+  if (entries.length === 0) {
+    list.innerHTML = `<p style="color:rgba(255,255,255,0.4); text-align:center; padding:30px; font-style:italic;">
+      ${currentAdviceFilter === 'all' ? 'Your survival guide is empty. Start adding advice, directions, and wisdom you want to remember.' : 'No entries in this category yet.'}
+    </p>`;
+    return;
+  }
+
+  let html = '';
+  entries.forEach(entry => {
+    const catEmoji = categoryEmojis[entry.category] || '📌';
+    const catColor = categoryColors[entry.category] || '#ff8a00';
+    const pinnedClass = entry.pinned ? 'advice-pinned' : '';
+
+    html += `<div class="advice-card ${pinnedClass}" style="border-left-color: ${catColor};">
+      <div class="advice-card-header">
+        <span class="advice-cat-badge" style="background: ${catColor}20; color: ${catColor};">${catEmoji} ${entry.category}</span>
+        ${entry.pinned ? '<span class="advice-pin-badge">PINNED</span>' : ''}
+        <span class="advice-date">${formatDate(entry.date)}</span>
+      </div>
+      <h4 class="advice-card-title">${escHtml(entry.title)}</h4>
+      <p class="advice-card-text">${escHtml(entry.text)}</p>
+      <div class="advice-card-actions">
+        <button class="advice-action-btn" onclick="togglePinAdvice(${entry._idx})">${entry.pinned ? '📌 Unpin' : '📌 Pin'}</button>
+        <button class="advice-action-btn advice-del-btn" onclick="deleteAdvice(${entry._idx})">Delete</button>
+      </div>
+    </div>`;
+  });
+
+  list.innerHTML = html;
+
+  // Update count
+  const countEl = document.getElementById('advice-count');
+  if (countEl) countEl.textContent = data.advice.length;
+}
+
 // ===== APP INITIALIZATION (DATE-SMART) =====
 function initApp(){
   const realToday = todayStr();
@@ -661,10 +924,12 @@ function initApp(){
   renderDiary(); 
   renderQuotes(); 
   if(typeof renderCommissions === 'function') renderCommissions();
-  updateStats(); 
-  updateMood(); 
-  saveData(); 
-  
+  renderAdvice();
+  updateStats();
+  updateMood();
+  updateLevelDisplay();
+  saveData();
+
   if(typeof startPhraseCycle === 'function') startPhraseCycle();
   if(typeof displayDailyOracle === 'function') displayDailyOracle();
   if(typeof initExpeditions === 'function') initExpeditions();

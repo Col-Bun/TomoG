@@ -186,6 +186,7 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     <button class="tab-btn" data-tab="expeditions">⚔️ Expeditions</button>
     <button class="tab-btn" data-tab="materials">🎒 Materials</button>
     <button class="tab-btn" data-tab="bestiary">🐲 Bestiary</button>
+    <button class="tab-btn" data-tab="advice">🧭 Advice</button>
     <button class="tab-btn" data-tab="commissions">🎨 Commissions</button>
     <button class="tab-btn" data-tab="clipboard">📋 Clipboard</button>
   </div>
@@ -210,6 +211,12 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
           <span class="mood-label">Mood:</span>
           <div class="mood-track"><div class="mood-fill" id="mood-fill" style="width:50%;background:linear-gradient(90deg,#ffcc00,#ff8a00)"></div></div>
           <span class="mood-label" id="mood-text">Neutral</span>
+        </div>
+        <div class="moe-level-bar">
+          <span class="moe-level-badge">Lv.<span id="moe-level-num">1</span></span>
+          <div class="moe-level-title" id="moe-level-title">🌱 Sleepy Sprout</div>
+          <div class="moe-xp-track"><div class="moe-xp-fill" id="moe-xp-fill" style="width:0%"></div></div>
+          <span class="moe-xp-text" id="moe-xp-text">0 / 25 XP</span>
         </div>
         <div class="random-bubble glass-strong" id="random-bubble"><span id="random-phrase"></span><span class="random-lang-tag" id="random-lang-tag"></span></div>
       </div>
@@ -592,6 +599,56 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     <!-- Chimera Detail Popup -->
     <div id="chimera-detail-overlay" class="loot-popup-overlay" style="display:none;" onclick="if(event.target===this)closeChimeraDetail()">
       <div class="loot-popup glass-strong" id="chimera-detail-content" style="max-width:500px;"></div>
+    </div>
+  </div>
+
+  <!-- ===== ADVICE & DIRECTIONS TAB ===== -->
+  <div class="tab-content" id="tab-advice">
+    <div class="glass-dark" style="padding: 22px;">
+      <div class="advice-header">
+        <h3 class="advice-page-title">🧭 Advice & Directions</h3>
+        <div class="advice-count-badge"><span id="advice-count">0</span> entries</div>
+      </div>
+      <p class="advice-subtitle">Your personal survival guide. Things you've learned, advice you want to remember, directions for your future self.</p>
+
+      <!-- Add new entry -->
+      <div class="advice-form glass" style="margin: 16px 0;">
+        <div class="advice-form-row">
+          <input type="text" id="advice-title" class="advice-input" placeholder="Title (e.g., 'How to handle bad days')">
+          <select id="advice-category" class="advice-select">
+            <option value="general">📌 General</option>
+            <option value="study">📚 Study</option>
+            <option value="life">🌱 Life</option>
+            <option value="health">💪 Health</option>
+            <option value="social">🤝 Social</option>
+            <option value="career">💼 Career</option>
+            <option value="creative">🎨 Creative</option>
+            <option value="tech">💻 Tech</option>
+            <option value="travel">✈️ Travel</option>
+            <option value="money">💰 Money</option>
+          </select>
+        </div>
+        <textarea id="advice-text" class="advice-textarea" placeholder="Write your advice, directions, or wisdom here..." rows="3"></textarea>
+        <button class="btn-glossy btn-green" style="width:100%; margin-top:8px;" onclick="addAdvice()">Add to Survival Guide</button>
+      </div>
+
+      <!-- Filters -->
+      <div class="advice-filters">
+        <button class="advice-filter-btn active" data-filter="all" onclick="setAdviceFilter('all')">All</button>
+        <button class="advice-filter-btn" data-filter="general" onclick="setAdviceFilter('general')">📌</button>
+        <button class="advice-filter-btn" data-filter="study" onclick="setAdviceFilter('study')">📚</button>
+        <button class="advice-filter-btn" data-filter="life" onclick="setAdviceFilter('life')">🌱</button>
+        <button class="advice-filter-btn" data-filter="health" onclick="setAdviceFilter('health')">💪</button>
+        <button class="advice-filter-btn" data-filter="social" onclick="setAdviceFilter('social')">🤝</button>
+        <button class="advice-filter-btn" data-filter="career" onclick="setAdviceFilter('career')">💼</button>
+        <button class="advice-filter-btn" data-filter="creative" onclick="setAdviceFilter('creative')">🎨</button>
+        <button class="advice-filter-btn" data-filter="tech" onclick="setAdviceFilter('tech')">💻</button>
+        <button class="advice-filter-btn" data-filter="travel" onclick="setAdviceFilter('travel')">✈️</button>
+        <button class="advice-filter-btn" data-filter="money" onclick="setAdviceFilter('money')">💰</button>
+      </div>
+
+      <!-- Advice list -->
+      <div id="advice-list" class="advice-list custom-scrollbar" style="max-height: 55vh; overflow-y: auto;"></div>
     </div>
   </div>
 
