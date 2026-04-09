@@ -1012,6 +1012,38 @@ body.clipboard-mode #app {
   border-top: 1px solid rgba(255,255,255,0.1);
 }
 
+/* ===== CHIMERA PERSONALITY & REACTION ===== */
+.chimera-personality {
+  font-size: 0.83rem;
+  color: rgba(255,255,255,0.85);
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 8px;
+  line-height: 1.5;
+}
+
+.chimera-reaction {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.6);
+  padding: 4px 10px;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.chimera-secret-badge {
+  display: inline-block;
+  background: linear-gradient(90deg, #9370DB, #00CED1);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 50px;
+  margin-left: 4px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
 /* ===== EXPEDITION LOG CHIMERA ===== */
 .exp-log-chimera {
   font-size: 0.8rem;

@@ -44,9 +44,54 @@ const TIER_COLORS = {
 
 // ===== CHIMERA DEFINITIONS =====
 // Chimeras are creatures Moe-chan can encounter during expeditions.
-// Each has a unique appearance, description, and habitat.
+// Each has a unique appearance, description, habitat, and optional conditions.
+// Some chimeras are secret and only appear under specific circumstances.
+
+// ===== PERSONALITY TRAITS (randomized per encounter) =====
+const CHIMERA_PERSONALITIES = [
+  { trait: 'Friendly', desc: 'approaches Moe-chan with curiosity, nuzzling her hand gently.', emoji: '💛' },
+  { trait: 'Shy', desc: 'peeks out from behind cover, watching Moe-chan with wide, nervous eyes before slowly creeping closer.', emoji: '💜' },
+  { trait: 'Playful', desc: 'bounces around Moe-chan in circles, clearly wanting to play.', emoji: '💚' },
+  { trait: 'Sleepy', desc: 'is curled up dozing and barely cracks one eye open as Moe-chan approaches.', emoji: '💙' },
+  { trait: 'Mischievous', desc: 'steals something from Moe-chan\'s pack and runs off with it before dropping it and chittering with laughter.', emoji: '🧡' },
+  { trait: 'Regal', desc: 'regards Moe-chan with an air of ancient dignity, as if granting an audience.', emoji: '👑' },
+  { trait: 'Hungry', desc: 'sniffs at Moe-chan\'s bag intently, clearly smelling something delicious inside.', emoji: '🍖' },
+  { trait: 'Aggressive', desc: 'puffs up and hisses at first, but calms down when Moe-chan holds still and speaks softly.', emoji: '💢' },
+  { trait: 'Melancholy', desc: 'sits alone staring at the horizon with an unmistakable sadness. Moe-chan sits with it in silence for a while.', emoji: '🌧️' },
+  { trait: 'Ecstatic', desc: 'is practically vibrating with joy at being found, spinning and chirping wildly.', emoji: '🎉' },
+  { trait: 'Wise', desc: 'locks eyes with Moe-chan for a long moment, and she feels like it understands something deep about her.', emoji: '🦉' },
+  { trait: 'Ghostly', desc: 'flickers in and out of visibility, as though not entirely here. Its presence leaves a chill.', emoji: '👻' },
+];
+
+// ===== STAT-REACTIVE FLAVOR TEXT =====
+const ENCOUNTER_REACTIONS = {
+  highStreak: [
+    'It seems drawn to the dedication radiating from Moe-chan. Study streaks attract rare spirits.',
+    'The chimera tilts its head, sensing the accumulated discipline of many study days.',
+    'Moe-chan\'s long streak has made her aura brighter. The chimera approaches without fear.',
+  ],
+  lowStreak: [
+    'It watches Moe-chan cautiously, as though sensing she has been away for a while.',
+    'The chimera seems surprised to see anyone here. It has been quiet lately.',
+  ],
+  highMaterials: [
+    'The chimera eyes Moe-chan\'s bulging pack with interest. A seasoned collector.',
+    'It sniffs the air around Moe-chan\'s inventory, recognizing the scent of rare materials.',
+  ],
+  firstEver: [
+    'Moe-chan\'s eyes go wide. She has never seen ANYTHING like this before.',
+    'This is the first chimera Moe-chan has ever encountered. She will never forget this moment.',
+  ],
+  manyEncounters: [
+    'An old friend. The chimera recognizes Moe-chan and greets her warmly.',
+    'They have met before, many times. There is a comfortable familiarity between them.',
+  ],
+};
+
 const CHIMERAS = [
-  // === Meadow Chimeras (Common) ===
+  // ============================================
+  // === MEADOW CHIMERAS (Common, rarity 1-4) ===
+  // ============================================
   {
     id: 'puffmoth', name: 'Puffmoth', emoji: '🦋',
     tier: 'Common', rarity: 2,
@@ -68,8 +113,31 @@ const CHIMERAS = [
     appearance: 'A tiny luminous sprite shaped like a teardrop of golden honey. It has two translucent dragonfly wings and a single bright eye that glows like a candle flame. It hums at a perfect middle C.',
     description: 'Honeywisps are the most common chimeras in the wild. They cluster around sweet-smelling flowers and leave trails of sticky golden light. Moe-chan says they taste like warm caramel when they land on your hand (she licked one once).'
   },
+  {
+    id: 'dandelion_knight', name: 'Dandelion Knight', emoji: '🌼',
+    tier: 'Common', rarity: 2,
+    habitats: ['meadow'],
+    appearance: 'A tiny armored insect the size of a thumb, wearing a helmet made from a dandelion seed head. It carries a thorn as a lance and rides atop a drowsy ladybug mount. Its armor is woven from dried flower petals lacquered with morning dew.',
+    description: 'Dandelion Knights patrol the meadow in solemn formations of one. They challenge anything that threatens wildflowers, which mostly means sneezing. They are absurdly brave and will charge at creatures a thousand times their size. Moe-chan finds their tiny battle cries adorable.'
+  },
+  {
+    id: 'paddlepod', name: 'Paddle Pod', emoji: '🐸',
+    tier: 'Common', rarity: 3,
+    habitats: ['meadow', 'forest'],
+    appearance: 'A round, bean-shaped amphibian with skin like a ripe avocado and oversized webbed feet that slap the ground comically as it walks. Its enormous eyes take up half its face, and it inflates to twice its size when startled, floating gently upward like a balloon.',
+    description: 'Paddle Pods are the comedians of the meadow. They have no survival instincts whatsoever, relying entirely on being too ridiculous for predators to take seriously. When they inflate, they drift on the breeze making a soft "pbbbt" sound that makes Moe-chan laugh every time.'
+  },
+  {
+    id: 'dustbunny', name: 'Dust Bunny', emoji: '🐇',
+    tier: 'Common', rarity: 1,
+    habitats: ['meadow', 'cave'],
+    appearance: 'A perfectly spherical ball of soft grey dust with two long ears made of cobweb silk and tiny pink eyes. It rolls instead of hopping, picking up more dust as it goes, growing slightly larger throughout the day before sneezing itself back to normal size at sunset.',
+    description: 'Dust Bunnies are found literally everywhere. They are born from accumulated dust in quiet corners and gain sentience after approximately three undisturbed weeks. They are harmless, affectionate, and slightly allergenic. Every explorer has one stuck to their clothes without knowing it.'
+  },
 
-  // === Forest Chimeras (Uncommon) ===
+  // ==============================================
+  // === FOREST CHIMERAS (Uncommon, rarity 5-8) ===
+  // ==============================================
   {
     id: 'mossback', name: 'Mossback Elk', emoji: '🦌',
     tier: 'Uncommon', rarity: 5,
@@ -91,8 +159,47 @@ const CHIMERAS = [
     appearance: 'A sleek fox with fur the color of autumn twilight, shifting between burnt orange and deep purple. Two hollow, crystalline horns sprout from its head, and when wind passes through them, they produce haunting flute-like melodies.',
     description: 'Hollowhorn Foxes are nocturnal tricksters who lead travelers in circles for fun. Despite this, they never cause real harm, they just enjoy the confusion. If you offer one a sweet fruit, it may play a song for you through its horns before vanishing into the mist.'
   },
+  {
+    id: 'loglurker', name: 'Log Lurker', emoji: '🪵',
+    tier: 'Uncommon', rarity: 5,
+    habitats: ['forest'],
+    appearance: 'What appears to be a fallen log suddenly sprouts six stubby legs and a pair of bark-textured eyes on stalks. Its body is covered in real lichen and shelf fungi, and small ferns grow from cracks in its back. When it yawns, the inside of its mouth glows warm amber.',
+    description: 'Log Lurkers are ambush feeders that eat fallen leaves by lying motionless for weeks and letting the leaves pile on top of them. They are the reason hikers sometimes swear a log moved. They are completely harmless unless you try to sit on one, in which case they will give you the fright of your life.'
+  },
+  {
+    id: 'inkfox', name: 'Ink Fox', emoji: '🖋️',
+    tier: 'Uncommon', rarity: 7,
+    habitats: ['forest', 'ruins'],
+    appearance: 'A fox made entirely of flowing black ink, leaving calligraphic brushstrokes in the air behind it as it runs. Its eyes are two drops of white ink, and when it shakes, droplets of black scatter and briefly form kanji characters before evaporating.',
+    description: 'Ink Foxes are said to be the ghosts of unfinished stories. Each one carries a different tale that was never completed, and the characters they scatter are fragments of those lost narratives. Scholars believe catching and reading all the characters from a single Ink Fox would reveal a complete forgotten masterpiece.'
+  },
+  {
+    id: 'bellsnail', name: 'Bell Snail', emoji: '🔔',
+    tier: 'Uncommon', rarity: 6,
+    habitats: ['forest', 'meadow'],
+    appearance: 'A large snail whose shell is a perfectly formed bronze bell, green with patina. As it moves, the bell chimes softly with each ripple of its muscular foot. Its eyestalks end in tiny glowing lanterns, and its slime trail hardens into a thin line of copper.',
+    description: 'Bell Snails were once used by monks to mark meditation hours in forest temples. The temples are gone, but the snails remember the schedule and still chime at the old prayer times. Following the sound of a Bell Snail will always lead you to a place of peace.'
+  },
 
-  // === Cave Chimeras (Rare) ===
+  // === CLASSIC GAME REFERENCE: Meadow/Forest ===
+  {
+    id: 'paddle_specter', name: 'Paddle Specter', emoji: '🏓',
+    tier: 'Uncommon', rarity: 8,
+    habitats: ['meadow', 'forest'],
+    appearance: 'A flat, rectangular phantom that slides back and forth between two invisible boundaries, deflecting anything that comes near it. It is pure white, featureless, and moves with mechanical precision. A faint square dot of light bounces eternally in its vicinity.',
+    description: 'Paddle Specters are remnants of an ancient game played by forgotten gods. They exist only to deflect and redirect, endlessly volleying a tiny mote of light that never touches the ground. If you stand in its path, it will simply phase through you and keep playing. It has been doing this since before the meadow existed.'
+  },
+  {
+    id: 'centipixel', name: 'Centipixel', emoji: '🐛',
+    tier: 'Common', rarity: 4,
+    habitats: ['meadow'],
+    appearance: 'A segmented insect made of chunky, low-resolution blocks, each segment a different bright color. It moves in sharp right angles, never curves, and leaves a trail of blocky mushrooms in its wake. When it turns, there is an audible "boop" sound.',
+    description: 'Centipixels descend in zigzag patterns from the canopy, getting faster as they approach the ground. They eat the blocky mushrooms that mysteriously grow in geometric grids throughout certain meadow clearings. Nobody knows where the mushrooms come from. Nobody questions it.'
+  },
+
+  // ==========================================
+  // === CAVE CHIMERAS (Rare, rarity 9-12) ===
+  // ==========================================
   {
     id: 'crystalcrab', name: 'Crystal Crab', emoji: '🦀',
     tier: 'Rare', rarity: 9,
@@ -114,8 +221,47 @@ const CHIMERAS = [
     appearance: 'An ancient turtle whose shell, when cracked open (naturally, over centuries), reveals a dazzling interior of amethyst, citrine, and opal formations. Its skin is slate-grey and rough like sandpaper, and its eyes are deep amber with flecks of gold.',
     description: 'Geode Turtles are among the oldest living chimeras, some estimated at over a thousand years old. They move imperceptibly slowly, and entire stalagmites may grow around a sleeping one. The crystals inside their shells are said to record the dreams of the earth itself.'
   },
+  {
+    id: 'gloomjelly', name: 'Gloom Jelly', emoji: '🪼',
+    tier: 'Rare', rarity: 9,
+    habitats: ['cave', 'abyss'],
+    appearance: 'A luminous jellyfish that floats through cave air instead of water, its bell pulsing with slow waves of turquoise and magenta bioluminescence. Trailing tentacles of light brush against stalactites, leaving brief glowing handprints. Its body is almost entirely transparent except for a small, dark core that looks like a sleeping eye.',
+    description: 'Gloom Jellies are the lanterns of the deep caves. They drift in slow processions through pitch-black passages, and experienced cavers follow their light to find safe routes. They feed on ambient darkness itself, growing dimmer in well-lit areas and blazing brilliantly in the deepest shadows.'
+  },
+  {
+    id: 'mirrorslime', name: 'Mirror Slime', emoji: '🪞',
+    tier: 'Rare', rarity: 10,
+    habitats: ['cave'],
+    appearance: 'A puddle of mercury-like fluid that moves with purpose, its surface a perfect mirror reflecting everything around it with uncanny clarity. When it encounters a living creature, it briefly reshapes itself into a perfect metallic copy before melting back into a puddle and slithering away.',
+    description: 'Mirror Slimes are thought to be a form of liquid memory. They copy everything they encounter, storing the reflections somewhere inside their impossible geometry. If you look into one long enough, you might see reflections of people who stood in that spot years ago. Moe-chan saw herself, but older, and it freaked her out a little.'
+  },
+  {
+    id: 'ore_chomper', name: 'Ore Chomper', emoji: '⛏️',
+    tier: 'Rare', rarity: 12,
+    habitats: ['cave'],
+    appearance: 'A stocky, barrel-chested creature with a massive underbite full of diamond teeth. Its body is dense and metallic, with visible veins of raw ore running through its rocky hide. It waddles on two thick legs, and its stubby arms end in pick-shaped claws.',
+    description: 'Ore Chompers literally eat minerals, processing raw stone in their guts and excreting refined metal ingots. Miners both love and hate them. Love, because following one leads to rich veins. Hate, because they eat the veins. An Ore Chomper once ate an entire mine cart. It seemed pleased with itself.'
+  },
 
-  // === Ruins Chimeras (Epic) ===
+  // === CLASSIC GAME REFERENCES: Cave ===
+  {
+    id: 'dig_phantom', name: 'Dig Phantom', emoji: '⬛',
+    tier: 'Rare', rarity: 11,
+    habitats: ['cave'],
+    appearance: 'A round, goggle-wearing creature that phases through solid rock as though it were water. Its body inflates and deflates rhythmically, and it wears what appears to be a tiny white spacesuit. When threatened, it swells to enormous size before popping harmlessly and reassembling elsewhere.',
+    description: 'Dig Phantoms tunnel through the earth in perfectly horizontal and vertical lines, never diagonals. They inflate creatures that annoy them until those creatures float away. Nobody knows where the floated creatures go. The Dig Phantoms do not seem concerned about this.'
+  },
+  {
+    id: 'boulder_dasher', name: 'Boulder Dasher', emoji: '🪨',
+    tier: 'Rare', rarity: 12,
+    habitats: ['cave', 'ruins'],
+    appearance: 'A perfectly spherical boulder with a single large eye and a wide grin carved into its face. It sits perfectly still until something moves nearby, then chases at alarming speed with a thunderous rumble. Despite appearances, it always stops just short of hitting anything, then wobbles smugly.',
+    description: 'Boulder Dashers live for the chase. They position themselves at the tops of slopes and wait, sometimes for months, for someone to walk below. The pursuit is purely recreational and they have never actually hit anyone. They are, however, responsible for approximately 90% of all adventurer cardio. Some spelunkers swear one winked at them.'
+  },
+
+  // ============================================
+  // === RUINS CHIMERAS (Epic, rarity 13-16) ===
+  // ============================================
   {
     id: 'glyphserpent', name: 'Glyph Serpent', emoji: '🐍',
     tier: 'Epic', rarity: 13,
@@ -137,8 +283,47 @@ const CHIMERAS = [
     appearance: 'A hulking humanoid figure cobbled together from ancient armor plates, corroded gears, and vine-wrapped stone. One eye socket holds a flickering emerald flame, the other is dark and hollow. Moss and small flowers grow in the joints of its limbs.',
     description: 'Rusted Golems are the remnants of an ancient civilization\'s guardians, still patrolling halls that crumbled centuries ago. They are not hostile but confused, endlessly searching for masters who will never return. Occasionally one will gently place a wildflower in your path, an old greeting protocol corrupted into something oddly tender.'
   },
+  {
+    id: 'pagoda_cat', name: 'Pagoda Cat', emoji: '🐱',
+    tier: 'Epic', rarity: 13,
+    habitats: ['ruins', 'forest'],
+    appearance: 'A serene calico cat with a tiny multi-tiered pagoda balanced perfectly on its head. Paper lanterns dangle from the pagoda eaves, glowing softly, and a wisp of incense smoke curls from the top floor. Its eyes are gold coins, and it walks with the measured grace of a temple guardian.',
+    description: 'Pagoda Cats are the keepers of abandoned shrines. Each one adopted a crumbling temple and maintains it through sheer spiritual stubbornness. The pagoda on its head is a functioning shrine in miniature, and if you leave a tiny offering, the cat will purr a blessing that brings good fortune for exactly one day.'
+  },
+  {
+    id: 'karakuri', name: 'Karakuri Dancer', emoji: '🎭',
+    tier: 'Epic', rarity: 15,
+    habitats: ['ruins'],
+    appearance: 'A wooden automaton in the style of a traditional Japanese mechanical doll, with painted porcelain face, silk robes now faded and torn, and visible clockwork gears in its joints. It moves with fluid, rehearsed grace, performing an endless tea ceremony for an audience that left centuries ago.',
+    description: 'Karakuri Dancers are the last functioning machines of a lost artisan class. Each one was built to perform a single task perfectly: pour tea, write calligraphy, shoot a tiny bow. They have been performing their task without interruption for hundreds of years. They do not understand that their audience is gone. Please clap for them. They deserve it.'
+  },
+  {
+    id: 'tome_mimic', name: 'Tome Mimic', emoji: '📖',
+    tier: 'Epic', rarity: 14,
+    habitats: ['ruins', 'cave'],
+    appearance: 'A leather-bound book with an ornate gold clasp that, upon closer inspection, has tiny teeth. When opened, instead of pages there is a wet, pink interior with a single eye that blinks up at you. Its bookmark is actually a tongue, and it growls softly when you reach for it.',
+    description: 'Tome Mimics disguise themselves as valuable ancient texts in ruin libraries. They are not dangerous so much as deeply annoying. They eat other books and grow thicker. The oldest known Tome Mimic is disguised as an encyclopedia and weighs over 200 pounds. It has eaten an estimated 10,000 books and shows no signs of stopping.'
+  },
 
-  // === Abyss Chimeras (Legendary) ===
+  // === CLASSIC GAME REFERENCES: Ruins ===
+  {
+    id: 'triangle_shade', name: 'Triangle Shade', emoji: '🔺',
+    tier: 'Epic', rarity: 16,
+    habitats: ['ruins', 'abyss'],
+    appearance: 'A flat, wireframe pyramid that rotates slowly in midair, casting no shadow despite glowing with an inner green light. When viewed from different angles, its geometry seems impossible, with more faces than a triangle should have. A low digital hum emanates from its core.',
+    description: 'Triangle Shades are living geometry from a reality where math works differently. They appear in ancient ruins that contain star maps or astronomical instruments, hovering silently and rotating in patterns that, if recorded and graphed, produce coordinates to places that do not exist on any known map. Early explorers called them "Tempests" and learned to navigate by their glow.'
+  },
+  {
+    id: 'shadow_colossus', name: 'Moss Colossus', emoji: '🗿',
+    tier: 'Epic', rarity: 16,
+    habitats: ['ruins'],
+    appearance: 'An enormous stone figure, easily thirty feet tall, covered in thick moss and climbing vines. Its joints are visible seams in the rock, and glowing sigils trace paths up its limbs like circuit boards. It moves with agonizing slowness, each step taking minutes, and birds nest in its shoulders. A faint glowing weak point pulses on its back.',
+    description: 'Moss Colossi were built as monuments, not machines, but something woke them. They walk predetermined paths through the ruins, retracing routes their builders once walked. They are not hostile but are so large that their footsteps reshape the terrain. Climbing one is technically possible but universally considered a terrible idea. The view from the top is supposedly unforgettable.'
+  },
+
+  // =============================================
+  // === ABYSS CHIMERAS (Legendary, rarity 17-20) ===
+  // =============================================
   {
     id: 'voidwhale', name: 'Void Whale', emoji: '🐋',
     tier: 'Legendary', rarity: 17,
@@ -167,9 +352,143 @@ const CHIMERAS = [
     appearance: 'A turtle of incomprehensible scale, its shell a living landscape of miniature mountains, forests, rivers, and clouds. Tiny civilizations flicker in and out of existence on its back. Its skin is the deep blue of ocean trenches, and its eyes hold the patient wisdom of geological time.',
     description: 'The World Turtle is more myth than chimera, glimpsed only in the deepest reaches of the Starlit Abyss. Those who have seen it describe the overwhelming sensation that the ground itself is alive and breathing. It is said to be the foundation upon which the world was built, and that its heartbeat is the turning of the seasons.'
   },
+  {
+    id: 'save_idol', name: 'Save Idol', emoji: '💾',
+    tier: 'Legendary', rarity: 17,
+    habitats: ['abyss', 'ruins'],
+    appearance: 'A small, ornate stone statue that glows with warm golden light. It resembles a seated figure with hands clasped in prayer, but its face is a smooth, featureless screen that displays a single blinking cursor. Touching it fills you with an overwhelming sense of safety and the certainty that everything will be okay.',
+    description: 'Save Idols are found in the most dangerous places, always positioned just before a point of no return. They radiate a field of calm that temporarily freezes all hostile chimeras in the area. Resting near one restores your energy completely and fills you with inexplicable confidence. Moe-chan hugs every single one she finds.'
+  },
+  {
+    id: 'polygon_wyrm', name: 'Polygon Wyrm', emoji: '🐲',
+    tier: 'Legendary', rarity: 19,
+    habitats: ['abyss'],
+    appearance: 'A massive dragon rendered in low-polygon geometry, its body made of flat-shaded triangles in deep crimson and black. Vertices jut at sharp angles, and its texture occasionally "pops" to a higher resolution before snapping back. Its eyes are solid white with no pupils, and when it roars, the sound has a faint digital compression artifact.',
+    description: 'The Polygon Wyrm is a creature from an earlier version of reality, before the world was fully rendered. It exists in a state of permanent graphical compromise, terrifying in concept but oddly endearing in its jagged execution. It guards the Abyss with genuine menace undercut by the fact that its wings clip through its own body when it tries to fly.'
+  },
+
+  // =============================================
+  // === SECRET / CONDITIONAL CHIMERAS =====
+  // =============================================
+  {
+    id: 'study_spirit', name: 'Study Spirit', emoji: '📚',
+    tier: 'Legendary', rarity: 18,
+    habitats: ['meadow', 'forest', 'cave', 'ruins', 'abyss'],
+    appearance: 'A translucent, glowing figure seated cross-legged in midair, surrounded by floating books and scrolls that orbit it like planets. Its form shifts between that of a student, a scholar, a monk, and a child, as though it is every learner who ever lived, compressed into one being. Light radiates from its eyes like reading lamps.',
+    description: 'The Study Spirit appears only to those who have maintained a study streak of 7 days or more. It is the patron chimera of dedicated learners, and its presence dramatically increases the rarity of all items found during the expedition. It speaks in every language simultaneously, and every word it says is something you needed to hear.',
+    condition: 'streak7'
+  },
+  {
+    id: 'midnight_kitsune', name: 'Midnight Kitsune', emoji: '🌑',
+    tier: 'Epic', rarity: 16,
+    habitats: ['forest', 'ruins', 'abyss'],
+    appearance: 'A nine-tailed fox made of compressed darkness, each tail tipped with a different colored foxfire flame. Its eyes are crescent moons, and it leaves no footprints. Cherry blossom petals materialize and disintegrate in the air around it, despite there being no trees nearby.',
+    description: 'The Midnight Kitsune only appears between 10 PM and 4 AM. It is a yokai of immense age and cunning, said to have once served as advisor to an emperor who was himself a dream. Each of its nine tails represents a century of accumulated wisdom, and it will share one secret with anyone bold enough to ask.',
+    condition: 'nighttime'
+  },
+  {
+    id: 'golden_tanuki', name: 'Golden Tanuki', emoji: '🦝',
+    tier: 'Rare', rarity: 12,
+    habitats: ['forest', 'meadow', 'ruins'],
+    appearance: 'A rotund raccoon dog with fur of polished gold and a belly like a lucky cat statue. It wears a straw hat and carries a sake bottle that never empties. Its tail is a massive golden leaf, and coins fall from its fur when it shakes.',
+    description: 'The Golden Tanuki appears only on weekends. It is a creature of leisure and celebration, rewarding those who balance work and rest. Finding one is said to bring financial good luck, though the coins it drops are made of chocolate wrapped in gold foil. Still delicious. Still lucky.',
+    condition: 'weekend'
+  },
+  {
+    id: 'aurora_moth', name: 'Aurora Moth', emoji: '🦚',
+    tier: 'Epic', rarity: 14,
+    habitats: ['meadow', 'abyss'],
+    appearance: 'An enormous moth with wings that display the full aurora borealis, rippling curtains of green, violet, and pink light that extend far beyond its physical wingspan. Its body is white as fresh snow, and its antennae are made of pure crystallized starlight.',
+    description: 'Aurora Moths only appear during winter months (December through February). They are migratory chimeras that follow the magnetic field lines of the earth, and their wings broadcast the northern lights to places that would never otherwise see them. Standing beneath one feels like being inside a snow globe filled with light.',
+    condition: 'winter'
+  },
+  {
+    id: 'sakura_dragon', name: 'Sakura Dragon', emoji: '🌸',
+    tier: 'Epic', rarity: 15,
+    habitats: ['forest', 'meadow', 'ruins'],
+    appearance: 'A sinuous eastern dragon whose body is made entirely of intertwined cherry blossom branches in full bloom. Petals constantly fall from it like pink snow, and its eyes are deep pools of spring rain. It smells overwhelmingly of flowers, and the air around it is always exactly the perfect temperature.',
+    description: 'The Sakura Dragon appears only in spring (March through May). It heralds renewal and new beginnings, and its presence causes dormant seeds to sprout instantly. Students who encounter one before exams are said to always pass. Moe-chan tried to ride one once. It politely declined.',
+    condition: 'spring'
+  },
+  {
+    id: 'harvest_golem', name: 'Harvest Golem', emoji: '🎃',
+    tier: 'Rare', rarity: 11,
+    habitats: ['meadow', 'forest'],
+    appearance: 'A shambling figure made of bundled wheat, corn husks, and autumn leaves, with a carved pumpkin for a head. Warm candlelight flickers behind its carved eyes, and it carries a cornucopia overflowing with glowing fruits that do not exist in nature. Crows perch on its shoulders companionably.',
+    description: 'The Harvest Golem appears only in autumn (September through November). It walks the fields gathering the last of the season\'s energy before winter. Encountering one guarantees bonus materials from the expedition. It communicates by rearranging the fruits in its cornucopia into expressive still-life tableaux.',
+    condition: 'autumn'
+  },
+  {
+    id: 'glitch_cat', name: 'Glitch Cat', emoji: '🐈‍⬛',
+    tier: 'Legendary', rarity: 20,
+    habitats: ['meadow', 'forest', 'cave', 'ruins', 'abyss'],
+    appearance: 'A black cat that is visibly broken. Parts of its body stretch into infinity before snapping back. It walks through walls, phases through the floor, and occasionally duplicates itself into 255 identical copies that stack on top of each other before collapsing back into one. Its meow is a sound that should not be possible.',
+    description: 'The Glitch Cat exists at the seams of reality where the rules break down. It can only be found when you have collected at least 15 unique materials and discovered at least 10 chimeras. It is the rarest chimera in existence, not because it hides, but because it literally does not exist most of the time. Petting it causes mild visual artifacts in your peripheral vision for approximately six hours.',
+    condition: 'collector'
+  },
 ];
 
 const CHIMERA_TIER_COLORS = TIER_COLORS; // Reuse material tier colors
+
+// ===== CHIMERA CONDITION CHECKS =====
+function checkChimeraCondition(chimera) {
+  if (!chimera.condition) return true; // No condition = always available
+
+  const now = new Date();
+  const hour = now.getHours();
+  const dayOfWeek = now.getDay(); // 0=Sun, 6=Sat
+  const month = now.getMonth(); // 0=Jan, 11=Dec
+
+  switch (chimera.condition) {
+    case 'streak7':
+      return (data.streak || 0) >= 7;
+    case 'nighttime':
+      return hour >= 22 || hour < 4;
+    case 'weekend':
+      return dayOfWeek === 0 || dayOfWeek === 6;
+    case 'winter':
+      return month === 11 || month === 0 || month === 1; // Dec, Jan, Feb
+    case 'spring':
+      return month >= 2 && month <= 4; // Mar, Apr, May
+    case 'autumn':
+      return month >= 8 && month <= 10; // Sep, Oct, Nov
+    case 'collector': {
+      const uniqueMats = Object.keys(data.materials || {}).filter(k => data.materials[k] > 0).length;
+      const uniqueChimeras = Object.keys(data.bestiary || {}).length;
+      return uniqueMats >= 15 && uniqueChimeras >= 10;
+    }
+    default:
+      return true;
+  }
+}
+
+// ===== GENERATE DYNAMIC ENCOUNTER TEXT =====
+function generateEncounterFlavor(chimera) {
+  // Pick a random personality
+  const personality = CHIMERA_PERSONALITIES[Math.floor(Math.random() * CHIMERA_PERSONALITIES.length)];
+
+  // Pick a stat-reactive line
+  let reactionPool = [];
+  const streak = data.streak || 0;
+  const totalMats = Object.values(data.materials || {}).reduce((a, b) => a + b, 0);
+  const timesSeen = data.bestiary && data.bestiary[chimera.id] ? data.bestiary[chimera.id].timesSeen : 0;
+
+  if (timesSeen === 0) {
+    reactionPool = ENCOUNTER_REACTIONS.firstEver;
+  } else if (timesSeen >= 5) {
+    reactionPool = ENCOUNTER_REACTIONS.manyEncounters;
+  } else if (streak >= 5) {
+    reactionPool = ENCOUNTER_REACTIONS.highStreak;
+  } else if (streak <= 1) {
+    reactionPool = ENCOUNTER_REACTIONS.lowStreak;
+  } else if (totalMats >= 50) {
+    reactionPool = ENCOUNTER_REACTIONS.highMaterials;
+  }
+
+  const reaction = reactionPool.length > 0 ? reactionPool[Math.floor(Math.random() * reactionPool.length)] : '';
+
+  return { personality, reaction };
+}
 
 // ===== CHIMERA ENCOUNTER LOGIC =====
 function rollChimeraEncounter(expeditionId, duration) {
@@ -184,16 +503,22 @@ function rollChimeraEncounter(expeditionId, duration) {
 
   if (Math.random() > encounterChance) return null;
 
-  // Determine which chimeras are eligible based on expedition habitat
+  // Determine which chimeras are eligible based on expedition habitat AND conditions
   const exp = EXPEDITIONS.find(e => e.id === expeditionId);
   const habitat = exp ? exp.id : 'meadow';
-  const eligible = CHIMERAS.filter(c => c.habitats.includes(habitat) && c.rarity <= (exp ? exp.maxRarity : 6));
+  const eligible = CHIMERAS.filter(c =>
+    c.habitats.includes(habitat) &&
+    c.rarity <= (exp ? exp.maxRarity : 6) &&
+    checkChimeraCondition(c)
+  );
 
   if (eligible.length === 0) return null;
 
   // Weighted random: rarer chimeras are harder to find
   let weights = eligible.map(c => {
     let w = Math.pow(21 - c.rarity, 2.5);
+    // Secret/conditional chimeras get a slight boost when conditions are met
+    if (c.condition) w *= 1.5;
     if (bonus > 1) w *= Math.pow(c.rarity / 20, (bonus - 1) * 0.6);
     return w;
   });
@@ -307,7 +632,8 @@ function checkAutoExpedition() {
   let chimeraData = null;
   if (chimera) {
     const isNew = addToBestiary(chimera);
-    chimeraData = { id: chimera.id, name: chimera.name, emoji: chimera.emoji, tier: chimera.tier, isNew: isNew, appearance: chimera.appearance, description: chimera.description };
+    const flavor = generateEncounterFlavor(chimera);
+    chimeraData = { id: chimera.id, name: chimera.name, emoji: chimera.emoji, tier: chimera.tier, isNew: isNew, appearance: chimera.appearance, description: chimera.description, personality: flavor.personality, reaction: flavor.reaction, condition: chimera.condition || null };
   }
 
   data.expeditions.lastAutoDate = today;
@@ -370,7 +696,8 @@ function checkActiveExpedition() {
     let chimeraData = null;
     if (chimera) {
       const isNew = addToBestiary(chimera);
-      chimeraData = { id: chimera.id, name: chimera.name, emoji: chimera.emoji, tier: chimera.tier, isNew: isNew, appearance: chimera.appearance, description: chimera.description };
+      const flavor = generateEncounterFlavor(chimera);
+    chimeraData = { id: chimera.id, name: chimera.name, emoji: chimera.emoji, tier: chimera.tier, isNew: isNew, appearance: chimera.appearance, description: chimera.description, personality: flavor.personality, reaction: flavor.reaction, condition: chimera.condition || null };
     }
 
     const logEntry = {
@@ -432,16 +759,21 @@ function showLootPopup(loot, expeditionName, chimeraData) {
   if (chimeraData) {
     const tc = CHIMERA_TIER_COLORS[chimeraData.tier] || CHIMERA_TIER_COLORS['Common'];
     const newBadge = chimeraData.isNew ? '<span class="chimera-new-badge">NEW DISCOVERY!</span>' : '';
+    const conditionBadge = chimeraData.condition ? '<span class="chimera-secret-badge">SECRET</span>' : '';
+    const personalityHtml = chimeraData.personality ? `<div class="chimera-personality">${chimeraData.personality.emoji} <strong>${chimeraData.personality.trait}</strong> — It ${chimeraData.personality.desc}</div>` : '';
+    const reactionHtml = chimeraData.reaction ? `<div class="chimera-reaction"><em>${chimeraData.reaction}</em></div>` : '';
     chimeraHtml = `
       <div class="chimera-encounter-panel" style="border-color:${tc.border}; background:${tc.bg}">
         <div class="chimera-encounter-header">
           <span class="chimera-encounter-emoji">${chimeraData.emoji}</span>
           <div>
             <span class="chimera-encounter-name" style="color:${tc.text}">${escHtml(chimeraData.name)}</span>
-            ${newBadge}
+            ${newBadge}${conditionBadge}
             <span class="chimera-tier-label" style="color:${tc.text}">${chimeraData.tier}</span>
           </div>
         </div>
+        ${personalityHtml}
+        ${reactionHtml}
         <p class="chimera-encounter-appearance">${escHtml(chimeraData.appearance)}</p>
         <p class="chimera-encounter-desc">${escHtml(chimeraData.description)}</p>
       </div>`;
@@ -671,9 +1003,10 @@ function renderBestiary() {
       const isEmpty = !discovered;
 
       if (isEmpty) {
+        const secretHint = ch.condition ? '🔒' : '❓';
         html += `<div class="bestiary-card bestiary-empty" style="border-color:rgba(255,255,255,0.08); background:rgba(0,0,0,0.2)">
-          <div class="bestiary-emoji" style="filter:brightness(0.2)">❓</div>
-          <div class="bestiary-name" style="color:rgba(255,255,255,0.2)">???</div>
+          <div class="bestiary-emoji" style="filter:brightness(0.3)">${secretHint}</div>
+          <div class="bestiary-name" style="color:rgba(255,255,255,0.2)">${ch.condition ? '??? (Secret)' : '???'}</div>
           <div class="bestiary-rarity">${'★'.repeat(Math.ceil(ch.rarity / 4))}${'☆'.repeat(5 - Math.ceil(ch.rarity / 4))}</div>
         </div>`;
       } else {
@@ -717,12 +1050,24 @@ function showChimeraDetail(chimeraId) {
   const content = document.getElementById('chimera-detail-content');
   if (!overlay || !content) return;
 
+  const conditionLabels = {
+    'streak7': 'Requires 7+ day study streak',
+    'nighttime': 'Appears between 10 PM and 4 AM',
+    'weekend': 'Appears on weekends only',
+    'winter': 'Appears in winter (Dec-Feb)',
+    'spring': 'Appears in spring (Mar-May)',
+    'autumn': 'Appears in autumn (Sep-Nov)',
+    'collector': 'Requires 15+ unique materials and 10+ chimera discoveries',
+  };
+  const condHtml = ch.condition ? `<div class="chimera-detail-section"><h4 class="chimera-detail-label">Appearance Condition</h4><p class="chimera-detail-text" style="color:#ff8000;">${conditionLabels[ch.condition] || 'Special conditions'}</p></div>` : '';
+
   content.innerHTML = `
     <div class="chimera-detail-header" style="border-bottom: 2px solid ${tc.border};">
       <span class="chimera-detail-emoji">${ch.emoji}</span>
       <div>
         <h3 class="chimera-detail-name" style="color:${tc.text}">${ch.name}</h3>
         <span class="chimera-detail-tier" style="color:${tc.text}">${ch.tier}</span>
+        ${ch.condition ? '<span class="chimera-secret-badge" style="margin-left:6px;">SECRET</span>' : ''}
         <span class="chimera-detail-rarity">${'★'.repeat(Math.ceil(ch.rarity / 4))}${'☆'.repeat(5 - Math.ceil(ch.rarity / 4))}</span>
       </div>
     </div>
@@ -738,6 +1083,7 @@ function showChimeraDetail(chimeraId) {
       <h4 class="chimera-detail-label">Habitat</h4>
       <p class="chimera-detail-text">${ch.habitats.map(h => { const e = EXPEDITIONS.find(ex => ex.id === h); return e ? e.emoji + ' ' + e.name : h; }).join(', ')}</p>
     </div>
+    ${condHtml}
     <div class="chimera-detail-stats">
       <span>First seen: ${formatDate(disc.firstSeen)}</span>
       <span>Encounters: ${disc.timesSeen}</span>
