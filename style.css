@@ -859,3 +859,162 @@ body.clipboard-mode #app {
 .mat-name { font-size: 0.78rem; font-weight: 600; margin-bottom: 2px; }
 .mat-qty { font-size: 1.4rem; font-weight: 800; }
 .mat-rarity-stars { font-size: 0.6rem; color: rgba(255,204,0,0.6); letter-spacing: 1px; margin-top: 2px; }
+
+/* ===== CHIMERA ENCOUNTER (LOOT POPUP) ===== */
+.chimera-encounter-panel {
+  border: 2px solid;
+  border-radius: 16px;
+  padding: 16px;
+  margin: 14px 0;
+  text-align: left;
+}
+
+.chimera-encounter-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.chimera-encounter-emoji { font-size: 2.4rem; }
+
+.chimera-encounter-name {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.2rem;
+  font-weight: 800;
+  display: block;
+}
+
+.chimera-new-badge {
+  display: inline-block;
+  background: linear-gradient(90deg, #ff3c8e, #ff8a00);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 50px;
+  margin-left: 6px;
+  animation: newBadgePulse 1.5s ease-in-out infinite;
+  letter-spacing: 0.5px;
+}
+
+@keyframes newBadgePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+.chimera-tier-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: block;
+  opacity: 0.7;
+}
+
+.chimera-encounter-appearance {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.9);
+  line-height: 1.5;
+  font-style: italic;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  background: rgba(0,0,0,0.15);
+  border-radius: 10px;
+  border-left: 3px solid rgba(255,255,255,0.2);
+}
+
+.chimera-encounter-desc {
+  font-size: 0.83rem;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.5;
+}
+
+/* ===== BESTIARY GRID ===== */
+.bestiary-tier-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.bestiary-card {
+  border: 1.5px solid;
+  border-radius: 14px;
+  padding: 16px 10px;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.bestiary-card:hover { transform: translateY(-2px); }
+.bestiary-card.bestiary-empty { opacity: 0.5; }
+.bestiary-card.bestiary-empty:hover { opacity: 0.7; }
+
+.bestiary-emoji { font-size: 2rem; margin-bottom: 6px; }
+.bestiary-name { font-size: 0.82rem; font-weight: 700; margin-bottom: 2px; }
+.bestiary-seen { font-size: 0.7rem; color: rgba(255,255,255,0.5); margin-bottom: 2px; }
+.bestiary-rarity { font-size: 0.6rem; color: rgba(255,204,0,0.6); letter-spacing: 1px; margin-top: 2px; }
+
+/* ===== CHIMERA DETAIL POPUP ===== */
+.chimera-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+}
+
+.chimera-detail-emoji { font-size: 3rem; }
+
+.chimera-detail-name {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.chimera-detail-tier {
+  font-size: 0.8rem;
+  font-weight: 600;
+  opacity: 0.7;
+}
+
+.chimera-detail-rarity {
+  font-size: 0.7rem;
+  color: rgba(255,204,0,0.7);
+  letter-spacing: 1px;
+  margin-left: 8px;
+}
+
+.chimera-detail-section {
+  margin-bottom: 14px;
+}
+
+.chimera-detail-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 6px;
+}
+
+.chimera-detail-text {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.6;
+}
+
+.chimera-detail-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.5);
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+/* ===== EXPEDITION LOG CHIMERA ===== */
+.exp-log-chimera {
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 3px 0;
+}

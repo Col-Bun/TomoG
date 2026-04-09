@@ -185,6 +185,7 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     <button class="tab-btn" data-tab="quotes">💬 Quotes</button>
     <button class="tab-btn" data-tab="expeditions">⚔️ Expeditions</button>
     <button class="tab-btn" data-tab="materials">🎒 Materials</button>
+    <button class="tab-btn" data-tab="bestiary">🐲 Bestiary</button>
     <button class="tab-btn" data-tab="commissions">🎨 Commissions</button>
     <button class="tab-btn" data-tab="clipboard">📋 Clipboard</button>
   </div>
@@ -287,13 +288,12 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
       <div class="history-grid" id="history-grid"></div>
     </div>
     <div class="nes-container">
-      <h3>PASSWORD SYSTEM</h3>
-      <p>GENERATE A PASSWORD TO BACK UP YOUR PROGRESS, OR PASTE A PASSWORD BELOW TO RESTORE DATA.</p>
-      <textarea id="nes-password-box" class="nes-textarea" placeholder="[ ENTER PASSWORD HERE ]" spellcheck="false"></textarea>
-      <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-        <button class="nes-btn" onclick="generatePassword()">GENERATE</button>
-        <button class="nes-btn" onclick="loadPassword()">RESTORE</button>
-        <button class="nes-btn" onclick="copyPassword()">COPY</button>
+      <h3>SAVE / LOAD</h3>
+      <p>Download your save data as a file, or upload a save file to restore your progress.</p>
+      <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 12px;">
+        <button class="nes-btn" id="save-download-btn" onclick="downloadSaveFile()">💾 Download Save File</button>
+        <button class="nes-btn" onclick="triggerLoadFile()">📂 Upload Save File</button>
+        <input type="file" id="save-file-input" accept=".json" style="display:none;" onchange="handleSaveFileUpload(event)">
       </div>
     </div>
   </div>
@@ -572,6 +572,26 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
         </div>
       </div>
       <div id="materials-grid" class="materials-grid"></div>
+    </div>
+  </div>
+
+  <!-- ===== BESTIARY TAB ===== -->
+  <div class="tab-content" id="tab-bestiary">
+    <div class="glass-dark" style="padding: 22px;">
+      <div class="mat-header-row">
+        <h3 class="mat-page-title">🐲 Chimera Bestiary</h3>
+        <div class="mat-summary">
+          <div class="glass mat-stat-chip"><span class="mat-stat-num" id="bestiary-total-count">0</span><span class="mat-stat-label">Encounters</span></div>
+          <div class="glass mat-stat-chip"><span class="mat-stat-num" id="bestiary-unique-count">0/16</span><span class="mat-stat-label">Discovered</span></div>
+        </div>
+      </div>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.85rem; margin-bottom:16px;">Moe-chan discovers chimeras during expeditions. Longer missions in harder areas find rarer creatures. Click a discovered chimera for details.</p>
+      <div id="bestiary-grid" class="materials-grid"></div>
+    </div>
+
+    <!-- Chimera Detail Popup -->
+    <div id="chimera-detail-overlay" class="loot-popup-overlay" style="display:none;" onclick="if(event.target===this)closeChimeraDetail()">
+      <div class="loot-popup glass-strong" id="chimera-detail-content" style="max-width:500px;"></div>
     </div>
   </div>
 

@@ -34,7 +34,7 @@ function toggleTheme() { document.body.classList.toggle('dark-mode'); localStora
 // ===== DATA INITIALIZATION =====
 const STORAGE_KEY = 'studyBuddyData';
 function getDefaultData() {
-  return { days: {}, dictionary: [], diary: [], streak: 0, lastActiveDate: null, starterLoaded: false, schedule: {}, calendar: {}, quotes: [], commissions: [], materials: {}, expeditions: { active: null, log: [], lastAutoDate: null } };
+  return { days: {}, dictionary: [], diary: [], streak: 0, lastActiveDate: null, starterLoaded: false, schedule: {}, calendar: {}, quotes: [], commissions: [], materials: {}, expeditions: { active: null, log: [], lastAutoDate: null }, bestiary: {} };
 }
 
 function loadData() { 
@@ -52,6 +52,7 @@ function loadData() {
       if (!Array.isArray(loaded.commissions)) loaded.commissions = [];
       if (!loaded.materials || typeof loaded.materials !== 'object') loaded.materials = {};
       if (!loaded.expeditions || typeof loaded.expeditions !== 'object') loaded.expeditions = { active: null, log: [], lastAutoDate: null };
+      if (!loaded.bestiary || typeof loaded.bestiary !== 'object') loaded.bestiary = {};
       if (typeof loaded.streak !== 'number') loaded.streak = 0;
       return loaded; 
     } 
@@ -79,32 +80,77 @@ if (!data.starterLoaded && typeof starterDeck !== 'undefined') {
   data.starterLoaded = true; saveData();
 }
 
-// ===== NES PASSWORD =====
-function generatePassword() { document.getElementById('nes-password-box').value = btoa(encodeURIComponent(JSON.stringify(data))).match(/.{1,8}/g).join('-'); }
-function loadPassword() {
-  const input = document.getElementById('nes-password-box').value.trim(); if (!input) return alert("ENTER PASSWORD.");
+// ===== FILE-BASED SAVE/LOAD =====
+function downloadSaveFile() {
   try {
-    let cleanInput = input.replace(/[-\s]/g, '');
-    let imported;
-    try { imported = JSON.parse(decodeURIComponent(atob(cleanInput))); } 
-    catch(e) { imported = JSON.parse(decodeURIComponent(escape(atob(cleanInput)))); }
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const timestamp = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `moe-chan-save-${timestamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    const btn = document.getElementById('save-download-btn');
+    if (btn) { btn.textContent = 'Downloaded!'; setTimeout(() => btn.textContent = '💾 Download Save File', 2000); }
+  } catch(e) {
+    console.error('Download save failed:', e);
+    alert('Failed to download save file.');
+  }
+}
 
-    if (imported && typeof imported === 'object' && imported.days) { 
+function triggerLoadFile() {
+  document.getElementById('save-file-input').click();
+}
+
+function handleSaveFileUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // Validate file type
+  if (!file.name.endsWith('.json')) {
+    alert('Please select a .json save file.');
+    event.target.value = '';
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+
+      if (!imported || typeof imported !== 'object' || !imported.days) {
+        alert('Invalid save file: missing required data.');
+        return;
+      }
+
       // Migrate all fields to ensure nothing is lost
       if (!Array.isArray(imported.dictionary)) imported.dictionary = [];
-      if (!Array.isArray(imported.diary)) imported.diary = []; 
+      if (!Array.isArray(imported.diary)) imported.diary = [];
       if (!imported.calendar || typeof imported.calendar !== 'object') imported.calendar = {};
       if (!imported.schedule || typeof imported.schedule !== 'object') imported.schedule = {};
       if (!Array.isArray(imported.quotes)) imported.quotes = [];
       if (!Array.isArray(imported.commissions)) imported.commissions = [];
       if (!imported.materials || typeof imported.materials !== 'object') imported.materials = {};
       if (!imported.expeditions || typeof imported.expeditions !== 'object') imported.expeditions = { active: null, log: [], lastAutoDate: null };
+      if (!imported.bestiary || typeof imported.bestiary !== 'object') imported.bestiary = {};
       if (typeof imported.streak !== 'number') imported.streak = 0;
-      data = imported; saveData(); initApp(); alert("RESTORED!"); document.getElementById('nes-password-box').value = ''; 
-    } else alert("INVALID DATA.");
-  } catch (err) { console.error('Password restore error:', err); alert("INVALID FORMAT."); }
+
+      data = imported;
+      saveData();
+      initApp();
+      alert('Save file restored successfully!');
+    } catch(err) {
+      console.error('Save file restore error:', err);
+      alert('Could not read save file. Make sure it is a valid Moe-Chan save.');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = ''; // Reset so same file can be re-selected
 }
-function copyPassword() { const pwBox = document.getElementById('nes-password-box'); if (!pwBox.value) return; pwBox.select(); document.execCommand('copy'); alert("COPIED!"); }
 
 function calcStreak() {
   const sortedDays=Object.keys(data.days).sort().reverse(); if(!sortedDays.length){data.streak=0;return;}

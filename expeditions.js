@@ -3,6 +3,7 @@
 // Auto daily expedition + optional timed missions
 // 20 material types with ascending rarity
 // Flashcard bonus: every 10 min = +0.5x rarity multiplier
+// Chimera encounter system: discover creatures during expeditions
 
 // ===== MATERIAL DEFINITIONS (20 types, ascending rarity) =====
 const MATERIALS = [
@@ -40,6 +41,184 @@ const TIER_COLORS = {
   'Epic':      { bg: 'rgba(163,53,238,0.15)',  border: 'rgba(163,53,238,0.35)', text: '#A335EE' },
   'Legendary': { bg: 'rgba(255,128,0,0.15)',   border: 'rgba(255,128,0,0.4)',  text: '#FF8000' },
 };
+
+// ===== CHIMERA DEFINITIONS =====
+// Chimeras are creatures Moe-chan can encounter during expeditions.
+// Each has a unique appearance, description, and habitat.
+const CHIMERAS = [
+  // === Meadow Chimeras (Common) ===
+  {
+    id: 'puffmoth', name: 'Puffmoth', emoji: '🦋',
+    tier: 'Common', rarity: 2,
+    habitats: ['meadow'],
+    appearance: 'A plump, cotton-ball-sized moth with iridescent pastel wings that shimmer between lavender and gold. Its fuzzy antennae curl like tiny ferns, and it trails a faint sparkle of pollen wherever it drifts.',
+    description: 'Puffmoths gather in sleepy clouds above wildflower patches at dawn. They are harmless and surprisingly warm to the touch, like holding a tiny, breathing pillow. Moe-chan loves chasing them.'
+  },
+  {
+    id: 'pebblejaw', name: 'Pebblejaw', emoji: '🪨',
+    tier: 'Common', rarity: 3,
+    habitats: ['meadow'],
+    appearance: 'A squat, tortoise-like creature whose shell is made of smooth river stones fused together. Its stubby legs are mossy green and its eyes are two chips of amber that blink very slowly.',
+    description: 'Pebblejaws lumber through meadow grass munching on clover. Their stone shells rattle softly as they move, sounding like a gentle rain on a tin roof. They are incredibly patient and will let you pet them if you sit still long enough.'
+  },
+  {
+    id: 'honeywisp', name: 'Honeywisp', emoji: '🐝',
+    tier: 'Common', rarity: 1,
+    habitats: ['meadow', 'forest'],
+    appearance: 'A tiny luminous sprite shaped like a teardrop of golden honey. It has two translucent dragonfly wings and a single bright eye that glows like a candle flame. It hums at a perfect middle C.',
+    description: 'Honeywisps are the most common chimeras in the wild. They cluster around sweet-smelling flowers and leave trails of sticky golden light. Moe-chan says they taste like warm caramel when they land on your hand (she licked one once).'
+  },
+
+  // === Forest Chimeras (Uncommon) ===
+  {
+    id: 'mossback', name: 'Mossback Elk', emoji: '🦌',
+    tier: 'Uncommon', rarity: 5,
+    habitats: ['forest', 'meadow'],
+    appearance: 'A tall, graceful elk with antlers that branch into living oak limbs, complete with rustling leaves. Its coat is deep emerald dappled with patches of real moss, and tiny mushrooms grow along its spine.',
+    description: 'Mossback Elk are the silent guardians of old-growth forests. They move without a sound despite their size, and where they sleep, medicinal herbs sprout overnight. Spotting one is considered very good luck among forest travelers.'
+  },
+  {
+    id: 'silkweaver', name: 'Silkweaver', emoji: '🕷️',
+    tier: 'Uncommon', rarity: 6,
+    habitats: ['forest'],
+    appearance: 'An elegant spider the size of a house cat, with a body like polished obsidian and legs banded in silver and violet. Its eight eyes glow a soft lilac, and the silk it produces catches light like fiber-optic threads.',
+    description: 'Silkweavers are surprisingly gentle despite their intimidating size. They build elaborate geometric webs between ancient trees that hum musically in the wind. Their silk is prized for its unbreakable strength and is one of the rarest crafting materials in the land.'
+  },
+  {
+    id: 'hollowhorn', name: 'Hollowhorn Fox', emoji: '🦊',
+    tier: 'Uncommon', rarity: 7,
+    habitats: ['forest'],
+    appearance: 'A sleek fox with fur the color of autumn twilight, shifting between burnt orange and deep purple. Two hollow, crystalline horns sprout from its head, and when wind passes through them, they produce haunting flute-like melodies.',
+    description: 'Hollowhorn Foxes are nocturnal tricksters who lead travelers in circles for fun. Despite this, they never cause real harm, they just enjoy the confusion. If you offer one a sweet fruit, it may play a song for you through its horns before vanishing into the mist.'
+  },
+
+  // === Cave Chimeras (Rare) ===
+  {
+    id: 'crystalcrab', name: 'Crystal Crab', emoji: '🦀',
+    tier: 'Rare', rarity: 9,
+    habitats: ['cave'],
+    appearance: 'A large crab with a shell made entirely of interlocking amethyst and quartz crystals. Its claws are translucent rose quartz, and bioluminescent fluid pulses through visible channels in its legs, casting purple-pink light on cave walls.',
+    description: 'Crystal Crabs are the jewelers of the underground. They carefully arrange mineral deposits into elaborate nests, essentially building tiny crystal palaces. They are fiercely territorial about their collections but can be pacified with offerings of moonstone.'
+  },
+  {
+    id: 'echoveil', name: 'Echoveil Bat', emoji: '🦇',
+    tier: 'Rare', rarity: 10,
+    habitats: ['cave'],
+    appearance: 'A bat with wings like translucent stained glass, each membrane displaying a shifting kaleidoscope of deep blues and golds. Its fur is midnight black with silver-tipped ears, and its echolocation pulses are visible as faint rings of pale blue light.',
+    description: 'Echoveil Bats navigate not just by sound but by a form of sonic memory. They can replay echoes of things that happened in a cave days or even weeks ago. Scholars seek them out to literally listen to the past. Their wings are said to contain maps of every cave they have ever visited.'
+  },
+  {
+    id: 'geodeturtle', name: 'Geode Turtle', emoji: '🐢',
+    tier: 'Rare', rarity: 11,
+    habitats: ['cave', 'ruins'],
+    appearance: 'An ancient turtle whose shell, when cracked open (naturally, over centuries), reveals a dazzling interior of amethyst, citrine, and opal formations. Its skin is slate-grey and rough like sandpaper, and its eyes are deep amber with flecks of gold.',
+    description: 'Geode Turtles are among the oldest living chimeras, some estimated at over a thousand years old. They move imperceptibly slowly, and entire stalagmites may grow around a sleeping one. The crystals inside their shells are said to record the dreams of the earth itself.'
+  },
+
+  // === Ruins Chimeras (Epic) ===
+  {
+    id: 'glyphserpent', name: 'Glyph Serpent', emoji: '🐍',
+    tier: 'Epic', rarity: 13,
+    habitats: ['ruins'],
+    appearance: 'A sinuous serpent with scales of burnished bronze, each one inscribed with a tiny, glowing glyph from a forgotten language. Its eyes are molten gold, and when it moves, the glyphs on its body rearrange themselves, as though composing new sentences.',
+    description: 'Glyph Serpents are living libraries. Each one carries fragments of a dead civilization written on its body. Linguists and archaeologists have spent lifetimes trying to decode a single serpent. They are non-venomous but profoundly intelligent, and some say they understand every language ever spoken.'
+  },
+  {
+    id: 'phantomstag', name: 'Phantom Stag', emoji: '🫎',
+    tier: 'Epic', rarity: 14,
+    habitats: ['ruins', 'forest'],
+    appearance: 'A majestic stag that flickers between solid and translucent, as though it exists in two places at once. Its antlers are made of pale blue spirit-flame, and ghostly afterimages trail behind it as it moves. Flowers of light bloom briefly in its hoofprints.',
+    description: 'Phantom Stags are guardians of places where the boundary between worlds is thin. They are rarely seen by the living, appearing only to those who carry a deep question in their heart. It is said that meeting one means you are on the verge of a great revelation.'
+  },
+  {
+    id: 'irongolem', name: 'Rusted Golem', emoji: '🤖',
+    tier: 'Epic', rarity: 15,
+    habitats: ['ruins'],
+    appearance: 'A hulking humanoid figure cobbled together from ancient armor plates, corroded gears, and vine-wrapped stone. One eye socket holds a flickering emerald flame, the other is dark and hollow. Moss and small flowers grow in the joints of its limbs.',
+    description: 'Rusted Golems are the remnants of an ancient civilization\'s guardians, still patrolling halls that crumbled centuries ago. They are not hostile but confused, endlessly searching for masters who will never return. Occasionally one will gently place a wildflower in your path, an old greeting protocol corrupted into something oddly tender.'
+  },
+
+  // === Abyss Chimeras (Legendary) ===
+  {
+    id: 'voidwhale', name: 'Void Whale', emoji: '🐋',
+    tier: 'Legendary', rarity: 17,
+    habitats: ['abyss'],
+    appearance: 'An immense whale that swims through the air of the deepest caverns, its body a silhouette of pure starfield, as though a window into deep space was cut in the shape of a leviathan. Tiny galaxies swirl in its eyes, and its song reverberates through dimensions.',
+    description: 'Void Whales migrate through the spaces between realities, and the Starlit Abyss is one of their resting stops. Seeing one is a once-in-a-lifetime event. Their songs can heal old wounds and are said to contain the fundamental frequencies of creation itself. Moe-chan cried the first time she heard one.'
+  },
+  {
+    id: 'solphoenix', name: 'Sol Phoenix', emoji: '🔥',
+    tier: 'Legendary', rarity: 18,
+    habitats: ['abyss', 'ruins'],
+    appearance: 'A radiant bird wreathed in plasma-white flames that shift through every color of the visible spectrum. Its tail feathers are streamers of concentrated sunrise, each one a different dawn from a different world. Its eyes are twin stars, calm and impossibly ancient.',
+    description: 'The Sol Phoenix is said to be the original source of all fire in the world. It nests at the bottom of the Abyss, where its heat keeps the deep waters warm and the underground ecosystems alive. Every thousand years it dies and is reborn, and the burst of energy creates new mineral veins throughout the earth.'
+  },
+  {
+    id: 'dreameater', name: 'Dream Eater', emoji: '🌀',
+    tier: 'Legendary', rarity: 19,
+    habitats: ['abyss'],
+    appearance: 'A shapeless, undulating mass of soft indigo mist with dozens of gently blinking eyes scattered across its form like stars in a nebula. Tendrils of lavender smoke curl from it, carrying the faint scent of rain and old books. It has no fixed shape, only suggestions of one.',
+    description: 'Dream Eaters feed on nightmares, drawn to sleeping creatures plagued by bad dreams. Far from malicious, they are compassionate devourers of fear. After a Dream Eater visits, you wake feeling lighter, as though a weight you did not know you carried has been lifted. They are the reason the deepest caves feel strangely peaceful.'
+  },
+  {
+    id: 'worldturtle', name: 'World Turtle', emoji: '🌍',
+    tier: 'Legendary', rarity: 20,
+    habitats: ['abyss'],
+    appearance: 'A turtle of incomprehensible scale, its shell a living landscape of miniature mountains, forests, rivers, and clouds. Tiny civilizations flicker in and out of existence on its back. Its skin is the deep blue of ocean trenches, and its eyes hold the patient wisdom of geological time.',
+    description: 'The World Turtle is more myth than chimera, glimpsed only in the deepest reaches of the Starlit Abyss. Those who have seen it describe the overwhelming sensation that the ground itself is alive and breathing. It is said to be the foundation upon which the world was built, and that its heartbeat is the turning of the seasons.'
+  },
+];
+
+const CHIMERA_TIER_COLORS = TIER_COLORS; // Reuse material tier colors
+
+// ===== CHIMERA ENCOUNTER LOGIC =====
+function rollChimeraEncounter(expeditionId, duration) {
+  // Base encounter chance: 30% for timed, 15% for auto daily
+  let encounterChance = duration ? 0.30 : 0.15;
+  // Longer expeditions = higher chance (up to 60%)
+  if (duration) encounterChance = Math.min(0.60, 0.20 + (duration / 480) * 0.40);
+
+  // Flashcard bonus increases encounter chance slightly
+  const bonus = getFlashcardRarityBonus();
+  if (bonus > 1) encounterChance = Math.min(0.75, encounterChance + (bonus - 1) * 0.05);
+
+  if (Math.random() > encounterChance) return null;
+
+  // Determine which chimeras are eligible based on expedition habitat
+  const exp = EXPEDITIONS.find(e => e.id === expeditionId);
+  const habitat = exp ? exp.id : 'meadow';
+  const eligible = CHIMERAS.filter(c => c.habitats.includes(habitat) && c.rarity <= (exp ? exp.maxRarity : 6));
+
+  if (eligible.length === 0) return null;
+
+  // Weighted random: rarer chimeras are harder to find
+  let weights = eligible.map(c => {
+    let w = Math.pow(21 - c.rarity, 2.5);
+    if (bonus > 1) w *= Math.pow(c.rarity / 20, (bonus - 1) * 0.6);
+    return w;
+  });
+
+  const totalWeight = weights.reduce((a, b) => a + b, 0);
+  let roll = Math.random() * totalWeight;
+  let chosen = eligible[0];
+  for (let j = 0; j < eligible.length; j++) {
+    roll -= weights[j];
+    if (roll <= 0) { chosen = eligible[j]; break; }
+  }
+
+  return chosen;
+}
+
+function addToBestiary(chimera) {
+  if (!data.bestiary) data.bestiary = {};
+  if (!data.bestiary[chimera.id]) {
+    data.bestiary[chimera.id] = { firstSeen: todayStr(), timesSeen: 1 };
+    return true; // New discovery!
+  } else {
+    data.bestiary[chimera.id].timesSeen++;
+    return false;
+  }
+}
 
 // ===== EXPEDITION DEFINITIONS =====
 const EXPEDITIONS = [
@@ -123,6 +302,14 @@ function checkAutoExpedition() {
   const loot = rollExpeditionLoot(10, 5); // Up to Rare, 5 items
   addMaterialsToInventory(loot);
 
+  // Roll for chimera encounter on daily walk
+  const chimera = rollChimeraEncounter('forest', null);
+  let chimeraData = null;
+  if (chimera) {
+    const isNew = addToBestiary(chimera);
+    chimeraData = { id: chimera.id, name: chimera.name, emoji: chimera.emoji, tier: chimera.tier, isNew: isNew, appearance: chimera.appearance, description: chimera.description };
+  }
+
   data.expeditions.lastAutoDate = today;
 
   const logEntry = {
@@ -130,7 +317,8 @@ function checkAutoExpedition() {
     date: today,
     loot: loot,
     expedition: 'Daily Adventure',
-    rarityBonus: getFlashcardRarityBonus()
+    rarityBonus: getFlashcardRarityBonus(),
+    chimera: chimeraData
   };
   data.expeditions.log.unshift(logEntry);
   if (data.expeditions.log.length > 30) data.expeditions.log.length = 30; // Keep last 30
@@ -177,13 +365,22 @@ function checkActiveExpedition() {
     const loot = rollExpeditionLoot(active.maxRarity, itemCount);
     addMaterialsToInventory(loot);
 
+    // Roll for chimera encounter
+    const chimera = rollChimeraEncounter(active.expeditionId, active.duration);
+    let chimeraData = null;
+    if (chimera) {
+      const isNew = addToBestiary(chimera);
+      chimeraData = { id: chimera.id, name: chimera.name, emoji: chimera.emoji, tier: chimera.tier, isNew: isNew, appearance: chimera.appearance, description: chimera.description };
+    }
+
     const logEntry = {
       type: 'mission',
       date: todayStr(),
       loot: loot,
       expedition: exp ? exp.name : 'Unknown',
       duration: active.duration,
-      rarityBonus: getFlashcardRarityBonus()
+      rarityBonus: getFlashcardRarityBonus(),
+      chimera: chimeraData
     };
     data.expeditions.log.unshift(logEntry);
     if (data.expeditions.log.length > 30) data.expeditions.log.length = 30;
@@ -201,16 +398,17 @@ function checkActiveExpedition() {
 function collectExpedition() {
   const result = checkActiveExpedition();
   if (result) {
-    showLootPopup(result.loot, result.expedition);
+    showLootPopup(result.loot, result.expedition, result.chimera);
     renderExpeditions();
     renderMaterials();
+    if (typeof renderBestiary === 'function') renderBestiary();
     setCreatureState('celebrate');
-    setSpeech('expeditionDone');
+    setSpeech(result.chimera ? 'chimeraFound' : 'expeditionDone');
   }
 }
 
 // ===== LOOT POPUP =====
-function showLootPopup(loot, expeditionName) {
+function showLootPopup(loot, expeditionName, chimeraData) {
   const overlay = document.getElementById('loot-popup-overlay');
   const content = document.getElementById('loot-popup-content');
   if (!overlay || !content) return;
@@ -229,10 +427,31 @@ function showLootPopup(loot, expeditionName) {
     </div>`;
   }).join('');
 
+  // Chimera encounter section
+  let chimeraHtml = '';
+  if (chimeraData) {
+    const tc = CHIMERA_TIER_COLORS[chimeraData.tier] || CHIMERA_TIER_COLORS['Common'];
+    const newBadge = chimeraData.isNew ? '<span class="chimera-new-badge">NEW DISCOVERY!</span>' : '';
+    chimeraHtml = `
+      <div class="chimera-encounter-panel" style="border-color:${tc.border}; background:${tc.bg}">
+        <div class="chimera-encounter-header">
+          <span class="chimera-encounter-emoji">${chimeraData.emoji}</span>
+          <div>
+            <span class="chimera-encounter-name" style="color:${tc.text}">${escHtml(chimeraData.name)}</span>
+            ${newBadge}
+            <span class="chimera-tier-label" style="color:${tc.text}">${chimeraData.tier}</span>
+          </div>
+        </div>
+        <p class="chimera-encounter-appearance">${escHtml(chimeraData.appearance)}</p>
+        <p class="chimera-encounter-desc">${escHtml(chimeraData.description)}</p>
+      </div>`;
+  }
+
   content.innerHTML = `
     <h3 class="loot-title">Expedition Complete!</h3>
     <p class="loot-subtitle">${escHtml(expeditionName)}</p>
     ${bonusHtml}
+    ${chimeraHtml}
     <div class="loot-items">${itemsHtml}</div>
     <button class="btn-glossy btn-green loot-close-btn" onclick="closeLootPopup()">Collect!</button>
   `;
@@ -384,11 +603,18 @@ function renderExpeditionLog() {
     const typeIcon = entry.type === 'auto' ? '🌅' : '⚔️';
     const bonusStr = entry.rarityBonus > 1 ? ` (${entry.rarityBonus.toFixed(1)}x bonus)` : '';
 
+    let chimeraLogHtml = '';
+    if (entry.chimera) {
+      const tc = CHIMERA_TIER_COLORS[entry.chimera.tier] || CHIMERA_TIER_COLORS['Common'];
+      chimeraLogHtml = `<div class="exp-log-chimera" style="color:${tc.text}">${entry.chimera.emoji} Encountered: ${escHtml(entry.chimera.name)}${entry.chimera.isNew ? ' (NEW!)' : ''}</div>`;
+    }
+
     html += `<div class="exp-log-entry">
       <div class="exp-log-header">
         <span>${typeIcon} ${escHtml(entry.expedition)}</span>
         <span class="exp-log-date">${formatDate(entry.date)}${bonusStr}</span>
       </div>
+      ${chimeraLogHtml}
       <div class="exp-log-loot">${lootStr}</div>
     </div>`;
   });
@@ -420,19 +646,130 @@ if (typeof speeches !== 'undefined') {
   speeches.expeditionDone = { en: "I found amazing loot!", jp: "すごいアイテムを見つけた！", es: "¡Encontré un tesoro increíble!" };
   speeches.expeditionStart = { en: "I'm heading out! Wish me luck!", jp: "行ってきます！応援してね！", es: "¡Me voy de aventura!" };
   speeches.autoExpedition = { en: "I went on a morning walk and found things!", jp: "朝の散歩で色々見つけたよ！", es: "¡Encontré cosas en mi paseo matutino!" };
+  speeches.chimeraFound = { en: "I saw an incredible creature!", jp: "すごい生き物を見つけた！", es: "¡Vi una criatura increíble!" };
+  speeches.chimeraNew = { en: "A chimera I've never seen before!!", jp: "見たことない合成獣だ！！", es: "¡¡Una quimera que nunca había visto!!" };
+}
+
+// ===== RENDER: Bestiary Page =====
+function renderBestiary() {
+  const grid = document.getElementById('bestiary-grid');
+  if (!grid) return;
+  if (!data.bestiary) data.bestiary = {};
+
+  let html = '';
+  const tiers = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary'];
+
+  tiers.forEach(tier => {
+    const tierChimeras = CHIMERAS.filter(c => c.tier === tier);
+    const tc = CHIMERA_TIER_COLORS[tier];
+
+    html += `<div class="mat-tier-header" style="color:${tc.text}; border-bottom: 1px solid ${tc.border};">${tier} Chimeras</div>`;
+    html += '<div class="bestiary-tier-grid">';
+
+    tierChimeras.forEach(ch => {
+      const discovered = data.bestiary[ch.id];
+      const isEmpty = !discovered;
+
+      if (isEmpty) {
+        html += `<div class="bestiary-card bestiary-empty" style="border-color:rgba(255,255,255,0.08); background:rgba(0,0,0,0.2)">
+          <div class="bestiary-emoji" style="filter:brightness(0.2)">❓</div>
+          <div class="bestiary-name" style="color:rgba(255,255,255,0.2)">???</div>
+          <div class="bestiary-rarity">${'★'.repeat(Math.ceil(ch.rarity / 4))}${'☆'.repeat(5 - Math.ceil(ch.rarity / 4))}</div>
+        </div>`;
+      } else {
+        html += `<div class="bestiary-card" style="border-color:${tc.border}; background:${tc.bg}; cursor:pointer;" onclick="showChimeraDetail('${ch.id}')">
+          <div class="bestiary-emoji">${ch.emoji}</div>
+          <div class="bestiary-name" style="color:${tc.text}">${ch.name}</div>
+          <div class="bestiary-seen">Seen: ${discovered.timesSeen}x</div>
+          <div class="bestiary-rarity">${'★'.repeat(Math.ceil(ch.rarity / 4))}${'☆'.repeat(5 - Math.ceil(ch.rarity / 4))}</div>
+        </div>`;
+      }
+    });
+
+    html += '</div>';
+  });
+
+  grid.innerHTML = html;
+
+  // Update counts
+  const totalEl = document.getElementById('bestiary-total-count');
+  if (totalEl) {
+    const total = Object.values(data.bestiary).reduce((a, b) => a + b.timesSeen, 0);
+    totalEl.textContent = total;
+  }
+
+  const uniqueEl = document.getElementById('bestiary-unique-count');
+  if (uniqueEl) {
+    const unique = CHIMERAS.filter(c => data.bestiary[c.id]).length;
+    uniqueEl.textContent = `${unique}/${CHIMERAS.length}`;
+  }
+}
+
+// ===== CHIMERA DETAIL POPUP =====
+function showChimeraDetail(chimeraId) {
+  const ch = CHIMERAS.find(c => c.id === chimeraId);
+  if (!ch) return;
+  const disc = data.bestiary[ch.id];
+  if (!disc) return;
+
+  const tc = CHIMERA_TIER_COLORS[ch.tier];
+  const overlay = document.getElementById('chimera-detail-overlay');
+  const content = document.getElementById('chimera-detail-content');
+  if (!overlay || !content) return;
+
+  content.innerHTML = `
+    <div class="chimera-detail-header" style="border-bottom: 2px solid ${tc.border};">
+      <span class="chimera-detail-emoji">${ch.emoji}</span>
+      <div>
+        <h3 class="chimera-detail-name" style="color:${tc.text}">${ch.name}</h3>
+        <span class="chimera-detail-tier" style="color:${tc.text}">${ch.tier}</span>
+        <span class="chimera-detail-rarity">${'★'.repeat(Math.ceil(ch.rarity / 4))}${'☆'.repeat(5 - Math.ceil(ch.rarity / 4))}</span>
+      </div>
+    </div>
+    <div class="chimera-detail-section">
+      <h4 class="chimera-detail-label">Appearance</h4>
+      <p class="chimera-detail-text">${escHtml(ch.appearance)}</p>
+    </div>
+    <div class="chimera-detail-section">
+      <h4 class="chimera-detail-label">Description</h4>
+      <p class="chimera-detail-text">${escHtml(ch.description)}</p>
+    </div>
+    <div class="chimera-detail-section">
+      <h4 class="chimera-detail-label">Habitat</h4>
+      <p class="chimera-detail-text">${ch.habitats.map(h => { const e = EXPEDITIONS.find(ex => ex.id === h); return e ? e.emoji + ' ' + e.name : h; }).join(', ')}</p>
+    </div>
+    <div class="chimera-detail-stats">
+      <span>First seen: ${formatDate(disc.firstSeen)}</span>
+      <span>Encounters: ${disc.timesSeen}</span>
+    </div>
+    <button class="btn-glossy btn-green" onclick="closeChimeraDetail()" style="margin-top:16px; width:100%;">Close</button>
+  `;
+  overlay.style.display = 'flex';
+}
+
+function closeChimeraDetail() {
+  const overlay = document.getElementById('chimera-detail-overlay');
+  if (overlay) overlay.style.display = 'none';
 }
 
 // ===== Initialize expeditions on app load =====
 function initExpeditions() {
   ensureExpeditionData();
 
+  // Ensure bestiary exists
+  if (!data.bestiary) data.bestiary = {};
+
   // Check auto daily expedition
   const autoResult = checkAutoExpedition();
   if (autoResult) {
     // Show notification of auto expedition results
     setTimeout(() => {
-      showLootPopup(autoResult.loot, 'Daily Morning Walk 🌅');
-      if (typeof setSpeech === 'function') setSpeech('autoExpedition');
+      showLootPopup(autoResult.loot, 'Daily Morning Walk 🌅', autoResult.chimera);
+      if (typeof setSpeech === 'function') {
+        if (autoResult.chimera && autoResult.chimera.isNew) setSpeech('chimeraNew');
+        else if (autoResult.chimera) setSpeech('chimeraFound');
+        else setSpeech('autoExpedition');
+      }
       if (typeof setCreatureState === 'function') setCreatureState('happy');
     }, 1000);
   }
@@ -441,13 +778,18 @@ function initExpeditions() {
   const completedWhileAway = checkActiveExpedition();
   if (completedWhileAway) {
     setTimeout(() => {
-      showLootPopup(completedWhileAway.loot, completedWhileAway.expedition);
-      if (typeof setSpeech === 'function') setSpeech('expeditionDone');
+      showLootPopup(completedWhileAway.loot, completedWhileAway.expedition, completedWhileAway.chimera);
+      if (typeof setSpeech === 'function') {
+        if (completedWhileAway.chimera && completedWhileAway.chimera.isNew) setSpeech('chimeraNew');
+        else if (completedWhileAway.chimera) setSpeech('chimeraFound');
+        else setSpeech('expeditionDone');
+      }
       if (typeof setCreatureState === 'function') setCreatureState('celebrate');
     }, autoResult ? 3000 : 1000); // Delay if auto also triggered
   }
 
   renderExpeditions();
   renderMaterials();
+  renderBestiary();
   startExpeditionTimer();
 }
