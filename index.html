@@ -189,6 +189,7 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     <button class="tab-btn" data-tab="advice">🧭 Advice</button>
     <button class="tab-btn" data-tab="commissions">🎨 Commissions</button>
     <button class="tab-btn" data-tab="clipboard">📋 Clipboard</button>
+    <button class="tab-btn" data-tab="map">🗺️ Map</button>
   </div>
 
   <div class="tab-content active" id="tab-home">
@@ -794,6 +795,57 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     </div>
   </div>
 
+  <!-- ===== MAP TAB ===== -->
+  <div class="tab-content" id="tab-map">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 1.4rem;">🗺️ Moe-chan's World</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.75rem; margin-bottom:14px;">A procedural world that grows each day you study. Streaks expand the frontier faster.</p>
+
+      <div class="map-stats-strip">
+        <div class="map-stat glass">
+          <div class="map-stat-num" id="map-day-info">Day 1</div>
+          <div class="map-stat-label">Exploration</div>
+        </div>
+        <div class="map-stat glass">
+          <div class="map-stat-num" id="map-radius">4</div>
+          <div class="map-stat-label">Frontier</div>
+        </div>
+        <div class="map-stat glass">
+          <div class="map-stat-num" id="map-tiles">0</div>
+          <div class="map-stat-label">Tiles</div>
+        </div>
+        <div class="map-stat glass">
+          <div class="map-stat-num" id="map-locations-count">0</div>
+          <div class="map-stat-label">Locations</div>
+        </div>
+        <div class="map-stat glass">
+          <div class="map-stat-num" id="map-streak-bonus">—</div>
+          <div class="map-stat-label">Streak Bonus</div>
+        </div>
+      </div>
+
+      <div class="map-container">
+        <pre class="map-display" id="map-display"></pre>
+      </div>
+
+      <div class="map-legend" id="map-legend"></div>
+
+      <div class="map-discoveries-section">
+        <h4 style="font-family:'Baloo 2',cursive; color:#a8e84c; margin-bottom:10px;">📍 Discovered Locations</h4>
+        <div class="map-discoveries-list" id="map-discoveries-list"></div>
+      </div>
+    </div>
+
+    <!-- Discovery popup -->
+    <div class="map-discovery-popup" id="map-discovery-popup" style="display:none;">
+      <div class="map-popup-inner glass-strong">
+        <h3 style="font-family:'Baloo 2',cursive; color:#ffcc00; margin-bottom:12px; font-size:1.3rem;">✦ New Discovery!</h3>
+        <div id="map-popup-content"></div>
+        <button class="btn-glossy btn-green" style="margin-top:16px; width:100%;" onclick="closeMapPopup()">Continue Exploring</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <div id="jisho-popup" class="glass-strong">
@@ -810,6 +862,7 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
 <script src="commissions.js"></script>
 <script src="expeditions.js"></script>
 <script src="clipboard.js"></script>
+<script src="map.js"></script>
 <script src="jisho.js"></script>
 </body>
 </html>

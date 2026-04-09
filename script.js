@@ -55,6 +55,7 @@ function loadData() {
       if (!loaded.bestiary || typeof loaded.bestiary !== 'object') loaded.bestiary = {};
       if (!Array.isArray(loaded.advice)) loaded.advice = [];
       if (typeof loaded.streak !== 'number') loaded.streak = 0;
+      if (!loaded.mapState) loaded.mapState = null; // Will be initialized by map.js on first use
       return loaded;
     }
   } catch(e) { console.error('loadData error:', e); } 
@@ -140,6 +141,7 @@ function handleSaveFileUpload(event) {
       if (!imported.bestiary || typeof imported.bestiary !== 'object') imported.bestiary = {};
       if (!Array.isArray(imported.advice)) imported.advice = [];
       if (typeof imported.streak !== 'number') imported.streak = 0;
+      if (!imported.mapState) imported.mapState = null;
 
       data = imported;
       saveData();
@@ -933,4 +935,5 @@ function initApp(){
   if(typeof startPhraseCycle === 'function') startPhraseCycle();
   if(typeof displayDailyOracle === 'function') displayDailyOracle();
   if(typeof initExpeditions === 'function') initExpeditions();
+  if(typeof initMap === 'function') initMap();
 }
