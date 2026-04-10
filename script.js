@@ -56,6 +56,8 @@ function loadData() {
       if (!Array.isArray(loaded.advice)) loaded.advice = [];
       if (typeof loaded.streak !== 'number') loaded.streak = 0;
       if (!loaded.mapState) loaded.mapState = null; // Will be initialized by map.js on first use
+      if (!loaded.slotMachine) loaded.slotMachine = null; // Will be initialized by slots.js
+      if (!loaded.economy) loaded.economy = null; // Will be initialized by economy.js
       return loaded;
     }
   } catch(e) { console.error('loadData error:', e); } 
@@ -936,4 +938,7 @@ function initApp(){
   if(typeof displayDailyOracle === 'function') displayDailyOracle();
   if(typeof initExpeditions === 'function') initExpeditions();
   if(typeof initMap === 'function') initMap();
+  if(typeof initSlots === 'function') initSlots();
+  if(typeof initEconomy === 'function') initEconomy();
+  if(typeof initHouse === 'function') initHouse();
 }

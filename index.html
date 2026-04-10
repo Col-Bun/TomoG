@@ -190,6 +190,9 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     <button class="tab-btn" data-tab="commissions">🎨 Commissions</button>
     <button class="tab-btn" data-tab="clipboard">📋 Clipboard</button>
     <button class="tab-btn" data-tab="map">🗺️ Map</button>
+    <button class="tab-btn" data-tab="slots">🎰 Slots</button>
+    <button class="tab-btn" data-tab="grocery">🛒 Grocery</button>
+    <button class="tab-btn" data-tab="house">🏠 House</button>
   </div>
 
   <div class="tab-content active" id="tab-home">
@@ -795,6 +798,92 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     </div>
   </div>
 
+  <!-- ===== SLOTS TAB ===== -->
+  <div class="tab-content" id="tab-slots">
+    <div class="glass-dark" style="padding: 22px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <h3 style="font-family:'Baloo 2',cursive; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,0.15); font-size:1.4rem;">🎰 Moe-Chan's Slot Machine</h3>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span class="glass" style="padding:6px 16px; border-radius:50px; font-weight:800; color:#a8e84c;">💰 <span id="slot-money">0</span> MB</span>
+          <button class="btn-glossy btn-purple" onclick="switchSlotTheme()" style="padding:8px 16px; font-size:0.8rem;">Switch Theme</button>
+        </div>
+      </div>
+
+      <div id="slot-celebration" style="position:relative; overflow:hidden; height:0;"></div>
+
+      <div style="display:flex; flex-direction:column; align-items:center; gap:14px;">
+        <div id="slot-machine-display"></div>
+        <div id="slot-message" style="font-weight:800; font-size:1rem; min-height:1.4em; text-align:center;">Spin to win MoeBucks!</div>
+        <button class="btn-glossy btn-pink huge-btn" onclick="spinSlots()" style="font-size:1.1rem; padding:14px 40px;">🎰 SPIN!</button>
+        <div id="slot-stats" style="display:flex; gap:16px; flex-wrap:wrap; font-size:0.8rem; color:rgba(255,255,255,0.6);"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== GROCERY TAB ===== -->
+  <div class="tab-content" id="tab-grocery">
+    <div class="glass-dark" style="padding: 22px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <h3 style="font-family:'Baloo 2',cursive; color:#fff; font-size:1.4rem;">🛒 Grocery Store & Kitchen</h3>
+        <span class="glass" style="padding:6px 16px; border-radius:50px; font-weight:800; color:#a8e84c;">💰 <span id="moe-bucks-display">0</span> MB</span>
+      </div>
+
+      <!-- Weight & Energy Panel -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+        <div class="glass" style="padding:14px; border-radius:16px;">
+          <div style="font-size:0.75rem; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">⚡ Energy</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:10px; height:20px; overflow:hidden; margin-bottom:4px;">
+            <div id="energy-bar-fill" style="height:100%; border-radius:10px; transition:width 0.4s;"></div>
+          </div>
+          <div id="energy-text" style="font-size:0.8rem; color:#fff; text-align:center;">0 / 100</div>
+        </div>
+        <div class="glass" style="padding:14px; border-radius:16px;">
+          <div style="font-size:0.75rem; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">⚖️ Weight: <span id="weight-number">120.0</span> lbs</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:10px; height:20px; overflow:hidden; margin-bottom:4px;">
+            <div id="weight-bar-fill" style="height:100%; border-radius:10px; transition:width 0.4s;"></div>
+          </div>
+          <div id="weight-status" style="font-size:0.75rem; color:rgba(255,255,255,0.7); text-align:center;">Perfect weight!</div>
+        </div>
+      </div>
+
+      <!-- Expedition Button -->
+      <div style="text-align:center; margin-bottom:16px;">
+        <button class="btn-glossy btn-green" id="economy-expedition-btn" onclick="doEconomyExpedition()" style="padding:10px 28px;">Go on Expedition (-20 energy)</button>
+      </div>
+
+      <!-- Daily Food Progress -->
+      <div id="grocery-daily-progress" style="margin-bottom:14px;"></div>
+
+      <div id="grocery-message" style="font-weight:700; font-size:0.9rem; min-height:1.2em; text-align:center; margin-bottom:14px;">Buy food to feed Moe-chan!</div>
+
+      <!-- Grocery Filters -->
+      <div id="grocery-filters" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;"></div>
+
+      <!-- Grocery Items Grid -->
+      <div id="grocery-items" class="grocery-grid"></div>
+
+      <!-- Food Inventory -->
+      <h4 style="font-family:'Baloo 2',cursive; color:#a8e84c; margin:20px 0 10px;">🍱 Food Inventory (click to eat)</h4>
+      <div id="food-inventory"></div>
+
+      <!-- Toy Shop -->
+      <h4 style="font-family:'Baloo 2',cursive; color:#ffcc00; margin:24px 0 10px;">🧸 Toy Shop <span id="toy-collection-count" style="font-size:0.8rem; color:rgba(255,255,255,0.5);"></span></h4>
+      <div id="toy-lock-message" style="color:#ff3c8e; font-size:0.85rem; text-align:center; padding:12px; display:none;"></div>
+      <div id="toy-shop-items" class="toy-grid"></div>
+    </div>
+  </div>
+
+  <!-- ===== HOUSE TAB ===== -->
+  <div class="tab-content" id="tab-house">
+    <div class="glass-dark" style="padding: 22px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <h3 style="font-family:'Baloo 2',cursive; color:#fff; font-size:1.4rem;">🏠 Moe-Chan's House</h3>
+        <button class="btn-theme" onclick="exitHouse()" style="padding:8px 16px; border-radius:50px; font-size:0.85rem;">◀ Back to Map</button>
+      </div>
+      <div id="house-display"></div>
+    </div>
+  </div>
+
   <!-- ===== MAP TAB ===== -->
   <div class="tab-content" id="tab-map">
     <div class="glass-dark" style="padding: 22px;">
@@ -863,6 +952,9 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
 <script src="expeditions.js"></script>
 <script src="clipboard.js"></script>
 <script src="map.js"></script>
+<script src="slots.js"></script>
+<script src="economy.js"></script>
+<script src="house.js"></script>
 <script src="jisho.js"></script>
 </body>
 </html>

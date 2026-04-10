@@ -298,8 +298,12 @@ function renderAsciiMap() {
         const tileKey = generateTile(x, y, biomeMap, mapData.worldSeed);
         const tile = TERRAIN[tileKey] || TERRAIN.GRASS;
         const isHouse = (x === cx && y === cy);
-        const cls = isHouse ? 'map-tile map-house' : 'map-tile';
-        html += `<span class="${cls}" style="color:${tile.fg}" title="${tile.name}">${tile.char}</span>`;
+        const cls = isHouse ? 'map-tile map-house map-house-clickable' : 'map-tile';
+        if (isHouse) {
+          html += `<span class="${cls}" style="color:${tile.fg}; cursor:pointer;" title="Click to enter Moe-chan's House!" onclick="enterHouse()">${tile.char}</span>`;
+        } else {
+          html += `<span class="${cls}" style="color:${tile.fg}" title="${tile.name}">${tile.char}</span>`;
+        }
       }
     }
     html += '\n';

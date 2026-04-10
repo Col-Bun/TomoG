@@ -1557,3 +1557,326 @@ body.clipboard-mode #app {
     max-height: 45vh;
   }
 }
+
+/* ===== SLOT MACHINE ===== */
+.slot-ascii-frame {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  line-height: 1.6;
+  color: #fff;
+  background: rgba(0,0,0,0.4);
+  padding: 16px 20px;
+  border-radius: 16px;
+  border: 2px solid rgba(255,255,255,0.15);
+  text-align: center;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.slot-reel-spinning {
+  animation: slot-blur 0.08s infinite;
+}
+
+@keyframes slot-blur {
+  0% { filter: blur(0px); }
+  50% { filter: blur(2px); }
+  100% { filter: blur(0px); }
+}
+
+.slot-reel-stop {
+  animation: slot-bounce 0.3s ease-out;
+}
+
+@keyframes slot-bounce {
+  0% { transform: translateY(-4px); }
+  50% { transform: translateY(2px); }
+  100% { transform: translateY(0); }
+}
+
+.slot-confetti {
+  position: absolute;
+  font-size: 1.2rem;
+  animation: confetti-fall 2s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes confetti-fall {
+  0% { top: -20px; opacity: 1; transform: rotate(0deg) scale(1); }
+  100% { top: 120px; opacity: 0; transform: rotate(720deg) scale(0.3); }
+}
+
+/* ===== MAP HOUSE CLICKABLE ===== */
+.map-house-clickable {
+  cursor: pointer;
+  animation: house-pulse 2s ease-in-out infinite;
+}
+
+.map-house-clickable:hover {
+  text-shadow: 0 0 8px #ff3c8e, 0 0 16px #ff3c8e;
+}
+
+@keyframes house-pulse {
+  0%, 100% { text-shadow: 0 0 4px rgba(255,60,142,0.4); }
+  50% { text-shadow: 0 0 10px rgba(255,60,142,0.8); }
+}
+
+/* ===== GROCERY STORE ===== */
+.grocery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+  max-height: 50vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.grocery-card {
+  padding: 12px 8px;
+  border-radius: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1.5px solid rgba(255,255,255,0.1);
+}
+
+.grocery-card:hover {
+  border-color: rgba(168,232,76,0.4);
+  transform: translateY(-2px);
+  background: rgba(168,232,76,0.1);
+}
+
+.grocery-emoji { font-size: 1.8rem; margin-bottom: 4px; }
+.grocery-name { font-size: 0.72rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.grocery-stats { display: flex; justify-content: center; gap: 6px; font-size: 0.62rem; margin-bottom: 4px; }
+.grocery-energy { color: #a8e84c; }
+.grocery-weight { color: #ffcc00; }
+.grocery-price { font-size: 0.75rem; font-weight: 800; color: #ff3c8e; }
+
+.grocery-filter-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.6);
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 0.72rem;
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: capitalize;
+}
+
+.grocery-filter-btn.active {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  border-color: rgba(255,255,255,0.35);
+}
+
+.grocery-filter-btn:hover { background: rgba(255,255,255,0.15); }
+
+.grocery-progress-bar {
+  background: rgba(0,0,0,0.3);
+  border-radius: 10px;
+  height: 14px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.grocery-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #a8e84c, #7ec832);
+  border-radius: 10px;
+  transition: width 0.4s;
+}
+
+.grocery-progress-text {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.6);
+  text-align: center;
+}
+
+/* ===== FOOD INVENTORY ===== */
+.food-inv-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.food-inv-item:hover {
+  border-color: rgba(168,232,76,0.3);
+  background: rgba(168,232,76,0.08);
+}
+
+.food-inv-emoji { font-size: 1.3rem; }
+.food-inv-name { font-size: 0.85rem; font-weight: 700; color: #fff; flex: 1; }
+.food-inv-count { font-size: 0.8rem; color: rgba(255,255,255,0.5); }
+.food-inv-eat {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #a8e84c;
+  background: rgba(168,232,76,0.15);
+  padding: 3px 10px;
+  border-radius: 50px;
+  text-transform: uppercase;
+}
+
+/* ===== TOY SHOP ===== */
+.toy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.toy-card {
+  padding: 14px 10px;
+  border-radius: 16px;
+  text-align: center;
+  transition: all 0.2s;
+  border: 1.5px solid rgba(255,255,255,0.1);
+}
+
+.toy-card:hover { border-color: rgba(255,204,0,0.3); transform: translateY(-2px); }
+.toy-card.toy-owned { border-color: rgba(168,232,76,0.3); opacity: 0.7; }
+.toy-card.toy-locked { opacity: 0.4; pointer-events: none; }
+
+.toy-emoji { font-size: 2rem; margin-bottom: 6px; }
+.toy-name { font-size: 0.8rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.toy-desc { font-size: 0.68rem; color: rgba(255,255,255,0.5); margin-bottom: 6px; line-height: 1.3; }
+.toy-price { font-size: 0.8rem; font-weight: 800; color: #ffcc00; margin-bottom: 6px; }
+.toy-buy-btn { padding: 6px 16px !important; font-size: 0.72rem !important; }
+.toy-buy-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ===== HOUSE MINIMAP ===== */
+.house-ascii-map {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  line-height: 1.5;
+  color: #a8e84c;
+  background: rgba(0,0,0,0.4);
+  padding: 16px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(168,232,76,0.2);
+  white-space: pre;
+  overflow-x: auto;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.house-room-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.house-room-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  border-radius: 14px;
+  cursor: pointer;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.08);
+  transition: all 0.2s;
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+}
+
+.house-room-btn:hover {
+  border-color: rgba(255,60,142,0.4);
+  background: rgba(255,60,142,0.1);
+  transform: translateY(-2px);
+}
+
+.house-room-emoji { font-size: 1.6rem; }
+.house-room-name { font-size: 0.72rem; font-weight: 700; }
+
+.house-room-view {
+  animation: room-fadein 0.3s ease-out;
+}
+
+@keyframes room-fadein {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.house-room-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.house-room-title {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.3rem;
+  color: #fff;
+}
+
+.house-back-btn {
+  padding: 6px 14px !important;
+  border-radius: 50px !important;
+  font-size: 0.82rem !important;
+}
+
+.house-room-ascii {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  line-height: 1.6;
+  color: #00e5ff;
+  background: rgba(0,0,0,0.45);
+  padding: 16px 20px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(0,229,255,0.2);
+  white-space: pre;
+  overflow-x: auto;
+  margin-bottom: 14px;
+}
+
+.house-room-desc {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 14px;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.house-connections {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.house-conn-label {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.5);
+  font-weight: 700;
+}
+
+.house-conn-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border-radius: 50px;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.house-conn-btn:hover {
+  background: rgba(255,255,255,0.2);
+  border-color: rgba(255,255,255,0.35);
+}
