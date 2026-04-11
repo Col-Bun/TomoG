@@ -61,6 +61,8 @@ function loadData() {
       if (!loaded.catching) loaded.catching = null; // Will be initialized by catching.js
       if (!loaded.conjStats) loaded.conjStats = null; // Will be initialized by conjugation.js
       if (!loaded.jlpt) loaded.jlpt = null; // Will be initialized by jlpt.js
+      if (!loaded.todos) loaded.todos = null; // Will be initialized by todo.js
+      if (!loaded.fun) loaded.fun = null; // Will be initialized by fun.js
       return loaded;
     }
   } catch(e) { console.error('loadData error:', e); } 
@@ -947,4 +949,6 @@ function initApp(){
   if(typeof initCatching === 'function') initCatching();
   if(typeof initConjugation === 'function') initConjugation();
   if(typeof initJlpt === 'function') initJlpt();
+  if(typeof initTodo === 'function') initTodo();
+  if(typeof initFun === 'function') initFun();
 }

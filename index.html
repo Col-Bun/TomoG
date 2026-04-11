@@ -172,30 +172,37 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     </div>
   </div>
 
+  <!-- Theme Switcher (always visible above tabs) -->
+  <div id="global-theme-bar" class="global-theme-bar glass-dark">
+    <div id="global-theme-mount"></div>
+  </div>
+
   <div class="tabs">
     <button class="tab-btn active" data-tab="home">🏠 Home</button>
-    <button class="tab-btn" data-tab="schedule">🕒 Schedule</button>
-    <button class="tab-btn" data-tab="calendar">📅 Calendar</button>
-    <button class="tab-btn" data-tab="dictionary">📖 Dictionary <span id="dict-tab-count"></span></button>
-    <button class="tab-btn" data-tab="diary">📓 Diary</button>
-    <button class="tab-btn" data-tab="history">📊 History</button>
-    <button class="tab-btn" data-tab="calc">🧮 COLcalc</button>
-    <button class="tab-btn" data-tab="numogram">🌀 Numogram</button>
-    <button class="tab-btn" data-tab="iching">☯️ I-Ching</button>
-    <button class="tab-btn" data-tab="quotes">💬 Quotes</button>
-    <button class="tab-btn" data-tab="expeditions">⚔️ Expeditions</button>
-    <button class="tab-btn" data-tab="materials">🎒 Materials</button>
-    <button class="tab-btn" data-tab="bestiary">🐲 Bestiary</button>
     <button class="tab-btn" data-tab="advice">🧭 Advice</button>
-    <button class="tab-btn" data-tab="commissions">🎨 Commissions</button>
+    <button class="tab-btn" data-tab="bestiary">🐲 Bestiary</button>
+    <button class="tab-btn" data-tab="calc">🧮 COLcalc</button>
+    <button class="tab-btn" data-tab="calendar">📅 Calendar</button>
     <button class="tab-btn" data-tab="clipboard">📋 Clipboard</button>
-    <button class="tab-btn" data-tab="map">🗺️ Map</button>
-    <button class="tab-btn" data-tab="slots">🎰 Slots</button>
-    <button class="tab-btn" data-tab="grocery">🛒 Grocery</button>
-    <button class="tab-btn" data-tab="house">🏠 House</button>
+    <button class="tab-btn" data-tab="commissions">🎨 Commissions</button>
     <button class="tab-btn" data-tab="conjugation">📝 Conjugation</button>
+    <button class="tab-btn" data-tab="diary">📓 Diary</button>
+    <button class="tab-btn" data-tab="dictionary">📖 Dictionary <span id="dict-tab-count"></span></button>
+    <button class="tab-btn" data-tab="expeditions">⚔️ Expeditions</button>
+    <button class="tab-btn" data-tab="fun">💖 Fun</button>
+    <button class="tab-btn" data-tab="grocery">🛒 Grocery</button>
+    <button class="tab-btn" data-tab="history">📊 History</button>
+    <button class="tab-btn" data-tab="house">🏡 House</button>
+    <button class="tab-btn" data-tab="iching">☯️ I-Ching</button>
     <button class="tab-btn" data-tab="inventory">🎒 Inventory</button>
     <button class="tab-btn" data-tab="jlpt">🎌 JLPT</button>
+    <button class="tab-btn" data-tab="map">🗺️ Map</button>
+    <button class="tab-btn" data-tab="materials">🎒 Materials</button>
+    <button class="tab-btn" data-tab="numogram">🌀 Numogram</button>
+    <button class="tab-btn" data-tab="quotes">💬 Quotes</button>
+    <button class="tab-btn" data-tab="schedule">🕒 Schedule</button>
+    <button class="tab-btn" data-tab="slots">🎰 Slots</button>
+    <button class="tab-btn" data-tab="todo">📌 Todo</button>
   </div>
 
   <div class="tab-content active" id="tab-home">
@@ -921,6 +928,24 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     </div>
   </div>
 
+  <!-- ===== TODO TAB ===== -->
+  <div class="tab-content" id="tab-todo">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 1.4rem;">📌 Todo List</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.75rem; margin-bottom:14px;">Track your tasks! Completing them earns MoeBucks.</p>
+      <div id="todo-list-area"></div>
+    </div>
+  </div>
+
+  <!-- ===== FUN WITH MOE-CHAN TAB ===== -->
+  <div class="tab-content" id="tab-fun">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 1.4rem;">💖 Fun with Moe-chan</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.75rem; margin-bottom:14px;">Tap, headpat, and play with graphics effects!</p>
+    </div>
+    <div id="fun-main-content"></div>
+  </div>
+
   <!-- ===== JLPT TAB ===== -->
   <div class="tab-content" id="tab-jlpt">
     <div class="glass-dark" style="padding: 22px;">
@@ -1005,6 +1030,8 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
 <script src="catching.js"></script>
 <script src="conjugation.js"></script>
 <script src="jlpt.js"></script>
+<script src="todo.js"></script>
+<script src="fun.js"></script>
 <script src="jisho.js"></script>
 </body>
 </html>

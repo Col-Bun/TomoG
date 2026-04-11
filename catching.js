@@ -92,6 +92,118 @@ const EXTRA_CHIMERAS = [
     appearance: 'An ancient tortoise with a shell that shows different time periods when viewed from different angles - past, present, and future all at once.',
     description: 'The Time Tortoise has been everywhere and everywhen. It moves so slowly that time has given up trying to affect it. It remembers tomorrow.'
   },
+
+  // ===== WAVE 2: MORE CHIMERAS =====
+  // Meadow
+  {
+    id: 'dandelion_wisp', name: 'Dandelion Wisp', emoji: '🌾',
+    tier: 'Common', rarity: 1,
+    habitats: ['meadow'],
+    appearance: 'A tiny orb of light wrapped in dandelion fluff, drifting on invisible currents. When it sneezes, seeds scatter in every direction.',
+    description: 'Dandelion Wisps carry wishes on the wind. If you catch the fluff they shed, whisper a wish into it before it drifts away.'
+  },
+  {
+    id: 'honey_slime', name: 'Honey Slime', emoji: '🍯',
+    tier: 'Common', rarity: 2,
+    habitats: ['meadow', 'forest'],
+    appearance: 'A golden-amber blob that oozes sweet nectar. Bees orbit it like tiny moons, and flowers bloom wherever it slides.',
+    description: 'Honey Slimes are considered the friendliest chimeras. They leave trails of wildflowers and attract butterflies wherever they go.'
+  },
+  {
+    id: 'ribbon_eel', name: 'Ribbon Eel', emoji: '🎀',
+    tier: 'Common', rarity: 3,
+    habitats: ['meadow'],
+    appearance: 'A serpentine creature made of flowing silk ribbons in pastel colors. It swims through grass as if it were water, leaving rainbow contrails.',
+    description: 'Ribbon Eels are thought to be born from lost festival decorations given life by moonlight. They love to dance on breezy days.'
+  },
+  // Forest
+  {
+    id: 'amber_beetle', name: 'Amber Beetle', emoji: '🪲',
+    tier: 'Uncommon', rarity: 5,
+    habitats: ['forest'],
+    appearance: 'A massive beetle with a translucent amber shell containing preserved prehistoric ferns. Its horn crackles with fossilized lightning.',
+    description: 'Amber Beetles carry the memories of ancient forests inside their shells. Scholars pay fortunes to study what they preserve.'
+  },
+  {
+    id: 'vine_monkey', name: 'Vine Monkey', emoji: '🐒',
+    tier: 'Uncommon', rarity: 6,
+    habitats: ['forest', 'meadow'],
+    appearance: 'A small monkey whose limbs extend into living vines. It can swing between trees using its own body, and fruits grow from its tail.',
+    description: 'Vine Monkeys replant forests faster than any creature. A single one can restore a burnt clearing to lush jungle in one season.'
+  },
+  {
+    id: 'spore_knight', name: 'Spore Knight', emoji: '🛡️',
+    tier: 'Uncommon', rarity: 7,
+    habitats: ['forest', 'cave'],
+    appearance: 'A small humanoid figure in armor made of hardened bracket fungus, wielding a rapier carved from a giant thorn. Bioluminescent spores trail behind.',
+    description: 'Spore Knights guard the boundary between the surface world and the fungal kingdoms below. They are chivalrous to a fault.'
+  },
+  // Cave
+  {
+    id: 'echo_bat', name: 'Echo Bat', emoji: '🦇',
+    tier: 'Rare', rarity: 9,
+    habitats: ['cave'],
+    appearance: 'A crystalline bat that emits visible sound waves in neon colors. Each screech paints the cave walls with temporary aurora borealis.',
+    description: 'Echo Bats can replay any sound they have ever heard. Some cave explorers use them as living tape recorders.'
+  },
+  {
+    id: 'magma_crab', name: 'Magma Crab', emoji: '🦀',
+    tier: 'Rare', rarity: 10,
+    habitats: ['cave'],
+    appearance: 'A crab with a shell of cooling magma, cracks glowing cherry-red. Its claws are obsidian and steam hisses from its joints.',
+    description: 'Magma Crabs forge their own shells from volcanic vents. Each shell is unique, and they take great pride in their molten designs.'
+  },
+  {
+    id: 'prism_moth', name: 'Prism Moth', emoji: '🦋',
+    tier: 'Rare', rarity: 11,
+    habitats: ['cave', 'ruins'],
+    appearance: 'An enormous moth with wings that split light into rainbows. In complete darkness, it glows with its own inner spectrum.',
+    description: 'Prism Moths are drawn to knowledge. They gather in libraries and archives, feeding on the ambient light of understanding.'
+  },
+  // Ruins
+  {
+    id: 'golem_pup', name: 'Golem Pup', emoji: '🗿',
+    tier: 'Epic', rarity: 13,
+    habitats: ['ruins'],
+    appearance: 'A puppy-sized stone golem covered in ancient runes. Its tail wags sending pebbles flying, and it fetches boulders instead of sticks.',
+    description: 'Golem Pups are the babies of ancient guardian statues. They are fiercely loyal once bonded, but they chew on everything — including walls.'
+  },
+  {
+    id: 'ink_serpent', name: 'Ink Serpent', emoji: '🖋️',
+    tier: 'Epic', rarity: 14,
+    habitats: ['ruins', 'cave'],
+    appearance: 'A snake made of flowing calligraphy ink, forming and dissolving kanji as it moves. Its eyes are drops of red seal ink.',
+    description: 'Ink Serpents are born from forgotten manuscripts. They remember every word ever written in the ruins they inhabit.'
+  },
+  {
+    id: 'mirror_fox', name: 'Mirror Fox', emoji: '🪞',
+    tier: 'Epic', rarity: 15,
+    habitats: ['ruins', 'forest'],
+    appearance: 'A fox whose fur is made of countless tiny mirrors. It reflects its surroundings perfectly, making it nearly invisible. Only its golden eyes give it away.',
+    description: 'Mirror Foxes show you your true self if you look into their fur. Some people are delighted; others run away.'
+  },
+  // Abyss
+  {
+    id: 'void_whale', name: 'Void Whale', emoji: '🐋',
+    tier: 'Legendary', rarity: 17,
+    habitats: ['abyss'],
+    appearance: 'A colossal whale that swims through empty space. Its body is a window into the void between stars, and its song vibrates reality.',
+    description: 'Void Whales are the largest chimeras ever recorded. Their songs can be heard across dimensions, and each note contains a universe of meaning.'
+  },
+  {
+    id: 'dream_weaver', name: 'Dream Weaver', emoji: '🕸️',
+    tier: 'Legendary', rarity: 18,
+    habitats: ['abyss', 'ruins'],
+    appearance: 'A spider-like entity that weaves webs from crystallized dreams. Each strand contains a sleeping person\'s vision, shimmering with narrative.',
+    description: 'Dream Weavers collect and curate dreams. If you sleep near one, you will have the most vivid and beautiful dream of your life.'
+  },
+  {
+    id: 'paradox_cat', name: 'Paradox Cat', emoji: '🐱',
+    tier: 'Legendary', rarity: 20,
+    habitats: ['abyss'],
+    appearance: 'A cat that exists and does not exist simultaneously. It phases between visible and invisible, solid and ghostly. Both alive and asleep at all times.',
+    description: 'The Paradox Cat is the rarest chimera known. It can only be observed when you are not looking for it, and captured only by those who do not wish to.'
+  },
 ];
 
 // ===== CATCHING MECHANICS =====
