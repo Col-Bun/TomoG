@@ -195,6 +195,7 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     <button class="tab-btn" data-tab="house">🏠 House</button>
     <button class="tab-btn" data-tab="conjugation">📝 Conjugation</button>
     <button class="tab-btn" data-tab="inventory">🎒 Inventory</button>
+    <button class="tab-btn" data-tab="jlpt">🎌 JLPT</button>
   </div>
 
   <div class="tab-content active" id="tab-home">
@@ -920,6 +921,16 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     </div>
   </div>
 
+  <!-- ===== JLPT TAB ===== -->
+  <div class="tab-content" id="tab-jlpt">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 1.4rem;">🎌 JLPT Practice</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.75rem; margin-bottom:14px;">Practice N5–N1 questions. Earn MoeBucks, XP, and loot for good scores!</p>
+      <div id="jlpt-main-content"></div>
+    </div>
+    <div id="jlpt-quiz-area"></div>
+  </div>
+
   <!-- ===== MAP TAB ===== -->
   <div class="tab-content" id="tab-map">
     <div class="glass-dark" style="padding: 22px;">
@@ -993,6 +1004,7 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
 <script src="house.js"></script>
 <script src="catching.js"></script>
 <script src="conjugation.js"></script>
+<script src="jlpt.js"></script>
 <script src="jisho.js"></script>
 </body>
 </html>

@@ -2140,3 +2140,200 @@ body.clipboard-mode #app {
   background: rgba(255,60,142,0.2);
   border-color: rgba(255,60,142,0.3);
 }
+
+/* ===== JLPT TAB ===== */
+.jlpt-overall-stats {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px;
+}
+.jlpt-stat-pill {
+  padding: 6px 14px; border-radius: 50px; font-size: 0.8rem; color: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+}
+
+.jlpt-level-grid {
+  display: flex; flex-direction: column; gap: 16px;
+}
+.jlpt-level-card {
+  padding: 18px; border-radius: 18px; border: 1.5px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.25); transition: border-color 0.2s, transform 0.15s;
+}
+.jlpt-level-card:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-1px); }
+
+.jlpt-level-header {
+  display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; flex-wrap: wrap;
+}
+.jlpt-level-name {
+  font-family: 'Press Start 2P', monospace; font-size: 1.4rem; font-weight: 700;
+}
+.jlpt-level-sublabel {
+  font-size: 0.75rem; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.5px;
+}
+.jlpt-level-best {
+  font-size: 0.8rem; font-weight: 700; margin-left: auto;
+}
+
+.jlpt-level-stats-row {
+  display: flex; gap: 14px; font-size: 0.75rem; color: rgba(255,255,255,0.45); margin-bottom: 12px; flex-wrap: wrap;
+}
+
+.jlpt-level-mondai-btns {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.jlpt-start-btn {
+  padding: 8px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 700;
+  cursor: pointer; border: 1.5px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06);
+  font-family: 'Nunito', sans-serif; transition: all 0.2s;
+}
+.jlpt-start-btn:hover { background: rgba(255,255,255,0.12); transform: translateY(-1px); }
+
+.jlpt-mondai-btn {
+  padding: 5px 12px; border-radius: 10px; font-size: 0.72rem;
+  cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.6); font-family: 'Nunito', sans-serif; transition: all 0.2s;
+}
+.jlpt-mondai-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+/* Quiz Container */
+.jlpt-quiz-container { padding: 22px; border-radius: 20px; margin-top: 16px; }
+
+.jlpt-quiz-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;
+}
+.jlpt-level-badge {
+  padding: 4px 12px; border-radius: 8px; font-weight: 800; font-size: 0.85rem;
+  font-family: 'Press Start 2P', monospace;
+}
+.jlpt-mondai-badge {
+  font-size: 0.78rem; color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.08);
+  padding: 4px 10px; border-radius: 8px;
+}
+.jlpt-progress {
+  font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-left: auto;
+}
+.jlpt-score-live {
+  font-size: 0.8rem; font-weight: 700; color: #7bed9f;
+}
+
+.jlpt-progress-bar {
+  width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 4px;
+  margin-bottom: 20px; overflow: hidden;
+}
+.jlpt-progress-fill {
+  height: 100%; border-radius: 4px; transition: width 0.3s ease;
+}
+
+/* Question Display */
+.jlpt-question-area { margin-bottom: 20px; }
+
+.jlpt-q-sentence {
+  font-size: 1.15rem; color: #fff; line-height: 1.8; margin-bottom: 10px;
+  font-family: 'Nunito', sans-serif;
+}
+.jlpt-q-word {
+  font-size: 2rem; color: #fff; text-align: center; margin: 16px 0;
+  font-family: 'Nunito', sans-serif; font-weight: 700;
+}
+.jlpt-q-instruction {
+  font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 6px;
+}
+
+.jlpt-highlight {
+  color: #ff6b81; font-weight: 700; text-decoration: underline;
+  text-decoration-color: rgba(255,107,129,0.4); text-underline-offset: 3px;
+}
+.jlpt-highlight-hira {
+  color: #70a1ff; font-weight: 700; text-decoration: underline;
+  text-decoration-color: rgba(112,161,255,0.4); text-underline-offset: 3px;
+}
+
+/* Options */
+.jlpt-options-grid {
+  display: flex; flex-direction: column; gap: 10px;
+}
+.jlpt-option-btn {
+  display: flex; align-items: center; gap: 12px; padding: 14px 18px;
+  border-radius: 14px; border: 1.5px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04); cursor: pointer; transition: all 0.15s;
+  text-align: left; font-family: 'Nunito', sans-serif; color: #fff; font-size: 0.95rem;
+  width: 100%;
+}
+.jlpt-option-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.25); transform: translateX(4px);
+}
+.jlpt-option-btn:disabled { cursor: default; opacity: 0.7; }
+
+.jlpt-opt-num {
+  width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center; font-size: 0.75rem;
+  font-weight: 700; flex-shrink: 0; color: rgba(255,255,255,0.5);
+}
+.jlpt-opt-text { flex: 1; }
+
+.jlpt-option-btn.jlpt-correct {
+  background: rgba(123,237,159,0.15) !important; border-color: rgba(123,237,159,0.4) !important;
+  color: #7bed9f !important;
+}
+.jlpt-option-btn.jlpt-wrong {
+  background: rgba(255,71,87,0.15) !important; border-color: rgba(255,71,87,0.4) !important;
+  color: #ff4757 !important;
+}
+
+/* Results */
+.jlpt-results { padding: 28px; border-radius: 22px; margin-top: 16px; text-align: center; }
+
+.jlpt-grade-display { margin-bottom: 20px; }
+.jlpt-grade-emoji { font-size: 3rem; margin-bottom: 6px; }
+.jlpt-grade-letter {
+  font-family: 'Press Start 2P', monospace; font-size: 4rem; font-weight: 700;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+.jlpt-grade-sublabel { font-size: 0.8rem; color: rgba(255,255,255,0.45); margin-top: 4px; }
+
+.jlpt-results-stats {
+  display: flex; gap: 12px; justify-content: center; margin-bottom: 18px; flex-wrap: wrap;
+}
+.jlpt-stat-box {
+  padding: 12px 20px; border-radius: 14px; text-align: center; min-width: 80px;
+}
+.jlpt-stat-num { font-size: 1.3rem; font-weight: 700; color: #fff; }
+.jlpt-stat-label { font-size: 0.7rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
+
+.jlpt-rewards-strip {
+  display: flex; gap: 10px; justify-content: center; margin-bottom: 18px; flex-wrap: wrap;
+}
+.jlpt-reward-badge {
+  padding: 6px 14px; border-radius: 50px; font-size: 0.85rem; font-weight: 700;
+  background: rgba(255,215,0,0.12); color: #ffd700; border: 1px solid rgba(255,215,0,0.2);
+}
+
+.jlpt-loot-section { margin-bottom: 18px; }
+.jlpt-loot-grid { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.jlpt-loot-badge {
+  padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 600;
+}
+
+/* Review */
+.jlpt-review-section { text-align: left; margin-top: 18px; }
+.jlpt-review-card {
+  padding: 12px; border-radius: 12px; margin-bottom: 8px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+}
+.jlpt-review-type { font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+.jlpt-review-q { font-size: 0.85rem; color: rgba(255,255,255,0.8); margin-bottom: 6px; }
+.jlpt-review-ans { display: flex; gap: 12px; font-size: 0.8rem; flex-wrap: wrap; }
+.jlpt-review-wrong { color: #ff4757; }
+.jlpt-review-right { color: #7bed9f; }
+
+.jlpt-results-actions {
+  display: flex; gap: 10px; justify-content: center; margin-top: 18px;
+}
+
+/* Performance grid */
+.jlpt-perf-grid { display: flex; flex-direction: column; gap: 8px; }
+.jlpt-perf-item { display: flex; align-items: center; gap: 10px; }
+.jlpt-perf-label { font-size: 0.78rem; color: rgba(255,255,255,0.6); min-width: 130px; }
+.jlpt-perf-bar-bg {
+  flex: 1; height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;
+}
+.jlpt-perf-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+.jlpt-perf-pct { font-size: 0.75rem; color: rgba(255,255,255,0.5); min-width: 35px; text-align: right; }
