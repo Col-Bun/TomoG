@@ -406,10 +406,188 @@ function buyToy(toyId) {
   updateGroceryMessage(`Moe-chan got a new toy: ${toy.name}!`, '#a8e84c');
 }
 
+// ===== MOE-CHAN AUTO-GROCERY SYSTEM =====
+// Moe-chan buys groceries for herself based on various factors:
+// - Day of week/month (seasonal preferences)
+// - Study minutes logged today
+// - Reading hours logged today
+// - Number of flashcards/dictionary words added
+// - Streak length
+// - Current weight (eats lighter if heavy)
+// - Current energy (eats more if low)
+
+function moeAutoGrocery() {
+  const eco = getEconomyData();
+  const sd = getSlotData();
+  const today = todayStr();
+
+  // Only auto-buy once per day
+  if (eco.lastAutoBuyDate === today) return null;
+
+  // Gather factors
+  const td = data.days[today] || { flash: 0, read: 0 };
+  const flashMin = td.flash || 0;
+  const readHrs = td.read || 0;
+  const dictSize = (data.dictionary || []).length;
+  const streak = data.streak || 0;
+  const dayOfWeek = new Date().getDay();
+  const dayOfMonth = new Date().getDate();
+  const currentWeight = eco.weight;
+  const currentEnergy = eco.energy;
+  const isHeavy = (currentWeight - eco.idealWeight) > 10;
+  const isLowEnergy = currentEnergy < 30;
+
+  // Determine budget based on factors
+  let budget = 15; // Base budget
+  budget += Math.floor(flashMin / 5) * 2;    // +2 per 5 min flashcards
+  budget += Math.floor(readHrs) * 3;         // +3 per hour reading
+  budget += Math.floor(dictSize / 20) * 2;   // +2 per 20 dictionary words
+  budget += Math.min(streak, 10) * 1;        // +1 per streak day (cap 10)
+  budget += dayOfMonth;                       // Higher later in month (payday feel)
+
+  // Cap at available money, but ensure at least something if she has money
+  budget = Math.min(budget, Math.floor(sd.moeBucks * 0.3)); // Never spend more than 30%
+  if (budget < 5 && sd.moeBucks >= 10) budget = 5;
+  if (sd.moeBucks < 5) {
+    eco.lastAutoBuyDate = today;
+    saveData();
+    return null; // Too broke
+  }
+
+  // Build preference weights for food categories based on factors
+  const catWeights = {
+    fruit: 10,
+    vegetable: 8,
+    grain: 12,
+    protein: 10,
+    dairy: 6,
+    snack: 8,
+    drink: 7,
+    meal: 10
+  };
+
+  // Adjust by study activity (studied = healthier choices)
+  if (flashMin > 20) { catWeights.vegetable += 8; catWeights.fruit += 6; catWeights.snack -= 3; }
+  if (readHrs > 1) { catWeights.drink += 6; catWeights.grain += 3; } // Tea/coffee for reading
+
+  // Day of week preferences
+  if (dayOfWeek === 0 || dayOfWeek === 6) { catWeights.meal += 8; catWeights.snack += 5; } // Weekend = treats
+  if (dayOfWeek === 1) { catWeights.grain += 5; catWeights.drink += 3; } // Monday = comfort food
+  if (dayOfWeek === 5) { catWeights.meal += 5; catWeights.snack += 4; } // Friday = celebrations
+
+  // Weight-aware eating
+  if (isHeavy) {
+    catWeights.vegetable += 10; catWeights.fruit += 8; catWeights.drink += 5;
+    catWeights.snack -= 6; catWeights.meal -= 4; catWeights.dairy -= 3;
+  }
+
+  // Low energy = hearty meals
+  if (isLowEnergy) {
+    catWeights.meal += 10; catWeights.protein += 8; catWeights.grain += 5;
+  }
+
+  // High streak = Moe-chan celebrates with treats
+  if (streak >= 7) { catWeights.snack += 4; catWeights.meal += 3; }
+
+  // Season (month-based)
+  const month = new Date().getMonth();
+  if (month >= 11 || month <= 1) { catWeights.meal += 5; catWeights.drink += 4; } // Winter: warm food
+  if (month >= 3 && month <= 5) { catWeights.fruit += 5; catWeights.drink += 3; } // Spring: fresh
+  if (month >= 6 && month <= 8) { catWeights.drink += 6; catWeights.fruit += 4; } // Summer: cold drinks
+  if (month >= 9 && month <= 10) { catWeights.grain += 4; catWeights.meal += 3; } // Autumn: hearty
+
+  // Normalize negative weights
+  Object.keys(catWeights).forEach(k => { if (catWeights[k] < 1) catWeights[k] = 1; });
+
+  // Shop!
+  const purchased = [];
+  let spent = 0;
+  let attempts = 0;
+  const maxAttempts = 30;
+
+  while (spent < budget && attempts < maxAttempts) {
+    attempts++;
+
+    // Pick category by weight
+    const totalCatWeight = Object.values(catWeights).reduce((a, b) => a + b, 0);
+    let catRoll = Math.random() * totalCatWeight;
+    let chosenCat = 'grain';
+    for (const [cat, w] of Object.entries(catWeights)) {
+      catRoll -= w;
+      if (catRoll <= 0) { chosenCat = cat; break; }
+    }
+
+    // Pick random item from category within budget
+    const affordable = GROCERY_ITEMS.filter(f => f.category === chosenCat && f.price <= (budget - spent));
+    if (affordable.length === 0) continue;
+
+    const item = affordable[Math.floor(Math.random() * affordable.length)];
+    if (sd.moeBucks < item.price) break;
+
+    sd.moeBucks -= item.price;
+    spent += item.price;
+    eco.dailyFoodSpend += item.price;
+    eco.totalFoodBought++;
+    if (!eco.foodInventory[item.id]) eco.foodInventory[item.id] = 0;
+    eco.foodInventory[item.id]++;
+    purchased.push(item);
+  }
+
+  // Moe-chan also eats some of what she bought (auto-eat for energy)
+  const toEat = purchased.slice(0, Math.min(3, purchased.length));
+  toEat.forEach(item => {
+    if (eco.foodInventory[item.id] && eco.foodInventory[item.id] > 0) {
+      eco.foodInventory[item.id]--;
+      if (eco.foodInventory[item.id] <= 0) delete eco.foodInventory[item.id];
+      eco.energy = Math.min(eco.maxEnergy, eco.energy + item.energy);
+      eco.weight = Math.round((eco.weight + item.weight) * 100) / 100;
+      eco.foodEatenToday.push(item.id);
+    }
+  });
+
+  // Check toy unlock
+  if (eco.dailyFoodSpend >= DAILY_FOOD_GOAL) eco.toyUnlocked = true;
+
+  eco.lastAutoBuyDate = today;
+  saveData();
+
+  return { purchased, spent, eaten: toEat };
+}
+
+function renderAutoGroceryLog() {
+  const result = moeAutoGrocery();
+  const logEl = document.getElementById('auto-grocery-log');
+  if (!logEl) return;
+
+  if (!result || result.purchased.length === 0) {
+    logEl.innerHTML = '<div style="color:rgba(255,255,255,0.5); font-style:italic;">Moe-chan hasn\'t gone shopping yet today...</div>';
+    return;
+  }
+
+  const items = result.purchased.map(i => `${i.emoji} ${i.name}`).join(', ');
+  const eaten = result.eaten.map(i => `${i.emoji}`).join(' ');
+
+  logEl.innerHTML = `
+    <div class="auto-grocery-card glass" style="padding:12px; border-radius:14px; margin-bottom:8px;">
+      <div style="font-weight:800; color:#a8e84c; margin-bottom:4px;">🛍️ Moe-chan went shopping! (-${result.spent} MB)</div>
+      <div style="font-size:0.82rem; color:rgba(255,255,255,0.7); line-height:1.5;">Bought: ${items}</div>
+      ${result.eaten.length > 0 ? `<div style="font-size:0.82rem; color:#ffcc00; margin-top:4px;">She ate: ${eaten} for energy!</div>` : ''}
+    </div>
+  `;
+
+  // Refresh displays
+  updateSlotMoneyDisplay();
+  renderFoodInventory();
+  renderWeightEnergy();
+  renderGroceryStore();
+  renderToyShop();
+}
+
 function initEconomy() {
   getEconomyData();
   renderGroceryStore();
   renderFoodInventory();
   renderWeightEnergy();
   renderToyShop();
+  renderAutoGroceryLog();
 }

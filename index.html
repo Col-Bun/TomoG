@@ -193,6 +193,8 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     <button class="tab-btn" data-tab="slots">🎰 Slots</button>
     <button class="tab-btn" data-tab="grocery">🛒 Grocery</button>
     <button class="tab-btn" data-tab="house">🏠 House</button>
+    <button class="tab-btn" data-tab="conjugation">📝 Conjugation</button>
+    <button class="tab-btn" data-tab="inventory">🎒 Inventory</button>
   </div>
 
   <div class="tab-content active" id="tab-home">
@@ -854,6 +856,9 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
       <!-- Daily Food Progress -->
       <div id="grocery-daily-progress" style="margin-bottom:14px;"></div>
 
+      <!-- Moe-chan Auto Shopping Log -->
+      <div id="auto-grocery-log" style="margin-bottom:14px;"></div>
+
       <div id="grocery-message" style="font-weight:700; font-size:0.9rem; min-height:1.2em; text-align:center; margin-bottom:14px;">Buy food to feed Moe-chan!</div>
 
       <!-- Grocery Filters -->
@@ -881,6 +886,37 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
         <button class="btn-theme" onclick="exitHouse()" style="padding:8px 16px; border-radius:50px; font-size:0.85rem;">◀ Back to Map</button>
       </div>
       <div id="house-display"></div>
+    </div>
+  </div>
+
+  <!-- ===== CONJUGATION GAME TAB ===== -->
+  <div class="tab-content" id="tab-conjugation">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family:'Baloo 2',cursive; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,0.15); font-size:1.4rem; margin-bottom:4px;">📝 Verb Conjugation Dojo</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.8rem; margin-bottom:16px;">Practice Japanese verb conjugation! Earn MoeBucks and loot for high accuracy.</p>
+      <div id="conj-game-display"></div>
+    </div>
+  </div>
+
+  <!-- ===== CHIMERA INVENTORY TAB ===== -->
+  <div class="tab-content" id="tab-inventory">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family:'Baloo 2',cursive; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,0.15); font-size:1.4rem; margin-bottom:4px;">🎒 Chimera Inventory</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.8rem; margin-bottom:16px;">Your caught chimeras and catching supplies. Catch chimeras during expeditions!</p>
+
+      <div id="chimera-inv-stats" style="display:flex; gap:16px; flex-wrap:wrap; font-size:0.82rem; color:rgba(255,255,255,0.6); margin-bottom:16px;"></div>
+
+      <!-- Catching Items Inventory -->
+      <h4 style="font-family:'Baloo 2',cursive; color:#00e5ff; margin-bottom:8px;">🥅 Catching Supplies</h4>
+      <div id="catch-item-inventory" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px;"></div>
+
+      <!-- Catch Item Shop -->
+      <h4 style="font-family:'Baloo 2',cursive; color:#ffcc00; margin-bottom:8px;">🛍️ Catch Shop</h4>
+      <div id="catch-shop-items" class="catch-shop-grid" style="margin-bottom:20px;"></div>
+
+      <!-- Caught Chimeras List -->
+      <h4 style="font-family:'Baloo 2',cursive; color:#a8e84c; margin-bottom:8px;">🐲 Caught Chimeras</h4>
+      <div id="chimera-inventory-list"></div>
     </div>
   </div>
 
@@ -955,6 +991,8 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
 <script src="slots.js"></script>
 <script src="economy.js"></script>
 <script src="house.js"></script>
+<script src="catching.js"></script>
+<script src="conjugation.js"></script>
 <script src="jisho.js"></script>
 </body>
 </html>

@@ -1880,3 +1880,263 @@ body.clipboard-mode #app {
   background: rgba(255,255,255,0.2);
   border-color: rgba(255,255,255,0.35);
 }
+
+/* ===== CONJUGATION GAME ===== */
+.conj-question-card {
+  text-align: center;
+  padding: 20px;
+}
+
+.conj-progress {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 4px;
+}
+
+.conj-score {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 16px;
+}
+
+.conj-verb-display {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #fff;
+  font-family: 'Noto Sans JP', sans-serif;
+  margin-bottom: 4px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.conj-reading {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 16px;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+.conj-form-ask {
+  font-size: 1.1rem;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.conj-form-highlight {
+  color: #ffcc00;
+  font-weight: 800;
+}
+
+.conj-form-desc {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 16px;
+}
+
+.conj-input-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.conj-input {
+  background: rgba(255,255,255,0.12);
+  border: 2px solid rgba(255,255,255,0.25);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 16px;
+  font-family: 'Noto Sans JP', 'Nunito', sans-serif;
+  font-size: 1.2rem;
+  text-align: center;
+  width: 280px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.conj-input:focus {
+  border-color: rgba(255,204,0,0.6);
+}
+
+.conj-difficulty-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .conj-difficulty-grid { grid-template-columns: 1fr; }
+}
+
+.conj-diff-card {
+  padding: 20px 14px;
+  border-radius: 18px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1.5px solid rgba(255,255,255,0.15);
+}
+
+.conj-diff-card:hover {
+  border-color: rgba(255,204,0,0.4);
+  transform: translateY(-3px);
+  background: rgba(255,204,0,0.08);
+}
+
+.conj-diff-emoji { font-size: 2rem; margin-bottom: 8px; }
+.conj-diff-name { font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 4px; }
+.conj-diff-desc { font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 4px; }
+.conj-diff-forms { font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-bottom: 8px; font-family: 'Noto Sans JP', sans-serif; }
+.conj-diff-reward { font-size: 0.75rem; color: #a8e84c; font-weight: 700; }
+
+.conj-results-card {
+  text-align: center;
+  padding: 20px;
+}
+
+.conj-grade {
+  font-size: 5rem;
+  font-weight: 900;
+  font-family: 'Press Start 2P', monospace;
+  margin-bottom: 8px;
+  text-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+.conj-results-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.conj-results-stats {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 16px;
+}
+
+.conj-rewards {
+  margin-top: 14px;
+}
+
+.conj-loot-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.conj-loot-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  border: 1px solid;
+}
+
+.conj-stats-bar {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.5);
+}
+
+/* ===== CATCHING / INVENTORY ===== */
+.catch-shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.catch-shop-card {
+  padding: 12px 10px;
+  border-radius: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1.5px solid rgba(255,255,255,0.1);
+}
+
+.catch-shop-card:hover {
+  border-color: rgba(0,229,255,0.3);
+  transform: translateY(-2px);
+  background: rgba(0,229,255,0.06);
+}
+
+.catch-shop-emoji { font-size: 1.6rem; margin-bottom: 4px; }
+.catch-shop-name { font-size: 0.78rem; font-weight: 700; color: #fff; margin-bottom: 3px; }
+.catch-shop-desc { font-size: 0.65rem; color: rgba(255,255,255,0.5); margin-bottom: 5px; line-height: 1.3; }
+.catch-shop-price { font-size: 0.8rem; font-weight: 800; color: #ffcc00; }
+.catch-shop-owned { font-size: 0.68rem; color: #a8e84c; margin-top: 3px; }
+
+.catch-inv-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+.chimera-inv-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  margin-bottom: 8px;
+  border: 1.5px solid;
+  transition: all 0.2s;
+}
+
+.chimera-inv-card:hover {
+  transform: translateX(3px);
+}
+
+.chimera-inv-emoji { font-size: 1.8rem; }
+
+.chimera-inv-info { flex: 1; }
+
+.chimera-inv-name {
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.chimera-inv-meta {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.5);
+}
+
+.chimera-inv-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.catch-action-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+}
+
+.catch-action-btn:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.catch-release-btn:hover {
+  background: rgba(255,60,142,0.2);
+  border-color: rgba(255,60,142,0.3);
+}

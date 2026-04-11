@@ -1023,6 +1023,8 @@ function showLootPopup(loot, expeditionName, chimeraData) {
         ${reactionHtml}
         <p class="chimera-encounter-appearance">${escHtml(chimeraData.appearance)}</p>
         <p class="chimera-encounter-desc">${escHtml(chimeraData.description)}</p>
+        <button class="btn-glossy btn-pink" style="margin-top:10px; width:100%;" onclick="tryToCatchChimera('${chimeraData.id}')">🥅 Attempt to Catch!</button>
+        <div id="catch-attempt-result" style="margin-top:8px; min-height:1.2em; text-align:center; font-weight:700;"></div>
       </div>`;
   }
 
@@ -1416,4 +1418,27 @@ function initExpeditions() {
   renderMaterials();
   renderBestiary();
   startExpeditionTimer();
+}
+
+// ===== CATCH CHIMERA FROM EXPEDITION POPUP =====
+function tryToCatchChimera(chimeraId) {
+  if (typeof attemptCatch !== 'function') {
+    const el = document.getElementById('catch-attempt-result');
+    if (el) el.innerHTML = '<span style="color:#ff3c8e;">Catching system not loaded!</span>';
+    return;
+  }
+  const result = attemptCatch(chimeraId);
+  const el = document.getElementById('catch-attempt-result');
+  if (el) {
+    if (result.success) {
+      el.innerHTML = `<span style="color:#a8e84c;">✓ ${result.message}</span>`;
+    } else {
+      el.innerHTML = `<span style="color:#ff3c8e;">✗ ${result.message}</span>`;
+    }
+  }
+  // Disable catch button after attempt
+  const btn = el ? el.previousElementSibling : null;
+  if (btn && btn.tagName === 'BUTTON') btn.disabled = true;
+  // Refresh inventory if visible
+  if (typeof renderChimeraInventory === 'function') renderChimeraInventory();
 }

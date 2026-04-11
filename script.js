@@ -58,6 +58,8 @@ function loadData() {
       if (!loaded.mapState) loaded.mapState = null; // Will be initialized by map.js on first use
       if (!loaded.slotMachine) loaded.slotMachine = null; // Will be initialized by slots.js
       if (!loaded.economy) loaded.economy = null; // Will be initialized by economy.js
+      if (!loaded.catching) loaded.catching = null; // Will be initialized by catching.js
+      if (!loaded.conjStats) loaded.conjStats = null; // Will be initialized by conjugation.js
       return loaded;
     }
   } catch(e) { console.error('loadData error:', e); } 
@@ -941,4 +943,6 @@ function initApp(){
   if(typeof initSlots === 'function') initSlots();
   if(typeof initEconomy === 'function') initEconomy();
   if(typeof initHouse === 'function') initHouse();
+  if(typeof initCatching === 'function') initCatching();
+  if(typeof initConjugation === 'function') initConjugation();
 }
