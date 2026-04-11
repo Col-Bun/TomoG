@@ -383,11 +383,6 @@ const JLPT_QUESTIONS = {
   }
 };
 
-// ===== CHIMERA PERSONALITIES (reused from catching.js) =====
-const CHIMERA_PERSONALITIES = typeof window.CHIMERA_PERSONALITIES !== 'undefined' ? window.CHIMERA_PERSONALITIES : [
-  { trait: 'Playful' }, { trait: 'Sleepy' }, { trait: 'Curious' }, { trait: 'Brave' }, { trait: 'Shy' }
-];
-
 // ===== JLPT CONFIG =====
 const JLPT_LEVEL_CONFIG = {
   N5: { color: '#7bed9f', label: 'Beginner', mbReward: 20, xpReward: 15, lootTier: 5, questionCount: 10 },
@@ -897,6 +892,13 @@ function renderJlptHome() {
 
 // ===== INIT =====
 function initJlpt() {
-  getJlptData();
-  renderJlptHome();
+  try {
+    getJlptData();
+    renderJlptHome();
+    console.log('[JLPT] Initialized successfully');
+  } catch(e) {
+    console.error('[JLPT] Init error:', e);
+    const mainEl = document.getElementById('jlpt-main-content');
+    if (mainEl) mainEl.innerHTML = '<p style="color:#ff4757;">JLPT failed to load: ' + e.message + '</p>';
+  }
 }
