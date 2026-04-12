@@ -199,6 +199,7 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     <button class="tab-btn" data-tab="map">🗺️ Map</button>
     <button class="tab-btn" data-tab="materials">🎒 Materials</button>
     <button class="tab-btn" data-tab="numogram">🌀 Numogram</button>
+    <button class="tab-btn" data-tab="pomodoro">🍅 Pomodoro</button>
     <button class="tab-btn" data-tab="quotes">💬 Quotes</button>
     <button class="tab-btn" data-tab="schedule">🕒 Schedule</button>
     <button class="tab-btn" data-tab="slots">🎰 Slots</button>
@@ -946,6 +947,15 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     <div id="fun-main-content"></div>
   </div>
 
+  <!-- ===== POMODORO TAB ===== -->
+  <div class="tab-content" id="tab-pomodoro">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 1.4rem;">🍅 Pomodoro Timer</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.75rem; margin-bottom:14px;">Focus sessions earn 5 MB each. Full cycles (4 sessions) earn a 10 MB bonus!</p>
+      <div id="pom-main"></div>
+    </div>
+  </div>
+
   <!-- ===== JLPT TAB ===== -->
   <div class="tab-content" id="tab-jlpt">
     <div class="glass-dark" style="padding: 22px;">
@@ -1032,6 +1042,7 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
 <script src="jlpt.js"></script>
 <script src="todo.js"></script>
 <script src="fun.js"></script>
+<script src="pomodoro.js"></script>
 <script src="jisho.js"></script>
 </body>
 </html>

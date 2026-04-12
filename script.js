@@ -22,7 +22,8 @@ function setDailyTheme() {
 setDailyTheme(); // Run immediately on load
 
 // ===== UTILS =====
-function todayStr() { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+// Day rolls over at 3 AM — before 3 AM counts as "yesterday"
+function todayStr() { const d=new Date(); d.setHours(d.getHours()-3); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function formatDate(s) { const [y,m,d]=s.split('-'); const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return mo[parseInt(m)-1]+' '+parseInt(d)+', '+y; }
 function formatDateTime(d) { return formatDate(todayStr()) + ' at ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); }
 function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
@@ -63,6 +64,7 @@ function loadData() {
       if (!loaded.jlpt) loaded.jlpt = null; // Will be initialized by jlpt.js
       if (!loaded.todos) loaded.todos = null; // Will be initialized by todo.js
       if (!loaded.fun) loaded.fun = null; // Will be initialized by fun.js
+      if (!loaded.pomodoro) loaded.pomodoro = null; // Will be initialized by pomodoro.js
       return loaded;
     }
   } catch(e) { console.error('loadData error:', e); } 
@@ -245,6 +247,8 @@ function logFlashcards(){
   const today=todayStr();if(!data.days[today])data.days[today]={flash:0,read:0}; data.days[today].flash=(data.days[today].flash||0)+val;
   document.getElementById('flash-input-area').style.display='none'; document.getElementById('flash-done').style.display='block'; document.getElementById('flash-done-text').textContent=data.days[today].flash+' min today!';
   document.getElementById('card-flash').classList.add('done'); setCreatureState('study');
+  // Award MoeBucks: 3 MB per 10 minutes of flashcard study
+  if(typeof getSlotData === 'function') { const sd=getSlotData(); const reward=Math.floor(val/10)*3; if(reward>0){ sd.moeBucks+=reward; if(typeof updateSlotMoneyDisplay==='function') updateSlotMoneyDisplay(); document.getElementById('flash-done-text').textContent=data.days[today].flash+' min today! (+'+reward+' MB)'; } }
   const readDone=(data.days[today].read||0)>0;setSpeech(readDone?'bothDone':'flashDone'); calcStreak();saveData();updateStats();updateMood();updateLevelDisplay(); if(readDone)setTimeout(()=>setCreatureState('celebrate'),300);
   if(typeof updateRarityBonusDisplay === 'function') updateRarityBonusDisplay();
 }
@@ -253,6 +257,8 @@ function logReading(){
   const today=todayStr();if(!data.days[today])data.days[today]={flash:0,read:0}; data.days[today].read=(data.days[today].read||0)+val;
   document.getElementById('read-input-area').style.display='none'; document.getElementById('read-done').style.display='block'; document.getElementById('read-done-text').textContent=data.days[today].read+' hrs today!';
   document.getElementById('card-read').classList.add('done'); setCreatureState('read');
+  // Award MoeBucks: 3 MB per 10 minutes (0.167 hrs) of reading
+  if(typeof getSlotData === 'function') { const sd=getSlotData(); const readMinutes=Math.round(val*60); const reward=Math.floor(readMinutes/10)*3; if(reward>0){ sd.moeBucks+=reward; if(typeof updateSlotMoneyDisplay==='function') updateSlotMoneyDisplay(); document.getElementById('read-done-text').textContent=data.days[today].read+' hrs today! (+'+reward+' MB)'; } }
   const flashDone=(data.days[today].flash||0)>0;setSpeech(flashDone?'bothDone':'readDone'); calcStreak();saveData();updateStats();updateMood();updateLevelDisplay(); if(flashDone)setTimeout(()=>setCreatureState('celebrate'),300);
 }
 
@@ -951,4 +957,5 @@ function initApp(){
   if(typeof initJlpt === 'function') initJlpt();
   if(typeof initTodo === 'function') initTodo();
   if(typeof initFun === 'function') initFun();
+  if(typeof initPomodoro === 'function') initPomodoro();
 }
