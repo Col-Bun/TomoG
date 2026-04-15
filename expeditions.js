@@ -735,8 +735,15 @@ function rollChimeraEncounter(expeditionId, duration) {
   // Determine which chimeras are eligible based on expedition habitat AND conditions
   const exp = EXPEDITIONS.find(e => e.id === expeditionId);
   const habitat = exp ? exp.id : 'meadow';
+  // Fallback mapping: new expedition habitats share chimeras with related biomes
+  const HABITAT_FALLBACK = {
+    'riverbank': ['meadow', 'forest'],
+    'bamboo':    ['forest', 'meadow'],
+    'volcano':   ['cave', 'ruins'],
+  };
+  const habitatSet = new Set([habitat, ...(HABITAT_FALLBACK[habitat] || [])]);
   const eligible = CHIMERAS.filter(c =>
-    c.habitats.includes(habitat) &&
+    c.habitats.some(h => habitatSet.has(h)) &&
     c.rarity <= (exp ? exp.maxRarity : 6) &&
     checkChimeraCondition(c)
   );
@@ -788,13 +795,26 @@ function addToBestiary(chimera) {
 }
 
 // ===== EXPEDITION DEFINITIONS =====
+// minLevel gates each expedition behind the Moe-chan level (see calculateMoeXP/getMoeLevel in script.js).
+// Higher levels unlock longer, more rewarding paths.
 const EXPEDITIONS = [
-  { id: 'meadow',    name: 'Sunny Meadow',      emoji: '🌻', duration: 30,  maxRarity: 6,  description: 'A peaceful meadow with common herbs and stones.' },
-  { id: 'forest',    name: 'Whispering Forest',  emoji: '🌲', duration: 60,  maxRarity: 10, description: 'A dense forest hiding uncommon treasures.' },
-  { id: 'cave',      name: 'Crystal Caverns',    emoji: '🦇', duration: 120, maxRarity: 14, description: 'Deep caves glittering with rare crystals.' },
-  { id: 'ruins',     name: 'Ancient Ruins',      emoji: '🏛️', duration: 240, maxRarity: 18, description: 'Crumbling ruins of a lost civilization.' },
-  { id: 'abyss',     name: 'The Starlit Abyss',  emoji: '🌌', duration: 480, maxRarity: 20, description: 'The deepest reaches, where legends are found.' },
+  { id: 'meadow',     name: 'Sunny Meadow',        emoji: '🌻', duration: 30,  maxRarity: 6,  minLevel: 1,  description: 'A peaceful meadow with common herbs and stones.' },
+  { id: 'forest',     name: 'Whispering Forest',   emoji: '🌲', duration: 60,  maxRarity: 10, minLevel: 3,  description: 'A dense forest hiding uncommon treasures.' },
+  { id: 'riverbank',  name: 'Mirror Riverbank',    emoji: '🏞️', duration: 90,  maxRarity: 12, minLevel: 5,  description: 'A river of liquid silver where memories wash ashore. Moe-chan catches driftwood, river pearls, and the occasional lost haiku.' },
+  { id: 'cave',       name: 'Crystal Caverns',     emoji: '🦇', duration: 120, maxRarity: 14, minLevel: 8,  description: 'Deep caves glittering with rare crystals.' },
+  { id: 'bamboo',     name: 'Shrouded Bamboo Sea', emoji: '🎋', duration: 180, maxRarity: 16, minLevel: 12, description: 'A swaying ocean of bamboo where time loses meaning. Fox spirits and old poets leave gifts among the stalks.' },
+  { id: 'ruins',      name: 'Ancient Ruins',       emoji: '🏛️', duration: 240, maxRarity: 18, minLevel: 16, description: 'Crumbling ruins of a lost civilization.' },
+  { id: 'volcano',    name: 'Obsidian Caldera',    emoji: '🌋', duration: 360, maxRarity: 19, minLevel: 22, description: 'A dormant volcano lined with obsidian mirrors. Salamander-kin forge rare metals in pools of fire-glass.' },
+  { id: 'abyss',      name: 'The Starlit Abyss',   emoji: '🌌', duration: 480, maxRarity: 20, minLevel: 30, description: 'The deepest reaches, where legends are found.' },
 ];
+
+// ===== HELPER: current Moe-chan level (falls back to 1 if script.js not yet loaded) =====
+function getCurrentMoeLevel() {
+  try {
+    if (typeof getMoeLevel === 'function') return getMoeLevel().level || 1;
+  } catch(e) {}
+  return 1;
+}
 
 // ===== HELPER: Get flashcard rarity bonus =====
 function getFlashcardRarityBonus() {
@@ -906,6 +926,14 @@ function startExpedition(expeditionId) {
 
   const exp = EXPEDITIONS.find(e => e.id === expeditionId);
   if (!exp) return;
+
+  // Level gate enforcement
+  const lvl = getCurrentMoeLevel();
+  const needed = exp.minLevel || 1;
+  if (lvl < needed) {
+    alert(`🔒 ${exp.name} is locked! Reach Moe-chan Level ${needed} (you're ${lvl}) to unlock it.`);
+    return;
+  }
 
   data.expeditions.active = {
     expeditionId: exp.id,
@@ -1106,6 +1134,8 @@ function renderExpeditionMissions() {
 
   const hasActive = !!data.expeditions.active;
 
+  const playerLevel = getCurrentMoeLevel();
+
   let html = '';
   EXPEDITIONS.forEach(exp => {
     const isActive = hasActive && data.expeditions.active.expeditionId === exp.id;
@@ -1113,17 +1143,29 @@ function renderExpeditionMissions() {
     const mins = exp.duration % 60;
     const timeStr = hrs > 0 ? `${hrs}h ${mins > 0 ? mins + 'm' : ''}` : `${mins}m`;
     const maxTier = MATERIALS.find(m => m.rarity === exp.maxRarity);
+    const minLvl = exp.minLevel || 1;
+    const locked = playerLevel < minLvl;
 
-    html += `<div class="exp-mission-card ${isActive ? 'exp-active' : ''} ${hasActive && !isActive ? 'exp-disabled' : ''}">
+    let actionHtml;
+    if (locked) {
+      actionHtml = `<span class="exp-badge-locked">🔒 Lv. ${minLvl} required (you: ${playerLevel})</span>`;
+    } else if (hasActive) {
+      actionHtml = isActive ? '<span class="exp-badge-active">In Progress...</span>' : '';
+    } else {
+      actionHtml = `<button class="btn-glossy exp-send-btn" onclick="startExpedition('${exp.id}')">Send Moe-chan!</button>`;
+    }
+
+    html += `<div class="exp-mission-card ${isActive ? 'exp-active' : ''} ${hasActive && !isActive ? 'exp-disabled' : ''} ${locked ? 'exp-locked' : ''}">
       <div class="exp-mission-header">
         <span class="exp-mission-emoji">${exp.emoji}</span>
         <span class="exp-mission-name">${exp.name}</span>
         <span class="exp-mission-time">${timeStr}</span>
+        <span class="exp-mission-level-badge ${locked ? 'is-locked' : ''}">Lv. ${minLvl}+</span>
       </div>
       <p class="exp-mission-desc">${exp.description}</p>
       <div class="exp-mission-footer">
         <span class="exp-mission-rarity">Max: ${maxTier ? maxTier.name : '???'}</span>
-        ${hasActive ? (isActive ? '<span class="exp-badge-active">In Progress...</span>' : '') : `<button class="btn-glossy exp-send-btn" onclick="startExpedition('${exp.id}')">Send Moe-chan!</button>`}
+        ${actionHtml}
       </div>
     </div>`;
   });
