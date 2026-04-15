@@ -201,6 +201,7 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     <button class="tab-btn" data-tab="numogram">🌀 Numogram</button>
     <button class="tab-btn" data-tab="pomodoro">🍅 Pomodoro</button>
     <button class="tab-btn" data-tab="quotes">💬 Quotes</button>
+    <button class="tab-btn" data-tab="rpg">🗝️ RPG</button>
     <button class="tab-btn" data-tab="schedule">🕒 Schedule</button>
     <button class="tab-btn" data-tab="slots">🎰 Slots</button>
     <button class="tab-btn" data-tab="todo">📌 Todo</button>
@@ -291,7 +292,19 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     <div class="dict-section glass-dark">
       <div class="dict-header"><h3>📖 My Dictionary</h3><span class="dict-count" id="dict-count">0 words</span></div>
       <div class="dict-add-form"><input type="text" id="dict-en" placeholder="English"><input type="text" id="dict-jp" placeholder="日本語"><input type="text" id="dict-es" placeholder="Español"><button class="add-word-btn" onclick="addWord()">+</button></div>
-      <div class="dict-filter"><input type="text" id="dict-search" placeholder="🔍 Search words..." oninput="renderDictionary()"></div>
+      <div class="dict-add-form dict-add-form-row2">
+        <select id="dict-type" title="Part of speech / type — used for RPG NPC requests">
+          <option value="noun">🧺 noun (object)</option>
+          <option value="verb">⚡ verb (action)</option>
+          <option value="adj">🎨 adjective</option>
+          <option value="adv">💨 adverb</option>
+          <option value="phrase">💬 phrase</option>
+          <option value="other">❓ other</option>
+        </select>
+        <input type="text" id="dict-tags" placeholder="tags (comma-sep): plant, kitchen, emotion..." style="flex:2;">
+      </div>
+      <div class="dict-filter"><input type="text" id="dict-search" placeholder="🔍 Search words / tags..." oninput="renderDictionary()"></div>
+      <div id="dict-tag-cloud" class="dict-tag-cloud"></div>
       <div class="dict-list" id="dict-list"></div>
     </div>
   </div>
@@ -966,6 +979,15 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     <div id="jlpt-quiz-area"></div>
   </div>
 
+  <!-- ===== RPG TAB ===== -->
+  <div class="tab-content" id="tab-rpg">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 1.4rem;">🗝️ 言葉の迷宮 · El Laberinto de las Palabras</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.75rem; margin-bottom:14px;">A turn-based, non-combat labyrinth generated from your flashcards. Satisfy NPCs with the right verb + object to earn MoeBucks.</p>
+      <div id="rpg-body"></div>
+    </div>
+  </div>
+
   <!-- ===== MAP TAB ===== -->
   <div class="tab-content" id="tab-map">
     <div class="glass-dark" style="padding: 22px;">
@@ -1044,5 +1066,6 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
 <script src="fun.js"></script>
 <script src="pomodoro.js"></script>
 <script src="jisho.js"></script>
+<script src="rpg.js"></script>
 </body>
 </html>
