@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moe-Chan & The Oracle</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="themes.css">
+<style>
+  .polling-active { animation: pulse-glow 1.2s ease-in-out infinite; background: linear-gradient(180deg,#ff6348 0%,#ee5a24 100%) !important; }
+  @keyframes pulse-glow { 0%,100% { box-shadow: 0 0 8px rgba(255,99,72,0.4); } 50% { box-shadow: 0 0 20px rgba(255,99,72,0.8); } }
+
+  /* ===== COMMISSIONS TAB ===== */
+  .comm-layout { display: grid; grid-template-columns: 340px 1fr; gap: 20px; }
+  @media (max-width: 860px) { .comm-layout { grid-template-columns: 1fr; } }
+
+  .comm-form { padding: 20px; border-radius: 20px; }
+  .comm-label { display: block; font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.6); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .comm-field-group { margin-bottom: 12px; }
+  .comm-input {
+    background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.2); color: #fff;
+    padding: 10px 12px; border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 0.9rem;
+    width: 100%; outline: none; transition: border-color 0.2s;
+  }
+  .comm-input:focus { border-color: rgba(255,255,255,0.5); }
+  .comm-input-sm { flex: 1; min-width: 0; }
+  .comm-input option { color: #000; }
+  .comm-checkbox-label {
+    display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: rgba(255,255,255,0.8);
+    cursor: pointer; user-select: none;
+  }
+  .comm-checkbox-label input[type="checkbox"] { accent-color: #a8e84c; width: 16px; height: 16px; cursor: pointer; }
+
+  .comm-filter-btn {
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.6);
+    padding: 5px 12px; border-radius: 50px; font-size: 0.75rem; font-family: 'Nunito', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .comm-filter-btn.active { background: rgba(255,255,255,0.2); color: #fff; border-color: rgba(255,255,255,0.35); }
+  .comm-filter-btn:hover { background: rgba(255,255,255,0.15); }
+
+  .comm-summary-strip { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+
+  .comm-card-list { display: flex; flex-direction: column; gap: 14px; max-height: 70vh; overflow-y: auto; padding-right: 4px; }
+
+  .comm-card {
+    background: rgba(0,0,0,0.35); border: 1.5px solid rgba(255,255,255,0.12); border-radius: 18px;
+    padding: 18px; position: relative; transition: border-color 0.25s, transform 0.15s;
+  }
+  .comm-card:hover { border-color: rgba(255,255,255,0.25); transform: translateY(-1px); }
+  .comm-card.is-finished { border-color: rgba(168,232,76,0.3); opacity: 0.75; }
+  .comm-card.is-finished:hover { opacity: 1; }
+
+  .comm-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .comm-client-name { font-family: 'Baloo 2', cursive; font-size: 1.15rem; color: #fff; line-height: 1.2; }
+  .comm-type-badge {
+    font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 50px; text-transform: uppercase;
+    letter-spacing: 0.5px; white-space: nowrap;
+  }
+  .comm-type-sketch { background: rgba(255,255,255,0.15); color: #ddd; }
+  .comm-type-colored { background: rgba(0,153,255,0.25); color: #66ccff; }
+  .comm-type-grayscale { background: rgba(180,180,180,0.2); color: #ccc; }
+  .comm-type-shaded { background: rgba(255,60,142,0.2); color: #ff6ea8; }
+
+  .comm-socials { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .comm-social-link {
+    font-size: 0.72rem; color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.06);
+    padding: 2px 8px; border-radius: 8px; text-decoration: none; transition: color 0.2s;
+  }
+  .comm-social-link:hover { color: #fff; }
+
+  .comm-meta-row { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.78rem; color: rgba(255,255,255,0.55); margin-bottom: 10px; }
+  .comm-meta-row span { white-space: nowrap; }
+
+  .comm-extras-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .comm-extra-tag {
+    font-size: 0.7rem; padding: 2px 9px; border-radius: 50px;
+    background: rgba(168,232,76,0.15); color: #a8e84c; border: 1px solid rgba(168,232,76,0.2);
+  }
+
+  /* === STAGE PIPELINE === */
+  .comm-pipeline { display: flex; align-items: center; gap: 0; margin: 14px 0 10px; position: relative; }
+  .comm-stage {
+    display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; z-index: 1;
+  }
+  .comm-stage-dot {
+    width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center;
+    font-size: 0.55rem; color: rgba(255,255,255,0.3); font-weight: 800; transition: all 0.3s;
+    position: relative;
+  }
+  .comm-stage-dot.reached { background: rgba(168,232,76,0.3); border-color: #a8e84c; color: #a8e84c; }
+  .comm-stage-dot.current { background: #a8e84c; border-color: #a8e84c; color: #000; box-shadow: 0 0 10px rgba(168,232,76,0.5); }
+  .comm-stage-dot.is-final { border-color: #ff3c8e; }
+  .comm-stage-dot.current.is-final { background: #ff3c8e; border-color: #ff3c8e; box-shadow: 0 0 10px rgba(255,60,142,0.5); }
+  .comm-stage-dot.reached.is-final { background: rgba(255,60,142,0.3); border-color: #ff3c8e; color: #ff3c8e; }
+  .comm-stage-dot.past-final { opacity: 0.2; }
+  .comm-stage-label {
+    font-size: 0.55rem; color: rgba(255,255,255,0.4); margin-top: 4px; text-align: center;
+    line-height: 1.1; max-width: 55px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .comm-stage-label.active-label { color: #a8e84c; font-weight: 700; }
+  .comm-stage-label.past-final { opacity: 0.2; }
+
+  .comm-pipeline-track {
+    position: absolute; top: 11px; left: 8%; right: 8%; height: 2px;
+    background: rgba(255,255,255,0.1); z-index: 0;
+  }
+  .comm-pipeline-fill {
+    height: 100%; background: linear-gradient(90deg, #a8e84c, #7ec832);
+    border-radius: 2px; transition: width 0.4s ease;
+  }
+
+  .comm-card-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .comm-act-btn {
+    font-size: 0.72rem; padding: 5px 12px; border-radius: 50px; cursor: pointer; font-family: 'Nunito', sans-serif;
+    border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7);
+    transition: all 0.2s;
+  }
+  .comm-act-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+  .comm-act-btn.advance-btn { border-color: rgba(168,232,76,0.3); color: #a8e84c; }
+  .comm-act-btn.advance-btn:hover { background: rgba(168,232,76,0.15); }
+  .comm-act-btn.finish-btn { border-color: rgba(0,229,255,0.3); color: #00e5ff; }
+  .comm-act-btn.done-btn { border-color: rgba(168,232,76,0.3); color: #a8e84c; background: rgba(168,232,76,0.1); }
+  .comm-act-btn.del-btn { border-color: rgba(255,60,142,0.2); color: #ff3c8e; }
+  .comm-act-btn.del-btn:hover { background: rgba(255,60,142,0.15); }
+
+  .comm-money-time { display: flex; gap: 12px; align-items: center; font-size: 0.82rem; margin-top: 6px; }
+  .comm-money { color: #a8e84c; font-weight: 700; }
+  .comm-time { color: rgba(255,255,255,0.5); }
+  .comm-hourly { color: #ffcc00; font-size: 0.72rem; }
+</style>
+</head>
+<body>
+
+<script>
+if (localStorage.getItem('studyBuddyTheme') === 'dark') document.body.classList.add('dark-mode');
+var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') document.body.classList.add('theme-' + _t);
+</script>
+
+<div class="metro-bg">
+  <div class="metro-sunburst"></div><div class="metro-halftone"></div>
+  <div class="metro-vectors">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <path d="M-100 700 Q 400 400, 900 800 T 1600 500 L 1600 1000 L -100 1000 Z" fill="#000" fill-opacity="0.15" />
+      <path d="M-100 750 Q 500 300, 1000 750 T 1600 400 L 1600 1000 L -100 1000 Z" fill="#fff" fill-opacity="0.25" />
+      <rect x="0" y="120" width="100%" height="40" fill="#fff" fill-opacity="0.15" />
+      <rect x="0" y="140" width="100%" height="8" fill="#000" fill-opacity="0.2" />
+      <circle cx="1200" cy="750" r="180" fill="none" stroke="#fff" stroke-width="40" stroke-opacity="0.15" />
+      <circle cx="1200" cy="750" r="60" fill="#000" fill-opacity="0.1" />
+      <g class="y2k-flower" transform="translate(150, 200) scale(1.5)" fill="#fff" fill-opacity="0.3"><circle cx="0" cy="-20" r="15"/><circle cx="19" cy="-6" r="15"/><circle cx="12" cy="16" r="15"/><circle cx="-12" cy="16" r="15"/><circle cx="-19" cy="-6" r="15"/><circle cx="0" cy="0" r="12" fill="var(--metro-bg1)" fill-opacity="1"/></g>
+      <g class="y2k-flower" transform="translate(1300, 250) scale(2)" fill="#000" fill-opacity="0.15"><circle cx="0" cy="-20" r="15"/><circle cx="19" cy="-6" r="15"/><circle cx="12" cy="16" r="15"/><circle cx="-12" cy="16" r="15"/><circle cx="-19" cy="-6" r="15"/><circle cx="0" cy="0" r="12" fill="#fff" fill-opacity="0.3"/></g>
+    </svg>
+  </div>
+</div>
+
+<div id="password-screen">
+  <div class="pw-creature" id="pw-creature"><img src="./sleep.png" alt="sleeping"></div>
+  <h1>Moe-Chan<br>is sleeping...</h1>
+  <p class="pw-hint">whisper the secret word to wake her up</p>
+  <input type="password" id="pw-input" placeholder="• • • •" autofocus>
+  <p class="pw-error" id="pw-error"></p>
+</div>
+
+<div id="app">
+  <div class="top-bar glass">
+    <h2>Moe-Chan</h2>
+    <div class="top-controls">
+      <button class="btn-theme" style="padding: 8px 14px; border-radius: 50px;" id="theme-btn" onclick="toggleTheme()" title="Toggle Dark Mode">🌙</button>
+      <span class="streak-badge" id="streak-badge">🔥 0 day streak</span>
+      <span class="date-display" id="date-display"></span>
+    </div>
+  </div>
+
+  <!-- Theme Switcher (always visible above tabs) -->
+  <div id="global-theme-bar" class="global-theme-bar glass-dark">
+    <div id="global-theme-mount"></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="home">🏠 Home</button>
+    <button class="tab-btn" data-tab="advice">🧭 Advice</button>
+    <button class="tab-btn" data-tab="bestiary">🐲 Bestiary</button>
+    <button class="tab-btn" data-tab="calc">🧮 COLcalc</button>
+    <button class="tab-btn" data-tab="calendar">📅 Calendar</button>
+    <button class="tab-btn" data-tab="clipboard">📋 Clipboard</button>
+    <button class="tab-btn" data-tab="commissions">🎨 Commissions</button>
+    <button class="tab-btn" data-tab="conjugation">📝 Conjugation</button>
+    <button class="tab-btn" data-tab="diary">📓 Diary</button>
+    <button class="tab-btn" data-tab="dictionary">📖 Dictionary <span id="dict-tab-count"></span></button>
+    <button class="tab-btn" data-tab="expeditions">⚔️ Expeditions</button>
+    <button class="tab-btn" data-tab="fun">💖 Fun</button>
+    <button class="tab-btn" data-tab="grocery">🛒 Grocery</button>
+    <button class="tab-btn" data-tab="history">📊 History</button>
+    <button class="tab-btn" data-tab="house">🏡 House</button>
+    <button class="tab-btn" data-tab="iching">☯️ I-Ching</button>
+    <button class="tab-btn" data-tab="inventory">🎒 Inventory</button>
+    <button class="tab-btn" data-tab="jlpt">🎌 JLPT</button>
+    <button class="tab-btn" data-tab="map">🗺️ Map</button>
+    <button class="tab-btn" data-tab="materials">🎒 Materials</button>
+    <button class="tab-btn" data-tab="numogram">🌀 Numogram</button>
+    <button class="tab-btn" data-tab="pomodoro">🍅 Pomodoro</button>
+    <button class="tab-btn" data-tab="quotes">💬 Quotes</button>
+    <button class="tab-btn" data-tab="rpg">🗝️ RPG</button>
+    <button class="tab-btn" data-tab="schedule">🕒 Schedule</button>
+    <button class="tab-btn" data-tab="slots">🎰 Slots</button>
+    <button class="tab-btn" data-tab="todo">📌 Todo</button>
+  </div>
+
+  <div class="tab-content active" id="tab-home">
+    <div class="home-main-row">
+      <div class="task-card glass-dark" id="card-flash">
+        <h3>📇 Flashcards</h3>
+        <div class="tri-label">Study flashcards! / フラッシュカード！ / ¡Tarjetas!</div>
+        <div id="flash-input-area"><div class="task-input-row"><input type="number" id="flash-minutes" min="1" max="999" placeholder="0"><span>min</span></div><button class="btn-glossy log-btn" onclick="logFlashcards()">Log Study Time</button></div>
+        <div id="flash-done" style="display:none"><div class="task-done-check">✅</div><p class="task-done-text" style="font-size:0.8rem;margin-top:4px" id="flash-done-text"></p></div>
+      </div>
+
+      <div class="creature-area glass" id="moe-container">
+        <div class="creature-sprite" id="creature-sprite"><img src="./idle.png" id="sprite-img" alt="creature"></div>
+        <div class="speech-bubble">
+          <div class="speech-line"><span class="lang-tag lang-en">EN</span><span id="speech-en">Hello! Let's study today!</span></div>
+          <div class="speech-line"><span class="lang-tag lang-jp">JP</span><span id="speech-jp" style="font-family:'Noto Sans JP',sans-serif">こんにちは！今日も勉強しよう！</span></div>
+          <div class="speech-line"><span class="lang-tag lang-es">ES</span><span id="speech-es">¡Hola! ¡Estudiemos hoy!</span></div>
+        </div>
+        <div class="mood-bar">
+          <span class="mood-label">Mood:</span>
+          <div class="mood-track"><div class="mood-fill" id="mood-fill" style="width:50%;background:linear-gradient(90deg,#ffcc00,#ff8a00)"></div></div>
+          <span class="mood-label" id="mood-text">Neutral</span>
+        </div>
+        <div class="moe-level-bar">
+          <span class="moe-level-badge">Lv.<span id="moe-level-num">1</span></span>
+          <div class="moe-level-title" id="moe-level-title">🌱 Sleepy Sprout</div>
+          <div class="moe-xp-track"><div class="moe-xp-fill" id="moe-xp-fill" style="width:0%"></div></div>
+          <span class="moe-xp-text" id="moe-xp-text">0 / 25 XP</span>
+        </div>
+        <div class="random-bubble glass-strong" id="random-bubble"><span id="random-phrase"></span><span class="random-lang-tag" id="random-lang-tag"></span></div>
+      </div>
+
+      <div class="task-card glass-dark" id="card-read">
+        <h3>📚 Reading</h3>
+        <div class="tri-label">Reading time! / 読書タイム！ / ¡Hora de leer!</div>
+        <div id="read-input-area"><div class="task-input-row"><input type="number" id="read-hours" min="0.25" max="24" step="0.25" placeholder="0"><span>hrs</span></div><button class="btn-glossy btn-pink log-btn" onclick="logReading()">Log Reading Time</button></div>
+        <div id="read-done" style="display:none"><div class="task-done-check">✅</div><p class="task-done-text" style="font-size:0.8rem;margin-top:4px" id="read-done-text"></p></div>
+      </div>
+    </div>
+
+    <div class="stats-strip">
+      <div class="stat-box glass"><div class="num" id="stat-total-flash">0</div><div class="label">Flashcard Min</div></div>
+      <div class="stat-box glass"><div class="num" id="stat-total-read">0</div><div class="label">Reading Hrs</div></div>
+      <div class="stat-box glass"><div class="num" id="stat-words">0</div><div class="label">Dict Words</div></div>
+      <div class="stat-box glass"><div class="num" id="stat-days">0</div><div class="label">Days Tracked</div></div>
+      <div class="stat-box glass"><div class="num" id="stat-materials">0</div><div class="label">Materials</div></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-schedule">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 16px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 1.4rem;">🕒 Hourly Schedule</h3>
+      <div id="schedule-list" style="background: rgba(0,0,0,0.2); border-radius: 16px; padding: 10px; max-height: 55vh; overflow-y: auto;">
+        </div>
+      <button class="btn-glossy btn-green" style="margin-top: 20px; width: 100%; font-size: 1.1rem; padding: 14px;" onclick="saveSchedule()">Save Schedule</button>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-calendar">
+    <div class="glass-dark" style="padding: 22px; position: relative;">
+      <div style="text-align: center;"><div class="cal-jp-date" id="cal-jp-date" style="font-size: 0.9rem; color: #a8e84c; margin-bottom: 10px;"></div></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <button class="btn-theme" style="border-radius: 50px; padding: 8px 16px;" onclick="changeMonth(-1)">◀ Prev</button>
+        <h3 id="cal-month-year" style="font-family: 'Baloo 2', cursive; color: #fff; margin: 0; font-size: 1.4rem; text-shadow: 0 1px 4px rgba(0,0,0,0.15);"></h3>
+        <button class="btn-theme" style="border-radius: 50px; padding: 8px 16px;" onclick="changeMonth(1)">Next ▶</button>
+      </div>
+      <div class="cal-grid" id="cal-grid">
+        </div>
+      
+      <div id="cal-modal" style="position: absolute; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px;">
+        <div class="cal-modal-content" style="background: var(--metro-bg1); border: 2px solid rgba(255,255,255,0.3); border-radius: 24px; padding: 24px; width: 100%; max-width: 400px;">
+          <div class="cal-modal-header" id="cal-modal-date" style="font-family: 'Baloo 2'; font-size: 1.4rem; color: #fff; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2);">Date</div>
+          <div class="cal-modal-add" style="display: flex; gap: 8px; margin-bottom: 16px;">
+            <input type="text" id="cal-modal-input" placeholder="New task..." style="flex:1; border-radius:12px; padding:10px;" onkeydown="if(event.key==='Enter') addCalTask()">
+            <button class="btn-glossy btn-pink" onclick="addCalTask()">+</button>
+          </div>
+          <div class="cal-modal-list" id="cal-modal-list" style="max-height: 200px; overflow-y: auto; margin-bottom: 15px;"></div>
+          <button class="cal-modal-close btn-theme" style="width:100%; padding:10px; border-radius:50px;" onclick="closeCalModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-dictionary">
+    <div class="dict-section glass-dark">
+      <div class="dict-header"><h3>📖 My Dictionary</h3><span class="dict-count" id="dict-count">0 words</span></div>
+      <div class="dict-add-form"><input type="text" id="dict-en" placeholder="English"><input type="text" id="dict-jp" placeholder="日本語"><input type="text" id="dict-es" placeholder="Español"><button class="add-word-btn" onclick="addWord()">+</button></div>
+      <div class="dict-add-form dict-add-form-row2">
+        <select id="dict-type" title="Part of speech / type — used for RPG NPC requests">
+          <option value="noun">🧺 noun (object)</option>
+          <option value="verb">⚡ verb (action)</option>
+          <option value="adj">🎨 adjective</option>
+          <option value="adv">💨 adverb</option>
+          <option value="phrase">💬 phrase</option>
+          <option value="other">❓ other</option>
+        </select>
+        <input type="text" id="dict-tags" placeholder="tags (comma-sep): plant, kitchen, emotion..." style="flex:2;">
+      </div>
+      <div class="dict-filter"><input type="text" id="dict-search" placeholder="🔍 Search words / tags..." oninput="renderDictionary()"></div>
+      <div id="dict-tag-cloud" class="dict-tag-cloud"></div>
+      <div class="dict-list" id="dict-list"></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-diary">
+    <div class="diary-section glass-dark">
+      <h3>📓 Personal Diary</h3>
+      <div class="diary-input-area"><textarea id="diary-input" class="diary-textarea" placeholder="Write your thoughts here..."></textarea><div class="diary-controls"><button class="diary-btn" onclick="addDiaryEntry()">Save Entry</button></div></div>
+      <div class="diary-list" id="diary-list"></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-history">
+    <div class="history-section glass-dark">
+      <h3>📊 Study History</h3>
+      <div class="history-grid" id="history-grid"></div>
+    </div>
+    <div class="nes-container">
+      <h3>SAVE / LOAD</h3>
+      <p>Download your save data as a file, or upload a save file to restore your progress.</p>
+      <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 12px;">
+        <button class="nes-btn" id="save-download-btn" onclick="downloadSaveFile()">💾 Download Save File</button>
+        <button class="nes-btn" onclick="triggerLoadFile()">📂 Upload Save File</button>
+        <input type="file" id="save-file-input" accept=".json" style="display:none;" onchange="handleSaveFileUpload(event)">
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-calc">
+    <div class="glass-dark" style="padding: 10px; height: 75vh;">
+      <div class="iframe-container"><iframe src="https://col-bun.github.io/COLcalc.github.io/" title="COLcalc"></iframe></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-numogram">
+    <div class="numogram-wrapper">
+      <div class="svg-numogram-container">
+        <svg viewBox="0 0 1000 1250" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="arrow-white" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#fff" /></marker>
+              <marker id="arrow-black" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#000" /></marker>
+            </defs>
+            <g class="dot-base">
+                <path d="M 330 350 Q 280 410 290 440" class="dot-wide"/><path d="M 330 350 Q 280 410 290 440" class="dot-mid"/><path d="M 330 350 Q 280 410 290 440" class="dot-core"/>
+                <path d="M 320 510 Q 380 570 450 600" class="dot-wide"/><path d="M 320 510 Q 380 570 450 600" class="dot-mid"/><path d="M 320 510 Q 380 570 450 600" class="dot-core"/>
+                <path d="M 660 470 Q 500 400 390 330" class="dot-wide"/><path d="M 660 470 Q 500 400 390 330" class="dot-mid"/><path d="M 660 470 Q 500 400 390 330" class="dot-core"/>
+                <path d="M 550 600 Q 640 550 670 510" class="dot-wide"/><path d="M 550 600 Q 640 550 670 510" class="dot-mid"/><path d="M 550 600 Q 640 550 670 510" class="dot-core"/>
+                <path d="M 690 440 Q 690 380 660 330" class="dot-wide"/><path d="M 690 440 Q 690 380 660 330" class="dot-mid"/><path d="M 690 440 Q 690 380 660 330" class="dot-core"/>
+                <path d="M 430 180 C 500 250 650 220 580 180" class="dot-wide"/><path d="M 430 180 C 500 250 650 220 580 180" class="dot-mid"/><path d="M 430 180 C 500 250 650 220 580 180" class="dot-core"/>
+                <path d="M 500 670 L 500 740" class="dot-wide"/><path d="M 500 670 L 500 740" class="dot-mid"/><path d="M 500 670 L 500 740" class="dot-core"/>
+                <path d="M 500 820 L 500 880" class="dot-wide"/><path d="M 500 820 L 500 880" class="dot-mid"/><path d="M 500 820 L 500 880" class="dot-core"/>
+                <path d="M 500 960 Q 550 1010 500 1020" class="dot-wide"/><path d="M 500 960 Q 550 1010 500 1020" class="dot-mid"/><path d="M 500 960 Q 550 1010 500 1020" class="dot-core"/>
+            </g>
+            <polygon points="415,150 385,140 385,160" fill="#fff" />
+            <polygon points="585,150 615,140 615,160" fill="#fff" />
+            <polygon points="635,300 665,290 665,310" fill="#fff" />
+            <polygon points="365,320 335,310 335,330" fill="#fff" />
+            <polygon points="310,495 290,465 320,475" fill="#fff" />
+            <polygon points="685,480 715,470 715,490" fill="#fff" />
+            <polygon points="500,645 485,615 515,615" fill="#000" />
+            <polygon points="500,755 485,785 515,785" fill="#fff" />
+            <polygon points="500,945 485,915 515,915" fill="#fff" />
+            <polygon points="500,1035 485,1065 515,1065" fill="#fff" />
+            <g stroke="#fff" stroke-width="2" fill="none">
+              <path d="M 650 300 Q 500 350 350 320" />
+              <path d="M 650 300 Q 525 225 400 150" />
+              <path d="M 400 150 Q 500 50 600 150" />
+              <path d="M 400 150 Q 500 250 600 150" />
+              <path d="M 350 320 C 300 -50 700 -50 600 150" />
+              <line x1="300" y1="480" x2="500" y2="620" />
+              <line x1="700" y1="480" x2="500" y2="620" />
+              <line x1="500" y1="780" x2="500" y2="920" />
+              <path d="M 500 620 C 400 500 600 500 500 620" />
+              <path d="M 500 920 C 400 920 400 820 500 920" />
+            </g>
+            <g stroke="#fff" stroke-width="2" fill="#000">
+              <circle cx="515" cy="18" r="15" /> <circle cx="500" cy="100" r="15" /> <circle cx="500" cy="200" r="15" /> 
+              <circle cx="525" cy="225" r="15" /> <circle cx="400" cy="550" r="15" /> <circle cx="600" cy="550" r="15" /> 
+              <circle cx="500" cy="530" r="15" /> <circle cx="500" cy="850" r="15" /> <circle cx="435" cy="880" r="15" /> 
+            </g>
+            <g class="gate-text" text-anchor="middle" dominant-baseline="central">
+              <text x="515" y="18">15</text> <text x="500" y="100">6</text> <text x="500" y="200">21</text> 
+              <text x="525" y="225">3</text> <text x="400" y="550">10</text> <text x="600" y="550">28</text> 
+              <text x="500" y="530">1</text> <text x="500" y="850">36</text> <text x="435" y="880">45</text>
+            </g>
+            <g class="zone-group" id="btn-zone-3" onclick="selectZone(3)">
+              <circle cx="400" cy="150" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="390" y="150" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">3</text>
+              <text x="420" y="130" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text>
+            </g>
+            <g class="zone-group" id="btn-zone-6" onclick="selectZone(6)">
+              <circle cx="600" cy="150" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="590" y="150" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">6</text>
+              <text x="620" y="130" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text>
+            </g>
+            <g class="zone-group" id="btn-zone-2" onclick="selectZone(2)">
+              <circle cx="650" cy="300" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="640" y="300" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">2</text>
+              <text x="670" y="280" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text>
+            </g>
+            <g class="zone-group" id="btn-zone-5" onclick="selectZone(5)">
+              <circle cx="350" cy="320" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="340" y="320" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">5</text>
+              <text x="370" y="300" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text>
+            </g>
+            <g class="zone-group" id="btn-zone-4" onclick="selectZone(4)">
+              <circle cx="300" cy="480" r="40" fill="#000" stroke="#ff0000" stroke-width="3"/>
+              <text x="290" y="480" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">4</text>
+              <text x="320" y="460" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text>
+            </g>
+            <g class="zone-group" id="btn-zone-7" onclick="selectZone(7)">
+              <circle cx="700" cy="480" r="40" fill="#000" class="glow" stroke="#ff3366" stroke-width="3"/>
+              <text x="690" y="480" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">7</text>
+              <text x="720" y="460" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text>
+            </g>
+            <g class="zone-group" id="btn-zone-1" onclick="selectZone(1)">
+              <circle cx="500" cy="620" r="50" fill="#fff" class="glow" stroke="#fff" stroke-width="3"/>
+              <text x="485" y="620" fill="#000" class="zone-text" text-anchor="middle" dominant-baseline="central">1</text>
+              <text x="525" y="600" fill="#000" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text>
+            </g>
+            <g class="zone-group" id="btn-zone-8" onclick="selectZone(8)">
+              <circle cx="500" cy="780" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="490" y="780" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">8</text>
+              <text x="520" y="760" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text>
+            </g>
+            <g class="zone-group" id="btn-zone-9" onclick="selectZone(9)">
+              <circle cx="500" cy="920" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="490" y="920" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">9</text>
+              <text x="520" y="900" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">+</text>
+            </g>
+            <g class="zone-group" id="btn-zone-0" onclick="selectZone(0)">
+              <circle cx="500" cy="1060" r="40" fill="#000" stroke="#fff" stroke-width="3" />
+              <text x="490" y="1060" fill="#fff" class="zone-text" text-anchor="middle" dominant-baseline="central">0</text>
+              <text x="520" y="1040" fill="#fff" class="zone-polarity" text-anchor="middle" dominant-baseline="central">-</text>
+            </g>
+            <g class="label-sound">
+              <text x="330" y="130" fill="#22dd22">"zx"</text> <text x="630" y="190" fill="#dddd00">"tch"</text> 
+              <text x="690" y="270" fill="#4488ff">"dt"</text> <text x="280" y="360" fill="#ffaa00">"ktt"</text> 
+              <text x="220" y="520" fill="#ff3333">"skr"</text> <text x="750" y="470" fill="#4488ff">"pb"</text> 
+              <text x="480" y="700" fill="#ddaa00">"gl"</text> <text x="430" y="770" fill="#22dd22">"mnm"</text> 
+              <text x="550" y="910" fill="#dddd00">"tn"</text> <text x="410" y="1110" fill="#22dd22">"eiaoung"</text>
+            </g>
+            <text x="50" y="80" class="label-region">Warp</text><text x="50" y="110" class="label-sub label-sub-italic">Hyper-Reality</text><text x="50" y="135" class="label-sub">Djynxx 6::3</text>
+            <text x="50" y="450" class="label-region">e-Circuit</text><text x="50" y="480" class="label-sub label-sub-italic">breakthrough</text><text x="50" y="505" class="label-sub label-sub-italic">connected</text><text x="50" y="530" class="label-sub label-sub-italic">psychoactives</text>
+            <text x="50" y="850" class="label-region">Plex</text><text x="50" y="880" class="label-sub label-sub-italic">Eiriel (Tchukululok)</text><text x="50" y="905" class="label-sub">Dissociative Void</text><text x="50" y="930" class="label-sub">Uttunul 9::0</text>
+            <text x="650" y="110" class="label-current">Warp</text><text x="650" y="135" font-family="Nunito" font-weight="700" fill="#fff" font-size="16">(Current)</text>
+            <text x="500" y="370" class="label-current">Hold</text><text x="800" y="300" class="label-current">Rise</text><text x="380" y="570" class="label-current">Sink</text>
+            <text x="560" y="980" class="label-current">Plex</text><text x="560" y="1005" font-family="Nunito" font-weight="700" fill="#fff" font-size="16">(Current)</text>
+        </svg>
+      </div>
+      <div class="numo-tools-col">
+        <div class="numo-calc" style="border-color: #00e5ff;">
+          <h4 style="color: #00e5ff;">📜 How to Use the Numogram</h4>
+          <div style="max-height: 220px; overflow-y: auto; padding-right: 8px; font-size: 0.8rem; color: rgba(255,255,255,0.85); line-height: 1.5;" class="custom-scrollbar">
+            <p style="margin-bottom: 8px;"><strong>The Decimal Labyrinth</strong> is a map of Lemurian time-sorcery driven by <em>Barkerian Arithmetic</em>.</p>
+            <ul style="margin-left: 16px; margin-bottom: 8px;">
+              <li><strong>Syzygies:</strong> Zones pair up to mutually sum to 9 (e.g., 8+1, 7+2).</li>
+              <li><strong>Currents:</strong> The arithmetic difference of a Syzygy twin directs its flow to a Tractor Zone (e.g., 7 - 2 = 5, producing the Hold current).</li>
+            </ul>
+            <p style="margin-bottom: 8px; color: #ff3c8e;"><strong>Using the Dashboard:</strong></p>
+            <ul style="margin-left: 16px; margin-bottom: 8px;">
+              <li style="margin-bottom: 6px;"><strong>Interactive Map:</strong> Click any numbered Zone (0-9) to reveal its esoteric planetary data below.</li>
+              <li style="margin-bottom: 6px;"><strong>Gematria:</strong> Type a word to find its alphanumeric Digital Root, linking it directly to a specific Zone's energy.</li>
+              <li style="margin-bottom: 6px;"><strong>Demon Finder:</strong> Enter any two Zones (the "Net-Span") to classify the class of entity that bridges those two points in the matrix.</li>
+              <li><strong>Encyclopedia:</strong> Search the comprehensive archives below for any term (like "Tic-Systems" or "A-Death").</li>
+            </ul>
+          </div>
+        </div>
+        <div class="numo-calc">
+          <h4>Gematria Time-Sorcery</h4>
+          <div class="numo-calc-explanation"><strong>In CCRU Theory:</strong> Converts words to base-9 roots.</div>
+          <div class="numo-input-row"><input type="text" id="numo-gematria-input" placeholder="e.g. CYBERNETICS"><button onclick="calculateNumogram()">EVAL</button></div>
+          <div id="numo-result-display" style="font-size: 0.85rem; color: #a8e84c; font-family: 'Baloo 2', cursive;"></div>
+        </div>
+        <div class="numo-calc">
+          <h4>Net-Span Demon Finder</h4>
+          <div class="numo-calc-explanation"><strong>In CCRU Theory:</strong> Locates entities bridging zones.</div>
+          <div class="numo-input-row"><input type="number" id="demon-z1" min="0" max="9" placeholder="Z1"><input type="number" id="demon-z2" min="0" max="9" placeholder="Z2"><button onclick="findDemon()">FIND</button></div>
+          <div id="demon-result" style="font-size: 0.85rem; color: #fff; margin-top: 10px; line-height: 1.4;"></div>
+        </div>
+        <div class="numo-calc">
+          <h4>CCRU Encyclopedia</h4>
+          <div class="numo-input-row" style="margin-bottom: 0;"><input type="text" id="lexicon-search" placeholder="Search archives..." oninput="searchLexicon()"></div>
+          <div id="lexicon-results" style="max-height: 200px; overflow-y: auto; margin-top: 10px; font-size: 0.8rem;" class="custom-scrollbar"></div>
+        </div>
+        <div class="glass-dark numo-info-panel custom-scrollbar"><div id="numo-display"><h3>The Numogram</h3><p>Click a Zone to reveal its esoteric data.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-iching">
+    <div class="iching-section glass-dark">
+      <h2 class="iching-header">☯️ The I-Ching Oracle</h2>
+      <p class="iching-desc">Concentrate on your question and cast the coins. The first reading of the day is saved to your history alongside a daily Japanese idiom.</p>
+      
+      <div id="daily-oracle-panel" class="daily-oracle-panel">
+        <div class="daily-oracle-title">✨ Today's Reading & Idiom ✨</div>
+        <div class="yoji-display">
+          <div class="yoji-kanji" id="daily-yoji-kanji"></div>
+          <div class="yoji-meaning" id="daily-yoji-meaning"></div>
+        </div>
+        <div class="daily-hexagram-preview">
+          <div class="preview-box">
+            <div class="preview-title">Primary</div>
+            <div class="preview-name" id="daily-pri-name"></div>
+          </div>
+          <div class="preview-box" id="daily-sec-box" style="display:none;">
+            <div class="preview-title">Changing</div>
+            <div class="preview-name" id="daily-sec-name"></div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-glossy btn-purple" style="background: linear-gradient(180deg, #8b5cf6 0%, #6d3fd6 100%); margin-bottom: 30px; font-size: 1.1rem; padding: 14px 32px;" onclick="castOracle()">Cast Coins (Generate Hexagram)</button>
+      
+      <div class="hexagram-container" id="iching-hex-container" style="display:none;">
+        <div class="hexagram-box">
+          <div class="hexagram-title">Primary Hexagram</div>
+          <div class="hexagram-visual" id="iching-primary-vis"></div>
+        </div>
+        <div class="hexagram-box" id="iching-secondary-box" style="display:none;">
+          <div class="hexagram-title">Changing Hexagram</div>
+          <div class="hexagram-visual" id="iching-secondary-vis"></div>
+        </div>
+      </div>
+
+      <div class="iching-result-box" id="iching-primary-result"></div>
+      <div class="iching-result-box" id="iching-secondary-result" style="border-color: #ff3c8e;"></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-quotes">
+    <div class="quotes-layout">
+      <div class="quotes-form glass-dark">
+        <h3 style="font-family: 'Baloo 2', cursive; font-size: 1.4rem; margin-bottom: 16px; color:#fff;">💬 Add Passage</h3>
+        <textarea id="quote-text" class="diary-textarea" placeholder="Enter quote or passage here..." style="height: 100px; margin-bottom: 12px;"></textarea>
+        
+        <textarea id="quote-meaning" class="diary-textarea" placeholder="Enter meaning, translation, or notes..." style="height: 80px; margin-bottom: 12px; background: rgba(0,0,0,0.2);"></textarea>
+        
+        <input type="text" id="quote-img" placeholder="Paste Image URL (optional)" style="background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.25); color: #fff; padding: 12px; border-radius: 14px; font-family: 'Nunito', sans-serif; width: 100%; margin-bottom: 12px;">
+        
+        <select id="quote-lang" style="background: rgba(0,0,0,0.3); border: 1.5px solid rgba(255,255,255,0.25); color: #fff; padding: 12px; border-radius: 14px; font-family: 'Nunito', sans-serif; width: 100%; margin-bottom: 16px; outline: none; cursor: pointer;">
+          <option value="en" style="color: #000;">🇬🇧 English</option>
+          <option value="es" style="color: #000;">🇪🇸 Español</option>
+          <option value="jp" style="color: #000;">🇯🇵 日本語</option>
+        </select>
+        
+        <button class="btn-glossy btn-green" style="width: 100%; padding: 14px;" onclick="addQuote()">Save to Archive</button>
+      </div>
+
+      <div class="quotes-display glass-dark">
+        <div class="quote-mini-tabs">
+          <button class="mini-tab active" data-lang="en" onclick="setQuoteTab('en')">English</button>
+          <button class="mini-tab" data-lang="es" onclick="setQuoteTab('es')">Spanish</button>
+          <button class="mini-tab" data-lang="jp" onclick="setQuoteTab('jp')">Japanese</button>
+        </div>
+        <div id="quotes-list" class="custom-scrollbar" style="max-height: 60vh; overflow-y: auto; padding-right: 10px; display: flex; flex-direction: column; gap: 16px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== EXPEDITIONS TAB ===== -->
+  <div class="tab-content" id="tab-expeditions">
+    <div class="exp-layout">
+      <!-- Status Panel -->
+      <div class="glass-dark exp-panel">
+        <h3 class="exp-section-title">⚔️ Expedition Status</h3>
+        <div id="exp-status"></div>
+        <div class="exp-rarity-display" id="exp-rarity-bonus"></div>
+      </div>
+
+      <!-- Missions Panel -->
+      <div class="glass-dark exp-panel">
+        <h3 class="exp-section-title">🗺️ Available Missions</h3>
+        <p class="exp-hint">Send Moe-chan on timed expeditions to gather materials. Longer missions yield rarer loot!</p>
+        <div id="exp-missions-list" class="exp-missions-list"></div>
+      </div>
+
+      <!-- Expedition Log -->
+      <div class="glass-dark exp-panel">
+        <h3 class="exp-section-title">📜 Expedition Log</h3>
+        <div id="exp-log" class="exp-log custom-scrollbar" style="max-height: 40vh; overflow-y: auto;"></div>
+      </div>
+    </div>
+
+    <!-- Loot Popup Overlay -->
+    <div id="loot-popup-overlay" class="loot-popup-overlay" style="display:none;" onclick="if(event.target===this)closeLootPopup()">
+      <div class="loot-popup glass-strong" id="loot-popup-content"></div>
+    </div>
+  </div>
+
+  <!-- ===== MATERIALS TAB ===== -->
+  <div class="tab-content" id="tab-materials">
+    <div class="glass-dark" style="padding: 22px;">
+      <div class="mat-header-row">
+        <h3 class="mat-page-title">🎒 Material Inventory</h3>
+        <div class="mat-summary">
+          <div class="glass mat-stat-chip"><span class="mat-stat-num" id="mat-total-count">0</span><span class="mat-stat-label">Total Items</span></div>
+          <div class="glass mat-stat-chip"><span class="mat-stat-num" id="mat-unique-count">0/20</span><span class="mat-stat-label">Discovered</span></div>
+        </div>
+      </div>
+      <div id="materials-grid" class="materials-grid"></div>
+    </div>
+  </div>
+
+  <!-- ===== BESTIARY TAB ===== -->
+  <div class="tab-content" id="tab-bestiary">
+    <div class="glass-dark" style="padding: 22px;">
+      <div class="mat-header-row">
+        <h3 class="mat-page-title">🐲 Chimera Bestiary</h3>
+        <div class="mat-summary">
+          <div class="glass mat-stat-chip"><span class="mat-stat-num" id="bestiary-total-count">0</span><span class="mat-stat-label">Encounters</span></div>
+          <div class="glass mat-stat-chip"><span class="mat-stat-num" id="bestiary-unique-count">0/61</span><span class="mat-stat-label">Discovered</span></div>
+        </div>
+      </div>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.85rem; margin-bottom:16px;">Moe-chan discovers chimeras during expeditions. Longer missions in harder areas find rarer creatures. Some chimeras are SECRET and only appear under special conditions. Click a discovered chimera for details.</p>
+      <div id="bestiary-grid" class="materials-grid"></div>
+    </div>
+
+    <!-- Chimera Detail Popup -->
+    <div id="chimera-detail-overlay" class="loot-popup-overlay" style="display:none;" onclick="if(event.target===this)closeChimeraDetail()">
+      <div class="loot-popup glass-strong" id="chimera-detail-content" style="max-width:500px;"></div>
+    </div>
+  </div>
+
+  <!-- ===== ADVICE & DIRECTIONS TAB ===== -->
+  <div class="tab-content" id="tab-advice">
+    <div class="glass-dark" style="padding: 22px;">
+      <div class="advice-header">
+        <h3 class="advice-page-title">🧭 Advice & Directions</h3>
+        <div class="advice-count-badge"><span id="advice-count">0</span> entries</div>
+      </div>
+      <p class="advice-subtitle">Your personal survival guide. Things you've learned, advice you want to remember, directions for your future self.</p>
+
+      <!-- Add new entry -->
+      <div class="advice-form glass" style="margin: 16px 0;">
+        <div class="advice-form-row">
+          <input type="text" id="advice-title" class="advice-input" placeholder="Title (e.g., 'How to handle bad days')">
+          <select id="advice-category" class="advice-select">
+            <option value="general">📌 General</option>
+            <option value="study">📚 Study</option>
+            <option value="life">🌱 Life</option>
+            <option value="health">💪 Health</option>
+            <option value="social">🤝 Social</option>
+            <option value="career">💼 Career</option>
+            <option value="creative">🎨 Creative</option>
+            <option value="tech">💻 Tech</option>
+            <option value="travel">✈️ Travel</option>
+            <option value="money">💰 Money</option>
+          </select>
+        </div>
+        <textarea id="advice-text" class="advice-textarea" placeholder="Write your advice, directions, or wisdom here..." rows="3"></textarea>
+        <button class="btn-glossy btn-green" style="width:100%; margin-top:8px;" onclick="addAdvice()">Add to Survival Guide</button>
+      </div>
+
+      <!-- Filters -->
+      <div class="advice-filters">
+        <button class="advice-filter-btn active" data-filter="all" onclick="setAdviceFilter('all')">All</button>
+        <button class="advice-filter-btn" data-filter="general" onclick="setAdviceFilter('general')">📌</button>
+        <button class="advice-filter-btn" data-filter="study" onclick="setAdviceFilter('study')">📚</button>
+        <button class="advice-filter-btn" data-filter="life" onclick="setAdviceFilter('life')">🌱</button>
+        <button class="advice-filter-btn" data-filter="health" onclick="setAdviceFilter('health')">💪</button>
+        <button class="advice-filter-btn" data-filter="social" onclick="setAdviceFilter('social')">🤝</button>
+        <button class="advice-filter-btn" data-filter="career" onclick="setAdviceFilter('career')">💼</button>
+        <button class="advice-filter-btn" data-filter="creative" onclick="setAdviceFilter('creative')">🎨</button>
+        <button class="advice-filter-btn" data-filter="tech" onclick="setAdviceFilter('tech')">💻</button>
+        <button class="advice-filter-btn" data-filter="travel" onclick="setAdviceFilter('travel')">✈️</button>
+        <button class="advice-filter-btn" data-filter="money" onclick="setAdviceFilter('money')">💰</button>
+      </div>
+
+      <!-- Advice list -->
+      <div id="advice-list" class="advice-list custom-scrollbar" style="max-height: 55vh; overflow-y: auto;"></div>
+    </div>
+  </div>
+
+  <!-- ===== COMMISSIONS TAB ===== -->
+  <div class="tab-content" id="tab-commissions">
+    <div class="comm-layout">
+
+      <!-- ADD / EDIT FORM -->
+      <div class="comm-form glass-dark" id="comm-form-panel">
+        <h3 style="font-family:'Baloo 2',cursive; font-size:1.4rem; color:#fff; margin-bottom:14px;">🎨 <span id="comm-form-title">New Commission</span></h3>
+
+        <div class="comm-field-group">
+          <label class="comm-label">Client Name</label>
+          <input type="text" id="comm-client" placeholder="Who's commissioning?" class="comm-input">
+        </div>
+
+        <div class="comm-field-group">
+          <label class="comm-label">Socials <span style="opacity:0.5">(optional)</span></label>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <input type="text" id="comm-twitter" placeholder="🐦 Twitter / X" class="comm-input comm-input-sm">
+            <input type="text" id="comm-bluesky" placeholder="🦋 Bluesky" class="comm-input comm-input-sm">
+            <input type="text" id="comm-fa" placeholder="🐾 FurAffinity" class="comm-input comm-input-sm">
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <div class="comm-field-group" style="flex:1; min-width:120px;">
+            <label class="comm-label">Characters</label>
+            <input type="number" id="comm-chars" min="1" value="1" class="comm-input">
+          </div>
+          <div class="comm-field-group" style="flex:2; min-width:160px;">
+            <label class="comm-label">Commission Type</label>
+            <select id="comm-type" class="comm-input">
+              <option value="sketch">✏️ Sketch</option>
+              <option value="colored">🎨 Colored</option>
+              <option value="grayscale">🩶 Grayscale</option>
+              <option value="shaded">✨ Full Shaded</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="comm-field-group">
+          <label class="comm-label">Extras</label>
+          <div style="display:flex; gap:14px; flex-wrap:wrap;">
+            <label class="comm-checkbox-label"><input type="checkbox" id="comm-lineart"> Colored Lineart</label>
+            <label class="comm-checkbox-label"><input type="checkbox" id="comm-bg"> Background</label>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <div class="comm-field-group" style="flex:1; min-width:140px;">
+            <label class="comm-label">Price ($)</label>
+            <input type="number" id="comm-price" min="0" step="0.01" placeholder="0.00" class="comm-input">
+          </div>
+          <div class="comm-field-group" style="flex:1; min-width:140px;">
+            <label class="comm-label">Time Spent (hrs)</label>
+            <input type="number" id="comm-time" min="0" step="0.25" placeholder="0" class="comm-input">
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <div class="comm-field-group" style="flex:1; min-width:140px;">
+            <label class="comm-label">Date Accepted</label>
+            <input type="date" id="comm-date-accepted" class="comm-input">
+          </div>
+          <div class="comm-field-group" style="flex:1; min-width:140px;">
+            <label class="comm-label">Date Payment Received</label>
+            <input type="date" id="comm-date-payment" class="comm-input">
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:6px;">
+          <button class="btn-glossy btn-green" style="flex:1; padding:13px;" onclick="saveCommission()">💾 Save</button>
+          <button class="btn-theme" style="padding:13px 20px; border-radius:50px;" onclick="cancelCommEdit()" id="comm-cancel-btn" style="display:none;">Cancel</button>
+        </div>
+        <input type="hidden" id="comm-edit-id" value="">
+      </div>
+
+      <!-- COMMISSION CARDS LIST -->
+      <div class="comm-list-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+          <h3 style="font-family:'Baloo 2',cursive; font-size:1.3rem; color:#fff; margin:0;">Active Commissions <span id="comm-active-count" style="color:#a8e84c;"></span></h3>
+          <div style="display:flex; gap:6px;">
+            <button class="comm-filter-btn active" data-filter="active" onclick="setCommFilter('active')">🔥 Active</button>
+            <button class="comm-filter-btn" data-filter="done" onclick="setCommFilter('done')">✅ Done</button>
+            <button class="comm-filter-btn" data-filter="all" onclick="setCommFilter('all')">📋 All</button>
+          </div>
+        </div>
+
+        <div class="comm-summary-strip" id="comm-summary-strip">
+          <div class="glass" style="padding:8px 14px; border-radius:12px; text-align:center;">
+            <div style="font-size:1.3rem; font-weight:800; color:#a8e84c;" id="comm-stat-active">0</div>
+            <div style="font-size:0.65rem; color:rgba(255,255,255,0.5);">Active</div>
+          </div>
+          <div class="glass" style="padding:8px 14px; border-radius:12px; text-align:center;">
+            <div style="font-size:1.3rem; font-weight:800; color:#00e5ff;" id="comm-stat-earned">$0</div>
+            <div style="font-size:0.65rem; color:rgba(255,255,255,0.5);">Earned (Done)</div>
+          </div>
+          <div class="glass" style="padding:8px 14px; border-radius:12px; text-align:center;">
+            <div style="font-size:1.3rem; font-weight:800; color:#ff3c8e;" id="comm-stat-hours">0h</div>
+            <div style="font-size:0.65rem; color:rgba(255,255,255,0.5);">Total Hours</div>
+          </div>
+        </div>
+
+        <div id="comm-card-list" class="comm-card-list custom-scrollbar"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-clipboard">
+    <div class="clipboard-focus-container glass-dark">
+      <button class="btn-theme exit-btn" onclick="exitClipboardMode()">◀ Return to Hub</button>
+      <h2 style="font-family:'Baloo 2'; color:#00e5ff; font-size: 2.2rem; margin-bottom: 4px;">📋 VN Text Hook</h2>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.8rem; margin-bottom:14px;">Captures text from Textractor / Agent / clipboard. Counts Japanese characters only (kanji + kana).</p>
+
+      <div class="clip-stats" style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-bottom:16px;">
+        <div class="glass" style="padding:10px 18px; border-radius:14px; text-align:center; min-width:100px;">
+          <div style="font-size:1.6rem; font-weight:800; color:#a8e84c;" id="clip-jp-session">0</div>
+          <div style="font-size:0.7rem; color:rgba(255,255,255,0.6);">Session JP Chars</div>
+        </div>
+        <div class="glass" style="padding:10px 18px; border-radius:14px; text-align:center; min-width:100px;">
+          <div style="font-size:1.6rem; font-weight:800; color:#00e5ff;" id="clip-jp-total">0</div>
+          <div style="font-size:0.7rem; color:rgba(255,255,255,0.6);">All-Time JP Chars</div>
+        </div>
+        <div class="glass" style="padding:10px 18px; border-radius:14px; text-align:center; min-width:80px;">
+          <div style="font-size:1.6rem; font-weight:800; color:#ff3c8e;" id="clip-line-count">0</div>
+          <div style="font-size:0.7rem; color:rgba(255,255,255,0.6);">Lines</div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:14px;">
+        <button class="btn-glossy btn-purple huge-btn" onclick="autoPaste()">📋 AUTO-PASTE</button>
+        <button class="btn-glossy btn-green huge-btn" id="clip-poll-btn" onclick="toggleAutoPoll()" style="background:linear-gradient(180deg,#2ed573 0%,#1aaf5d 100%);">▶ START AUTO-CAPTURE</button>
+      </div>
+
+      <textarea id="clipboard-area" class="diary-textarea custom-scrollbar" placeholder="Hooked text appears here (newest at top)..." style="font-family:'Noto Sans JP','Nunito',sans-serif; font-size:1.05rem; line-height:1.8; min-height:40vh;" readonly></textarea>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:14px;">
+        <button class="btn-theme" style="padding:8px 16px; border-radius:50px; font-size:0.85rem;" onclick="exportClipLog()">💾 Export Log</button>
+        <button class="btn-theme" style="padding:8px 16px; border-radius:50px; font-size:0.85rem;" onclick="clearClipSession()">🗑 Clear Session</button>
+        <button class="btn-theme" style="padding:8px 16px; border-radius:50px; font-size:0.85rem; color:#ff3c8e;" onclick="resetClipLifetime()">Reset Lifetime</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLOTS TAB ===== -->
+  <div class="tab-content" id="tab-slots">
+    <div class="glass-dark" style="padding: 22px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <h3 style="font-family:'Baloo 2',cursive; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,0.15); font-size:1.4rem;">🎰 Moe-Chan's Slot Machine</h3>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span class="glass" style="padding:6px 16px; border-radius:50px; font-weight:800; color:#a8e84c;">💰 <span id="slot-money">0</span> MB</span>
+          <button class="btn-glossy btn-purple" onclick="switchSlotTheme()" style="padding:8px 16px; font-size:0.8rem;">Switch Theme</button>
+        </div>
+      </div>
+
+      <div id="slot-celebration" style="position:relative; overflow:hidden; height:0;"></div>
+
+      <div style="display:flex; flex-direction:column; align-items:center; gap:14px;">
+        <div id="slot-machine-display"></div>
+        <div id="slot-message" style="font-weight:800; font-size:1rem; min-height:1.4em; text-align:center;">Spin to win MoeBucks!</div>
+        <button class="btn-glossy btn-pink huge-btn" onclick="spinSlots()" style="font-size:1.1rem; padding:14px 40px;">🎰 SPIN!</button>
+        <div id="slot-stats" style="display:flex; gap:16px; flex-wrap:wrap; font-size:0.8rem; color:rgba(255,255,255,0.6);"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== GROCERY TAB ===== -->
+  <div class="tab-content" id="tab-grocery">
+    <div class="glass-dark" style="padding: 22px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <h3 style="font-family:'Baloo 2',cursive; color:#fff; font-size:1.4rem;">🛒 Grocery Store & Kitchen</h3>
+        <span class="glass" style="padding:6px 16px; border-radius:50px; font-weight:800; color:#a8e84c;">💰 <span id="moe-bucks-display">0</span> MB</span>
+      </div>
+
+      <!-- Weight & Energy Panel -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+        <div class="glass" style="padding:14px; border-radius:16px;">
+          <div style="font-size:0.75rem; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">⚡ Energy</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:10px; height:20px; overflow:hidden; margin-bottom:4px;">
+            <div id="energy-bar-fill" style="height:100%; border-radius:10px; transition:width 0.4s;"></div>
+          </div>
+          <div id="energy-text" style="font-size:0.8rem; color:#fff; text-align:center;">0 / 100</div>
+        </div>
+        <div class="glass" style="padding:14px; border-radius:16px;">
+          <div style="font-size:0.75rem; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">⚖️ Weight: <span id="weight-number">120.0</span> lbs</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:10px; height:20px; overflow:hidden; margin-bottom:4px;">
+            <div id="weight-bar-fill" style="height:100%; border-radius:10px; transition:width 0.4s;"></div>
+          </div>
+          <div id="weight-status" style="font-size:0.75rem; color:rgba(255,255,255,0.7); text-align:center;">Perfect weight!</div>
+        </div>
+      </div>
+
+      <!-- Expedition Button -->
+      <div style="text-align:center; margin-bottom:16px;">
+        <button class="btn-glossy btn-green" id="economy-expedition-btn" onclick="doEconomyExpedition()" style="padding:10px 28px;">Go on Expedition (-20 energy)</button>
+      </div>
+
+      <!-- Daily Food Progress -->
+      <div id="grocery-daily-progress" style="margin-bottom:14px;"></div>
+
+      <!-- Moe-chan Auto Shopping Log -->
+      <div id="auto-grocery-log" style="margin-bottom:14px;"></div>
+
+      <div id="grocery-message" style="font-weight:700; font-size:0.9rem; min-height:1.2em; text-align:center; margin-bottom:14px;">Buy food to feed Moe-chan!</div>
+
+      <!-- Grocery Filters -->
+      <div id="grocery-filters" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;"></div>
+
+      <!-- Grocery Items Grid -->
+      <div id="grocery-items" class="grocery-grid"></div>
+
+      <!-- Food Inventory -->
+      <h4 style="font-family:'Baloo 2',cursive; color:#a8e84c; margin:20px 0 10px;">🍱 Food Inventory (click to eat)</h4>
+      <div id="food-inventory"></div>
+
+      <!-- Toy Shop -->
+      <h4 style="font-family:'Baloo 2',cursive; color:#ffcc00; margin:24px 0 10px;">🧸 Toy Shop <span id="toy-collection-count" style="font-size:0.8rem; color:rgba(255,255,255,0.5);"></span></h4>
+      <div id="toy-lock-message" style="color:#ff3c8e; font-size:0.85rem; text-align:center; padding:12px; display:none;"></div>
+      <div id="toy-shop-items" class="toy-grid"></div>
+    </div>
+  </div>
+
+  <!-- ===== HOUSE TAB ===== -->
+  <div class="tab-content" id="tab-house">
+    <div class="glass-dark" style="padding: 22px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <h3 style="font-family:'Baloo 2',cursive; color:#fff; font-size:1.4rem;">🏠 Moe-Chan's House</h3>
+        <button class="btn-theme" onclick="exitHouse()" style="padding:8px 16px; border-radius:50px; font-size:0.85rem;">◀ Back to Map</button>
+      </div>
+      <div id="house-display"></div>
+    </div>
+  </div>
+
+  <!-- ===== CONJUGATION GAME TAB ===== -->
+  <div class="tab-content" id="tab-conjugation">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family:'Baloo 2',cursive; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,0.15); font-size:1.4rem; margin-bottom:4px;">📝 Verb Conjugation Dojo</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.8rem; margin-bottom:16px;">Practice Japanese verb conjugation! Earn MoeBucks and loot for high accuracy.</p>
+      <div id="conj-game-display"></div>
+    </div>
+  </div>
+
+  <!-- ===== CHIMERA INVENTORY TAB ===== -->
+  <div class="tab-content" id="tab-inventory">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family:'Baloo 2',cursive; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,0.15); font-size:1.4rem; margin-bottom:4px;">🎒 Chimera Inventory</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.8rem; margin-bottom:16px;">Your caught chimeras and catching supplies. Catch chimeras during expeditions!</p>
+
+      <div id="chimera-inv-stats" style="display:flex; gap:16px; flex-wrap:wrap; font-size:0.82rem; color:rgba(255,255,255,0.6); margin-bottom:16px;"></div>
+
+      <!-- Catching Items Inventory -->
+      <h4 style="font-family:'Baloo 2',cursive; color:#00e5ff; margin-bottom:8px;">🥅 Catching Supplies</h4>
+      <div id="catch-item-inventory" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px;"></div>
+
+      <!-- Catch Item Shop -->
+      <h4 style="font-family:'Baloo 2',cursive; color:#ffcc00; margin-bottom:8px;">🛍️ Catch Shop</h4>
+      <div id="catch-shop-items" class="catch-shop-grid" style="margin-bottom:20px;"></div>
+
+      <!-- Caught Chimeras List -->
+      <h4 style="font-family:'Baloo 2',cursive; color:#a8e84c; margin-bottom:8px;">🐲 Caught Chimeras</h4>
+      <div id="chimera-inventory-list"></div>
+    </div>
+  </div>
+
+  <!-- ===== TODO TAB ===== -->
+  <div class="tab-content" id="tab-todo">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 1.4rem;">📌 Todo List</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.75rem; margin-bottom:14px;">Track your tasks! Completing them earns MoeBucks.</p>
+      <div id="todo-list-area"></div>
+    </div>
+  </div>
+
+  <!-- ===== FUN WITH MOE-CHAN TAB ===== -->
+  <div class="tab-content" id="tab-fun">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 1.4rem;">💖 Fun with Moe-chan</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.75rem; margin-bottom:14px;">Tap, headpat, and play with graphics effects!</p>
+    </div>
+    <div id="fun-main-content"></div>
+  </div>
+
+  <!-- ===== POMODORO TAB ===== -->
+  <div class="tab-content" id="tab-pomodoro">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 1.4rem;">🍅 Pomodoro Timer</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.75rem; margin-bottom:14px;">Focus sessions earn 5 MB each. Full cycles (4 sessions) earn a 10 MB bonus!</p>
+      <div id="pom-main"></div>
+    </div>
+  </div>
+
+  <!-- ===== JLPT TAB ===== -->
+  <div class="tab-content" id="tab-jlpt">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 1.4rem;">🎌 JLPT Practice</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.75rem; margin-bottom:14px;">Practice N5–N1 questions. Earn MoeBucks, XP, and loot for good scores!</p>
+      <div id="jlpt-main-content"><p style="color:rgba(255,255,255,0.4); font-size:0.85rem;">Loading JLPT levels...</p></div>
+    </div>
+    <div id="jlpt-quiz-area"></div>
+  </div>
+
+  <!-- ===== RPG TAB ===== -->
+  <div class="tab-content" id="tab-rpg">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 1.4rem;">🗝️ 言葉の迷宮 · El Laberinto de las Palabras</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.75rem; margin-bottom:14px;">A turn-based, non-combat labyrinth generated from your flashcards. Satisfy NPCs with the right verb + object to earn MoeBucks.</p>
+      <div id="rpg-body"></div>
+    </div>
+  </div>
+
+  <!-- ===== MAP TAB ===== -->
+  <div class="tab-content" id="tab-map">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 1.4rem;">🗺️ Moe-chan's World</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.75rem; margin-bottom:14px;">A procedural world that grows each day you study. Streaks expand the frontier faster.</p>
+
+      <div class="map-stats-strip">
+        <div class="map-stat glass">
+          <div class="map-stat-num" id="map-day-info">Day 1</div>
+          <div class="map-stat-label">Exploration</div>
+        </div>
+        <div class="map-stat glass">
+          <div class="map-stat-num" id="map-radius">4</div>
+          <div class="map-stat-label">Frontier</div>
+        </div>
+        <div class="map-stat glass">
+          <div class="map-stat-num" id="map-tiles">0</div>
+          <div class="map-stat-label">Tiles</div>
+        </div>
+        <div class="map-stat glass">
+          <div class="map-stat-num" id="map-locations-count">0</div>
+          <div class="map-stat-label">Locations</div>
+        </div>
+        <div class="map-stat glass">
+          <div class="map-stat-num" id="map-streak-bonus">—</div>
+          <div class="map-stat-label">Streak Bonus</div>
+        </div>
+      </div>
+
+      <div class="map-container">
+        <pre class="map-display" id="map-display"></pre>
+      </div>
+
+      <div class="map-legend" id="map-legend"></div>
+
+      <div class="map-discoveries-section">
+        <h4 style="font-family:'Baloo 2',cursive; color:#a8e84c; margin-bottom:10px;">📍 Discovered Locations</h4>
+        <div class="map-discoveries-list" id="map-discoveries-list"></div>
+      </div>
+    </div>
+
+    <!-- Discovery popup -->
+    <div class="map-discovery-popup" id="map-discovery-popup" style="display:none;">
+      <div class="map-popup-inner glass-strong">
+        <h3 style="font-family:'Baloo 2',cursive; color:#ffcc00; margin-bottom:12px; font-size:1.3rem;">✦ New Discovery!</h3>
+        <div id="map-popup-content"></div>
+        <button class="btn-glossy btn-green" style="margin-top:16px; width:100%;" onclick="closeMapPopup()">Continue Exploring</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="jisho-popup" class="glass-strong">
+  <div id="jisho-header">
+    <span style="font-weight: 800; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">📖 JP Quick-Search</span>
+    <button id="jisho-close" onclick="document.getElementById('jisho-popup').style.display='none'">✖</button>
+  </div>
+  <iframe id="jisho-iframe" src="https://www.japandict.com/" title="Japanese Dictionary"></iframe>
+</div>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+<script src="themes.js"></script>
+<script src="commissions.js"></script>
+<script src="expeditions.js"></script>
+<script src="clipboard.js"></script>
+<script src="map.js"></script>
+<script src="slots.js"></script>
+<script src="economy.js"></script>
+<script src="house.js"></script>
+<script src="catching.js"></script>
+<script src="conjugation.js"></script>
+<script src="jlpt.js"></script>
+<script src="todo.js"></script>
+<script src="fun.js"></script>
+<script src="pomodoro.js"></script>
+<script src="jisho.js"></script>
+<script src="rpg.js"></script>
+</body>
+</html>

@@ -183,11 +183,44 @@ body.dark-mode .speech-line { color: #fff; }
 .dict-list { max-height: 400px; overflow-y: auto; }
 .dict-list::-webkit-scrollbar { width: 6px; }
 .dict-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
-.dict-entry { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); align-items: center; font-size: 0.85rem; font-weight: 700; }
+.dict-entry { display: grid; grid-template-columns: 70px 1fr 1fr 1fr 1.5fr auto auto; gap: 10px; padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); align-items: center; font-size: 0.85rem; font-weight: 700; }
 .dict-entry:hover { background: rgba(255,255,255,0.05); border-radius: 10px; }
 .dict-entry .en { color: #88ccff; } .dict-entry .jp { color: #ff88bb; font-family: 'Noto Sans JP', sans-serif; } .dict-entry .es { color: #b8ff8b; }
 .del-word { background: none; border: none; color: rgba(255,255,255,0.3); cursor: pointer; font-size: 1rem; transition: color 0.2s; }
 .del-word:hover { color: #ff3c8e; }
+
+/* Row 2 (type + tags) */
+.dict-add-form-row2 { grid-template-columns: 170px 1fr auto !important; }
+.dict-add-form-row2 select { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.25); color: #fff; padding: 10px 12px; border-radius: 14px; font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700; }
+.dict-add-form-row2 select option { color: #000; }
+
+/* Type badge */
+.dict-type-badge { font-size: 0.65rem; padding: 2px 8px; border-radius: 50px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
+.dict-type-noun { background: rgba(255, 196, 87, 0.2); color: #ffc457; border: 1px solid rgba(255,196,87,0.35); }
+.dict-type-verb { background: rgba(255, 99, 132, 0.2); color: #ff6384; border: 1px solid rgba(255,99,132,0.35); }
+.dict-type-adj  { background: rgba(130, 200, 255, 0.2); color: #82c8ff; border: 1px solid rgba(130,200,255,0.35); }
+.dict-type-adv  { background: rgba(168, 232, 76, 0.2); color: #a8e84c; border: 1px solid rgba(168,232,76,0.35); }
+.dict-type-phrase { background: rgba(200, 130, 255, 0.2); color: #c882ff; border: 1px solid rgba(200,130,255,0.35); }
+.dict-type-other  { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.2); }
+
+/* Tag chips on entries */
+.dict-tags-line { display: flex; gap: 4px; flex-wrap: wrap; }
+.dict-tag-chip { font-size: 0.65rem; padding: 2px 7px; border-radius: 50px; background: rgba(0,229,255,0.12); color: #00e5ff; border: 1px solid rgba(0,229,255,0.25); }
+.dict-uses-badge { font-size: 0.7rem; color: #a8e84c; background: rgba(168,232,76,0.12); padding: 2px 7px; border-radius: 50px; }
+
+/* Tag cloud */
+.dict-tag-cloud { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 14px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); }
+.dict-tag-cloud-empty { color: rgba(255,255,255,0.35); font-size: 0.78rem; font-style: italic; }
+.dict-tag-cloud-chip { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; cursor: pointer; font-family: 'Nunito', sans-serif; transition: all 0.2s; }
+.dict-tag-cloud-chip:hover { background: rgba(0,229,255,0.2); border-color: rgba(0,229,255,0.4); color: #00e5ff; }
+.dict-tag-cloud-chip .dict-tag-count { opacity: 0.6; margin-left: 4px; }
+
+/* ===== EXPEDITION LEVEL GATE ===== */
+.exp-mission-level-badge { margin-left: auto; font-size: 0.7rem; padding: 2px 10px; border-radius: 50px; background: rgba(168,232,76,0.15); color: #a8e84c; border: 1px solid rgba(168,232,76,0.3); font-weight: 800; }
+.exp-mission-level-badge.is-locked { background: rgba(120,120,120,0.18); color: rgba(255,255,255,0.45); border-color: rgba(255,255,255,0.2); }
+.exp-mission-card.exp-locked { opacity: 0.55; filter: grayscale(0.4); }
+.exp-mission-card.exp-locked:hover { opacity: 0.75; }
+.exp-badge-locked { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.55); padding: 6px 14px; border-radius: 50px; font-size: 0.78rem; font-weight: 700; border: 1px dashed rgba(255,255,255,0.2); }
 
 /* ===== DIARY ===== */
 .diary-section { padding: 22px; }
@@ -2663,3 +2696,74 @@ body.clipboard-mode #app {
 .pom-toggle-active {
   background: rgba(123,237,159,0.12); border-color: rgba(123,237,159,0.25); color: #7bed9f;
 }
+
+/* ===================================================================
+   RPG — Kotoba no Meikyuu / El Laberinto de las Palabras
+   =================================================================== */
+.rpg-empty, .rpg-intro { padding: 30px; text-align: center; }
+.rpg-empty h3, .rpg-intro h3 { font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 10px; font-size: 1.3rem; }
+.rpg-empty p, .rpg-intro p { color: rgba(255,255,255,0.7); margin: 8px 0; }
+.rpg-empty code { background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 6px; color: #00e5ff; font-size: 0.85rem; }
+
+.rpg-btn, .rpg-btn-big, .rpg-btn-sm { font-family: 'Nunito', sans-serif; font-weight: 800; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: #fff; padding: 6px 14px; border-radius: 50px; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; }
+.rpg-btn:hover, .rpg-btn-big:hover, .rpg-btn-sm:hover { background: rgba(255,255,255,0.2); }
+.rpg-btn-big { padding: 12px 24px; font-size: 1rem; margin: 14px 0; }
+.rpg-btn-sm { padding: 3px 10px; font-size: 0.72rem; }
+.rpg-btn-danger { border-color: rgba(255,60,142,0.3); color: #ff6ea8; }
+
+.rpg-stats-row { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-top: 14px; color: rgba(255,255,255,0.65); font-size: 0.82rem; }
+
+.rpg-layout { display: grid; grid-template-columns: minmax(280px, 1fr) 1.3fr; gap: 16px; }
+@media (max-width: 880px) { .rpg-layout { grid-template-columns: 1fr; } }
+
+.rpg-header { padding: 12px 16px; margin-bottom: 12px; }
+.rpg-header-stats { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.8rem; color: rgba(255,255,255,0.75); align-items: center; }
+.rpg-header-stats b { color: #fff; }
+
+.rpg-map { display: grid; gap: 3px; padding: 12px; max-width: 100%; }
+.rpg-cell { aspect-ratio: 1; min-height: 30px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; font-size: 0.9rem; cursor: pointer; transition: all 0.15s; color: rgba(255,255,255,0.3); }
+.rpg-cell-void { background: transparent; border: none; cursor: default; }
+.rpg-cell.unseen { color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.02); }
+.rpg-cell.visited { color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.07); }
+.rpg-cell.current { background: rgba(168,232,76,0.3); border-color: #a8e84c; color: #fff; box-shadow: 0 0 10px rgba(168,232,76,0.4); transform: scale(1.06); z-index: 2; }
+.rpg-cell.satisfied { background: rgba(0,229,255,0.15); border-color: rgba(0,229,255,0.3); }
+.rpg-type-boss.visited { background: rgba(255,60,142,0.2); border-color: rgba(255,60,142,0.4); }
+.rpg-type-shop.visited { background: rgba(255,204,0,0.12); border-color: rgba(255,204,0,0.3); }
+.rpg-type-treasure.visited { background: rgba(255,196,87,0.15); border-color: rgba(255,196,87,0.35); }
+.rpg-type-start.visited { background: rgba(130,200,255,0.15); border-color: rgba(130,200,255,0.35); }
+.rpg-cell:hover { transform: scale(1.05); }
+
+.rpg-move-pad { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 12px 0; }
+.rpg-move-row { display: flex; gap: 6px; }
+.rpg-move-btn { width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #fff; font-size: 1.1rem; cursor: pointer; transition: all 0.15s; }
+.rpg-move-btn:hover { background: rgba(168,232,76,0.2); border-color: #a8e84c; }
+.rpg-move-center { background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.3); }
+
+.rpg-room { padding: 18px; margin-bottom: 14px; }
+.rpg-room h4 { font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 10px; font-size: 1.1rem; }
+.rpg-room-done { opacity: 0.65; }
+.rpg-npc-room { border: 1.5px solid rgba(168,232,76,0.2); }
+.rpg-npc-greet { color: #ffcc66; font-size: 0.85rem; margin-bottom: 6px; }
+.rpg-npc-prompt { font-family: 'Noto Sans JP', 'Nunito', sans-serif; font-size: 1.2rem; color: #fff; margin: 10px 0; padding: 14px; background: rgba(255,255,255,0.04); border-left: 3px solid #a8e84c; border-radius: 8px; }
+.rpg-npc-selected { font-size: 0.85rem; color: rgba(255,255,255,0.8); margin: 10px 0; padding: 8px 12px; background: rgba(0,0,0,0.2); border-radius: 10px; }
+.rpg-verbs-label { font-size: 0.75rem; color: rgba(255,255,255,0.5); margin: 10px 0 6px; text-transform: uppercase; letter-spacing: 1px; }
+.rpg-verb-choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.rpg-choice-btn { background: rgba(255,99,132,0.15); border: 1.5px solid rgba(255,99,132,0.3); color: #ff88bb; padding: 10px 16px; border-radius: 14px; font-family: 'Noto Sans JP', 'Nunito', sans-serif; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+.rpg-choice-btn:hover { background: rgba(255,99,132,0.3); color: #fff; transform: translateY(-1px); }
+.rpg-hint { font-size: 0.7rem; color: rgba(255,255,255,0.45); font-style: italic; margin: 6px 0; }
+
+.rpg-inventory { padding: 14px 18px; margin-bottom: 14px; }
+.rpg-inventory h4 { font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 8px; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; }
+.rpg-inv-chips { display: flex; flex-wrap: wrap; gap: 6px; max-height: 170px; overflow-y: auto; padding: 4px; }
+.rpg-inv-chip { font-family: 'Noto Sans JP', 'Nunito', sans-serif; font-size: 0.82rem; padding: 5px 11px; border-radius: 50px; background: rgba(255,196,87,0.12); border: 1px solid rgba(255,196,87,0.25); color: #ffc457; cursor: pointer; transition: all 0.15s; }
+.rpg-inv-chip:hover { background: rgba(255,196,87,0.25); }
+.rpg-inv-chip.selected { background: rgba(168,232,76,0.3); border-color: #a8e84c; color: #fff; box-shadow: 0 0 8px rgba(168,232,76,0.3); }
+
+.rpg-shop-list { display: flex; flex-direction: column; gap: 6px; }
+.rpg-shop-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: rgba(255,255,255,0.04); border-radius: 10px; font-size: 0.85rem; }
+
+.rpg-log { padding: 12px 16px; max-height: 200px; overflow-y: auto; font-size: 0.8rem; }
+.rpg-log h4 { font-family: 'Baloo 2', cursive; color: rgba(255,255,255,0.75); margin-bottom: 6px; font-size: 0.9rem; }
+.rpg-log ul { list-style: none; padding: 0; margin: 0; color: rgba(255,255,255,0.7); }
+.rpg-log li { padding: 3px 0; border-bottom: 1px dashed rgba(255,255,255,0.07); }
+.rpg-theme-chip { display: inline-block; background: rgba(0,229,255,0.15); color: #00e5ff; border: 1px solid rgba(0,229,255,0.3); padding: 1px 8px; border-radius: 50px; font-size: 0.7rem; margin-right: 3px; }

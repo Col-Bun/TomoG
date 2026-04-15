@@ -239,6 +239,10 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
          document.body.appendChild(moeContainer);
       }
     }
+
+    // Lazy-render certain tabs when activated
+    if (tabId === 'rpg' && typeof renderRpg === 'function') renderRpg();
+    if (tabId === 'expeditions' && typeof renderExpeditionMissions === 'function') renderExpeditionMissions();
   });
 });
 
@@ -262,13 +266,42 @@ function logReading(){
   const flashDone=(data.days[today].flash||0)>0;setSpeech(flashDone?'bothDone':'readDone'); calcStreak();saveData();updateStats();updateMood();updateLevelDisplay(); if(flashDone)setTimeout(()=>setCreatureState('celebrate'),300);
 }
 
+// ===== DICTIONARY / FLASHCARDS (with tags + type for RPG generation) =====
+function parseTagInput(raw) {
+  if (!raw) return [];
+  return raw.split(/[,;]+/).map(t => t.trim().toLowerCase()).filter(Boolean).slice(0, 12);
+}
+
+// Normalize older entries in-place so legacy saves still work
+function ensureDictShape() {
+  if (!Array.isArray(data.dictionary)) { data.dictionary = []; return; }
+  data.dictionary.forEach(w => {
+    if (!Array.isArray(w.tags)) w.tags = [];
+    if (!w.type) {
+      // Naive auto-detection for legacy entries
+      if (/(ing|ate|ize|ise)$/i.test(w.en || '')) w.type = 'verb';
+      else if ((w.jp || '').endsWith('う') || (w.jp || '').endsWith('る')) w.type = 'verb';
+      else w.type = 'noun';
+    }
+    if (typeof w.uses !== 'number') w.uses = 0;       // RPG usage counter (for SRS)
+    if (typeof w.correct !== 'number') w.correct = 0; // correct answers in RPG
+  });
+}
+
 function addWord(){
-  const en=document.getElementById('dict-en').value.trim(),jp=document.getElementById('dict-jp').value.trim(),es=document.getElementById('dict-es').value.trim(); if(!en&&!jp&&!es)return;
-  if (!Array.isArray(data.dictionary)) data.dictionary = [];
-  data.dictionary.push({en:en||'—',jp:jp||'—',es:es||'—',addedDate:todayStr()});
-  document.getElementById('dict-en').value='';document.getElementById('dict-jp').value='';document.getElementById('dict-es').value=''; 
+  const en=document.getElementById('dict-en').value.trim();
+  const jp=document.getElementById('dict-jp').value.trim();
+  const es=document.getElementById('dict-es').value.trim();
+  if(!en&&!jp&&!es)return;
+  const typeEl = document.getElementById('dict-type');
+  const tagsEl = document.getElementById('dict-tags');
+  const type = typeEl ? typeEl.value : 'noun';
+  const tags = tagsEl ? parseTagInput(tagsEl.value) : [];
+  ensureDictShape();
+  data.dictionary.push({en:en||'—',jp:jp||'—',es:es||'—',addedDate:todayStr(),type:type,tags:tags,uses:0,correct:0});
+  document.getElementById('dict-en').value='';document.getElementById('dict-jp').value='';document.getElementById('dict-es').value='';
+  if (tagsEl) tagsEl.value='';
   saveData();
-  // Verify the word persisted
   try {
     const verify = JSON.parse(localStorage.getItem(STORAGE_KEY));
     if (!verify.dictionary || verify.dictionary.length !== data.dictionary.length) {
@@ -277,15 +310,53 @@ function addWord(){
   } catch(e) { console.error('Dict verify error:', e); }
   renderDictionary();updateStats();updateLevelDisplay();setSpeech('newWord');setCreatureState('happy');
 }
-['dict-en','dict-jp','dict-es'].forEach(id=>{document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')addWord();});});
+['dict-en','dict-jp','dict-es','dict-tags'].forEach(id=>{const el=document.getElementById(id); if(el) el.addEventListener('keydown',e=>{if(e.key==='Enter')addWord();});});
 function deleteWord(i){if(!Array.isArray(data.dictionary) || i < 0 || i >= data.dictionary.length) return; data.dictionary.splice(i,1);saveData();renderDictionary();updateStats();}
 
+function setDictSearch(query) {
+  const s = document.getElementById('dict-search');
+  if (s) { s.value = query; renderDictionary(); }
+}
+
 function renderDictionary(){
-  const search=(document.getElementById('dict-search').value||'').toLowerCase(); const list=document.getElementById('dict-list');list.innerHTML='';
-  const filtered=data.dictionary.map((w, idx) => ({...w, _idx: idx})).filter(w=>{if(!search)return true;return w.en.toLowerCase().includes(search)||w.jp.toLowerCase().includes(search)||w.es.toLowerCase().includes(search);});
-  filtered.slice().reverse().forEach((w)=>{ const row=document.createElement('div');row.className='dict-entry';
-    row.innerHTML=`<span class="en">${escHtml(w.en)}</span><span class="jp">${escHtml(w.jp)}</span><span class="es">${escHtml(w.es)}</span><button class="del-word" onclick="deleteWord(${w._idx})">×</button>`; list.appendChild(row); });
-  document.getElementById('dict-count').textContent=data.dictionary.length+' words'; document.getElementById('dict-tab-count').textContent='('+data.dictionary.length+')';
+  ensureDictShape();
+  const searchEl = document.getElementById('dict-search');
+  const search=(searchEl ? searchEl.value : '').toLowerCase().trim();
+  const list=document.getElementById('dict-list');
+  if (!list) return;
+  list.innerHTML='';
+
+  const filtered=data.dictionary.map((w, idx) => ({...w, _idx: idx})).filter(w=>{
+    if(!search)return true;
+    const hay = [w.en, w.jp, w.es, w.type, ...(w.tags||[])].join(' ').toLowerCase();
+    return hay.includes(search);
+  });
+
+  filtered.slice().reverse().forEach((w)=>{
+    const row=document.createElement('div');
+    row.className='dict-entry';
+    const tagChips = (w.tags||[]).map(t => `<span class="dict-tag-chip">#${escHtml(t)}</span>`).join('');
+    const typeBadge = w.type ? `<span class="dict-type-badge dict-type-${escHtml(w.type)}">${escHtml(w.type)}</span>` : '';
+    const usesHtml = w.uses > 0 ? `<span class="dict-uses-badge" title="Times used in RPG">⚔️ ${w.uses}</span>` : '';
+    row.innerHTML=`${typeBadge}<span class="en">${escHtml(w.en)}</span><span class="jp">${escHtml(w.jp)}</span><span class="es">${escHtml(w.es)}</span><span class="dict-tags-line">${tagChips}</span>${usesHtml}<button class="del-word" onclick="deleteWord(${w._idx})">×</button>`;
+    list.appendChild(row);
+  });
+
+  const countEl = document.getElementById('dict-count'); if (countEl) countEl.textContent=data.dictionary.length+' words';
+  const tabCountEl = document.getElementById('dict-tab-count'); if (tabCountEl) tabCountEl.textContent='('+data.dictionary.length+')';
+
+  // Tag cloud
+  const cloudEl = document.getElementById('dict-tag-cloud');
+  if (cloudEl) {
+    const counts = {};
+    data.dictionary.forEach(w => (w.tags||[]).forEach(t => { counts[t] = (counts[t]||0)+1; }));
+    const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0, 30);
+    if (sorted.length === 0) {
+      cloudEl.innerHTML = '<span class="dict-tag-cloud-empty">Add tags to words to see them here.</span>';
+    } else {
+      cloudEl.innerHTML = sorted.map(([t, n]) => `<button class="dict-tag-cloud-chip" onclick="setDictSearch('${escHtml(t)}')">#${escHtml(t)} <span class="dict-tag-count">${n}</span></button>`).join('');
+    }
+  }
 }
 
 function renderHistory(){
@@ -892,8 +963,9 @@ function renderAdvice() {
 // ===== APP INITIALIZATION (DATE-SMART) =====
 function initApp(){
   const realToday = todayStr();
-  document.getElementById('date-display').textContent = formatDate(realToday); 
+  document.getElementById('date-display').textContent = formatDate(realToday);
   calcStreak();
+  ensureDictShape(); // Normalize legacy dictionary entries (add tags/type/uses/correct fields)
 
   // 1. Mandatory UI Reset
   document.getElementById('flash-input-area').style.display = 'block';
