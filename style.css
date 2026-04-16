@@ -2767,3 +2767,19 @@ body.clipboard-mode #app {
 .rpg-log ul { list-style: none; padding: 0; margin: 0; color: rgba(255,255,255,0.7); }
 .rpg-log li { padding: 3px 0; border-bottom: 1px dashed rgba(255,255,255,0.07); }
 .rpg-theme-chip { display: inline-block; background: rgba(0,229,255,0.15); color: #00e5ff; border: 1px solid rgba(0,229,255,0.3); padding: 1px 8px; border-radius: 50px; font-size: 0.7rem; margin-right: 3px; }
+
+/* ===== DICTIONARY TAG PICKER (chip selector) ===== */
+#dict-tag-picker-wrap { display: flex; flex-direction: column; gap: 6px; }
+.dict-tag-selected { min-height: 32px; padding: 6px 8px; border-radius: 12px; background: rgba(0,0,0,0.25); border: 1px dashed rgba(255,255,255,0.12); display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font-size: 0.78rem; }
+.dict-tag-empty-msg { color: rgba(255,255,255,0.4); font-style: italic; font-size: 0.72rem; }
+.dict-tag-selected-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(168,232,76,0.22); color: #cdf28a; border: 1px solid rgba(168,232,76,0.45); padding: 2px 8px; border-radius: 50px; font-size: 0.72rem; cursor: pointer; transition: all 0.15s; }
+.dict-tag-selected-chip:hover { background: rgba(255,90,90,0.3); color: #fff; border-color: rgba(255,90,90,0.55); }
+.dict-tag-selected-chip::after { content: '×'; font-weight: 700; opacity: 0.8; }
+.dict-tag-picker { max-height: 220px; overflow-y: auto; padding: 8px; border-radius: 12px; background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.06); }
+.dict-tagcat { margin-bottom: 8px; }
+.dict-tagcat:last-child { margin-bottom: 0; }
+.dict-tagcat-label { display: block; font-size: 0.66rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; font-weight: 600; }
+.dict-tagcat-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.dict-tagpick { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 50px; font-size: 0.7rem; cursor: pointer; transition: all 0.12s ease; user-select: none; }
+.dict-tagpick:hover { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.9); }
+.dict-tagpick.is-selected { background: rgba(168,232,76,0.25); color: #cdf28a; border-color: rgba(168,232,76,0.5); box-shadow: 0 0 6px rgba(168,232,76,0.18); }

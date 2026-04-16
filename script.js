@@ -267,6 +267,60 @@ function logReading(){
 }
 
 // ===== DICTIONARY / FLASHCARDS (with tags + type for RPG generation) =====
+// Standardized taxonomy — these are the ONLY tags the RPG engine recognizes.
+// If you add custom free-form tags via save-file edits they'll be preserved
+// but won't drive room themes.
+const DICT_TAG_CATEGORIES = {
+  'Place':     ['kitchen','bedroom','bathroom','livingroom','garden','school','office','shop','street','park','temple','beach','mountain','forest','river','cafe','station','library'],
+  'Nature':    ['plant','flower','tree','animal','bird','fish','insect','weather','sky','stone','water','fire','wind','earth'],
+  'Food':      ['food','drink','fruit','vegetable','sweet','meat','grain','spice'],
+  'Body/Self': ['body','face','hand','emotion','feeling','health','mind','clothing','accessory'],
+  'Objects':   ['tool','furniture','container','utensil','book','paper','technology','vehicle','toy'],
+  'Social':    ['family','friend','profession','greeting','question'],
+  'Abstract':  ['time','season','color','shape','size','number','direction'],
+  'Action':    ['motion','cooking','cleaning','communication','study','rest','play','work','create','destroy','perception']
+};
+const DICT_ALL_TAGS = Object.values(DICT_TAG_CATEGORIES).flat();
+
+// Selection state for the add-word form
+let _dictTagSelection = new Set();
+
+function renderTagPicker() {
+  const pickerEl = document.getElementById('dict-tag-picker');
+  const selectedEl = document.getElementById('dict-tag-selected');
+  if (!pickerEl || !selectedEl) return;
+
+  // Chip grid grouped by category
+  let html = '';
+  for (const [cat, tags] of Object.entries(DICT_TAG_CATEGORIES)) {
+    html += `<div class="dict-tagcat"><span class="dict-tagcat-label">${cat}</span><div class="dict-tagcat-chips">`;
+    html += tags.map(t => {
+      const sel = _dictTagSelection.has(t);
+      return `<button type="button" class="dict-tagpick${sel?' is-selected':''}" onclick="toggleTagChip('${t}')">${t}</button>`;
+    }).join('');
+    html += `</div></div>`;
+  }
+  pickerEl.innerHTML = html;
+
+  // Selected summary on top — chips are clickable to remove (× rendered via CSS)
+  if (_dictTagSelection.size === 0) {
+    selectedEl.classList.add('is-empty');
+    selectedEl.innerHTML = '<span class="dict-tag-empty-msg">click tags below to add — or leave empty</span>';
+  } else {
+    selectedEl.classList.remove('is-empty');
+    selectedEl.innerHTML = Array.from(_dictTagSelection)
+      .map(t => `<span class="dict-tag-selected-chip" onclick="toggleTagChip('${t}')" title="click to remove">${t}</span>`)
+      .join('');
+  }
+}
+
+function toggleTagChip(tag) {
+  if (_dictTagSelection.has(tag)) _dictTagSelection.delete(tag);
+  else _dictTagSelection.add(tag);
+  renderTagPicker();
+}
+
+// Kept for backward compat if any old save / text-input path still hits it
 function parseTagInput(raw) {
   if (!raw) return [];
   return raw.split(/[,;]+/).map(t => t.trim().toLowerCase()).filter(Boolean).slice(0, 12);
@@ -294,13 +348,13 @@ function addWord(){
   const es=document.getElementById('dict-es').value.trim();
   if(!en&&!jp&&!es)return;
   const typeEl = document.getElementById('dict-type');
-  const tagsEl = document.getElementById('dict-tags');
   const type = typeEl ? typeEl.value : 'noun';
-  const tags = tagsEl ? parseTagInput(tagsEl.value) : [];
+  const tags = Array.from(_dictTagSelection);
   ensureDictShape();
   data.dictionary.push({en:en||'—',jp:jp||'—',es:es||'—',addedDate:todayStr(),type:type,tags:tags,uses:0,correct:0});
   document.getElementById('dict-en').value='';document.getElementById('dict-jp').value='';document.getElementById('dict-es').value='';
-  if (tagsEl) tagsEl.value='';
+  _dictTagSelection.clear();
+  renderTagPicker();
   saveData();
   try {
     const verify = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -310,7 +364,7 @@ function addWord(){
   } catch(e) { console.error('Dict verify error:', e); }
   renderDictionary();updateStats();updateLevelDisplay();setSpeech('newWord');setCreatureState('happy');
 }
-['dict-en','dict-jp','dict-es','dict-tags'].forEach(id=>{const el=document.getElementById(id); if(el) el.addEventListener('keydown',e=>{if(e.key==='Enter')addWord();});});
+['dict-en','dict-jp','dict-es'].forEach(id=>{const el=document.getElementById(id); if(el) el.addEventListener('keydown',e=>{if(e.key==='Enter')addWord();});});
 function deleteWord(i){if(!Array.isArray(data.dictionary) || i < 0 || i >= data.dictionary.length) return; data.dictionary.splice(i,1);saveData();renderDictionary();updateStats();}
 
 function setDictSearch(query) {
@@ -1007,8 +1061,9 @@ function initApp(){
   // Initialize UI components
   renderSchedule(); 
   renderCalendar(); 
-  renderDictionary(); 
-  renderDiary(); 
+  renderDictionary();
+  if(typeof renderTagPicker === 'function') renderTagPicker();
+  renderDiary();
   renderQuotes(); 
   if(typeof renderCommissions === 'function') renderCommissions();
   renderAdvice();
