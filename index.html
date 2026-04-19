@@ -819,15 +819,13 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
         <button class="btn-glossy btn-purple huge-btn" id="clip-fudoki-btn" onclick="toggleFudokiMode()" style="background:linear-gradient(180deg,#ff9a44 0%,#e8651d 100%);">📚 FUDOKI MODE</button>
       </div>
 
-      <div id="clip-fudoki-legend" style="display:none; font-size:0.7rem; color:rgba(255,255,255,0.6); text-align:center; margin-bottom:8px; font-family:'Courier New',monospace;">
-        <span style="color:#ff8fa3;">名詞</span> ·
-        <span style="color:#8ddbff;">動詞</span> ·
-        <span style="color:#c6f27a;">形容詞</span> ·
-        <span style="color:#ffd36a;">副詞</span> ·
-        <span style="color:#c49bff;">助詞</span> ·
-        <span style="color:#a0a0a0;">助動詞</span> ·
-        <span style="color:#ff6eaa;">代名詞</span> ·
-        <span style="color:#7ee6c6;">連体詞</span>
+      <div id="clip-fudoki-legend" style="display:none; font-size:0.78rem; color:rgba(255,255,255,0.65); text-align:center; margin-bottom:8px; font-family:'Noto Sans JP','Nunito',sans-serif;">
+        <span style="color:#ffd36a;border-bottom:2px solid #ffd36a55;padding:0 4px;">漢字</span>
+        <span style="color:#ff8fa3;border-bottom:2px solid #ff8fa355;padding:0 4px;margin-left:6px;">ひらがな</span>
+        <span style="color:#8ddbff;border-bottom:2px solid #8ddbff55;padding:0 4px;margin-left:6px;">カタカナ</span>
+        <span style="color:#c6f27a;border-bottom:2px solid #c6f27a55;padding:0 4px;margin-left:6px;">Romaji</span>
+        <span style="color:#c49bff;border-bottom:2px solid #c49bff55;padding:0 4px;margin-left:6px;">123</span>
+        <span style="color:#808080;border-bottom:2px solid #80808055;padding:0 4px;margin-left:6px;">、。</span>
       </div>
 
       <textarea id="clipboard-area" class="diary-textarea custom-scrollbar" placeholder="Hooked text appears here (newest at bottom)..." style="font-family:'Noto Sans JP','Nunito',sans-serif; font-size:1.05rem; line-height:1.8; min-height:0;" readonly></textarea>
