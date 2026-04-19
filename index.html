@@ -819,13 +819,17 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
         <button class="btn-glossy btn-purple huge-btn" id="clip-fudoki-btn" onclick="toggleFudokiMode()" style="background:linear-gradient(180deg,#ff9a44 0%,#e8651d 100%);">📚 FUDOKI MODE</button>
       </div>
 
-      <div id="clip-fudoki-legend" style="display:none; font-size:0.78rem; color:rgba(255,255,255,0.65); text-align:center; margin-bottom:8px; font-family:'Noto Sans JP','Nunito',sans-serif;">
-        <span style="color:#ffd36a;border-bottom:2px solid #ffd36a55;padding:0 4px;">漢字</span>
-        <span style="color:#ff8fa3;border-bottom:2px solid #ff8fa355;padding:0 4px;margin-left:6px;">ひらがな</span>
-        <span style="color:#8ddbff;border-bottom:2px solid #8ddbff55;padding:0 4px;margin-left:6px;">カタカナ</span>
-        <span style="color:#c6f27a;border-bottom:2px solid #c6f27a55;padding:0 4px;margin-left:6px;">Romaji</span>
-        <span style="color:#c49bff;border-bottom:2px solid #c49bff55;padding:0 4px;margin-left:6px;">123</span>
-        <span style="color:#808080;border-bottom:2px solid #80808055;padding:0 4px;margin-left:6px;">、。</span>
+      <div id="clip-fudoki-legend" style="display:none; gap:14px; flex-wrap:wrap; justify-content:center; font-size:0.82rem; color:rgba(255,255,255,0.8); margin-bottom:10px; font-family:'Noto Sans JP','Nunito',sans-serif;">
+        <span style="color:#a8e84c;">名詞</span>
+        <span style="color:#4ec6ff;">動詞</span>
+        <span style="color:#ffd36a;">形容詞</span>
+        <span style="color:#ff6eaa;">副詞</span>
+        <span style="color:#c49bff;">助詞</span>
+        <span style="color:#d7b7ff;">助動詞</span>
+        <span style="color:#ff8fa3;">代名詞</span>
+        <span style="color:#7ee6c6;">連体詞</span>
+        <span style="color:#ffb300;">接続詞</span>
+        <span style="color:#ff9ed1;">感動詞</span>
       </div>
 
       <textarea id="clipboard-area" class="diary-textarea custom-scrollbar" placeholder="Hooked text appears here (newest at bottom)..." style="font-family:'Noto Sans JP','Nunito',sans-serif; font-size:1.05rem; line-height:1.8; min-height:0;" readonly></textarea>

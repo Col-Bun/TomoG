@@ -8,66 +8,119 @@ let clipPollingActive = false;    // Auto-poll toggle
 let clipPollTimer = null;
 let clipLastText = '';            // Dedup: last captured string
 
-// ===== FUDOKI MODE (lightweight script-class highlighter) =====
-// Previously used kuromoji.js — its 5MB dictionary download would freeze the
-// page. Fudoki (the site that inspired this) just colors tokens by script
-// class, so we do the same: purely local, zero network, instant.
+// ===== FUDOKI MODE (Kuromoji POS tagger in a Web Worker) =====
+// Tokenizes each line with kuromoji.js and renders stacked tokens à la Fudoki:
+//
+//   [カタカナ reading]       ← tok.reading
+//   [romaji]                  ← derived from reading
+//   原文                      ← tok.surface_form
+//   [POS abbrev (名/動/…)]
+//   [colored underline by POS]
+//
+// The heavy dictionary download (~5MB) and tokenizer parse run in a Web Worker,
+// so the main thread is never frozen. Browser HTTP cache makes subsequent
+// sessions instant.
 let fudokiEnabled = false;
+let fudokiWorker = null;
+let fudokiReady = false;
+let fudokiLoadMsg = '';
+let fudokiSeq = 0;
+const fudokiPending = new Map();       // seq → {resolve,reject}
+const fudokiTokenCache = new Map();    // line → tokens[]  (so re-renders are free)
 
-// Unicode script class → color palette
-// Each glyph is grouped by its Unicode range and colored accordingly.
-const FUDOKI_CLASS_COLORS = {
-  kanji:      '#ffd36a',  // 漢字 · gold
-  hiragana:   '#ff8fa3',  // ひらがな · soft pink
-  katakana:   '#8ddbff',  // カタカナ · cyan
-  halfkana:   '#8ddbff',  // half-width katakana
-  bopomofo:   '#8ddbff',
-  latin:      '#c6f27a',  // A–Z a–z · green
-  digit:      '#c49bff',  // 0–9 · lavender
-  punct:      '#808080',  // ，。、「」 etc · grey
-  space:      'transparent',
-  other:      '#bbbbbb',
+// POS → color (matches the site's general vibe)
+const FUDOKI_POS_COLORS = {
+  '名詞':      '#a8e84c',  // noun    — green
+  '動詞':      '#4ec6ff',  // verb    — cyan
+  '形容詞':    '#ffd36a',  // i-adj   — gold
+  '形容動詞':  '#ffb86b',  // na-adj  — orange
+  '副詞':      '#ff6eaa',  // adverb  — pink-hot
+  '助詞':      '#c49bff',  // particle — lavender
+  '助動詞':    '#d7b7ff',  // aux verb — light lavender
+  '連体詞':    '#7ee6c6',  // adnominal — teal
+  '代名詞':    '#ff8fa3',  // pronoun  — pink
+  '接続詞':    '#ffb300',  // conj    — amber
+  '感動詞':    '#ff9ed1',  // interj  — bubblegum
+  '接頭詞':    '#8ddbff',  // prefix  — sky
+  '接尾':      '#b0c4ff',  // suffix  — periwinkle
+  '記号':      '#666',     // symbol  — grey
+  'フィラー':  '#888',
+  'その他':    '#bbb',
 };
 
-const FUDOKI_CLASS_LABELS = {
-  kanji: '漢字', hiragana: 'ひらがな', katakana: 'カタカナ',
-  halfkana: '半角カナ', latin: 'ローマ字', digit: '数字',
-  punct: '記号', space: '空白', other: 'その他',
+// Japanese POS abbreviations shown under each token (short form like Fudoki)
+const FUDOKI_POS_ABBREV = {
+  '名詞': '名', '動詞': '動', '形容詞': '形', '形容動詞': '形動',
+  '副詞': '副', '助詞': '助', '助動詞': '助動',
+  '連体詞': '連体', '代名詞': '代名', '接続詞': '接続',
+  '感動詞': '感', '接頭詞': '接頭詞', '接尾': '接尾',
+  '記号': '記号', 'フィラー': 'フィラー', 'その他': '他',
 };
 
-// Classify a single character by Unicode code point.
-function fudokiClassOf(ch) {
-  if (!ch) return 'other';
-  const code = ch.codePointAt(0);
-  if (ch === ' ' || ch === '\t' || ch === '\n' || ch === '\u3000') return 'space';
-  // Kanji (CJK Unified + extensions + compat)
-  if ((code >= 0x4E00 && code <= 0x9FFF) ||
-      (code >= 0x3400 && code <= 0x4DBF) ||
-      (code >= 0xF900 && code <= 0xFAFF) ||
-      (code >= 0x20000 && code <= 0x2A6DF)) return 'kanji';
-  if (code >= 0x3040 && code <= 0x309F) return 'hiragana';
-  if (code >= 0x30A0 && code <= 0x30FF) return 'katakana';
-  if (code >= 0xFF66 && code <= 0xFF9F) return 'halfkana'; // half-width katakana
-  // Latin letters (basic + full-width)
-  if ((code >= 0x0041 && code <= 0x005A) ||
-      (code >= 0x0061 && code <= 0x007A) ||
-      (code >= 0xFF21 && code <= 0xFF3A) ||
-      (code >= 0xFF41 && code <= 0xFF5A)) return 'latin';
-  // Digits (basic + full-width)
-  if ((code >= 0x0030 && code <= 0x0039) ||
-      (code >= 0xFF10 && code <= 0xFF19)) return 'digit';
-  // Japanese punctuation + CJK symbols + general punctuation + ASCII punct
-  if ((code >= 0x3000 && code <= 0x303F) ||
-      (code >= 0xFF00 && code <= 0xFF0F) ||
-      (code >= 0xFF1A && code <= 0xFF20) ||
-      (code >= 0xFF3B && code <= 0xFF40) ||
-      (code >= 0xFF5B && code <= 0xFF65) ||
-      (code >= 0x2000 && code <= 0x206F) ||
-      (code >= 0x0021 && code <= 0x002F) ||
-      (code >= 0x003A && code <= 0x0040) ||
-      (code >= 0x005B && code <= 0x0060) ||
-      (code >= 0x007B && code <= 0x007E)) return 'punct';
-  return 'other';
+// ===== KATAKANA → ROMAJI (Hepburn) =====
+const KATA_ROMAJI = {
+  'ア':'a','イ':'i','ウ':'u','エ':'e','オ':'o',
+  'カ':'ka','キ':'ki','ク':'ku','ケ':'ke','コ':'ko',
+  'ガ':'ga','ギ':'gi','グ':'gu','ゲ':'ge','ゴ':'go',
+  'サ':'sa','シ':'shi','ス':'su','セ':'se','ソ':'so',
+  'ザ':'za','ジ':'ji','ズ':'zu','ゼ':'ze','ゾ':'zo',
+  'タ':'ta','チ':'chi','ツ':'tsu','テ':'te','ト':'to',
+  'ダ':'da','ヂ':'ji','ヅ':'zu','デ':'de','ド':'do',
+  'ナ':'na','ニ':'ni','ヌ':'nu','ネ':'ne','ノ':'no',
+  'ハ':'ha','ヒ':'hi','フ':'fu','ヘ':'he','ホ':'ho',
+  'バ':'ba','ビ':'bi','ブ':'bu','ベ':'be','ボ':'bo',
+  'パ':'pa','ピ':'pi','プ':'pu','ペ':'pe','ポ':'po',
+  'マ':'ma','ミ':'mi','ム':'mu','メ':'me','モ':'mo',
+  'ヤ':'ya','ユ':'yu','ヨ':'yo',
+  'ラ':'ra','リ':'ri','ル':'ru','レ':'re','ロ':'ro',
+  'ワ':'wa','ヰ':'wi','ヱ':'we','ヲ':'wo','ン':'n',
+  'ヴ':'vu',
+};
+const KATA_SMALL_Y = { 'ャ':'ya','ュ':'yu','ョ':'yo' };
+
+function katakanaToRomaji(k) {
+  if (!k) return '';
+  const chars = Array.from(k);
+  let out = '';
+  for (let i = 0; i < chars.length; i++) {
+    const c  = chars[i];
+    const nx = chars[i + 1];
+    // Small tsu → double next consonant
+    if (c === 'ッ') {
+      if (nx && KATA_ROMAJI[nx]) {
+        const r = KATA_ROMAJI[nx];
+        out += r[0] === 'c' ? 't' : r[0];   // "chi" doubles to "tchi"
+      }
+      continue;
+    }
+    // Long vowel dash → extend previous vowel
+    if (c === 'ー') {
+      const last = out.slice(-1);
+      if (/[aeiou]/.test(last)) out += last;
+      continue;
+    }
+    // Digraph: C + small y = CyX mutation (kya/sha/cho/…)
+    if (nx && KATA_SMALL_Y[nx] && KATA_ROMAJI[c] && KATA_ROMAJI[c].endsWith('i')) {
+      const base = KATA_ROMAJI[c];
+      const stem = base.slice(0, -1);           // "ki" → "k", "shi" → "sh", "chi" → "ch"
+      const y = KATA_SMALL_Y[nx];               // "ya"
+      // Special cases: shi+ya → sha (drop y), chi+ya → cha, ji+ya → ja
+      if (stem === 'sh' || stem === 'ch' || stem === 'j') out += stem + y[1];
+      else out += stem + 'y' + y[1];
+      i++;  // consume small y
+      continue;
+    }
+    if (KATA_ROMAJI[c]) { out += KATA_ROMAJI[c]; continue; }
+    if (KATA_SMALL_Y[c]) { out += KATA_SMALL_Y[c]; continue; }
+    // Hiragana fallback — convert to katakana then map
+    const code = c.codePointAt(0);
+    if (code >= 0x3041 && code <= 0x3096) {
+      const kata = String.fromCodePoint(code + 0x60);
+      if (KATA_ROMAJI[kata]) { out += KATA_ROMAJI[kata]; continue; }
+    }
+    out += c;
+  }
+  return out;
 }
 
 // ===== INIT =====
@@ -264,10 +317,9 @@ function exitClipboardMode() {
 }
 
 // ===== FUDOKI MODE ==========================================================
-// Lightweight, dictionary-free script-class highlighter (no network).
-// Each character is colored by its Unicode script class — kanji, hiragana,
-// katakana, romaji, digits, punctuation. Inspired by https://github.com/iamcheyan/fudoki
-// (we skip the full POS tokenizer to avoid the ~5MB dictionary download.)
+// Real Kuromoji POS tagger, fully off the main thread (Web Worker), with a
+// stacked Fudoki-style render: katakana reading + romaji + surface + POS
+// abbreviation + colored underline. Inspired by https://github.com/iamcheyan/fudoki
 
 function escapeHtml(s) {
   return String(s)
@@ -278,55 +330,167 @@ function escapeHtml(s) {
     .replace(/'/g, '&#39;');
 }
 
-// Splits a line into runs of consecutive same-class characters,
-// then wraps each run in a colored span. Cheap, instant, no dictionary.
-function fudokiHighlightLine(line) {
-  if (!line) return '';
-  let out = '';
-  let runClass = null;
-  let runStart = 0;
-  const flush = (endExclusive) => {
-    if (runClass === null || endExclusive <= runStart) return;
-    const text = line.slice(runStart, endExclusive);
-    const color = FUDOKI_CLASS_COLORS[runClass] || '#ddd';
-    const label = FUDOKI_CLASS_LABELS[runClass] || runClass;
-    if (runClass === 'space') {
-      out += escapeHtml(text);
-    } else {
-      out += '<span class="fudoki-tok fudoki-' + runClass +
-             '" style="color:' + color +
-             ';border-bottom:2px solid ' + color + '55;" title="' + label + '">' +
-             escapeHtml(text) + '</span>';
+// ---- WORKER --------------------------------------------------------------
+// We build the worker as an inline Blob so no extra files need to ship to
+// GitHub Pages. The worker itself imports kuromoji.js from jsDelivr, then
+// loads dictionary files from the same CDN. All on a separate thread, so
+// the UI never freezes.
+const FUDOKI_WORKER_SRC = `
+  let tokenizer = null;
+  let buildPromise = null;
+  const KUROMOJI_SRC  = 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/build/kuromoji.js';
+  const DICT_PATH     = 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/';
+
+  function ready(){
+    if (tokenizer) return Promise.resolve();
+    if (buildPromise) return buildPromise;
+    buildPromise = new Promise((resolve, reject) => {
+      try {
+        importScripts(KUROMOJI_SRC);
+      } catch (e) { reject(e); return; }
+      postMessage({type:'progress', msg:'kuromoji.js loaded · downloading dictionary…'});
+      kuromoji.builder({ dicPath: DICT_PATH }).build((err, t) => {
+        if (err) { reject(err); return; }
+        tokenizer = t;
+        postMessage({type:'ready'});
+        resolve();
+      });
+    });
+    return buildPromise;
+  }
+
+  self.onmessage = async (ev) => {
+    const msg = ev.data || {};
+    if (msg.type === 'init') {
+      try { await ready(); }
+      catch (err) { postMessage({type:'error', msg: err && err.message || 'load failed'}); }
+      return;
+    }
+    if (msg.type === 'tokenize') {
+      try {
+        await ready();
+        const tokens = tokenizer.tokenize(String(msg.text || ''));
+        // Strip down so we don't transfer fields we don't need
+        const slim = tokens.map(t => ({
+          surface_form: t.surface_form,
+          pos: t.pos,
+          pos_detail_1: t.pos_detail_1,
+          basic_form: t.basic_form,
+          reading: t.reading,
+          pronunciation: t.pronunciation,
+        }));
+        postMessage({type:'tokens', seq: msg.seq, tokens: slim});
+      } catch (err) {
+        postMessage({type:'tokens-error', seq: msg.seq, msg: err && err.message || 'tokenize failed'});
+      }
     }
   };
-  // Iterate by code-point so surrogate pairs (rare kanji) aren't split.
-  const chars = Array.from(line);
-  let cursor = 0;
-  for (let i = 0; i < chars.length; i++) {
-    const ch = chars[i];
-    const cls = fudokiClassOf(ch);
-    if (cls !== runClass) {
-      flush(cursor);
-      runClass = cls;
-      runStart = cursor;
+`;
+
+function ensureFudokiWorker() {
+  if (fudokiWorker) return fudokiWorker;
+  const blob = new Blob([FUDOKI_WORKER_SRC], { type: 'application/javascript' });
+  const url  = URL.createObjectURL(blob);
+  fudokiWorker = new Worker(url);
+  fudokiWorker.onmessage = (ev) => {
+    const m = ev.data || {};
+    if (m.type === 'progress') {
+      fudokiLoadMsg = m.msg || '';
+      if (!fudokiReady) renderFudokiLoadingState();
+    } else if (m.type === 'ready') {
+      fudokiReady = true;
+      const btn = document.getElementById('clip-fudoki-btn');
+      if (btn) { btn.textContent = '📖 FUDOKI ON · click to exit'; btn.disabled = false; }
+      renderFudokiView();   // process all current lines
+    } else if (m.type === 'error') {
+      fudokiReady = false;
+      const view = document.getElementById('clipboard-fudoki-view');
+      if (view) view.innerHTML = '<span style="color:#ff7a7a;">Failed to load Kuromoji: ' + escapeHtml(m.msg) + '</span>';
+      const btn = document.getElementById('clip-fudoki-btn');
+      if (btn) { btn.textContent = '📚 FUDOKI MODE (retry)'; btn.disabled = false; }
+    } else if (m.type === 'tokens') {
+      const p = fudokiPending.get(m.seq);
+      if (p) { fudokiPending.delete(m.seq); p.resolve(m.tokens); }
+    } else if (m.type === 'tokens-error') {
+      const p = fudokiPending.get(m.seq);
+      if (p) { fudokiPending.delete(m.seq); p.reject(new Error(m.msg)); }
     }
-    cursor += ch.length;
-  }
-  flush(cursor);
-  return out;
+  };
+  return fudokiWorker;
 }
 
-function renderFudokiView() {
+function fudokiTokenize(text) {
+  return new Promise((resolve, reject) => {
+    const seq = ++fudokiSeq;
+    fudokiPending.set(seq, { resolve, reject });
+    ensureFudokiWorker().postMessage({ type: 'tokenize', seq, text });
+  });
+}
+
+// ---- RENDER ---------------------------------------------------------------
+function renderFudokiLoadingState() {
   const view = document.getElementById('clipboard-fudoki-view');
   if (!view) return;
+  view.innerHTML =
+    '<div style="text-align:center; padding:24px; color:rgba(255,255,255,0.7); font-family:\'Noto Sans JP\',sans-serif;">' +
+    '<div style="font-size:1.4rem; margin-bottom:8px;">📚 風土記モード起動中…</div>' +
+    '<div style="font-size:0.85rem; opacity:0.75; margin-bottom:14px;">' + escapeHtml(fudokiLoadMsg || 'loading kuromoji.js …') + '</div>' +
+    '<div class="fudoki-spinner"></div>' +
+    '<div style="font-size:0.7rem; margin-top:14px; opacity:0.55;">First time only — ~5MB dictionary is cached for next time.</div>' +
+    '</div>';
+}
+
+// Build one stacked-token block (Fudoki-style)
+function renderFudokiToken(tok) {
+  const surface = tok.surface_form || '';
+  const pos     = tok.pos || 'その他';
+  const color   = FUDOKI_POS_COLORS[pos] || '#ddd';
+  const abbrev  = FUDOKI_POS_ABBREV[pos] || pos;
+  const reading = (tok.reading && tok.reading !== '*') ? tok.reading : '';
+  const romaji  = reading ? katakanaToRomaji(reading).toLowerCase() : '';
+  const base    = (tok.basic_form && tok.basic_form !== '*') ? tok.basic_form : surface;
+  const tooltip = pos + (reading ? '\u3000' + reading : '') + (base !== surface ? '\u3000(' + base + ')' : '');
+
+  // Symbols / spaces don't deserve the full stack
+  if (pos === '記号' || /^\s+$/.test(surface)) {
+    return '<span class="fudoki-tok fudoki-symbol" style="color:' + color + ';">' + escapeHtml(surface) + '</span>';
+  }
+
+  return (
+    '<span class="fudoki-tok" title="' + escapeHtml(tooltip) + '" data-pos="' + escapeHtml(pos) + '">' +
+      '<span class="fudoki-kata"  >' + escapeHtml(reading) + '</span>' +
+      '<span class="fudoki-romaji">' + escapeHtml(romaji)  + '</span>' +
+      '<span class="fudoki-surface" style="color:' + color + ';">' + escapeHtml(surface) + '</span>' +
+      '<span class="fudoki-pos"   style="color:' + color + ';">'  + escapeHtml(abbrev)   + '</span>' +
+      '<span class="fudoki-bar"   style="background:' + color + ';"></span>' +
+    '</span>'
+  );
+}
+
+async function renderFudokiView() {
+  const view = document.getElementById('clipboard-fudoki-view');
+  if (!view) return;
+  if (!fudokiReady) { renderFudokiLoadingState(); return; }
   if (clipSessionLines.length === 0) {
     view.innerHTML = '<span style="color:rgba(255,255,255,0.4);font-style:italic;">何もなし · nothing captured yet</span>';
     return;
   }
-  const fragments = clipSessionLines.map(line =>
-    '<div class="fudoki-line">' + fudokiHighlightLine(line) + '</div>'
-  );
-  view.innerHTML = fragments.join('');
+
+  // Tokenize each line (cached)
+  const lineHtml = await Promise.all(clipSessionLines.map(async (line) => {
+    let tokens = fudokiTokenCache.get(line);
+    if (!tokens) {
+      try { tokens = await fudokiTokenize(line); fudokiTokenCache.set(line, tokens); }
+      catch (e) { tokens = null; }
+    }
+    if (!tokens || tokens.length === 0) {
+      return '<div class="fudoki-line">' + escapeHtml(line) + '</div>';
+    }
+    const inner = tokens.map(renderFudokiToken).join('');
+    return '<div class="fudoki-line">' + inner + '</div>';
+  }));
+
+  view.innerHTML = lineHtml.join('');
   view.scrollTop = view.scrollHeight;
 }
 
@@ -342,13 +506,22 @@ function toggleFudokiMode() {
   if (fudokiEnabled) {
     textarea.style.display = 'none';
     view.style.display = 'block';
-    if (legend) legend.style.display = 'block';
-    btn.textContent = '📖 FUDOKI ON · click to exit';
-    renderFudokiView();
+    if (legend) legend.style.display = 'flex';
+    if (!fudokiReady) {
+      btn.textContent = '⏳ LOADING…';
+      btn.disabled = true;
+      fudokiLoadMsg = 'spawning worker · loading kuromoji.js…';
+      renderFudokiLoadingState();
+      ensureFudokiWorker().postMessage({ type: 'init' });
+    } else {
+      btn.textContent = '📖 FUDOKI ON · click to exit';
+      renderFudokiView();
+    }
   } else {
     textarea.style.display = '';
     view.style.display = 'none';
     if (legend) legend.style.display = 'none';
     btn.textContent = '📚 FUDOKI MODE';
+    btn.disabled = false;
   }
 }

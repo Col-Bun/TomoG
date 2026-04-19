@@ -2796,20 +2796,65 @@ body.clipboard-mode #app {
 .dict-tags-block-title { font-size: 0.78rem; color: rgba(255,255,255,0.8); font-weight: 600; letter-spacing: 0.02em; }
 .dict-tags-hint { color: rgba(255,255,255,0.45); font-weight: 400; font-size: 0.7rem; margin-left: 4px; }
 
-/* ===== FUDOKI MODE (kuromoji tokenized view) ===== */
-.fudoki-line { padding: 4px 6px; border-radius: 6px; }
-.fudoki-line:hover { background: rgba(255,255,255,0.04); }
-.fudoki-tok {
-  display: inline-block; line-height: 1.55;
-  transition: transform 0.08s, filter 0.12s;
-  cursor: help;
-}
-.fudoki-tok:hover { transform: translateY(-1px); filter: brightness(1.2); }
+/* ===== FUDOKI MODE (kuromoji POS-tagged, stacked view) ===== */
 #clipboard-fudoki-view {
   flex: 1;
   background: rgba(0,0,0,0.35);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 12px;
   color: #eee;
+  font-family: 'Noto Sans JP','Nunito',sans-serif;
+  padding: 16px 14px !important;
 }
-#clipboard-fudoki-view ruby rt { user-select: none; }
+.fudoki-line {
+  padding: 6px 6px 14px;
+  border-bottom: 1px dashed rgba(255,255,255,0.08);
+  margin-bottom: 6px;
+  display: flex; flex-wrap: wrap; align-items: flex-end;
+  gap: 2px;
+}
+.fudoki-line:last-child { border-bottom: none; }
+
+/* Each token is a vertical stack: katakana → romaji → surface → POS → bar */
+.fudoki-tok {
+  display: inline-flex; flex-direction: column; align-items: center;
+  padding: 0 3px; margin: 0 1px;
+  line-height: 1.0;
+  cursor: help; position: relative;
+  transition: transform 0.08s ease;
+}
+.fudoki-tok:hover { transform: translateY(-2px); }
+.fudoki-tok.fudoki-symbol {
+  flex-direction: row; font-size: 1.05rem; padding: 0 2px;
+}
+.fudoki-kata {
+  font-size: 0.62rem; color: rgba(255,255,255,0.5);
+  letter-spacing: 0.02em; min-height: 0.9em;
+}
+.fudoki-romaji {
+  font-size: 0.6rem; color: rgba(255,255,255,0.35);
+  font-style: italic; letter-spacing: 0.02em; min-height: 0.8em;
+}
+.fudoki-surface {
+  font-size: 1.15rem; font-weight: 500;
+  letter-spacing: 0.01em; margin: 2px 0 1px;
+}
+.fudoki-pos {
+  font-size: 0.58rem; opacity: 0.85;
+  letter-spacing: 0.04em;
+}
+.fudoki-bar {
+  height: 3px; width: 100%; min-width: 14px;
+  margin-top: 3px; border-radius: 2px;
+  box-shadow: 0 0 4px currentColor;
+}
+
+/* Loading spinner for Fudoki */
+.fudoki-spinner {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.14);
+  border-top-color: #ffd36a;
+  animation: fudoki-spin 0.8s linear infinite;
+  margin: 0 auto;
+}
+@keyframes fudoki-spin { to { transform: rotate(360deg); } }
