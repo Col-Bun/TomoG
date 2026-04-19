@@ -440,6 +440,80 @@ function renderFudokiLoadingState() {
     '</div>';
 }
 
+// ---- MERGE (ported from iamcheyan/fudoki mergeTokensForDisplay) -----------
+// Fudoki post-processes kuromoji's raw output so that verb-conjugation
+// particles (て, で, た) don't appear as standalone tokens — e.g. "して" and
+// "いって" stay as a single 動詞 token instead of split "し+て" / "いっ+て".
+// Also merges digit-runs with 年 / 月 / 日 so "2026年" is one token.
+function mergeTokensForDisplay(tokens) {
+  if (!Array.isArray(tokens) || tokens.length === 0) return tokens || [];
+
+  // --- Step 1: digit + 年/月/日 ---
+  const isDigitRun = (s) => /^[0-9０-９]+$/.test(s || '');
+  const withYMD = [];
+  for (let i = 0; i < tokens.length; i++) {
+    const cur = tokens[i];
+    const next = tokens[i + 1];
+    const curSurf = cur.surface_form || '';
+    if (next && isDigitRun(curSurf)) {
+      const ns = next.surface_form || '';
+      if (ns === '年' || ns === '月' || ns === '日') {
+        const readingMap = { '年': 'ネン', '月': 'ガツ', '日': 'ニチ' };
+        const merged = {
+          surface_form: curSurf + ns,
+          pos: '名詞',
+          pos_detail_1: cur.pos_detail_1 || '',
+          basic_form: (cur.basic_form && cur.basic_form !== '*' ? cur.basic_form : curSurf) + ns,
+          reading: (cur.reading && cur.reading !== '*' ? cur.reading : curSurf) + (readingMap[ns] || ns),
+          pronunciation: (cur.pronunciation || curSurf) + (readingMap[ns] || ns),
+        };
+        withYMD.push(merged);
+        i++;
+        continue;
+      }
+    }
+    withYMD.push(cur);
+  }
+
+  // --- Step 2: verb/adj + て/で (助詞) or た (助動詞) ---
+  // Uses a while loop so merged tokens can chain-merge (e.g. 行っ+て → 行って,
+  // then 行って + しまっ won't chain because しまっ is 動詞 not 助詞/助動詞,
+  // but 行って + ください etc. stay separate as intended by Fudoki).
+  const out = [];
+  let i = 0;
+  while (i < withYMD.length) {
+    const cur = withYMD[i];
+    const next = withYMD[i + 1];
+    if (next) {
+      const curPos  = cur.pos  || '';
+      const nextPos = next.pos || '';
+      const nextSurf = next.surface_form || '';
+      const isVerbOrAdj = (curPos === '動詞' || curPos === '形容詞');
+      const ruleTeDe = isVerbOrAdj && nextPos === '助詞'   && (nextSurf === 'て' || nextSurf === 'で');
+      const ruleTa   = isVerbOrAdj && nextPos === '助動詞' &&  nextSurf === 'た';
+      if (ruleTeDe || ruleTa) {
+        const curSurf = cur.surface_form || '';
+        const curRead = (cur.reading && cur.reading !== '*') ? cur.reading : curSurf;
+        const nextRead = (next.reading && next.reading !== '*') ? next.reading : nextSurf;
+        const merged = {
+          surface_form: curSurf + nextSurf,
+          pos: '動詞',
+          pos_detail_1: cur.pos_detail_1 || '',
+          basic_form: (cur.basic_form && cur.basic_form !== '*') ? cur.basic_form : curSurf,
+          reading: curRead + nextRead,
+          pronunciation: (cur.pronunciation || curRead) + (next.pronunciation || nextRead),
+        };
+        withYMD[i + 1] = merged;   // overwrite next, re-examine on the following iter
+        i += 1;                    // advance to the merged slot → becomes next cur
+        continue;
+      }
+    }
+    out.push(cur);
+    i += 1;
+  }
+  return out;
+}
+
 // Build one stacked-token block (Fudoki-style)
 function renderFudokiToken(tok) {
   const surface = tok.surface_form || '';
@@ -486,7 +560,10 @@ async function renderFudokiView() {
     if (!tokens || tokens.length === 0) {
       return '<div class="fudoki-line">' + escapeHtml(line) + '</div>';
     }
-    const inner = tokens.map(renderFudokiToken).join('');
+    // Merge verb-conjugation particles (て/で/た) and digit+年/月/日
+    // into single display tokens — matches iamcheyan/fudoki's tokenization.
+    const merged = mergeTokensForDisplay(tokens);
+    const inner = merged.map(renderFudokiToken).join('');
     return '<div class="fudoki-line">' + inner + '</div>';
   }));
 
