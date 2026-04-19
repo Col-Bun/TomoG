@@ -96,12 +96,11 @@ function renderClipboardDisplay() {
   const displayArea = document.getElementById('clipboard-area');
   if (!displayArea) return;
 
-  // Show newest lines at top
-  const reversed = [...clipSessionLines].reverse();
-  displayArea.value = reversed.join('\n');
+  // Show newest lines at bottom (chat-style)
+  displayArea.value = clipSessionLines.join('\n');
 
-  // Auto-scroll to top (newest)
-  displayArea.scrollTop = 0;
+  // Auto-scroll to bottom (newest)
+  displayArea.scrollTop = displayArea.scrollHeight;
 }
 
 // ===== MANUAL PASTE =====

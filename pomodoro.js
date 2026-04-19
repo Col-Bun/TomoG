@@ -174,6 +174,11 @@ function completeWorkSession() {
 
   saveData();
 
+  // Summon a cat for the cat tab
+  if (typeof onPomodoroWorkComplete === 'function') {
+    onPomodoroWorkComplete();
+  }
+
   // Show completion notification
   const phrase = MOE_BREAK_PHRASES[Math.floor(Math.random() * MOE_BREAK_PHRASES.length)];
   showPomNotification(phrase, 'break');

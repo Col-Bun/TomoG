@@ -6,6 +6,7 @@
 <title>Moe-Chan & The Oracle</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="themes.css">
+<link rel="stylesheet" href="cats.css">
 <style>
   .polling-active { animation: pulse-glow 1.2s ease-in-out infinite; background: linear-gradient(180deg,#ff6348 0%,#ee5a24 100%) !important; }
   @keyframes pulse-glow { 0%,100% { box-shadow: 0 0 8px rgba(255,99,72,0.4); } 50% { box-shadow: 0 0 20px rgba(255,99,72,0.8); } }
@@ -183,6 +184,7 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     <button class="tab-btn" data-tab="bestiary">🐲 Bestiary</button>
     <button class="tab-btn" data-tab="calc">🧮 COLcalc</button>
     <button class="tab-btn" data-tab="calendar">📅 Calendar</button>
+    <button class="tab-btn" data-tab="cats">🐈 Cats</button>
     <button class="tab-btn" data-tab="clipboard">📋 Clipboard</button>
     <button class="tab-btn" data-tab="commissions">🎨 Commissions</button>
     <button class="tab-btn" data-tab="conjugation">📝 Conjugation</button>
@@ -812,7 +814,7 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
         <button class="btn-glossy btn-green huge-btn" id="clip-poll-btn" onclick="toggleAutoPoll()" style="background:linear-gradient(180deg,#2ed573 0%,#1aaf5d 100%);">▶ START AUTO-CAPTURE</button>
       </div>
 
-      <textarea id="clipboard-area" class="diary-textarea custom-scrollbar" placeholder="Hooked text appears here (newest at top)..." style="font-family:'Noto Sans JP','Nunito',sans-serif; font-size:1.05rem; line-height:1.8; min-height:40vh;" readonly></textarea>
+      <textarea id="clipboard-area" class="diary-textarea custom-scrollbar" placeholder="Hooked text appears here (newest at bottom)..." style="font-family:'Noto Sans JP','Nunito',sans-serif; font-size:1.05rem; line-height:1.8; min-height:0;" readonly></textarea>
 
       <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:14px;">
         <button class="btn-theme" style="padding:8px 16px; border-radius:50px; font-size:0.85rem;" onclick="exportClipLog()">💾 Export Log</button>
@@ -969,6 +971,9 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     </div>
   </div>
 
+  <!-- ===== ASCII CATS TAB ===== -->
+  <div class="tab-content" id="tab-cats"></div>
+
   <!-- ===== JLPT TAB ===== -->
   <div class="tab-content" id="tab-jlpt">
     <div class="glass-dark" style="padding: 22px;">
@@ -1065,6 +1070,7 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
 <script src="todo.js"></script>
 <script src="fun.js"></script>
 <script src="pomodoro.js"></script>
+<script src="cats.js"></script>
 <script src="jisho.js"></script>
 <script src="rpg.js"></script>
 </body>

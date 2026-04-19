@@ -243,6 +243,7 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
     // Lazy-render certain tabs when activated
     if (tabId === 'rpg' && typeof renderRpg === 'function') renderRpg();
     if (tabId === 'expeditions' && typeof renderExpeditionMissions === 'function') renderExpeditionMissions();
+    if (tabId === 'cats' && typeof renderCatsTab === 'function') renderCatsTab();
   });
 });
 

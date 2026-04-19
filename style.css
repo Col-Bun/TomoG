@@ -405,18 +405,27 @@ body.clipboard-mode #app {
   padding: 0; 
 }
 
-/* The main focus container takes over the entire viewport */
-.clipboard-focus-container { 
-  width: 100vw; 
-  height: 100vh; 
-  max-width: none; 
-  padding: 70px 40px 40px 40px; 
-  text-align: center; 
-  position: relative; 
-  display: flex; 
-  flex-direction: column; 
-  border-radius: 0; 
+/* The main focus container takes over the entire viewport.
+   Fixed overlay so it never spills below the visible page. */
+.clipboard-focus-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh; /* better on mobile (excludes browser chrome) */
+  max-width: none;
+  padding: 70px 40px 40px 40px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0;
   border: none;
+  z-index: 40;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .exit-btn { 
