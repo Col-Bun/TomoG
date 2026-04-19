@@ -8,6 +8,38 @@ let clipPollingActive = false;    // Auto-poll toggle
 let clipPollTimer = null;
 let clipLastText = '';            // Dedup: last captured string
 
+// ===== FUDOKI MODE (Kuromoji-powered POS tagging) =====
+let fudokiEnabled = false;
+let fudokiTokenizer = null;       // Kuromoji tokenizer (async-built)
+let fudokiLoading = false;
+let fudokiLoadPromise = null;
+const FUDOKI_KUROMOJI_SRC = 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/build/kuromoji.min.js';
+const FUDOKI_DICT_PATH    = 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/';
+
+// Part-of-speech → color palette
+const FUDOKI_POS_COLORS = {
+  '名詞':   '#ff8fa3',   // noun — pink
+  '動詞':   '#8ddbff',   // verb — cyan
+  '形容詞': '#c6f27a',   // i-adj — green
+  '形容動詞':'#a0f0b5',  // na-adj — minty green
+  '副詞':   '#ffd36a',   // adverb — gold
+  '助詞':   '#c49bff',   // particle — lavender
+  '助動詞': '#a0a0a0',   // aux verb — grey
+  '連体詞': '#7ee6c6',   // adnominal — teal
+  '代名詞': '#ff6eaa',   // pronoun — hot pink
+  '接続詞': '#ffa060',   // conjunction — orange
+  '感動詞': '#ffb3ee',   // interjection — pink
+  '接頭詞': '#bfd9ff',   // prefix — pale blue
+  '記号':   '#6a6a6a',   // symbol — dim
+  'フィラー': '#888',    // filler — grey
+  'その他': '#bbb',      // other — near-white
+};
+
+function fudokiPickColor(pos) {
+  if (!pos) return '#ddd';
+  return FUDOKI_POS_COLORS[pos] || '#ddd';
+}
+
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
   clipTotalJPChars = parseInt(localStorage.getItem('studyBuddyClipJPTotal') || '0', 10);
@@ -94,13 +126,15 @@ function processClipboardText(text) {
 
 function renderClipboardDisplay() {
   const displayArea = document.getElementById('clipboard-area');
-  if (!displayArea) return;
+  if (displayArea) {
+    // Show newest lines at bottom (chat-style)
+    displayArea.value = clipSessionLines.join('\n');
+    // Auto-scroll to bottom (newest)
+    displayArea.scrollTop = displayArea.scrollHeight;
+  }
 
-  // Show newest lines at bottom (chat-style)
-  displayArea.value = clipSessionLines.join('\n');
-
-  // Auto-scroll to bottom (newest)
-  displayArea.scrollTop = displayArea.scrollHeight;
+  // Also render into Fudoki view if active
+  if (fudokiEnabled) renderFudokiView();
 }
 
 // ===== MANUAL PASTE =====
@@ -197,4 +231,151 @@ function exitClipboardMode() {
   if (clipPollingActive) toggleAutoPoll();
   const homeBtn = document.querySelector('[data-tab="home"]');
   if (homeBtn) homeBtn.click();
+}
+
+// ===== FUDOKI MODE ==========================================================
+// Loads kuromoji.js on first toggle and renders every line with colored tokens
+// labeled by part of speech. Inspired by https://github.com/iamcheyan/fudoki
+
+function loadFudokiScript() {
+  if (window.kuromoji) return Promise.resolve();
+  if (fudokiLoadPromise) return fudokiLoadPromise;
+  fudokiLoadPromise = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = FUDOKI_KUROMOJI_SRC;
+    s.async = true;
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error('Failed to load kuromoji.js'));
+    document.head.appendChild(s);
+  });
+  return fudokiLoadPromise;
+}
+
+function buildFudokiTokenizer() {
+  if (fudokiTokenizer) return Promise.resolve(fudokiTokenizer);
+  return new Promise((resolve, reject) => {
+    if (!window.kuromoji) {
+      reject(new Error('kuromoji global missing'));
+      return;
+    }
+    window.kuromoji
+      .builder({ dicPath: FUDOKI_DICT_PATH })
+      .build((err, tokenizer) => {
+        if (err) { reject(err); return; }
+        fudokiTokenizer = tokenizer;
+        resolve(tokenizer);
+      });
+  });
+}
+
+async function ensureFudokiReady() {
+  if (fudokiTokenizer) return fudokiTokenizer;
+  if (fudokiLoading) {
+    // Wait for in-flight load
+    await new Promise(r => {
+      const poll = () => fudokiTokenizer ? r() : setTimeout(poll, 150);
+      poll();
+    });
+    return fudokiTokenizer;
+  }
+  fudokiLoading = true;
+  try {
+    await loadFudokiScript();
+    await buildFudokiTokenizer();
+  } finally {
+    fudokiLoading = false;
+  }
+  return fudokiTokenizer;
+}
+
+function renderFudokiView() {
+  const view = document.getElementById('clipboard-fudoki-view');
+  if (!view) return;
+  if (!fudokiTokenizer) {
+    view.innerHTML = '<span style="color:rgba(255,255,255,0.5);font-style:italic;">…辞書読み込み中 · loading dictionary …</span>';
+    return;
+  }
+  if (clipSessionLines.length === 0) {
+    view.innerHTML = '<span style="color:rgba(255,255,255,0.4);font-style:italic;">何もなし · nothing captured yet</span>';
+    return;
+  }
+
+  const fragments = clipSessionLines.map(line => {
+    let tokens;
+    try { tokens = fudokiTokenizer.tokenize(line); }
+    catch (_) { tokens = null; }
+    if (!tokens || tokens.length === 0) {
+      return '<div class="fudoki-line">' + escapeHtml(line) + '</div>';
+    }
+    const inner = tokens.map(tok => {
+      const surface = escapeHtml(tok.surface_form);
+      const pos = tok.pos || 'その他';
+      const color = fudokiPickColor(pos);
+      const reading = tok.reading && tok.reading !== '*' ? tok.reading : '';
+      const base = tok.basic_form && tok.basic_form !== '*' ? tok.basic_form : tok.surface_form;
+      const title = pos + (reading ? '　' + reading : '') + (base !== tok.surface_form ? '　(' + base + ')' : '');
+      // Skip decoration for symbols / whitespace
+      if (pos === '記号' || /^\s+$/.test(tok.surface_form)) {
+        return '<span style="color:' + color + ';">' + surface + '</span>';
+      }
+      return '<ruby class="fudoki-tok" style="color:' + color + ';border-bottom:2px solid ' + color + '44;padding:0 1px;margin:0 1px;border-radius:3px;" title="' + escapeHtml(title) + '">' +
+             surface +
+             (reading && /[\u4E00-\u9FFF]/.test(tok.surface_form) ? '<rt style="color:rgba(255,255,255,0.45);font-size:0.55em;">' + escapeHtml(reading) + '</rt>' : '') +
+             '</ruby>';
+    }).join('');
+    return '<div class="fudoki-line" style="margin-bottom:6px;">' + inner + '</div>';
+  });
+
+  view.innerHTML = fragments.join('');
+  view.scrollTop = view.scrollHeight;
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+async function toggleFudokiMode() {
+  const btn      = document.getElementById('clip-fudoki-btn');
+  const legend   = document.getElementById('clip-fudoki-legend');
+  const textarea = document.getElementById('clipboard-area');
+  const view     = document.getElementById('clipboard-fudoki-view');
+  if (!btn || !textarea || !view) return;
+
+  fudokiEnabled = !fudokiEnabled;
+
+  if (fudokiEnabled) {
+    btn.textContent = '⏳ LOADING DICT…';
+    btn.disabled = true;
+    textarea.style.display = 'none';
+    view.style.display = 'block';
+    if (legend) legend.style.display = 'block';
+    view.innerHTML = '<span style="color:rgba(255,255,255,0.6);font-style:italic;">📚 Fudoki tokenizer 起動中… (≈3–5MB dict download, first time only)</span>';
+
+    try {
+      await ensureFudokiReady();
+      btn.textContent = '📖 FUDOKI ON · click to exit';
+      btn.disabled = false;
+      renderFudokiView();
+    } catch (err) {
+      console.error('Fudoki load failed:', err);
+      view.innerHTML = '<span style="color:#ff7a7a;">Failed to load Kuromoji dictionary. Check network / CDN access.</span>';
+      btn.textContent = '📚 FUDOKI MODE (retry)';
+      btn.disabled = false;
+      fudokiEnabled = false;
+      textarea.style.display = '';
+      view.style.display = 'none';
+      if (legend) legend.style.display = 'none';
+    }
+  } else {
+    btn.textContent = '📚 FUDOKI MODE';
+    btn.disabled = false;
+    textarea.style.display = '';
+    view.style.display = 'none';
+    if (legend) legend.style.display = 'none';
+  }
 }

@@ -196,6 +196,66 @@ const CAT_WEEKDAY_LAYOUTS = [
 ];
 function currentWeekdayLayout() { return CAT_WEEKDAY_LAYOUTS[new Date().getDay()]; }
 
+// ===== PERSONALITY → PROP / BUILDING AFFINITY =====
+// What emojis each personality is drawn to in the background (weekday props).
+// Falls back to "any" if no match exists in current layout.
+const CAT_BUILDING_AFFINITY = {
+  philosopher: ['📚','📖','📕','📘','🕯️','⛩️','🌳','🌲'],
+  architect:   ['🏢','🏬','🏯','🗼','⛩️','🛒','🏠'],
+  sloth:       ['🟫','🪑','🏠','🛖','☕','🍶'],
+  lover:       ['🌸','🏮','🍣','🍶','🎌','🍺'],
+  grifter:     ['🎰','🎮','🎰','💼','🛒','🍺'],
+  mystic:      ['⛩️','🏮','🕯️','🦋','🌸','🌳','🍄'],
+  merchant:    ['🛒','🏪','🏬','🥕','🐟','🍅','🧅','🍜'],
+  samurai:     ['⛩️','🏯','🌸','🎌','🗼'],
+  poet:        ['📚','📖','🌸','🕯️','🌳','🍶'],
+  adventurer:  ['🌳','🌲','🍄','🏯','🗼','🎮','👾'],
+  kitten:      ['🦋','🌸','🍄','🎮','🍡','🍥','🛒'],
+  sage:        ['📚','📖','📕','📘','🕯️','⛩️','🌳'],
+  shadow:      ['🕯️','📚','🏮','⛩️','🌲'],
+  king:        ['🏯','🗼','⛩️','🏬','🎌','🏮'],
+  chef:        ['🍣','🍢','🍜','🥕','🐟','🍅','🧅'],
+  bureaucrat:  ['💼','🏢','📎','☕','🖥️','🏬'],
+};
+
+// Picks a building target inside the current props for `cat`.
+// Returns null if nothing suitable in the layout.
+function pickTargetProp(cat) {
+  const stage = catRuntime.stageEl;
+  if (!stage) return null;
+  const props = catRuntime.propsCache;
+  if (!props || props.length === 0) return null;
+  const w = stage.clientWidth || 600;
+  const h = stage.clientHeight || 320;
+
+  const personalityId = cat.personality && cat.personality.id;
+  const wanted = CAT_BUILDING_AFFINITY[personalityId] || [];
+  // 70% of the time prefer a wanted prop, else pick any prop
+  let pool = (Math.random() < 0.7 && wanted.length)
+    ? props.filter(p => wanted.indexOf(p.emoji) >= 0)
+    : [];
+  if (pool.length === 0) pool = props.slice();
+  if (pool.length === 0) return null;
+
+  const chosen = pool[Math.floor(Math.random() * pool.length)];
+  // Convert percent positions → pixel center
+  const px = (chosen.leftPct / 100) * w;
+  const py = (chosen.topPct  / 100) * h;
+  // Strength of attraction depends on how loved the prop is
+  const loved = wanted.indexOf(chosen.emoji) >= 0;
+  return {
+    x: px,
+    y: py,
+    emoji: chosen.emoji,
+    loved,
+    arriveDist: 30,
+    lingerMs: loved ? (12000 + Math.random() * 18000) : (4000 + Math.random() * 6000),
+    travelUntil: performance.now() + 30000,  // give up after 30s if blocked
+    arrivedAt: 0,
+    propRef: chosen,
+  };
+}
+
 // ===== BEHAVIOR BASE RATES (per second; tick scales by dt) =====
 const CAT_RATE_CHAT     = 0.012;     // near another cat: ~1.2%/sec
 const CAT_RATE_BUILD    = 0.00015;   // VERY rare — architect-biased
@@ -284,6 +344,8 @@ function makeCatEntity(opts = {}) {
     lastChatMs: 0,               // throttle chit-chat
     isKitten: opts.isKitten === true,
     parents: opts.parents || null, // if born from mating
+    targetProp: null,            // {x, y, emoji, loved, arriveDist, lingerMs, travelUntil, arrivedAt}
+    lastSeekRoll: 0,             // throttle for targetProp rolls
   };
 
   cat.el = renderCatDom(cat);
@@ -360,14 +422,16 @@ function buildCatBackground() {
   }
   // Weekday-themed large prop emojis scattered behind the cats
   const layout = currentWeekdayLayout();
+  catRuntime.propsCache = [];
   (layout.props || []).forEach((emoji, i) => {
     const top = 8 + (i * 13 + Math.random() * 10) % 80;
     const left = 5 + (i * 17 + Math.random() * 12) % 88;
     const size = 28 + Math.floor(Math.random() * 18);
     const op = (0.20 + Math.random() * 0.22).toFixed(2);
-    html += '<span class="cat-prop" style="position:absolute;top:' + top.toFixed(1) +
+    html += '<span class="cat-prop" data-prop-idx="' + i + '" style="position:absolute;top:' + top.toFixed(1) +
             '%;left:' + left.toFixed(1) + '%;opacity:' + op +
             ';font-size:' + size + 'px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));">' + emoji + '</span>';
+    catRuntime.propsCache.push({ emoji, topPct: top, leftPct: left, idx: i });
   });
   bg.innerHTML = html;
 }
@@ -401,9 +465,89 @@ function catAnimateTick(ts) {
   const h = catRuntime.stageEl.clientHeight || 320;
   const now = ts;
 
+  // Boss collision / timeout first so cats get knocked before moving this frame
+  tickBossCollision(now);
+
   catRuntime.roaming.forEach(c => {
     c.wiggle += 0.04;
     const wob = Math.sin(c.wiggle) * 0.15;
+
+    // ==== BUILDING ATTRACTION ====
+    // Low-chance roll to pick a target prop.
+    if (!c.targetProp && !c.isKitten && now - c.lastSeekRoll > 1200) {
+      c.lastSeekRoll = now;
+      const p = c.personality || {};
+      // Weight: philosophers, sage, sloth, bureaucrat love hanging around.
+      const affinityBias =
+        (p.id === 'sloth' || p.id === 'philosopher' || p.id === 'sage' || p.id === 'bureaucrat') ? 2.2 :
+        (p.id === 'shadow' || p.id === 'king' || p.id === 'poet') ? 1.6 :
+        (p.id === 'samurai' || p.id === 'adventurer') ? 0.6 :
+        1.0;
+      const seekRate = 0.0015 * affinityBias * dtSec * 1000; // per 1.2s window
+      if (Math.random() < seekRate) {
+        c.targetProp = pickTargetProp(c);
+      }
+    }
+
+    if (c.targetProp) {
+      const t = c.targetProp;
+      const dx = t.x - c.x;
+      const dy = t.y - c.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist <= t.arriveDist) {
+        // Arrived! Linger.
+        if (!t.arrivedAt) {
+          t.arrivedAt = now;
+          c.el && c.el.classList.add('ascii-cat-anchored');
+          // Highlight the prop while loved
+          if (t.loved) {
+            const propEl = catRuntime.bgCharsEl && catRuntime.bgCharsEl.querySelector('.cat-prop[data-prop-idx="' + t.propRef.idx + '"]');
+            if (propEl) propEl.classList.add('cat-prop-wanted');
+          }
+          // Speech line
+          if (t.loved) {
+            const lines = ['ここが好き…','居心地がいい','me gusta aquí','mi lugar favorito','…落ち着く','aquí me quedo, parce'];
+            setCatBubble(c, catPick(lines), 2200);
+          }
+        }
+        // Gentle idle jitter while at the prop
+        c.vx *= 0.88;
+        c.vy *= 0.88;
+        c.vx += (Math.random() - 0.5) * 0.02;
+        c.vy += (Math.random() - 0.5) * 0.02;
+        // Done lingering → release
+        if (now - t.arrivedAt >= t.lingerMs) {
+          c.el && c.el.classList.remove('ascii-cat-anchored');
+          if (t.loved && t.propRef) {
+            const propEl = catRuntime.bgCharsEl && catRuntime.bgCharsEl.querySelector('.cat-prop[data-prop-idx="' + t.propRef.idx + '"]');
+            if (propEl) propEl.classList.remove('cat-prop-wanted');
+          }
+          // Kick off with a random nudge so it wanders again
+          const a = Math.random() * Math.PI * 2;
+          const base = (c.lucky ? 0.55 : 0.35) * ((c.personality && c.personality.speedMult) || 1);
+          c.vx = Math.cos(a) * base;
+          c.vy = Math.sin(a) * base;
+          c.targetProp = null;
+        }
+      } else {
+        // Steer toward target (blend with current velocity)
+        const base = (c.lucky ? 0.55 : 0.35) * ((c.personality && c.personality.speedMult) || 1);
+        const steerStrength = t.loved ? 0.08 : 0.05;
+        const nx = dx / dist, ny = dy / dist;
+        c.vx = c.vx * (1 - steerStrength) + nx * base * (t.loved ? 1.2 : 1.0) * steerStrength * 10;
+        c.vy = c.vy * (1 - steerStrength) + ny * base * (t.loved ? 1.2 : 1.0) * steerStrength * 10;
+        // Clamp speed
+        const sp = Math.hypot(c.vx, c.vy);
+        const max = base * 1.6;
+        if (sp > max) { c.vx = c.vx / sp * max; c.vy = c.vy / sp * max; }
+        // Give up if it takes too long
+        if (now > t.travelUntil) {
+          c.targetProp = null;
+          c.el && c.el.classList.remove('ascii-cat-anchored');
+        }
+      }
+    }
+
     c.x += (c.vx + wob) * (dtMs / 16);
     c.y += (c.vy - wob * 0.5) * (dtMs / 16);
     if (c.x < 0) { c.x = 0; c.vx = Math.abs(c.vx); }
@@ -483,18 +627,20 @@ function nearestCatWithin(cat, maxDist) {
 
 function setCatBubble(cat, text, ms) {
   if (!cat.el) return;
-  cat.bubble = { text, until: performance.now() + (ms || 2400) };
+  cat.bubble = { text, until: performance.now() + (ms || 2800) };
   const slot = cat.el.querySelector('.ascii-cat-bubble');
   if (slot) {
     slot.textContent = text;
     slot.style.display = 'block';
   }
+  cat.el.classList.add('ascii-cat-talking');
 }
 function clearCatBubble(cat) {
   cat.bubble = null;
   if (cat.el) {
     const slot = cat.el.querySelector('.ascii-cat-bubble');
     if (slot) slot.style.display = 'none';
+    cat.el.classList.remove('ascii-cat-talking');
   }
 }
 
@@ -697,6 +843,248 @@ function catMate(a, b) {
     catLog('💕 #' + a.id + ' × #' + b.id + ' → kitten #' + child.id +
            ' (' + (child.personality ? child.personality.jp : '?') + ')');
   }
+}
+
+// ===== CHIMERA BOSS BATTLES =====
+// Every ~hour a giant chimera descends on the stage. Roaming cats that bounce
+// into it deal damage on contact. Lucky / samurai / king cats hit harder.
+const CAT_BOSS_INTERVAL_MS = 60 * 60 * 1000;     // 1 hour
+const CAT_BOSS_GRACE_MS    = 30 * 60 * 1000;     // first boss appears 30 min after cats tab opens (cozy)
+const CAT_BOSS_MAX_LIFE_MS = 45 * 60 * 1000;     // boss gives up & flees after 45 min
+
+// --- persistent boss schedule anchor ---
+function getBossSchedule() {
+  const cd = getCatData();
+  if (!cd.bossSchedule) {
+    cd.bossSchedule = {
+      firstInitMs: Date.now(),
+      nextBossAtMs: Date.now() + CAT_BOSS_GRACE_MS,
+      defeated: 0,
+      fled: 0,
+    };
+    saveData();
+  }
+  return cd.bossSchedule;
+}
+
+function maybeSpawnChimeraBoss() {
+  const stage = catRuntime.stageEl;
+  if (!stage) return;
+  if (catRuntime.boss) return;
+  const sched = getBossSchedule();
+  if (Date.now() < sched.nextBossAtMs) return;
+  spawnChimeraBoss();
+}
+
+function pickBossChimera() {
+  if (typeof CHIMERAS !== 'undefined' && CHIMERAS && CHIMERAS.length) {
+    // Favor uncommon+ tiers so bosses feel meaningful
+    const pool = CHIMERAS.filter(c => c.tier !== 'Common');
+    const arr = pool.length ? pool : CHIMERAS;
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+  // Fallback if expeditions.js wasn't loaded for some reason
+  return { id: 'voidcat', name: 'Voidcat',  emoji: '🐲', tier: 'Rare' };
+}
+
+function spawnChimeraBoss() {
+  const stage = catRuntime.stageEl;
+  if (!stage) return;
+  const chimera = pickBossChimera();
+  const sched = getBossSchedule();
+
+  // Scale HP by number already defeated so it ramps
+  const tierMul = { 'Common': 0.8, 'Uncommon': 1.0, 'Rare': 1.4, 'Epic': 1.9, 'Legendary': 2.6 };
+  const baseHp = 120;
+  const mult = tierMul[chimera.tier] || 1;
+  const hp = Math.round((baseHp + sched.defeated * 20) * mult);
+
+  const w = stage.clientWidth || 600;
+  const h = stage.clientHeight || 320;
+  const x = w / 2 - 30;
+  const y = 24;
+
+  const el = document.createElement('div');
+  el.className = 'cat-boss cat-boss-' + (chimera.tier || 'Common').toLowerCase();
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  el.innerHTML =
+    '<div class="cat-boss-hpbar"><div class="cat-boss-hpfill" style="width:100%"></div></div>' +
+    '<div class="cat-boss-emoji">' + chimera.emoji + '</div>' +
+    '<div class="cat-boss-name">' + (chimera.name || '???') +
+      ' <span class="cat-boss-tier">' + (chimera.tier || '') + '</span></div>';
+  stage.appendChild(el);
+
+  catRuntime.boss = {
+    chimera,
+    hp,
+    hpMax: hp,
+    x, y,
+    w: 84, // collision box
+    h: 84,
+    el,
+    spawnMs: performance.now(),
+    lastHitById: {},  // throttle per-cat hit cadence
+  };
+  updateBossChip();
+  catLog('⚔️ BOSS APPEARS: ' + chimera.emoji + ' ' + chimera.name +
+         ' (' + chimera.tier + ') · HP ' + hp);
+}
+
+function updateBossChip() {
+  const chip = document.getElementById('cat-boss-chip');
+  if (!chip) return;
+  const b = catRuntime.boss;
+  if (!b) {
+    chip.style.display = 'none';
+    const sched = getBossSchedule();
+    const mins = Math.max(0, Math.ceil((sched.nextBossAtMs - Date.now()) / 60000));
+    chip.title = 'Next boss in ~' + mins + ' min';
+    return;
+  }
+  chip.style.display = 'inline-block';
+  chip.textContent = '⚔️ ' + b.chimera.emoji + ' ' + b.chimera.name + ' · ' + b.hp + '/' + b.hpMax + ' HP';
+}
+
+function damageBoss(amount, byCat) {
+  const b = catRuntime.boss;
+  if (!b) return;
+  b.hp = Math.max(0, b.hp - amount);
+  const fill = b.el.querySelector('.cat-boss-hpfill');
+  if (fill) fill.style.width = (100 * b.hp / b.hpMax).toFixed(1) + '%';
+  // flash
+  b.el.classList.add('cat-boss-hit');
+  setTimeout(() => b.el && b.el.classList.remove('cat-boss-hit'), 120);
+  updateBossChip();
+  if (b.hp <= 0) defeatBoss(byCat);
+}
+
+function defeatBoss(byCat) {
+  const b = catRuntime.boss;
+  if (!b) return;
+  const chimera = b.chimera;
+  const sched = getBossSchedule();
+  sched.defeated++;
+  sched.nextBossAtMs = Date.now() + CAT_BOSS_INTERVAL_MS;
+
+  // Reward MoeBucks
+  const tierReward = { 'Common': 25, 'Uncommon': 35, 'Rare': 50, 'Epic': 75, 'Legendary': 120 };
+  const reward = tierReward[chimera.tier] || 30;
+  if (typeof getSlotData === 'function') {
+    const sd = getSlotData();
+    sd.moeBucks = (sd.moeBucks || 0) + reward;
+    if (typeof updateSlotMoneyDisplay === 'function') updateSlotMoneyDisplay();
+  }
+
+  // Add the chimera to the catch inventory (a rare pity guarantee)
+  try {
+    if (typeof CHIMERA_PERSONALITIES !== 'undefined') {
+      if (!data.caughtChimeras) data.caughtChimeras = [];
+      const perso = CHIMERA_PERSONALITIES[Math.floor(Math.random() * CHIMERA_PERSONALITIES.length)];
+      data.caughtChimeras.push({
+        id: chimera.id,
+        name: chimera.name,
+        emoji: chimera.emoji,
+        tier: chimera.tier,
+        nickname: null,
+        caughtDate: new Date().toISOString(),
+        personality: perso,
+        defeatedAs: 'boss',
+      });
+    }
+  } catch (e) { console.error('chimera boss reward failed', e); }
+  saveData();
+
+  // Visual: explosion of sparks, boss fades
+  const stage = catRuntime.stageEl;
+  if (stage) {
+    for (let i = 0; i < 14; i++) {
+      const s = document.createElement('div');
+      s.className = 'cat-spark';
+      s.textContent = ['✦','✧','⋆','✨','💥'][Math.floor(Math.random() * 5)];
+      s.style.left = (b.x + 30 + (Math.random() - 0.5) * 60) + 'px';
+      s.style.top = (b.y + 30 + (Math.random() - 0.5) * 60) + 'px';
+      stage.appendChild(s);
+      setTimeout(() => { if (s.parentNode) s.parentNode.removeChild(s); }, 1600);
+    }
+  }
+  if (b.el && b.el.parentNode) b.el.parentNode.removeChild(b.el);
+  catRuntime.boss = null;
+  updateBossChip();
+  catLog('🏆 Boss defeated by #' + (byCat ? byCat.id : '?') + ' → +' + reward +
+         ' MB + ' + chimera.emoji + ' ' + chimera.name + ' to inventory');
+}
+
+function boredBossFlees() {
+  const b = catRuntime.boss;
+  if (!b) return;
+  const sched = getBossSchedule();
+  sched.fled = (sched.fled || 0) + 1;
+  sched.nextBossAtMs = Date.now() + CAT_BOSS_INTERVAL_MS;
+  saveData();
+  if (b.el && b.el.parentNode) b.el.parentNode.removeChild(b.el);
+  catLog('💨 ' + b.chimera.emoji + ' ' + b.chimera.name + ' grew bored and vanished');
+  catRuntime.boss = null;
+  updateBossChip();
+}
+
+// Called each tick with the cat list — deals damage on bounce / collision
+function tickBossCollision(now) {
+  const b = catRuntime.boss;
+  if (!b) return;
+  // Give up if it's been sitting untouched too long
+  if (now - b.spawnMs > CAT_BOSS_MAX_LIFE_MS) { boredBossFlees(); return; }
+
+  // Track AABB
+  const bx1 = b.x, by1 = b.y, bx2 = b.x + b.w, by2 = b.y + b.h;
+  catRuntime.roaming.forEach(c => {
+    const cx1 = c.x, cy1 = c.y, cx2 = c.x + 60, cy2 = c.y + 50;
+    const overlap = (cx1 < bx2) && (cx2 > bx1) && (cy1 < by2) && (cy2 > by1);
+    if (!overlap) return;
+
+    // Throttle: one hit per cat per ~500ms
+    const last = b.lastHitById[c.id] || 0;
+    if (now - last < 500) {
+      // still bounce the cat off
+      c.vx = -c.vx;
+      c.vy = -c.vy;
+      return;
+    }
+    b.lastHitById[c.id] = now;
+
+    // Damage scales with speed + personality + lucky
+    const speed = Math.hypot(c.vx, c.vy);
+    let dmg = Math.round(3 + speed * 4);
+    if (c.lucky) dmg *= 2;
+    if (c.personality) {
+      if (c.personality.id === 'samurai') dmg *= 3;
+      if (c.personality.id === 'king')    dmg *= 2;
+      if (c.personality.id === 'adventurer') dmg = Math.round(dmg * 1.5);
+      if (c.personality.id === 'sloth' || c.personality.id === 'kitten') dmg = Math.max(1, Math.round(dmg * 0.5));
+    }
+    damageBoss(dmg, c);
+
+    // bounce the cat away from boss
+    const cxC = c.x + 30, cyC = c.y + 25;
+    const bxC = b.x + b.w / 2, byC = b.y + b.h / 2;
+    const dx = cxC - bxC, dy = cyC - byC;
+    const d = Math.hypot(dx, dy) || 1;
+    const bounce = 0.8 + speed * 0.4;
+    c.vx = (dx / d) * bounce * (1 + Math.random() * 0.4);
+    c.vy = (dy / d) * bounce * (1 + Math.random() * 0.4);
+
+    // tiny damage number floater
+    const stage = catRuntime.stageEl;
+    if (stage) {
+      const t = document.createElement('div');
+      t.className = 'cat-dmg-num';
+      t.textContent = '-' + dmg;
+      t.style.left = (b.x + b.w / 2 - 10) + 'px';
+      t.style.top  = (b.y + b.h / 2 - 10) + 'px';
+      stage.appendChild(t);
+      setTimeout(() => { if (t.parentNode) t.parentNode.removeChild(t); }, 700);
+    }
+  });
 }
 
 // ---------- CLICK HANDLERS ----------
@@ -918,7 +1306,7 @@ function renderCatsTab() {
       '<div class="cat-hud" id="cat-hud-row">' +
         '<span id="cat-hud-count">Roaming: 0 · Next ID: 1 · Collected: 0</span>' +
         '<span id="cat-flash" style="opacity:0.3;transition:opacity 0.3s;font-size:0.8rem;"></span>' +
-        '<button class="cat-btn" id="cat-btn-spawn">+ Spawn cat</button>' +
+        '<span id="cat-boss-chip" class="cat-boss-chip" style="display:none;"></span>' +
         '<button class="cat-btn" id="cat-btn-layout">↻ Reroll layout</button>' +
       '</div>' +
 
@@ -949,8 +1337,6 @@ function renderCatsTab() {
 
   applyWeekdayLayout();
 
-  const spawnBtn = document.getElementById('cat-btn-spawn');
-  if (spawnBtn) spawnBtn.addEventListener('click', () => makeCatEntity());
   const layoutBtn = document.getElementById('cat-btn-layout');
   if (layoutBtn) layoutBtn.addEventListener('click', () => applyWeekdayLayout());
 
@@ -967,13 +1353,25 @@ function renderCatsTab() {
 
 // ---------- SPAWNER / LIFECYCLE ----------
 function ensureCatSpawner() {
-  if (catRuntime.spawnInterval) return;
-  catRuntime.spawnInterval = setInterval(() => {
-    // Only spawn while the cats tab is the active one OR the stage is mounted
-    const tab = document.getElementById('tab-cats');
-    if (!tab || !catRuntime.stageEl) return;
-    makeCatEntity();
-  }, CAT_SPAWN_MS);
+  if (!catRuntime.spawnInterval) {
+    catRuntime.spawnInterval = setInterval(() => {
+      // Only spawn while the cats tab is the active one OR the stage is mounted
+      const tab = document.getElementById('tab-cats');
+      if (!tab || !catRuntime.stageEl) return;
+      makeCatEntity();
+    }, CAT_SPAWN_MS);
+  }
+  // Boss watcher ticks every 60s — cheap
+  if (!catRuntime.bossInterval) {
+    catRuntime.bossInterval = setInterval(() => {
+      if (!catRuntime.stageEl) return;
+      maybeSpawnChimeraBoss();
+      updateBossChip();
+    }, 60 * 1000);
+  }
+  // Initialize the boss chip with the next-boss countdown immediately
+  getBossSchedule();
+  updateBossChip();
   if (!catRuntime.animFrame) {
     catRuntime.animFrame = requestAnimationFrame(catAnimateTick);
   }

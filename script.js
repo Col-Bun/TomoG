@@ -244,6 +244,7 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
     if (tabId === 'rpg' && typeof renderRpg === 'function') renderRpg();
     if (tabId === 'expeditions' && typeof renderExpeditionMissions === 'function') renderExpeditionMissions();
     if (tabId === 'cats' && typeof renderCatsTab === 'function') renderCatsTab();
+    if (tabId === 'dictionary' && typeof renderTagPicker === 'function') renderTagPicker();
   });
 });
 

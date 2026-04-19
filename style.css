@@ -2792,3 +2792,24 @@ body.clipboard-mode #app {
 .dict-tagpick { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 50px; font-size: 0.7rem; cursor: pointer; transition: all 0.12s ease; user-select: none; }
 .dict-tagpick:hover { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.9); }
 .dict-tagpick.is-selected { background: rgba(168,232,76,0.25); color: #cdf28a; border-color: rgba(168,232,76,0.5); box-shadow: 0 0 6px rgba(168,232,76,0.18); }
+.dict-tags-block { margin: 10px 0 6px; display: flex; flex-direction: column; gap: 6px; }
+.dict-tags-block-title { font-size: 0.78rem; color: rgba(255,255,255,0.8); font-weight: 600; letter-spacing: 0.02em; }
+.dict-tags-hint { color: rgba(255,255,255,0.45); font-weight: 400; font-size: 0.7rem; margin-left: 4px; }
+
+/* ===== FUDOKI MODE (kuromoji tokenized view) ===== */
+.fudoki-line { padding: 4px 6px; border-radius: 6px; }
+.fudoki-line:hover { background: rgba(255,255,255,0.04); }
+.fudoki-tok {
+  display: inline-block; line-height: 1.55;
+  transition: transform 0.08s, filter 0.12s;
+  cursor: help;
+}
+.fudoki-tok:hover { transform: translateY(-1px); filter: brightness(1.2); }
+#clipboard-fudoki-view {
+  flex: 1;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  color: #eee;
+}
+#clipboard-fudoki-view ruby rt { user-select: none; }

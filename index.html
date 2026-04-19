@@ -303,7 +303,11 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
           <option value="phrase">💬 phrase</option>
           <option value="other">❓ other</option>
         </select>
-        <input type="text" id="dict-tags" placeholder="tags (comma-sep): plant, kitchen, emotion..." style="flex:2;">
+      </div>
+      <div class="dict-tags-block">
+        <div class="dict-tags-block-title">🏷️ Tags <span class="dict-tags-hint">— pick from preset categories (used for RPG room theming)</span></div>
+        <div id="dict-tag-selected" class="dict-tag-selected is-empty"></div>
+        <div id="dict-tag-picker" class="dict-tag-picker"></div>
       </div>
       <div class="dict-filter"><input type="text" id="dict-search" placeholder="🔍 Search words / tags..." oninput="renderDictionary()"></div>
       <div id="dict-tag-cloud" class="dict-tag-cloud"></div>
@@ -812,9 +816,22 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
       <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:14px;">
         <button class="btn-glossy btn-purple huge-btn" onclick="autoPaste()">📋 AUTO-PASTE</button>
         <button class="btn-glossy btn-green huge-btn" id="clip-poll-btn" onclick="toggleAutoPoll()" style="background:linear-gradient(180deg,#2ed573 0%,#1aaf5d 100%);">▶ START AUTO-CAPTURE</button>
+        <button class="btn-glossy btn-purple huge-btn" id="clip-fudoki-btn" onclick="toggleFudokiMode()" style="background:linear-gradient(180deg,#ff9a44 0%,#e8651d 100%);">📚 FUDOKI MODE</button>
+      </div>
+
+      <div id="clip-fudoki-legend" style="display:none; font-size:0.7rem; color:rgba(255,255,255,0.6); text-align:center; margin-bottom:8px; font-family:'Courier New',monospace;">
+        <span style="color:#ff8fa3;">名詞</span> ·
+        <span style="color:#8ddbff;">動詞</span> ·
+        <span style="color:#c6f27a;">形容詞</span> ·
+        <span style="color:#ffd36a;">副詞</span> ·
+        <span style="color:#c49bff;">助詞</span> ·
+        <span style="color:#a0a0a0;">助動詞</span> ·
+        <span style="color:#ff6eaa;">代名詞</span> ·
+        <span style="color:#7ee6c6;">連体詞</span>
       </div>
 
       <textarea id="clipboard-area" class="diary-textarea custom-scrollbar" placeholder="Hooked text appears here (newest at bottom)..." style="font-family:'Noto Sans JP','Nunito',sans-serif; font-size:1.05rem; line-height:1.8; min-height:0;" readonly></textarea>
+      <div id="clipboard-fudoki-view" class="diary-textarea custom-scrollbar" style="display:none; font-family:'Noto Sans JP','Nunito',sans-serif; font-size:1.05rem; line-height:2.0; min-height:0; padding:12px; overflow-y:auto; white-space:pre-wrap; user-select:text;"></div>
 
       <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:14px;">
         <button class="btn-theme" style="padding:8px 16px; border-radius:50px; font-size:0.85rem;" onclick="exportClipLog()">💾 Export Log</button>
