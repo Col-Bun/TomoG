@@ -1,0 +1,345 @@
+/* ===== CAT PARK (RCT-style extensions) ===== */
+
+/* --- HUD bar above stage --- */
+.cat-park-hud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 6px 0 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.park-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.park-chip-token {
+  background: linear-gradient(135deg, rgba(255, 180, 80, 0.35), rgba(255, 80, 140, 0.25));
+  border-color: rgba(255, 180, 80, 0.55);
+  color: #ffeac4;
+}
+.park-chip-flash {
+  box-shadow: 0 0 14px #ffd17a, 0 0 6px #ffd17a inset;
+  background: linear-gradient(135deg, rgba(255, 217, 130, 0.6), rgba(255, 120, 90, 0.4));
+}
+.park-btn {
+  padding: 5px 12px;
+  font-size: 0.78rem !important;
+}
+.park-btn-sm {
+  padding: 2px 8px;
+  font-size: 0.7rem !important;
+  margin-left: 6px;
+}
+.park-btn-danger {
+  color: #ffb8cb !important;
+  border-color: rgba(255, 60, 142, 0.35) !important;
+}
+
+/* --- Inspector modal --- */
+.cat-park-inspector-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 3, 20, 0.72);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  animation: cpi-fadein 0.18s ease-out;
+}
+@keyframes cpi-fadein { from { opacity: 0; } to { opacity: 1; } }
+
+.cat-park-inspector {
+  max-width: 520px;
+  width: min(520px, 94vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 229, 255, 0.08);
+  animation: cpi-pop 0.22s cubic-bezier(.2,.9,.3,1.3);
+}
+@keyframes cpi-pop { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.cpi-header {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.cpi-portrait {
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+  text-align: center;
+  font-family: 'Courier New', 'MS Gothic', monospace;
+  line-height: 1.1;
+  min-width: 96px;
+}
+.cpi-face { font-size: 1.1rem; }
+.cpi-kanji { font-size: 1.4rem; font-weight: 700; }
+.cpi-header-main { flex: 1; }
+.cpi-title {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.15rem;
+  color: #fff;
+  font-weight: 800;
+}
+.cpi-lucky {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ffd700, #ff9900);
+  color: #3a2200;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+.cpi-subtitle {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.82rem;
+  margin-top: 2px;
+}
+.cpi-dim { color: rgba(255, 255, 255, 0.45); font-weight: 400; }
+.cpi-row {
+  margin-top: 6px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.cpi-chip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.82);
+}
+.cpi-close {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.cpi-close:hover { background: rgba(255, 90, 90, 0.35); }
+
+.cpi-stats {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.cpi-stat {
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.cpi-stat-label {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 6px;
+  letter-spacing: 0.04em;
+}
+.cpi-stat-val { font-size: 0.85rem; color: #fff; font-weight: 700; }
+.cpi-stat-big { font-size: 1.4rem; color: #fff; font-weight: 800; font-family: 'Baloo 2', cursive; }
+.cpi-bar {
+  height: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+.cpi-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.cpi-thoughts {
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.cpi-thought-list {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0;
+}
+.cpi-thought-list li {
+  padding: 4px 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.85rem;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+}
+.cpi-thought-list li:last-child { border-bottom: none; }
+
+.cpi-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.cpi-btn {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.82rem;
+  transition: all 0.2s;
+}
+.cpi-btn:hover { background: rgba(255, 255, 255, 0.18); transform: translateY(-1px); }
+.cpi-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.cpi-btn-pet   { border-color: rgba(140, 255, 140, 0.4); color: #d0ffd0; }
+.cpi-btn-feed  { border-color: rgba(255, 200, 90, 0.4); color: #ffe6b8; }
+.cpi-btn-fling { border-color: rgba(180, 120, 255, 0.4); color: #e0ccff; }
+.cpi-btn-close { opacity: 0.7; }
+
+/* --- Rides on the stage --- */
+.park-ride {
+  text-align: center;
+  user-select: none;
+  cursor: default;
+  padding: 4px 6px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px dashed rgba(255, 213, 122, 0.3);
+  box-shadow: 0 0 12px rgba(255, 213, 122, 0.15) inset;
+}
+.park-ride-art {
+  color: #ffd57a;
+  font-weight: 600;
+}
+.park-ride-label {
+  margin-top: 2px;
+  font-family: 'Baloo 2', cursive;
+  font-size: 0.72rem;
+  color: #ffeac4;
+}
+.park-ride-occ {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* --- Ride shop cards --- */
+.park-ride-shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.park-ride-card {
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: center;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.park-ride-card:hover {
+  border-color: rgba(255, 213, 122, 0.4);
+  transform: translateY(-2px);
+}
+.park-ride-card-art {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  line-height: 1;
+  color: #ffd57a;
+  margin-bottom: 4px;
+  white-space: pre;
+  min-height: 60px;
+}
+.park-ride-card-title {
+  font-family: 'Baloo 2', cursive;
+  font-weight: 800;
+  color: #fff;
+  font-size: 0.88rem;
+}
+.park-ride-card-sub { color: rgba(255, 255, 255, 0.6); font-size: 0.72rem; margin-bottom: 6px; }
+.park-ride-card-meta { font-size: 0.7rem; color: rgba(255, 213, 122, 0.8); margin-bottom: 8px; }
+.park-ride-card-buy { width: 100%; }
+
+.park-ride-built {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.22);
+}
+.park-ride-built-list {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0;
+}
+.park-ride-built-list li {
+  padding: 4px 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.85rem;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+}
+
+/* --- Robot cat --- */
+.ascii-cat-robot {
+  z-index: 3;
+  filter: drop-shadow(0 0 4px #00e5ff);
+  animation: park-robot-pulse 1.6s ease-in-out infinite;
+}
+@keyframes park-robot-pulse {
+  0%, 100% { filter: drop-shadow(0 0 4px #00e5ff); }
+  50%      { filter: drop-shadow(0 0 12px #00e5ff) drop-shadow(0 0 4px #ff6ea8); }
+}
+
+/* --- Fling/drag states --- */
+.ascii-cat-grabbed {
+  transform: scale(1.3) rotate(-4deg) !important;
+  cursor: grabbing !important;
+  filter: brightness(1.25) drop-shadow(0 0 8px rgba(255,255,255,0.45));
+  z-index: 10;
+}
+.ascii-cat-flung {
+  animation: park-flung-spin 0.9s ease-out;
+}
+@keyframes park-flung-spin {
+  from { transform: rotate(0) scale(1.2); }
+  to   { transform: rotate(720deg) scale(1); }
+}
+
+/* --- Day/night overlay --- */
+.park-day-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  transition: background 4s linear, opacity 4s linear;
+  mix-blend-mode: multiply;
+}
+
+/* Ensure stage children stack above overlay */
+.cat-stage { position: relative; }
+.cat-stage > .ascii-cat,
+.cat-stage > .park-ride { z-index: 2; }

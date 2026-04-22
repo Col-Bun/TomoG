@@ -1,0 +1,282 @@
+/* widgets.css — floating draggable widgets (Suba clock + pomodoro mini) */
+
+/* Base float panel. Overrides the big border-radius of .glass-dark for a
+   snug, widget-appropriate size. */
+.widget-float {
+  position: fixed;
+  z-index: 9999;
+  user-select: none;
+  min-width: 190px;
+  max-width: 260px;
+  padding: 10px 14px !important;
+  border-radius: 14px !important;
+  cursor: grab;
+  touch-action: none;
+  font-family: 'Noto Sans JP', 'Nunito', sans-serif;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+.widget-float:hover { box-shadow: 0 10px 32px rgba(0,0,0,0.35); }
+.widget-float.widget-dragging {
+  cursor: grabbing;
+  transform: scale(1.03);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.45);
+}
+
+.widget-handle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.68rem;
+  margin-bottom: 6px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+  opacity: 0.88;
+}
+.widget-title {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: rgba(255,255,255,0.95);
+}
+.widget-meta {
+  font-size: 0.62rem;
+  opacity: 0.6;
+  color: rgba(255,255,255,0.65);
+  white-space: nowrap;
+}
+.widget-body { padding: 2px 0; }
+
+/* ---- Suba clock body ---- */
+.suba-time {
+  font-family: 'Share Tech Mono', 'Noto Sans JP', monospace;
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #fff;
+  text-align: center;
+  margin: 6px 0 2px;
+  text-shadow: 0 0 10px rgba(255,255,255,0.18);
+  font-variant-numeric: tabular-nums;
+}
+.suba-date {
+  font-size: 0.74rem;
+  color: rgba(255,255,255,0.75);
+  text-transform: capitalize;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+.suba-flag {
+  font-size: 0.62rem;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  margin-top: 6px;
+  letter-spacing: 0.02em;
+}
+
+/* ---- Pomodoro mini ---- */
+#pom-mini-widget { min-width: 210px; }
+.pom-mini-time {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.9rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 6px 0 10px;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 10px currentColor;
+  font-variant-numeric: tabular-nums;
+}
+.pom-mini-bar-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.pom-mini-bar {
+  height: 100%;
+  width: 0%;
+  background: #ff4757;
+  transition: width 1s linear, background 0.3s;
+}
+.pom-mini-ctl {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+.pom-mini-btn {
+  flex: 1;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.9);
+  padding: 5px 0;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  font-family: inherit;
+}
+.pom-mini-btn:hover { background: rgba(255,255,255,0.16); }
+.pom-mini-btn:active { transform: scale(0.96); }
+
+/* =========================================================================
+   PER-THEME STYLING
+   ========================================================================= */
+
+/* ---- Silver · The 25th Ward (neon cyan / magenta on near-black) ---- */
+body.theme-silver .widget-float {
+  background: rgba(8,8,14,0.88) !important;
+  border: 1px solid rgba(0,229,255,0.55) !important;
+  border-radius: 3px !important;
+  font-family: 'Share Tech Mono', monospace !important;
+  box-shadow: 0 0 22px rgba(0,229,255,0.18), 0 8px 24px rgba(0,0,0,0.5) !important;
+}
+body.theme-silver .widget-title { color: #00e5ff; text-transform: uppercase; letter-spacing: 0.14em; }
+body.theme-silver .widget-meta  { color: rgba(255,0,102,0.7); text-transform: uppercase; }
+body.theme-silver .widget-handle { border-bottom-color: rgba(0,229,255,0.25); }
+body.theme-silver .suba-time,
+body.theme-silver .pom-mini-time {
+  color: #00e5ff;
+  text-shadow: 0 0 12px rgba(0,229,255,0.55);
+}
+body.theme-silver .suba-date,
+body.theme-silver .suba-flag { color: rgba(176,184,192,0.8); }
+body.theme-silver .pom-mini-btn {
+  background: rgba(0,229,255,0.08);
+  border-color: rgba(0,229,255,0.4);
+  color: #00e5ff;
+  border-radius: 2px;
+}
+
+/* ---- Windows 98 (3D chisel, title bar, MS-Sans/Pixelify) ---- */
+body.theme-win98 .widget-float {
+  background: #c0c0c0 !important;
+  border-top: 2px solid #fff !important;
+  border-left: 2px solid #fff !important;
+  border-right: 2px solid #404040 !important;
+  border-bottom: 2px solid #404040 !important;
+  border-radius: 0 !important;
+  color: #000 !important;
+  font-family: 'Pixelify Sans', 'MS Sans Serif', Tahoma, sans-serif !important;
+  padding: 3px 3px 8px !important;
+  box-shadow: 0 2px 0 #000, 2px 2px 0 #000 !important;
+}
+body.theme-win98 .widget-handle {
+  background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+  color: #fff;
+  margin: -3px -3px 6px;
+  padding: 3px 6px;
+  border-bottom: none;
+  border-radius: 0;
+  opacity: 1;
+}
+body.theme-win98 .widget-title { color: #fff; font-weight: 700; letter-spacing: 0; }
+body.theme-win98 .widget-meta  { color: #c0c0c0; }
+body.theme-win98 .suba-time,
+body.theme-win98 .pom-mini-time {
+  color: #000080;
+  text-shadow: none;
+  background: #fff;
+  border: 1px inset #808080;
+  padding: 3px 6px;
+  margin: 4px 6px 8px;
+}
+body.theme-win98 .suba-date,
+body.theme-win98 .suba-flag { color: #000; }
+body.theme-win98 .pom-mini-bar-track {
+  background: #808080;
+  border: 1px inset #404040;
+  border-radius: 0;
+  height: 14px;
+  margin: 0 4px 8px;
+  width: calc(100% - 8px);
+}
+body.theme-win98 .pom-mini-bar {
+  background: repeating-linear-gradient(90deg, #000080 0px, #000080 8px, transparent 8px, transparent 10px), #1084d0;
+}
+body.theme-win98 .pom-mini-btn {
+  background: #c0c0c0;
+  border-top: 2px solid #fff;
+  border-left: 2px solid #fff;
+  border-right: 2px solid #404040;
+  border-bottom: 2px solid #404040;
+  border-radius: 0;
+  color: #000;
+}
+body.theme-win98 .pom-mini-btn:active {
+  border-top: 2px solid #404040;
+  border-left: 2px solid #404040;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+}
+
+/* ---- Terminal (pure CRT green on black) ---- */
+body.theme-terminal .widget-float {
+  background: rgba(0,8,0,0.92) !important;
+  border: 1px solid #00ff41 !important;
+  border-radius: 4px !important;
+  color: #00ff41 !important;
+  font-family: 'VT323', 'Share Tech Mono', monospace !important;
+  box-shadow: 0 0 24px rgba(0,255,65,0.25), inset 0 0 20px rgba(0,255,65,0.08) !important;
+}
+body.theme-terminal .widget-handle { border-bottom-color: rgba(0,255,65,0.25); }
+body.theme-terminal .widget-title,
+body.theme-terminal .widget-meta,
+body.theme-terminal .suba-date,
+body.theme-terminal .suba-flag { color: #00ff41; }
+body.theme-terminal .suba-time,
+body.theme-terminal .pom-mini-time {
+  color: #00ff41;
+  text-shadow: 0 0 8px #00ff41, 0 0 14px rgba(0,255,65,0.5);
+}
+body.theme-terminal .pom-mini-btn {
+  background: rgba(0,255,65,0.08);
+  border-color: #00ff41;
+  color: #00ff41;
+  border-radius: 2px;
+}
+
+/* ---- ULTRAKILL Gothic (crimson + gold on pitch-black) ---- */
+body.theme-ultrakill .widget-float {
+  background: rgba(20,0,0,0.93) !important;
+  border: 2px solid #ff0000 !important;
+  border-radius: 0 !important;
+  color: #ffcc00 !important;
+  box-shadow: 0 0 28px rgba(255,0,0,0.4), inset 0 0 14px rgba(255,0,0,0.2) !important;
+  font-family: 'UnifrakturCook', 'Noto Serif JP', serif !important;
+}
+body.theme-ultrakill .widget-handle { border-bottom-color: rgba(255,0,0,0.4); }
+body.theme-ultrakill .widget-title  { color: #ff0000; text-transform: uppercase; letter-spacing: 0.12em; }
+body.theme-ultrakill .widget-meta   { color: #ffcc00; }
+body.theme-ultrakill .suba-time,
+body.theme-ultrakill .pom-mini-time {
+  color: #ffcc00;
+  text-shadow: 0 0 8px #ff0000, 0 0 14px rgba(255,0,0,0.6);
+  font-family: 'Share Tech Mono', monospace;
+}
+body.theme-ultrakill .suba-date,
+body.theme-ultrakill .suba-flag { color: rgba(255,204,0,0.75); }
+body.theme-ultrakill .pom-mini-btn {
+  background: rgba(255,0,0,0.1);
+  border: 1px solid #ff0000;
+  color: #ffcc00;
+  border-radius: 0;
+}
+
+/* ---- Moe (default glossy pastel — lean on .glass-dark already) ---- */
+body.theme-moe .widget-float {
+  background: linear-gradient(135deg, rgba(255,138,0,0.25), rgba(255,60,142,0.22)) !important;
+  border: 1.5px solid rgba(255,255,255,0.35) !important;
+  box-shadow: 0 8px 32px rgba(255,60,142,0.25), inset 0 1px 0 rgba(255,255,255,0.3) !important;
+}
+body.theme-moe .widget-title { color: #fff; text-shadow: 0 1px 2px rgba(255,60,142,0.4); }
+body.theme-moe .suba-time,
+body.theme-moe .pom-mini-time { color: #fff; text-shadow: 0 0 10px rgba(255,138,0,0.45); }
+
+/* Small screens: keep widgets readable but compact */
+@media (max-width: 600px) {
+  .widget-float { min-width: 160px; max-width: 200px; padding: 8px 10px !important; }
+  .suba-time,
+  .pom-mini-time { font-size: 1.4rem; }
+}

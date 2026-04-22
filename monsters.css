@@ -1,0 +1,81 @@
+/* ===== POCKET MONSTERS (PMD sprite renderer) ===== */
+
+.pmon {
+  position: absolute;
+  pointer-events: auto;
+  transition: filter 0.2s;
+  will-change: transform, left, top;
+}
+
+.pmon:hover {
+  filter: brightness(1.15) drop-shadow(0 0 6px rgba(255, 255, 255, 0.55));
+}
+
+.pmon-sprite {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  pointer-events: none;
+}
+
+.pmon-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  width: 38%;
+  height: 7px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0));
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.pmon-label {
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.66rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.82);
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.85), 0 1px 0 rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.pmon:hover .pmon-label {
+  opacity: 1;
+}
+
+.pmon-bubble {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 12, 40, 0.88);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  white-space: nowrap;
+  animation: pmon-bubble-pop 0.18s ease-out;
+}
+@keyframes pmon-bubble-pop {
+  from { transform: translateX(-50%) scale(0.5); opacity: 0; }
+  to   { transform: translateX(-50%) scale(1);   opacity: 1; }
+}
+
+.pmon-despawning {
+  animation: pmon-fadeout 1.2s ease-out forwards;
+}
+@keyframes pmon-fadeout {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-12px); }
+}
