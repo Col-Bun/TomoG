@@ -22,7 +22,8 @@ function setDailyTheme() {
 setDailyTheme(); // Run immediately on load
 
 // ===== UTILS =====
-function todayStr() { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+// Day rolls over at 3 AM — before 3 AM counts as "yesterday"
+function todayStr() { const d=new Date(); d.setHours(d.getHours()-3); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function formatDate(s) { const [y,m,d]=s.split('-'); const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return mo[parseInt(m)-1]+' '+parseInt(d)+', '+y; }
 function formatDateTime(d) { return formatDate(todayStr()) + ' at ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); }
 function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
@@ -34,7 +35,7 @@ function toggleTheme() { document.body.classList.toggle('dark-mode'); localStora
 // ===== DATA INITIALIZATION =====
 const STORAGE_KEY = 'studyBuddyData';
 function getDefaultData() {
-  return { days: {}, dictionary: [], diary: [], streak: 0, lastActiveDate: null, starterLoaded: false, schedule: {}, calendar: {}, quotes: [], commissions: [], materials: {}, expeditions: { active: null, log: [], lastAutoDate: null } };
+  return { days: {}, dictionary: [], diary: [], streak: 0, lastActiveDate: null, starterLoaded: false, schedule: {}, calendar: {}, quotes: [], commissions: [], materials: {}, expeditions: { active: null, log: [], lastAutoDate: null }, bestiary: {}, advice: [] };
 }
 
 function loadData() { 
@@ -52,9 +53,20 @@ function loadData() {
       if (!Array.isArray(loaded.commissions)) loaded.commissions = [];
       if (!loaded.materials || typeof loaded.materials !== 'object') loaded.materials = {};
       if (!loaded.expeditions || typeof loaded.expeditions !== 'object') loaded.expeditions = { active: null, log: [], lastAutoDate: null };
+      if (!loaded.bestiary || typeof loaded.bestiary !== 'object') loaded.bestiary = {};
+      if (!Array.isArray(loaded.advice)) loaded.advice = [];
       if (typeof loaded.streak !== 'number') loaded.streak = 0;
-      return loaded; 
-    } 
+      if (!loaded.mapState) loaded.mapState = null; // Will be initialized by map.js on first use
+      if (!loaded.slotMachine) loaded.slotMachine = null; // Will be initialized by slots.js
+      if (!loaded.economy) loaded.economy = null; // Will be initialized by economy.js
+      if (!loaded.catching) loaded.catching = null; // Will be initialized by catching.js
+      if (!loaded.conjStats) loaded.conjStats = null; // Will be initialized by conjugation.js
+      if (!loaded.jlpt) loaded.jlpt = null; // Will be initialized by jlpt.js
+      if (!loaded.todos) loaded.todos = null; // Will be initialized by todo.js
+      if (!loaded.fun) loaded.fun = null; // Will be initialized by fun.js
+      if (!loaded.pomodoro) loaded.pomodoro = null; // Will be initialized by pomodoro.js
+      return loaded;
+    }
   } catch(e) { console.error('loadData error:', e); } 
   return getDefaultData(); 
 }
@@ -79,32 +91,79 @@ if (!data.starterLoaded && typeof starterDeck !== 'undefined') {
   data.starterLoaded = true; saveData();
 }
 
-// ===== NES PASSWORD =====
-function generatePassword() { document.getElementById('nes-password-box').value = btoa(encodeURIComponent(JSON.stringify(data))).match(/.{1,8}/g).join('-'); }
-function loadPassword() {
-  const input = document.getElementById('nes-password-box').value.trim(); if (!input) return alert("ENTER PASSWORD.");
+// ===== FILE-BASED SAVE/LOAD =====
+function downloadSaveFile() {
   try {
-    let cleanInput = input.replace(/[-\s]/g, '');
-    let imported;
-    try { imported = JSON.parse(decodeURIComponent(atob(cleanInput))); } 
-    catch(e) { imported = JSON.parse(decodeURIComponent(escape(atob(cleanInput)))); }
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const timestamp = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `moe-chan-save-${timestamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    const btn = document.getElementById('save-download-btn');
+    if (btn) { btn.textContent = 'Downloaded!'; setTimeout(() => btn.textContent = '💾 Download Save File', 2000); }
+  } catch(e) {
+    console.error('Download save failed:', e);
+    alert('Failed to download save file.');
+  }
+}
 
-    if (imported && typeof imported === 'object' && imported.days) { 
+function triggerLoadFile() {
+  document.getElementById('save-file-input').click();
+}
+
+function handleSaveFileUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // Validate file type
+  if (!file.name.endsWith('.json')) {
+    alert('Please select a .json save file.');
+    event.target.value = '';
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+
+      if (!imported || typeof imported !== 'object' || !imported.days) {
+        alert('Invalid save file: missing required data.');
+        return;
+      }
+
       // Migrate all fields to ensure nothing is lost
       if (!Array.isArray(imported.dictionary)) imported.dictionary = [];
-      if (!Array.isArray(imported.diary)) imported.diary = []; 
+      if (!Array.isArray(imported.diary)) imported.diary = [];
       if (!imported.calendar || typeof imported.calendar !== 'object') imported.calendar = {};
       if (!imported.schedule || typeof imported.schedule !== 'object') imported.schedule = {};
       if (!Array.isArray(imported.quotes)) imported.quotes = [];
       if (!Array.isArray(imported.commissions)) imported.commissions = [];
       if (!imported.materials || typeof imported.materials !== 'object') imported.materials = {};
       if (!imported.expeditions || typeof imported.expeditions !== 'object') imported.expeditions = { active: null, log: [], lastAutoDate: null };
+      if (!imported.bestiary || typeof imported.bestiary !== 'object') imported.bestiary = {};
+      if (!Array.isArray(imported.advice)) imported.advice = [];
       if (typeof imported.streak !== 'number') imported.streak = 0;
-      data = imported; saveData(); initApp(); alert("RESTORED!"); document.getElementById('nes-password-box').value = ''; 
-    } else alert("INVALID DATA.");
-  } catch (err) { console.error('Password restore error:', err); alert("INVALID FORMAT."); }
+      if (!imported.mapState) imported.mapState = null;
+
+      data = imported;
+      saveData();
+      initApp();
+      alert('Save file restored successfully!');
+    } catch(err) {
+      console.error('Save file restore error:', err);
+      alert('Could not read save file. Make sure it is a valid Moe-Chan save.');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = ''; // Reset so same file can be re-selected
 }
-function copyPassword() { const pwBox = document.getElementById('nes-password-box'); if (!pwBox.value) return; pwBox.select(); document.execCommand('copy'); alert("COPIED!"); }
 
 function calcStreak() {
   const sortedDays=Object.keys(data.days).sort().reverse(); if(!sortedDays.length){data.streak=0;return;}
@@ -180,6 +239,12 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
          document.body.appendChild(moeContainer);
       }
     }
+
+    // Lazy-render certain tabs when activated
+    if (tabId === 'rpg' && typeof renderRpg === 'function') renderRpg();
+    if (tabId === 'expeditions' && typeof renderExpeditionMissions === 'function') renderExpeditionMissions();
+    if (tabId === 'cats' && typeof renderCatsTab === 'function') renderCatsTab();
+    if (tabId === 'dictionary' && typeof renderTagPicker === 'function') renderTagPicker();
   });
 });
 
@@ -188,7 +253,9 @@ function logFlashcards(){
   const today=todayStr();if(!data.days[today])data.days[today]={flash:0,read:0}; data.days[today].flash=(data.days[today].flash||0)+val;
   document.getElementById('flash-input-area').style.display='none'; document.getElementById('flash-done').style.display='block'; document.getElementById('flash-done-text').textContent=data.days[today].flash+' min today!';
   document.getElementById('card-flash').classList.add('done'); setCreatureState('study');
-  const readDone=(data.days[today].read||0)>0;setSpeech(readDone?'bothDone':'flashDone'); calcStreak();saveData();updateStats();updateMood(); if(readDone)setTimeout(()=>setCreatureState('celebrate'),300);
+  // Award MoeBucks: 3 MB per 10 minutes of flashcard study
+  if(typeof getSlotData === 'function') { const sd=getSlotData(); const reward=Math.floor(val/10)*3; if(reward>0){ sd.moeBucks+=reward; if(typeof updateSlotMoneyDisplay==='function') updateSlotMoneyDisplay(); document.getElementById('flash-done-text').textContent=data.days[today].flash+' min today! (+'+reward+' MB)'; } }
+  const readDone=(data.days[today].read||0)>0;setSpeech(readDone?'bothDone':'flashDone'); calcStreak();saveData();updateStats();updateMood();updateLevelDisplay(); if(readDone)setTimeout(()=>setCreatureState('celebrate'),300);
   if(typeof updateRarityBonusDisplay === 'function') updateRarityBonusDisplay();
 }
 function logReading(){
@@ -196,33 +263,159 @@ function logReading(){
   const today=todayStr();if(!data.days[today])data.days[today]={flash:0,read:0}; data.days[today].read=(data.days[today].read||0)+val;
   document.getElementById('read-input-area').style.display='none'; document.getElementById('read-done').style.display='block'; document.getElementById('read-done-text').textContent=data.days[today].read+' hrs today!';
   document.getElementById('card-read').classList.add('done'); setCreatureState('read');
-  const flashDone=(data.days[today].flash||0)>0;setSpeech(flashDone?'bothDone':'readDone'); calcStreak();saveData();updateStats();updateMood(); if(flashDone)setTimeout(()=>setCreatureState('celebrate'),300);
+  // Award MoeBucks: 3 MB per 10 minutes (0.167 hrs) of reading
+  if(typeof getSlotData === 'function') { const sd=getSlotData(); const readMinutes=Math.round(val*60); const reward=Math.floor(readMinutes/10)*3; if(reward>0){ sd.moeBucks+=reward; if(typeof updateSlotMoneyDisplay==='function') updateSlotMoneyDisplay(); document.getElementById('read-done-text').textContent=data.days[today].read+' hrs today! (+'+reward+' MB)'; } }
+  const flashDone=(data.days[today].flash||0)>0;setSpeech(flashDone?'bothDone':'readDone'); calcStreak();saveData();updateStats();updateMood();updateLevelDisplay(); if(flashDone)setTimeout(()=>setCreatureState('celebrate'),300);
+}
+
+// ===== DICTIONARY / FLASHCARDS (with tags + type for RPG generation) =====
+// Standardized taxonomy — these are the ONLY tags the RPG engine recognizes.
+// If you add custom free-form tags via save-file edits they'll be preserved
+// but won't drive room themes.
+const DICT_TAG_CATEGORIES = {
+  'Place':     ['kitchen','bedroom','bathroom','livingroom','garden','school','office','shop','street','park','temple','beach','mountain','forest','river','cafe','station','library'],
+  'Nature':    ['plant','flower','tree','animal','bird','fish','insect','weather','sky','stone','water','fire','wind','earth'],
+  'Food':      ['food','drink','fruit','vegetable','sweet','meat','grain','spice'],
+  'Body/Self': ['body','face','hand','emotion','feeling','health','mind','clothing','accessory'],
+  'Objects':   ['tool','furniture','container','utensil','book','paper','technology','vehicle','toy'],
+  'Social':    ['family','friend','profession','greeting','question'],
+  'Abstract':  ['time','season','color','shape','size','number','direction'],
+  'Action':    ['motion','cooking','cleaning','communication','study','rest','play','work','create','destroy','perception']
+};
+const DICT_ALL_TAGS = Object.values(DICT_TAG_CATEGORIES).flat();
+
+// Selection state for the add-word form
+let _dictTagSelection = new Set();
+
+function renderTagPicker() {
+  const pickerEl = document.getElementById('dict-tag-picker');
+  const selectedEl = document.getElementById('dict-tag-selected');
+  if (!pickerEl || !selectedEl) return;
+
+  // Chip grid grouped by category
+  let html = '';
+  for (const [cat, tags] of Object.entries(DICT_TAG_CATEGORIES)) {
+    html += `<div class="dict-tagcat"><span class="dict-tagcat-label">${cat}</span><div class="dict-tagcat-chips">`;
+    html += tags.map(t => {
+      const sel = _dictTagSelection.has(t);
+      return `<button type="button" class="dict-tagpick${sel?' is-selected':''}" onclick="toggleTagChip('${t}')">${t}</button>`;
+    }).join('');
+    html += `</div></div>`;
+  }
+  pickerEl.innerHTML = html;
+
+  // Selected summary on top — chips are clickable to remove (× rendered via CSS)
+  if (_dictTagSelection.size === 0) {
+    selectedEl.classList.add('is-empty');
+    selectedEl.innerHTML = '<span class="dict-tag-empty-msg">click tags below to add — or leave empty</span>';
+  } else {
+    selectedEl.classList.remove('is-empty');
+    selectedEl.innerHTML = Array.from(_dictTagSelection)
+      .map(t => `<span class="dict-tag-selected-chip" onclick="toggleTagChip('${t}')" title="click to remove">${t}</span>`)
+      .join('');
+  }
+}
+
+function toggleTagChip(tag) {
+  if (_dictTagSelection.has(tag)) _dictTagSelection.delete(tag);
+  else _dictTagSelection.add(tag);
+  renderTagPicker();
+}
+
+// Kept for backward compat if any old save / text-input path still hits it
+function parseTagInput(raw) {
+  if (!raw) return [];
+  return raw.split(/[,;]+/).map(t => t.trim().toLowerCase()).filter(Boolean).slice(0, 12);
+}
+
+// Normalize older entries in-place so legacy saves still work
+function ensureDictShape() {
+  if (!Array.isArray(data.dictionary)) { data.dictionary = []; return; }
+  data.dictionary.forEach(w => {
+    if (!Array.isArray(w.tags)) w.tags = [];
+    if (!w.type) {
+      // Naive auto-detection for legacy entries
+      if (/(ing|ate|ize|ise)$/i.test(w.en || '')) w.type = 'verb';
+      else if ((w.jp || '').endsWith('う') || (w.jp || '').endsWith('る')) w.type = 'verb';
+      else w.type = 'noun';
+    }
+    if (typeof w.uses !== 'number') w.uses = 0;       // RPG usage counter (for SRS)
+    if (typeof w.correct !== 'number') w.correct = 0; // correct answers in RPG
+  });
 }
 
 function addWord(){
-  const en=document.getElementById('dict-en').value.trim(),jp=document.getElementById('dict-jp').value.trim(),es=document.getElementById('dict-es').value.trim(); if(!en&&!jp&&!es)return;
-  if (!Array.isArray(data.dictionary)) data.dictionary = [];
-  data.dictionary.push({en:en||'—',jp:jp||'—',es:es||'—',addedDate:todayStr()});
-  document.getElementById('dict-en').value='';document.getElementById('dict-jp').value='';document.getElementById('dict-es').value=''; 
+  const en=document.getElementById('dict-en').value.trim();
+  const jp=document.getElementById('dict-jp').value.trim();
+  const es=document.getElementById('dict-es').value.trim();
+  if(!en&&!jp&&!es)return;
+  const typeEl = document.getElementById('dict-type');
+  const type = typeEl ? typeEl.value : 'noun';
+  let tags = Array.from(_dictTagSelection);
+  ensureDictShape();
+  const _newEntry = {en:en||'—',jp:jp||'—',es:es||'—',addedDate:todayStr(),type:type,tags:tags,uses:0,correct:0};
+  // Auto-infer semantic tags from word meaning (if auto-tag.js is loaded)
+  try { if (typeof mergeAutoTags === 'function') _newEntry.tags = mergeAutoTags(_newEntry.tags, _newEntry); } catch(e){}
+  data.dictionary.push(_newEntry);
+  document.getElementById('dict-en').value='';document.getElementById('dict-jp').value='';document.getElementById('dict-es').value='';
+  _dictTagSelection.clear();
+  renderTagPicker();
   saveData();
-  // Verify the word persisted
   try {
     const verify = JSON.parse(localStorage.getItem(STORAGE_KEY));
     if (!verify.dictionary || verify.dictionary.length !== data.dictionary.length) {
       console.error('Dictionary save verification failed!');
     }
   } catch(e) { console.error('Dict verify error:', e); }
-  renderDictionary();updateStats();setSpeech('newWord');setCreatureState('happy');
+  renderDictionary();updateStats();updateLevelDisplay();setSpeech('newWord');setCreatureState('happy');
 }
-['dict-en','dict-jp','dict-es'].forEach(id=>{document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')addWord();});});
+['dict-en','dict-jp','dict-es'].forEach(id=>{const el=document.getElementById(id); if(el) el.addEventListener('keydown',e=>{if(e.key==='Enter')addWord();});});
 function deleteWord(i){if(!Array.isArray(data.dictionary) || i < 0 || i >= data.dictionary.length) return; data.dictionary.splice(i,1);saveData();renderDictionary();updateStats();}
 
+function setDictSearch(query) {
+  const s = document.getElementById('dict-search');
+  if (s) { s.value = query; renderDictionary(); }
+}
+
 function renderDictionary(){
-  const search=(document.getElementById('dict-search').value||'').toLowerCase(); const list=document.getElementById('dict-list');list.innerHTML='';
-  const filtered=data.dictionary.map((w, idx) => ({...w, _idx: idx})).filter(w=>{if(!search)return true;return w.en.toLowerCase().includes(search)||w.jp.toLowerCase().includes(search)||w.es.toLowerCase().includes(search);});
-  filtered.slice().reverse().forEach((w)=>{ const row=document.createElement('div');row.className='dict-entry';
-    row.innerHTML=`<span class="en">${escHtml(w.en)}</span><span class="jp">${escHtml(w.jp)}</span><span class="es">${escHtml(w.es)}</span><button class="del-word" onclick="deleteWord(${w._idx})">×</button>`; list.appendChild(row); });
-  document.getElementById('dict-count').textContent=data.dictionary.length+' words'; document.getElementById('dict-tab-count').textContent='('+data.dictionary.length+')';
+  ensureDictShape();
+  const searchEl = document.getElementById('dict-search');
+  const search=(searchEl ? searchEl.value : '').toLowerCase().trim();
+  const list=document.getElementById('dict-list');
+  if (!list) return;
+  list.innerHTML='';
+
+  const filtered=data.dictionary.map((w, idx) => ({...w, _idx: idx})).filter(w=>{
+    if(!search)return true;
+    const hay = [w.en, w.jp, w.es, w.type, ...(w.tags||[])].join(' ').toLowerCase();
+    return hay.includes(search);
+  });
+
+  filtered.slice().reverse().forEach((w)=>{
+    const row=document.createElement('div');
+    row.className='dict-entry';
+    const tagChips = (w.tags||[]).map(t => `<span class="dict-tag-chip">#${escHtml(t)}</span>`).join('');
+    const typeBadge = w.type ? `<span class="dict-type-badge dict-type-${escHtml(w.type)}">${escHtml(w.type)}</span>` : '';
+    const usesHtml = w.uses > 0 ? `<span class="dict-uses-badge" title="Times used in RPG">⚔️ ${w.uses}</span>` : '';
+    row.innerHTML=`${typeBadge}<span class="en">${escHtml(w.en)}</span><span class="jp">${escHtml(w.jp)}</span><span class="es">${escHtml(w.es)}</span><span class="dict-tags-line">${tagChips}</span>${usesHtml}<button class="del-word" onclick="deleteWord(${w._idx})">×</button>`;
+    list.appendChild(row);
+  });
+
+  const countEl = document.getElementById('dict-count'); if (countEl) countEl.textContent=data.dictionary.length+' words';
+  const tabCountEl = document.getElementById('dict-tab-count'); if (tabCountEl) tabCountEl.textContent='('+data.dictionary.length+')';
+
+  // Tag cloud
+  const cloudEl = document.getElementById('dict-tag-cloud');
+  if (cloudEl) {
+    const counts = {};
+    data.dictionary.forEach(w => (w.tags||[]).forEach(t => { counts[t] = (counts[t]||0)+1; }));
+    const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0, 30);
+    if (sorted.length === 0) {
+      cloudEl.innerHTML = '<span class="dict-tag-cloud-empty">Add tags to words to see them here.</span>';
+    } else {
+      cloudEl.innerHTML = sorted.map(([t, n]) => `<button class="dict-tag-cloud-chip" onclick="setDictSearch('${escHtml(t)}')">#${escHtml(t)} <span class="dict-tag-count">${n}</span></button>`).join('');
+    }
+  }
 }
 
 function renderHistory(){
@@ -565,11 +758,273 @@ function delCalTask(idx) {
   renderCalModal();
 }
 
+// ===== MOE-CHAN LEVELING SYSTEM =====
+// XP sources: flashcard minutes, reading hours, words learned, streak days, chimera discoveries, materials collected
+const MOE_LEVEL_TITLES = [
+  { level: 1,  title: 'Sleepy Sprout',       emoji: '🌱' },
+  { level: 2,  title: 'Curious Seedling',     emoji: '🌿' },
+  { level: 3,  title: 'Eager Learner',        emoji: '📗' },
+  { level: 4,  title: 'Page Turner',          emoji: '📖' },
+  { level: 5,  title: 'Vocab Collector',       emoji: '📚' },
+  { level: 7,  title: 'Dedicated Student',     emoji: '✏️' },
+  { level: 10, title: 'Knowledge Seeker',      emoji: '🔍' },
+  { level: 13, title: 'Streak Warrior',        emoji: '🔥' },
+  { level: 16, title: 'Expedition Scout',      emoji: '🗺️' },
+  { level: 20, title: 'Chimera Whisperer',     emoji: '🐲' },
+  { level: 25, title: 'Scholar Adept',         emoji: '🎓' },
+  { level: 30, title: 'Polyglot Apprentice',   emoji: '🌐' },
+  { level: 35, title: 'Lore Keeper',           emoji: '📜' },
+  { level: 40, title: 'Crystal Sage',          emoji: '💎' },
+  { level: 45, title: 'Abyss Walker',          emoji: '🌌' },
+  { level: 50, title: 'Legendary Oracle',      emoji: '☯️' },
+  { level: 60, title: 'Transcendent Mind',     emoji: '✨' },
+  { level: 75, title: 'World Turtle\'s Pupil', emoji: '🌍' },
+  { level: 99, title: 'Moe-Chan Ascended',     emoji: '👑' },
+];
+
+function calculateMoeXP() {
+  let xp = 0;
+
+  // Flashcard minutes (1 XP per minute)
+  let totalFlash = 0;
+  let totalRead = 0;
+  Object.values(data.days).forEach(d => {
+    totalFlash += d.flash || 0;
+    totalRead += d.read || 0;
+  });
+  xp += totalFlash; // 1 XP per flashcard minute
+
+  // Reading hours (5 XP per hour)
+  xp += Math.floor(totalRead * 5);
+
+  // Dictionary words (3 XP each)
+  xp += (data.dictionary ? data.dictionary.length : 0) * 3;
+
+  // Days tracked (2 XP each)
+  xp += Object.keys(data.days).length * 2;
+
+  // Streak bonus (current streak * 5)
+  xp += (data.streak || 0) * 5;
+
+  // Chimera discoveries (10 XP each unique, 2 XP per repeat encounter)
+  if (data.bestiary) {
+    Object.values(data.bestiary).forEach(b => {
+      xp += 10; // First discovery
+      xp += (b.timesSeen - 1) * 2; // Repeat encounters
+    });
+  }
+
+  // Materials collected (1 XP per item)
+  if (data.materials) {
+    xp += Object.values(data.materials).reduce((a, b) => a + b, 0);
+  }
+
+  // Diary entries (2 XP each)
+  xp += (data.diary ? data.diary.length : 0) * 2;
+
+  // Quotes saved (2 XP each)
+  xp += (data.quotes ? data.quotes.length : 0) * 2;
+
+  // Advice entries (3 XP each — building your survival guide is valuable!)
+  xp += (data.advice ? data.advice.length : 0) * 3;
+
+  return xp;
+}
+
+function xpForLevel(level) {
+  // Exponential curve: level 1=0, level 2=25, level 5=200, level 10=800, level 20=4000, etc.
+  if (level <= 1) return 0;
+  return Math.floor(20 * Math.pow(level - 1, 1.8));
+}
+
+function getMoeLevel() {
+  const xp = calculateMoeXP();
+  let level = 1;
+  while (xpForLevel(level + 1) <= xp && level < 99) {
+    level++;
+  }
+  return { level, xp, xpForCurrent: xpForLevel(level), xpForNext: xpForLevel(level + 1) };
+}
+
+function getMoeLevelTitle(level) {
+  let title = MOE_LEVEL_TITLES[0];
+  for (let i = MOE_LEVEL_TITLES.length - 1; i >= 0; i--) {
+    if (level >= MOE_LEVEL_TITLES[i].level) {
+      title = MOE_LEVEL_TITLES[i];
+      break;
+    }
+  }
+  return title;
+}
+
+function updateLevelDisplay() {
+  const levelInfo = getMoeLevel();
+  const titleInfo = getMoeLevelTitle(levelInfo.level);
+
+  const levelEl = document.getElementById('moe-level-num');
+  const titleEl = document.getElementById('moe-level-title');
+  const xpBarFill = document.getElementById('moe-xp-fill');
+  const xpText = document.getElementById('moe-xp-text');
+
+  if (levelEl) levelEl.textContent = levelInfo.level;
+  if (titleEl) titleEl.textContent = `${titleInfo.emoji} ${titleInfo.title}`;
+
+  if (xpBarFill) {
+    if (levelInfo.level >= 99) {
+      xpBarFill.style.width = '100%';
+      xpBarFill.style.background = 'linear-gradient(90deg, #FFD700, #FF8000, #FF3C8E, #8B5CF6, #00CED1)';
+    } else {
+      const progress = ((levelInfo.xp - levelInfo.xpForCurrent) / (levelInfo.xpForNext - levelInfo.xpForCurrent)) * 100;
+      xpBarFill.style.width = Math.min(100, progress) + '%';
+    }
+  }
+
+  if (xpText) {
+    if (levelInfo.level >= 99) {
+      xpText.textContent = `${levelInfo.xp} XP (MAX)`;
+    } else {
+      xpText.textContent = `${levelInfo.xp} / ${levelInfo.xpForNext} XP`;
+    }
+  }
+}
+
+// ===== ADVICE & DIRECTIONS (Personal Survival Guide) =====
+function addAdvice() {
+  const titleEl = document.getElementById('advice-title');
+  const textEl = document.getElementById('advice-text');
+  const categoryEl = document.getElementById('advice-category');
+  const title = titleEl ? titleEl.value.trim() : '';
+  const text = textEl ? textEl.value.trim() : '';
+  const category = categoryEl ? categoryEl.value : 'general';
+
+  if (!text) return;
+  if (!Array.isArray(data.advice)) data.advice = [];
+
+  data.advice.push({
+    title: title || 'Untitled',
+    text: text,
+    category: category,
+    date: todayStr(),
+    pinned: false
+  });
+
+  if (titleEl) titleEl.value = '';
+  if (textEl) textEl.value = '';
+  saveData();
+  renderAdvice();
+  updateLevelDisplay();
+}
+
+function deleteAdvice(idx) {
+  if (!Array.isArray(data.advice) || idx < 0 || idx >= data.advice.length) return;
+  data.advice.splice(idx, 1);
+  saveData();
+  renderAdvice();
+  updateLevelDisplay();
+}
+
+function togglePinAdvice(idx) {
+  if (!data.advice || !data.advice[idx]) return;
+  data.advice[idx].pinned = !data.advice[idx].pinned;
+  saveData();
+  renderAdvice();
+}
+
+let currentAdviceFilter = 'all';
+
+function setAdviceFilter(filter) {
+  currentAdviceFilter = filter;
+  document.querySelectorAll('.advice-filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === filter);
+  });
+  renderAdvice();
+}
+
+function renderAdvice() {
+  const list = document.getElementById('advice-list');
+  if (!list) return;
+  if (!Array.isArray(data.advice)) data.advice = [];
+
+  const categoryEmojis = {
+    'general': '📌',
+    'study': '📚',
+    'life': '🌱',
+    'health': '💪',
+    'social': '🤝',
+    'career': '💼',
+    'creative': '🎨',
+    'tech': '💻',
+    'travel': '✈️',
+    'money': '💰',
+  };
+
+  const categoryColors = {
+    'general': '#ff8a00',
+    'study': '#0099ff',
+    'life': '#7ec832',
+    'health': '#ff3c8e',
+    'social': '#8b5cf6',
+    'career': '#FFD700',
+    'creative': '#00CED1',
+    'tech': '#708090',
+    'travel': '#FF6347',
+    'money': '#a8e84c',
+  };
+
+  // Sort: pinned first, then by date (newest first)
+  let entries = data.advice.map((a, idx) => ({ ...a, _idx: idx }));
+
+  if (currentAdviceFilter !== 'all') {
+    entries = entries.filter(a => a.category === currentAdviceFilter);
+  }
+
+  entries.sort((a, b) => {
+    if (a.pinned && !b.pinned) return -1;
+    if (!a.pinned && b.pinned) return 1;
+    return 0; // Maintain insertion order otherwise
+  });
+
+  if (entries.length === 0) {
+    list.innerHTML = `<p style="color:rgba(255,255,255,0.4); text-align:center; padding:30px; font-style:italic;">
+      ${currentAdviceFilter === 'all' ? 'Your survival guide is empty. Start adding advice, directions, and wisdom you want to remember.' : 'No entries in this category yet.'}
+    </p>`;
+    return;
+  }
+
+  let html = '';
+  entries.forEach(entry => {
+    const catEmoji = categoryEmojis[entry.category] || '📌';
+    const catColor = categoryColors[entry.category] || '#ff8a00';
+    const pinnedClass = entry.pinned ? 'advice-pinned' : '';
+
+    html += `<div class="advice-card ${pinnedClass}" style="border-left-color: ${catColor};">
+      <div class="advice-card-header">
+        <span class="advice-cat-badge" style="background: ${catColor}20; color: ${catColor};">${catEmoji} ${entry.category}</span>
+        ${entry.pinned ? '<span class="advice-pin-badge">PINNED</span>' : ''}
+        <span class="advice-date">${formatDate(entry.date)}</span>
+      </div>
+      <h4 class="advice-card-title">${escHtml(entry.title)}</h4>
+      <p class="advice-card-text">${escHtml(entry.text)}</p>
+      <div class="advice-card-actions">
+        <button class="advice-action-btn" onclick="togglePinAdvice(${entry._idx})">${entry.pinned ? '📌 Unpin' : '📌 Pin'}</button>
+        <button class="advice-action-btn advice-del-btn" onclick="deleteAdvice(${entry._idx})">Delete</button>
+      </div>
+    </div>`;
+  });
+
+  list.innerHTML = html;
+
+  // Update count
+  const countEl = document.getElementById('advice-count');
+  if (countEl) countEl.textContent = data.advice.length;
+}
+
 // ===== APP INITIALIZATION (DATE-SMART) =====
 function initApp(){
   const realToday = todayStr();
-  document.getElementById('date-display').textContent = formatDate(realToday); 
+  document.getElementById('date-display').textContent = formatDate(realToday);
   calcStreak();
+  ensureDictShape(); // Normalize legacy dictionary entries (add tags/type/uses/correct fields)
 
   // 1. Mandatory UI Reset
   document.getElementById('flash-input-area').style.display = 'block';
@@ -611,15 +1066,28 @@ function initApp(){
   // Initialize UI components
   renderSchedule(); 
   renderCalendar(); 
-  renderDictionary(); 
-  renderDiary(); 
+  renderDictionary();
+  if(typeof renderTagPicker === 'function') renderTagPicker();
+  renderDiary();
   renderQuotes(); 
   if(typeof renderCommissions === 'function') renderCommissions();
-  updateStats(); 
-  updateMood(); 
-  saveData(); 
-  
+  renderAdvice();
+  updateStats();
+  updateMood();
+  updateLevelDisplay();
+  saveData();
+
   if(typeof startPhraseCycle === 'function') startPhraseCycle();
   if(typeof displayDailyOracle === 'function') displayDailyOracle();
   if(typeof initExpeditions === 'function') initExpeditions();
+  if(typeof initMap === 'function') initMap();
+  if(typeof initSlots === 'function') initSlots();
+  if(typeof initEconomy === 'function') initEconomy();
+  if(typeof initHouse === 'function') initHouse();
+  if(typeof initCatching === 'function') initCatching();
+  if(typeof initConjugation === 'function') initConjugation();
+  if(typeof initJlpt === 'function') initJlpt();
+  if(typeof initTodo === 'function') initTodo();
+  if(typeof initFun === 'function') initFun();
+  if(typeof initPomodoro === 'function') initPomodoro();
 }

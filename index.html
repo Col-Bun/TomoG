@@ -6,6 +6,10 @@
 <title>Moe-Chan & The Oracle</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="themes.css">
+<link rel="stylesheet" href="cats.css">
+<link rel="stylesheet" href="catpark.css">
+<link rel="stylesheet" href="monsters.css">
+<link rel="stylesheet" href="widgets.css">
 <style>
   .polling-active { animation: pulse-glow 1.2s ease-in-out infinite; background: linear-gradient(180deg,#ff6348 0%,#ee5a24 100%) !important; }
   @keyframes pulse-glow { 0%,100% { box-shadow: 0 0 8px rgba(255,99,72,0.4); } 50% { box-shadow: 0 0 20px rgba(255,99,72,0.8); } }
@@ -172,21 +176,40 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     </div>
   </div>
 
+  <!-- Theme Switcher (always visible above tabs) -->
+  <div id="global-theme-bar" class="global-theme-bar glass-dark">
+    <div id="global-theme-mount"></div>
+  </div>
+
   <div class="tabs">
     <button class="tab-btn active" data-tab="home">🏠 Home</button>
-    <button class="tab-btn" data-tab="schedule">🕒 Schedule</button>
-    <button class="tab-btn" data-tab="calendar">📅 Calendar</button>
-    <button class="tab-btn" data-tab="dictionary">📖 Dictionary <span id="dict-tab-count"></span></button>
-    <button class="tab-btn" data-tab="diary">📓 Diary</button>
-    <button class="tab-btn" data-tab="history">📊 History</button>
+    <button class="tab-btn" data-tab="advice">🧭 Advice</button>
+    <button class="tab-btn" data-tab="bestiary">🐲 Bestiary</button>
     <button class="tab-btn" data-tab="calc">🧮 COLcalc</button>
-    <button class="tab-btn" data-tab="numogram">🌀 Numogram</button>
-    <button class="tab-btn" data-tab="iching">☯️ I-Ching</button>
-    <button class="tab-btn" data-tab="quotes">💬 Quotes</button>
-    <button class="tab-btn" data-tab="expeditions">⚔️ Expeditions</button>
-    <button class="tab-btn" data-tab="materials">🎒 Materials</button>
-    <button class="tab-btn" data-tab="commissions">🎨 Commissions</button>
+    <button class="tab-btn" data-tab="calendar">📅 Calendar</button>
+    <button class="tab-btn" data-tab="cats">🐈 Cats</button>
     <button class="tab-btn" data-tab="clipboard">📋 Clipboard</button>
+    <button class="tab-btn" data-tab="commissions">🎨 Commissions</button>
+    <button class="tab-btn" data-tab="conjugation">📝 Conjugation</button>
+    <button class="tab-btn" data-tab="diary">📓 Diary</button>
+    <button class="tab-btn" data-tab="dictionary">📖 Dictionary <span id="dict-tab-count"></span></button>
+    <button class="tab-btn" data-tab="expeditions">⚔️ Expeditions</button>
+    <button class="tab-btn" data-tab="fun">💖 Fun</button>
+    <button class="tab-btn" data-tab="grocery">🛒 Grocery</button>
+    <button class="tab-btn" data-tab="history">📊 History</button>
+    <button class="tab-btn" data-tab="house">🏡 House</button>
+    <button class="tab-btn" data-tab="iching">☯️ I-Ching</button>
+    <button class="tab-btn" data-tab="inventory">🎒 Inventory</button>
+    <button class="tab-btn" data-tab="jlpt">🎌 JLPT</button>
+    <button class="tab-btn" data-tab="map">🗺️ Map</button>
+    <button class="tab-btn" data-tab="materials">🎒 Materials</button>
+    <button class="tab-btn" data-tab="numogram">🌀 Numogram</button>
+    <button class="tab-btn" data-tab="pomodoro">🍅 Pomodoro</button>
+    <button class="tab-btn" data-tab="quotes">💬 Quotes</button>
+    <button class="tab-btn" data-tab="rpg">🗝️ RPG</button>
+    <button class="tab-btn" data-tab="schedule">🕒 Schedule</button>
+    <button class="tab-btn" data-tab="slots">🎰 Slots</button>
+    <button class="tab-btn" data-tab="todo">📌 Todo</button>
   </div>
 
   <div class="tab-content active" id="tab-home">
@@ -209,6 +232,12 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
           <span class="mood-label">Mood:</span>
           <div class="mood-track"><div class="mood-fill" id="mood-fill" style="width:50%;background:linear-gradient(90deg,#ffcc00,#ff8a00)"></div></div>
           <span class="mood-label" id="mood-text">Neutral</span>
+        </div>
+        <div class="moe-level-bar">
+          <span class="moe-level-badge">Lv.<span id="moe-level-num">1</span></span>
+          <div class="moe-level-title" id="moe-level-title">🌱 Sleepy Sprout</div>
+          <div class="moe-xp-track"><div class="moe-xp-fill" id="moe-xp-fill" style="width:0%"></div></div>
+          <span class="moe-xp-text" id="moe-xp-text">0 / 25 XP</span>
         </div>
         <div class="random-bubble glass-strong" id="random-bubble"><span id="random-phrase"></span><span class="random-lang-tag" id="random-lang-tag"></span></div>
       </div>
@@ -268,7 +297,23 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     <div class="dict-section glass-dark">
       <div class="dict-header"><h3>📖 My Dictionary</h3><span class="dict-count" id="dict-count">0 words</span></div>
       <div class="dict-add-form"><input type="text" id="dict-en" placeholder="English"><input type="text" id="dict-jp" placeholder="日本語"><input type="text" id="dict-es" placeholder="Español"><button class="add-word-btn" onclick="addWord()">+</button></div>
-      <div class="dict-filter"><input type="text" id="dict-search" placeholder="🔍 Search words..." oninput="renderDictionary()"></div>
+      <div class="dict-add-form dict-add-form-row2">
+        <select id="dict-type" title="Part of speech / type — used for RPG NPC requests">
+          <option value="noun">🧺 noun (object)</option>
+          <option value="verb">⚡ verb (action)</option>
+          <option value="adj">🎨 adjective</option>
+          <option value="adv">💨 adverb</option>
+          <option value="phrase">💬 phrase</option>
+          <option value="other">❓ other</option>
+        </select>
+      </div>
+      <div class="dict-tags-block">
+        <div class="dict-tags-block-title">🏷️ Tags <span class="dict-tags-hint">— pick from preset categories (used for RPG room theming)</span></div>
+        <div id="dict-tag-selected" class="dict-tag-selected is-empty"></div>
+        <div id="dict-tag-picker" class="dict-tag-picker"></div>
+      </div>
+      <div class="dict-filter"><input type="text" id="dict-search" placeholder="🔍 Search words / tags..." oninput="renderDictionary()"></div>
+      <div id="dict-tag-cloud" class="dict-tag-cloud"></div>
       <div class="dict-list" id="dict-list"></div>
     </div>
   </div>
@@ -287,13 +332,12 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
       <div class="history-grid" id="history-grid"></div>
     </div>
     <div class="nes-container">
-      <h3>PASSWORD SYSTEM</h3>
-      <p>GENERATE A PASSWORD TO BACK UP YOUR PROGRESS, OR PASTE A PASSWORD BELOW TO RESTORE DATA.</p>
-      <textarea id="nes-password-box" class="nes-textarea" placeholder="[ ENTER PASSWORD HERE ]" spellcheck="false"></textarea>
-      <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-        <button class="nes-btn" onclick="generatePassword()">GENERATE</button>
-        <button class="nes-btn" onclick="loadPassword()">RESTORE</button>
-        <button class="nes-btn" onclick="copyPassword()">COPY</button>
+      <h3>SAVE / LOAD</h3>
+      <p>Download your save data as a file, or upload a save file to restore your progress.</p>
+      <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 12px;">
+        <button class="nes-btn" id="save-download-btn" onclick="downloadSaveFile()">💾 Download Save File</button>
+        <button class="nes-btn" onclick="triggerLoadFile()">📂 Upload Save File</button>
+        <input type="file" id="save-file-input" accept=".json" style="display:none;" onchange="handleSaveFileUpload(event)">
       </div>
     </div>
   </div>
@@ -575,6 +619,76 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
     </div>
   </div>
 
+  <!-- ===== BESTIARY TAB ===== -->
+  <div class="tab-content" id="tab-bestiary">
+    <div class="glass-dark" style="padding: 22px;">
+      <div class="mat-header-row">
+        <h3 class="mat-page-title">🐲 Chimera Bestiary</h3>
+        <div class="mat-summary">
+          <div class="glass mat-stat-chip"><span class="mat-stat-num" id="bestiary-total-count">0</span><span class="mat-stat-label">Encounters</span></div>
+          <div class="glass mat-stat-chip"><span class="mat-stat-num" id="bestiary-unique-count">0/61</span><span class="mat-stat-label">Discovered</span></div>
+        </div>
+      </div>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.85rem; margin-bottom:16px;">Moe-chan discovers chimeras during expeditions. Longer missions in harder areas find rarer creatures. Some chimeras are SECRET and only appear under special conditions. Click a discovered chimera for details.</p>
+      <div id="bestiary-grid" class="materials-grid"></div>
+    </div>
+
+    <!-- Chimera Detail Popup -->
+    <div id="chimera-detail-overlay" class="loot-popup-overlay" style="display:none;" onclick="if(event.target===this)closeChimeraDetail()">
+      <div class="loot-popup glass-strong" id="chimera-detail-content" style="max-width:500px;"></div>
+    </div>
+  </div>
+
+  <!-- ===== ADVICE & DIRECTIONS TAB ===== -->
+  <div class="tab-content" id="tab-advice">
+    <div class="glass-dark" style="padding: 22px;">
+      <div class="advice-header">
+        <h3 class="advice-page-title">🧭 Advice & Directions</h3>
+        <div class="advice-count-badge"><span id="advice-count">0</span> entries</div>
+      </div>
+      <p class="advice-subtitle">Your personal survival guide. Things you've learned, advice you want to remember, directions for your future self.</p>
+
+      <!-- Add new entry -->
+      <div class="advice-form glass" style="margin: 16px 0;">
+        <div class="advice-form-row">
+          <input type="text" id="advice-title" class="advice-input" placeholder="Title (e.g., 'How to handle bad days')">
+          <select id="advice-category" class="advice-select">
+            <option value="general">📌 General</option>
+            <option value="study">📚 Study</option>
+            <option value="life">🌱 Life</option>
+            <option value="health">💪 Health</option>
+            <option value="social">🤝 Social</option>
+            <option value="career">💼 Career</option>
+            <option value="creative">🎨 Creative</option>
+            <option value="tech">💻 Tech</option>
+            <option value="travel">✈️ Travel</option>
+            <option value="money">💰 Money</option>
+          </select>
+        </div>
+        <textarea id="advice-text" class="advice-textarea" placeholder="Write your advice, directions, or wisdom here..." rows="3"></textarea>
+        <button class="btn-glossy btn-green" style="width:100%; margin-top:8px;" onclick="addAdvice()">Add to Survival Guide</button>
+      </div>
+
+      <!-- Filters -->
+      <div class="advice-filters">
+        <button class="advice-filter-btn active" data-filter="all" onclick="setAdviceFilter('all')">All</button>
+        <button class="advice-filter-btn" data-filter="general" onclick="setAdviceFilter('general')">📌</button>
+        <button class="advice-filter-btn" data-filter="study" onclick="setAdviceFilter('study')">📚</button>
+        <button class="advice-filter-btn" data-filter="life" onclick="setAdviceFilter('life')">🌱</button>
+        <button class="advice-filter-btn" data-filter="health" onclick="setAdviceFilter('health')">💪</button>
+        <button class="advice-filter-btn" data-filter="social" onclick="setAdviceFilter('social')">🤝</button>
+        <button class="advice-filter-btn" data-filter="career" onclick="setAdviceFilter('career')">💼</button>
+        <button class="advice-filter-btn" data-filter="creative" onclick="setAdviceFilter('creative')">🎨</button>
+        <button class="advice-filter-btn" data-filter="tech" onclick="setAdviceFilter('tech')">💻</button>
+        <button class="advice-filter-btn" data-filter="travel" onclick="setAdviceFilter('travel')">✈️</button>
+        <button class="advice-filter-btn" data-filter="money" onclick="setAdviceFilter('money')">💰</button>
+      </div>
+
+      <!-- Advice list -->
+      <div id="advice-list" class="advice-list custom-scrollbar" style="max-height: 55vh; overflow-y: auto;"></div>
+    </div>
+  </div>
+
   <!-- ===== COMMISSIONS TAB ===== -->
   <div class="tab-content" id="tab-commissions">
     <div class="comm-layout">
@@ -705,14 +819,343 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
       <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:14px;">
         <button class="btn-glossy btn-purple huge-btn" onclick="autoPaste()">📋 AUTO-PASTE</button>
         <button class="btn-glossy btn-green huge-btn" id="clip-poll-btn" onclick="toggleAutoPoll()" style="background:linear-gradient(180deg,#2ed573 0%,#1aaf5d 100%);">▶ START AUTO-CAPTURE</button>
+        <button class="btn-glossy btn-purple huge-btn" id="clip-fudoki-btn" onclick="toggleFudokiMode()" style="background:linear-gradient(180deg,#ff9a44 0%,#e8651d 100%);">📚 FUDOKI MODE</button>
       </div>
 
-      <textarea id="clipboard-area" class="diary-textarea custom-scrollbar" placeholder="Hooked text appears here (newest at top)..." style="font-family:'Noto Sans JP','Nunito',sans-serif; font-size:1.05rem; line-height:1.8; min-height:40vh;" readonly></textarea>
+      <div id="clip-fudoki-legend" style="display:none; gap:14px; flex-wrap:wrap; justify-content:center; font-size:0.82rem; color:rgba(255,255,255,0.8); margin-bottom:10px; font-family:'Noto Sans JP','Nunito',sans-serif;">
+        <span style="color:#a8e84c;">名詞</span>
+        <span style="color:#4ec6ff;">動詞</span>
+        <span style="color:#ffd36a;">形容詞</span>
+        <span style="color:#ff6eaa;">副詞</span>
+        <span style="color:#c49bff;">助詞</span>
+        <span style="color:#d7b7ff;">助動詞</span>
+        <span style="color:#ff8fa3;">代名詞</span>
+        <span style="color:#7ee6c6;">連体詞</span>
+        <span style="color:#ffb300;">接続詞</span>
+        <span style="color:#ff9ed1;">感動詞</span>
+      </div>
+
+      <textarea id="clipboard-area" class="diary-textarea custom-scrollbar" placeholder="Hooked text appears here (newest at bottom)..." style="font-family:'Noto Sans JP','Nunito',sans-serif; font-size:1.05rem; line-height:1.8; min-height:0;" readonly></textarea>
+      <div id="clipboard-fudoki-view" class="diary-textarea custom-scrollbar" style="display:none; font-family:'Noto Sans JP','Nunito',sans-serif; font-size:1.05rem; line-height:2.0; min-height:0; padding:12px; overflow-y:auto; white-space:pre-wrap; user-select:text;"></div>
 
       <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:14px;">
         <button class="btn-theme" style="padding:8px 16px; border-radius:50px; font-size:0.85rem;" onclick="exportClipLog()">💾 Export Log</button>
         <button class="btn-theme" style="padding:8px 16px; border-radius:50px; font-size:0.85rem;" onclick="clearClipSession()">🗑 Clear Session</button>
         <button class="btn-theme" style="padding:8px 16px; border-radius:50px; font-size:0.85rem; color:#ff3c8e;" onclick="resetClipLifetime()">Reset Lifetime</button>
+      </div>
+
+      <!-- ===== Collapsible Cat Cam (cute distraction) ===== -->
+      <div class="clip-panel clip-panel-collapsed" id="clip-catcam-panel">
+        <button class="clip-panel-header" type="button" onclick="toggleClipPanel('catcam')">
+          <span class="clip-panel-title">🐱 Cat Cam <span class="clip-panel-sub">— cute distraction</span></span>
+          <span class="clip-panel-arrow">▼</span>
+        </button>
+        <div class="clip-panel-body">
+          <div id="clip-mini-cat-stage" class="clip-mini-cat-stage">
+            <div class="clip-mini-cat-bg"></div>
+          </div>
+          <div class="clip-mini-cat-caption">shrink or expand — cats wander regardless ₍˄·͈༝·͈˄₎</div>
+        </div>
+      </div>
+
+      <!-- ===== Collapsible Fudoki Guide (label translations) ===== -->
+      <div class="clip-panel clip-panel-collapsed" id="clip-fudoki-guide-panel">
+        <button class="clip-panel-header" type="button" onclick="toggleClipPanel('fudoki-guide')">
+          <span class="clip-panel-title">📚 Fudoki Guide <span class="clip-panel-sub">— what each Japanese label means</span></span>
+          <span class="clip-panel-arrow">▼</span>
+        </button>
+        <div class="clip-panel-body">
+          <p class="clip-fg-intro">Fudoki mode tokenizes every Japanese line and stacks information vertically over each word: <strong>reading (katakana)</strong> on top, <strong>romaji</strong> below it, the <strong>surface form</strong> (the word itself) in the middle, a short <strong>part-of-speech tag</strong> under that, and a colored underline that matches the tag's color. The original Fudoki project uses only Chinese/Japanese labels — here's what each one actually means:</p>
+
+          <div class="clip-fg-table">
+            <div class="clip-fg-row" style="--fg-c:#a8e84c;">
+              <div class="clip-fg-jp">名詞 <span class="clip-fg-ab">名</span></div>
+              <div class="clip-fg-en"><strong>Noun</strong> — people, places, things (本 "book", 猫 "cat"). Usually the subject or object of a sentence.</div>
+            </div>
+            <div class="clip-fg-row" style="--fg-c:#4ec6ff;">
+              <div class="clip-fg-jp">動詞 <span class="clip-fg-ab">動</span></div>
+              <div class="clip-fg-en"><strong>Verb</strong> — action words (食べる "eat", 行く "go"). The engine of the sentence; the conjugated form is what you see here.</div>
+            </div>
+            <div class="clip-fg-row" style="--fg-c:#ffd36a;">
+              <div class="clip-fg-jp">形容詞 <span class="clip-fg-ab">形</span></div>
+              <div class="clip-fg-en"><strong>i-Adjective</strong> — words ending in い that describe nouns (赤い "red", 楽しい "fun"). They conjugate like mini-verbs.</div>
+            </div>
+            <div class="clip-fg-row" style="--fg-c:#ffd36a;">
+              <div class="clip-fg-jp">形容動詞 <span class="clip-fg-ab">形動</span></div>
+              <div class="clip-fg-en"><strong>na-Adjective</strong> — descriptive words that need "な" before a noun (静かな "quiet", 綺麗な "pretty"). Behave more like nouns.</div>
+            </div>
+            <div class="clip-fg-row" style="--fg-c:#ff6eaa;">
+              <div class="clip-fg-jp">副詞 <span class="clip-fg-ab">副</span></div>
+              <div class="clip-fg-en"><strong>Adverb</strong> — modifies verbs or adjectives (とても "very", ゆっくり "slowly"). Answers "how / how much / when".</div>
+            </div>
+            <div class="clip-fg-row" style="--fg-c:#c49bff;">
+              <div class="clip-fg-jp">助詞 <span class="clip-fg-ab">助</span></div>
+              <div class="clip-fg-en"><strong>Particle</strong> — tiny grammar markers that glue the sentence together (は marks topic, を marks object, に marks direction). These are the most frequent tokens you'll see.</div>
+            </div>
+            <div class="clip-fg-row" style="--fg-c:#d7b7ff;">
+              <div class="clip-fg-jp">助動詞 <span class="clip-fg-ab">助動</span></div>
+              <div class="clip-fg-en"><strong>Auxiliary Verb</strong> — endings that attach to verbs to change meaning or tense (た past tense, ない negative, れる passive). Almost always appears glued to the verb before it.</div>
+            </div>
+            <div class="clip-fg-row" style="--fg-c:#ff8fa3;">
+              <div class="clip-fg-jp">代名詞 <span class="clip-fg-ab">代名</span></div>
+              <div class="clip-fg-en"><strong>Pronoun</strong> — stand-ins for nouns (私 "I", 彼 "he", これ "this"). Japanese drops them a lot, so when one shows up it's worth noting.</div>
+            </div>
+            <div class="clip-fg-row" style="--fg-c:#7ee6c6;">
+              <div class="clip-fg-jp">連体詞 <span class="clip-fg-ab">連体</span></div>
+              <div class="clip-fg-en"><strong>Pre-noun Adjectival</strong> — a small closed set of words that only appear directly before a noun (この "this", その "that", 大きな "big"). Can't conjugate at all.</div>
+            </div>
+            <div class="clip-fg-row" style="--fg-c:#ffb300;">
+              <div class="clip-fg-jp">接続詞 <span class="clip-fg-ab">接続</span></div>
+              <div class="clip-fg-en"><strong>Conjunction</strong> — joins clauses (しかし "but", そして "and then", だから "so"). Usually sits at the start of the next sentence.</div>
+            </div>
+            <div class="clip-fg-row" style="--fg-c:#ff9ed1;">
+              <div class="clip-fg-jp">感動詞 <span class="clip-fg-ab">感</span></div>
+              <div class="clip-fg-en"><strong>Interjection</strong> — exclamations and filler (あっ "ah!", はい "yes", えっと "uhh"). Very common in VN dialogue.</div>
+            </div>
+            <div class="clip-fg-row" style="--fg-c:rgba(255,255,255,0.5);">
+              <div class="clip-fg-jp">記号 <span class="clip-fg-ab">記号</span></div>
+              <div class="clip-fg-en"><strong>Symbol</strong> — punctuation and symbols (。、「」…). Tokenizer marks them so they don't mix with real words.</div>
+            </div>
+            <div class="clip-fg-row" style="--fg-c:rgba(255,255,255,0.5);">
+              <div class="clip-fg-jp">接頭詞 <span class="clip-fg-ab">接頭詞</span></div>
+              <div class="clip-fg-en"><strong>Prefix</strong> — attaches to the front of a noun (お茶 "(honorific) tea", 新〜 "new-"). Short and often honorific.</div>
+            </div>
+            <div class="clip-fg-row" style="--fg-c:rgba(255,255,255,0.5);">
+              <div class="clip-fg-jp">接尾 <span class="clip-fg-ab">接尾</span></div>
+              <div class="clip-fg-en"><strong>Suffix</strong> — attaches to the end of a word (〜さん, 〜たち "group/plural"). Often changes nuance or level of politeness.</div>
+            </div>
+            <div class="clip-fg-row" style="--fg-c:rgba(255,255,255,0.5);">
+              <div class="clip-fg-jp">フィラー <span class="clip-fg-ab">フィラー</span></div>
+              <div class="clip-fg-en"><strong>Filler</strong> — "um / uh" noises (あの "um", えー "uhh"). Mostly in speech / VN monologues.</div>
+            </div>
+            <div class="clip-fg-row" style="--fg-c:rgba(255,255,255,0.5);">
+              <div class="clip-fg-jp">その他 <span class="clip-fg-ab">他</span></div>
+              <div class="clip-fg-en"><strong>Other</strong> — anything the tokenizer can't cleanly categorize. Rare.</div>
+            </div>
+          </div>
+
+          <div class="clip-fg-note">『読み方』 The top row of tiny letters over each word is the <em>reading</em> in katakana; the row below that is the <em>romaji</em>. If the word is already kana, the reading row is left blank so your eyes don't repeat work.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLOTS TAB ===== -->
+  <div class="tab-content" id="tab-slots">
+    <div class="glass-dark" style="padding: 22px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <h3 style="font-family:'Baloo 2',cursive; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,0.15); font-size:1.4rem;">🎰 Moe-Chan's Slot Machine</h3>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span class="glass" style="padding:6px 16px; border-radius:50px; font-weight:800; color:#a8e84c;">💰 <span id="slot-money">0</span> MB</span>
+          <button class="btn-glossy btn-purple" onclick="switchSlotTheme()" style="padding:8px 16px; font-size:0.8rem;">Switch Theme</button>
+        </div>
+      </div>
+
+      <div id="slot-celebration" style="position:relative; overflow:hidden; height:0;"></div>
+
+      <div style="display:flex; flex-direction:column; align-items:center; gap:14px;">
+        <div id="slot-machine-display"></div>
+        <div id="slot-message" style="font-weight:800; font-size:1rem; min-height:1.4em; text-align:center;">Spin to win MoeBucks!</div>
+        <button class="btn-glossy btn-pink huge-btn" onclick="spinSlots()" style="font-size:1.1rem; padding:14px 40px;">🎰 SPIN!</button>
+        <div id="slot-stats" style="display:flex; gap:16px; flex-wrap:wrap; font-size:0.8rem; color:rgba(255,255,255,0.6);"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== GROCERY TAB ===== -->
+  <div class="tab-content" id="tab-grocery">
+    <div class="glass-dark" style="padding: 22px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <h3 style="font-family:'Baloo 2',cursive; color:#fff; font-size:1.4rem;">🛒 Grocery Store & Kitchen</h3>
+        <span class="glass" style="padding:6px 16px; border-radius:50px; font-weight:800; color:#a8e84c;">💰 <span id="moe-bucks-display">0</span> MB</span>
+      </div>
+
+      <!-- Weight & Energy Panel -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+        <div class="glass" style="padding:14px; border-radius:16px;">
+          <div style="font-size:0.75rem; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">⚡ Energy</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:10px; height:20px; overflow:hidden; margin-bottom:4px;">
+            <div id="energy-bar-fill" style="height:100%; border-radius:10px; transition:width 0.4s;"></div>
+          </div>
+          <div id="energy-text" style="font-size:0.8rem; color:#fff; text-align:center;">0 / 100</div>
+        </div>
+        <div class="glass" style="padding:14px; border-radius:16px;">
+          <div style="font-size:0.75rem; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">⚖️ Weight: <span id="weight-number">120.0</span> lbs</div>
+          <div style="background:rgba(0,0,0,0.3); border-radius:10px; height:20px; overflow:hidden; margin-bottom:4px;">
+            <div id="weight-bar-fill" style="height:100%; border-radius:10px; transition:width 0.4s;"></div>
+          </div>
+          <div id="weight-status" style="font-size:0.75rem; color:rgba(255,255,255,0.7); text-align:center;">Perfect weight!</div>
+        </div>
+      </div>
+
+      <!-- Expedition Button -->
+      <div style="text-align:center; margin-bottom:16px;">
+        <button class="btn-glossy btn-green" id="economy-expedition-btn" onclick="doEconomyExpedition()" style="padding:10px 28px;">Go on Expedition (-20 energy)</button>
+      </div>
+
+      <!-- Daily Food Progress -->
+      <div id="grocery-daily-progress" style="margin-bottom:14px;"></div>
+
+      <!-- Moe-chan Auto Shopping Log -->
+      <div id="auto-grocery-log" style="margin-bottom:14px;"></div>
+
+      <div id="grocery-message" style="font-weight:700; font-size:0.9rem; min-height:1.2em; text-align:center; margin-bottom:14px;">Buy food to feed Moe-chan!</div>
+
+      <!-- Grocery Filters -->
+      <div id="grocery-filters" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;"></div>
+
+      <!-- Grocery Items Grid -->
+      <div id="grocery-items" class="grocery-grid"></div>
+
+      <!-- Food Inventory -->
+      <h4 style="font-family:'Baloo 2',cursive; color:#a8e84c; margin:20px 0 10px;">🍱 Food Inventory (click to eat)</h4>
+      <div id="food-inventory"></div>
+
+      <!-- Toy Shop -->
+      <h4 style="font-family:'Baloo 2',cursive; color:#ffcc00; margin:24px 0 10px;">🧸 Toy Shop <span id="toy-collection-count" style="font-size:0.8rem; color:rgba(255,255,255,0.5);"></span></h4>
+      <div id="toy-lock-message" style="color:#ff3c8e; font-size:0.85rem; text-align:center; padding:12px; display:none;"></div>
+      <div id="toy-shop-items" class="toy-grid"></div>
+    </div>
+  </div>
+
+  <!-- ===== HOUSE TAB ===== -->
+  <div class="tab-content" id="tab-house">
+    <div class="glass-dark" style="padding: 22px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <h3 style="font-family:'Baloo 2',cursive; color:#fff; font-size:1.4rem;">🏠 Moe-Chan's House</h3>
+        <button class="btn-theme" onclick="exitHouse()" style="padding:8px 16px; border-radius:50px; font-size:0.85rem;">◀ Back to Map</button>
+      </div>
+      <div id="house-display"></div>
+    </div>
+  </div>
+
+  <!-- ===== CONJUGATION GAME TAB ===== -->
+  <div class="tab-content" id="tab-conjugation">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family:'Baloo 2',cursive; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,0.15); font-size:1.4rem; margin-bottom:4px;">📝 Verb Conjugation Dojo</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.8rem; margin-bottom:16px;">Practice Japanese verb conjugation! Earn MoeBucks and loot for high accuracy.</p>
+      <div id="conj-game-display"></div>
+    </div>
+  </div>
+
+  <!-- ===== CHIMERA INVENTORY TAB ===== -->
+  <div class="tab-content" id="tab-inventory">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family:'Baloo 2',cursive; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,0.15); font-size:1.4rem; margin-bottom:4px;">🎒 Chimera Inventory</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.8rem; margin-bottom:16px;">Your caught chimeras and catching supplies. Catch chimeras during expeditions!</p>
+
+      <div id="chimera-inv-stats" style="display:flex; gap:16px; flex-wrap:wrap; font-size:0.82rem; color:rgba(255,255,255,0.6); margin-bottom:16px;"></div>
+
+      <!-- Catching Items Inventory -->
+      <h4 style="font-family:'Baloo 2',cursive; color:#00e5ff; margin-bottom:8px;">🥅 Catching Supplies</h4>
+      <div id="catch-item-inventory" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px;"></div>
+
+      <!-- Catch Item Shop -->
+      <h4 style="font-family:'Baloo 2',cursive; color:#ffcc00; margin-bottom:8px;">🛍️ Catch Shop</h4>
+      <div id="catch-shop-items" class="catch-shop-grid" style="margin-bottom:20px;"></div>
+
+      <!-- Caught Chimeras List -->
+      <h4 style="font-family:'Baloo 2',cursive; color:#a8e84c; margin-bottom:8px;">🐲 Caught Chimeras</h4>
+      <div id="chimera-inventory-list"></div>
+    </div>
+  </div>
+
+  <!-- ===== TODO TAB ===== -->
+  <div class="tab-content" id="tab-todo">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 1.4rem;">📌 Todo List</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.75rem; margin-bottom:14px;">Track your tasks! Completing them earns MoeBucks.</p>
+      <div id="todo-list-area"></div>
+    </div>
+  </div>
+
+  <!-- ===== FUN WITH MOE-CHAN TAB ===== -->
+  <div class="tab-content" id="tab-fun">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 1.4rem;">💖 Fun with Moe-chan</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.75rem; margin-bottom:14px;">Tap, headpat, and play with graphics effects!</p>
+    </div>
+    <div id="fun-main-content"></div>
+  </div>
+
+  <!-- ===== POMODORO TAB ===== -->
+  <div class="tab-content" id="tab-pomodoro">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 1.4rem;">🍅 Pomodoro Timer</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.75rem; margin-bottom:14px;">Focus sessions earn 5 MB each. Full cycles (4 sessions) earn a 10 MB bonus!</p>
+      <div id="pom-main"></div>
+    </div>
+  </div>
+
+  <!-- ===== ASCII CATS TAB ===== -->
+  <div class="tab-content" id="tab-cats"></div>
+
+  <!-- ===== JLPT TAB ===== -->
+  <div class="tab-content" id="tab-jlpt">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 1.4rem;">🎌 JLPT Practice</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.75rem; margin-bottom:14px;">Practice N5–N1 questions. Earn MoeBucks, XP, and loot for good scores!</p>
+      <div id="jlpt-main-content"><p style="color:rgba(255,255,255,0.4); font-size:0.85rem;">Loading JLPT levels...</p></div>
+    </div>
+    <div id="jlpt-quiz-area"></div>
+  </div>
+
+  <!-- ===== RPG TAB ===== -->
+  <div class="tab-content" id="tab-rpg">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 1.4rem;">🗝️ 言葉の迷宮 · El Laberinto de las Palabras</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.75rem; margin-bottom:14px;">A turn-based, non-combat labyrinth generated from your flashcards. Satisfy NPCs with the right verb + object to earn MoeBucks.</p>
+      <div id="rpg-body"></div>
+    </div>
+  </div>
+
+  <!-- ===== MAP TAB ===== -->
+  <div class="tab-content" id="tab-map">
+    <div class="glass-dark" style="padding: 22px;">
+      <h3 style="font-family: 'Baloo 2', cursive; color: #fff; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 1.4rem;">🗺️ Moe-chan's World</h3>
+      <p style="color:rgba(255,255,255,0.5); font-size:0.75rem; margin-bottom:14px;">A procedural world that grows each day you study. Streaks expand the frontier faster.</p>
+
+      <div class="map-stats-strip">
+        <div class="map-stat glass">
+          <div class="map-stat-num" id="map-day-info">Day 1</div>
+          <div class="map-stat-label">Exploration</div>
+        </div>
+        <div class="map-stat glass">
+          <div class="map-stat-num" id="map-radius">4</div>
+          <div class="map-stat-label">Frontier</div>
+        </div>
+        <div class="map-stat glass">
+          <div class="map-stat-num" id="map-tiles">0</div>
+          <div class="map-stat-label">Tiles</div>
+        </div>
+        <div class="map-stat glass">
+          <div class="map-stat-num" id="map-locations-count">0</div>
+          <div class="map-stat-label">Locations</div>
+        </div>
+        <div class="map-stat glass">
+          <div class="map-stat-num" id="map-streak-bonus">—</div>
+          <div class="map-stat-label">Streak Bonus</div>
+        </div>
+      </div>
+
+      <div class="map-container">
+        <pre class="map-display" id="map-display"></pre>
+      </div>
+
+      <div class="map-legend" id="map-legend"></div>
+
+      <div class="map-discoveries-section">
+        <h4 style="font-family:'Baloo 2',cursive; color:#a8e84c; margin-bottom:10px;">📍 Discovered Locations</h4>
+        <div class="map-discoveries-list" id="map-discoveries-list"></div>
+      </div>
+    </div>
+
+    <!-- Discovery popup -->
+    <div class="map-discovery-popup" id="map-discovery-popup" style="display:none;">
+      <div class="map-popup-inner glass-strong">
+        <h3 style="font-family:'Baloo 2',cursive; color:#ffcc00; margin-bottom:12px; font-size:1.3rem;">✦ New Discovery!</h3>
+        <div id="map-popup-content"></div>
+        <button class="btn-glossy btn-green" style="margin-top:16px; width:100%;" onclick="closeMapPopup()">Continue Exploring</button>
       </div>
     </div>
   </div>
@@ -728,11 +1171,30 @@ var _t = localStorage.getItem('studyBuddyTheme_v2'); if (_t && _t !== 'moe') doc
 </div>
 
 <script src="data.js"></script>
+<script src="default-deck.js"></script>
+<script src="default-deck-extra.js"></script>
 <script src="script.js"></script>
 <script src="themes.js"></script>
 <script src="commissions.js"></script>
 <script src="expeditions.js"></script>
 <script src="clipboard.js"></script>
+<script src="map.js"></script>
+<script src="slots.js"></script>
+<script src="economy.js"></script>
+<script src="house.js"></script>
+<script src="catching.js"></script>
+<script src="conjugation.js"></script>
+<script src="jlpt.js"></script>
+<script src="todo.js"></script>
+<script src="fun.js"></script>
+<script src="pomodoro.js"></script>
+<script src="cats.js"></script>
+<script src="catpark.js"></script>
+<script src="monsters.js"></script>
+<script src="widgets.js"></script>
 <script src="jisho.js"></script>
+<script src="rpg.js"></script>
+<script src="anki-import.js"></script>
+<script src="auto-tag.js"></script>
 </body>
 </html>

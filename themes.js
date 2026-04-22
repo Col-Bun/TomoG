@@ -138,16 +138,20 @@ document.addEventListener('click', function(e) {
 });
 
 function initThemeSystem() {
+  // Try global mount first, fallback to top-controls
+  const globalMount = document.getElementById('global-theme-mount');
   const topControls = document.querySelector('.top-controls');
-  if (!topControls) return;
+  const mountTarget = globalMount || topControls;
+  if (!mountTarget) return;
 
   if (document.querySelector('.theme-picker-wrap')) return;
 
   const savedTheme = localStorage.getItem(THEME_KEY) || 'moe';
   const current = THEMES.find(t => t.id === savedTheme) || THEMES[0];
-  
+
   const wrap = document.createElement('div');
   wrap.className = 'theme-picker-wrap';
+  wrap.style.display = 'inline-block';
   wrap.innerHTML = `
     <button class="theme-picker-btn" onclick="toggleThemeDropdown(event)">
       <span id="theme-picker-label">${current.icon} ${current.label}</span> ▾
@@ -161,8 +165,22 @@ function initThemeSystem() {
       `).join('')}
     </div>
   `;
-  
-  topControls.insertBefore(wrap, topControls.firstChild);
+
+  if (globalMount) {
+    globalMount.appendChild(wrap);
+    // Also add dark mode toggle and day-of-week label
+    const extras = document.createElement('div');
+    extras.className = 'global-theme-extras';
+    const dayNames = ['日 Sun','月 Mon','火 Tue','水 Wed','木 Thu','金 Fri','土 Sat'];
+    const today = new Date().getDay();
+    extras.innerHTML = `
+      <button class="btn-theme global-dm-btn" id="global-theme-btn" onclick="toggleTheme()" title="Toggle Dark Mode">🌙</button>
+      <span class="global-day-label">${dayNames[today]}</span>
+    `;
+    globalMount.appendChild(extras);
+  } else {
+    topControls.insertBefore(wrap, topControls.firstChild);
+  }
   applyTheme(savedTheme);
 }
 
