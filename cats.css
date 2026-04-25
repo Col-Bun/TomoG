@@ -387,3 +387,321 @@
 .cat-boss-legendary { filter: drop-shadow(0 0 20px #ff8000); }
 .cat-boss-epic      { filter: drop-shadow(0 0 16px #a335ee); }
 .cat-boss-rare      { filter: drop-shadow(0 0 14px #0099ff); }
+
+/* ============================================================== */
+/* ===== ASCII WORLD · 世界 ====================================== */
+/* ============================================================== */
+
+.ascii-building {
+  position: absolute;
+  margin: 0;
+  z-index: 1;
+  font-family: 'Courier New', 'MS Gothic', monospace;
+  font-size: 13px;
+  line-height: 1.05;
+  color: rgba(220, 200, 255, 0.78);
+  text-shadow: 0 0 6px rgba(120, 90, 200, 0.55), 0 1px 2px rgba(0,0,0,0.55);
+  pointer-events: auto;
+  cursor: help;
+  white-space: pre;
+  letter-spacing: 0.5px;
+  animation: cat-building-rise 0.55s ease-out;
+  user-select: none;
+}
+.ascii-building:hover { color: rgba(255,235,180,0.95); }
+.ascii-building-tier-1 { color: rgba(200, 220, 200, 0.72); }
+.ascii-building-tier-2 { color: rgba(220, 200, 255, 0.78);
+  text-shadow: 0 0 8px rgba(160, 120, 230, 0.55), 0 1px 2px rgba(0,0,0,0.6); }
+.ascii-building-tier-3 {
+  color: rgba(255, 215, 130, 0.85);
+  text-shadow: 0 0 10px rgba(255, 180, 80, 0.55), 0 0 18px rgba(255,140,40,0.3), 0 1px 2px rgba(0,0,0,0.7);
+}
+@keyframes cat-building-rise {
+  0%   { opacity: 0; transform: translateY(8px) scale(0.92); }
+  60%  { opacity: 1; transform: translateY(-2px) scale(1.04); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.ascii-farm {
+  position: absolute;
+  margin: 0;
+  z-index: 1;
+  font-family: 'Courier New', 'MS Gothic', monospace;
+  font-size: 14px;
+  line-height: 1;
+  color: #a8e84c;
+  text-shadow: 0 0 5px rgba(168, 232, 76, 0.55), 0 1px 1px rgba(0,0,0,0.6);
+  pointer-events: auto;
+  cursor: help;
+  white-space: pre;
+  letter-spacing: 2px;
+  user-select: none;
+  animation: cat-farm-fade-in 0.4s ease-out;
+}
+@keyframes cat-farm-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ============================================================== */
+/* ===== CAT STATE VISUALS · 行動状態 ============================ */
+/* ============================================================== */
+
+/* Sleep — gentle bob + blue tint, lower brightness */
+.ascii-cat-state-sleep .ascii-cat-face {
+  filter: brightness(0.7) saturate(0.6);
+  animation: cat-state-sleep-bob 3.2s ease-in-out infinite;
+}
+@keyframes cat-state-sleep-bob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-2px) rotate(2deg); }
+}
+
+/* Meditate — tight halo */
+.ascii-cat-state-meditate .ascii-cat-face {
+  filter: drop-shadow(0 0 8px rgba(180, 140, 255, 0.7)) brightness(1.05);
+  animation: cat-state-meditate-pulse 2.6s ease-in-out infinite;
+}
+@keyframes cat-state-meditate-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
+}
+
+/* Dance — quick wiggle */
+.ascii-cat-state-dance .ascii-cat-face {
+  animation: cat-state-dance-shake 0.45s ease-in-out infinite;
+}
+@keyframes cat-state-dance-shake {
+  0%, 100% { transform: translateX(0) rotate(-4deg); }
+  50%      { transform: translateX(2px) rotate(5deg); }
+}
+
+/* Play — bouncy */
+.ascii-cat-state-play .ascii-cat-face {
+  animation: cat-state-play-bounce 0.6s ease-in-out infinite;
+}
+@keyframes cat-state-play-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-3px) scale(1.08); }
+}
+
+/* Flee — red tint, fast tremble */
+.ascii-cat-state-flee .ascii-cat-face {
+  filter: drop-shadow(0 0 6px rgba(255, 80, 80, 0.75)) brightness(1.2);
+  animation: cat-state-flee-tremble 0.16s linear infinite;
+}
+@keyframes cat-state-flee-tremble {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-1px); }
+  75%      { transform: translateX(1px); }
+}
+
+/* Farm/tend/build — small green/orange glow */
+.ascii-cat-state-farm .ascii-cat-face,
+.ascii-cat-state-tend .ascii-cat-face {
+  filter: drop-shadow(0 0 5px rgba(168, 232, 76, 0.6));
+}
+.ascii-cat-state-build .ascii-cat-face {
+  filter: drop-shadow(0 0 5px rgba(255, 184, 108, 0.7));
+}
+
+/* Follow — subtle blue trail */
+.ascii-cat-state-follow .ascii-cat-face {
+  filter: drop-shadow(0 0 4px rgba(120, 200, 255, 0.55));
+}
+
+/* ============================================================== */
+/* ===== CHIMERA ROAMERS · 迷い込んだキマイラ ==================== */
+/* ============================================================== */
+
+.cat-chimera-roamer {
+  position: absolute;
+  z-index: 5;
+  text-align: center;
+  pointer-events: none;
+  filter: drop-shadow(0 0 10px rgba(155, 91, 255, 0.5));
+  animation: cat-chimera-roam-bob 2.8s ease-in-out infinite;
+  width: 50px;
+  user-select: none;
+}
+.cat-chimera-emoji {
+  font-size: 32px;
+  line-height: 1;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.55));
+}
+.cat-chimera-name {
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  color: rgba(255,255,255,0.65);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.85);
+  white-space: nowrap;
+  margin-top: 1px;
+}
+.cat-chimera-roamer.cat-chimera-leaving {
+  opacity: 0.65;
+  animation: cat-chimera-leaving 1.6s ease-in-out infinite;
+}
+@keyframes cat-chimera-roam-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+@keyframes cat-chimera-leaving {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+  50%      { transform: translateY(-3px) scale(0.95); opacity: 0.4; }
+}
+
+/* ============================================================== */
+/* ===== ASCII WORLD ============================================ */
+/* ============================================================== */
+
+.ascii-building {
+  position: absolute;
+  margin: 0;
+  z-index: 1;
+  font-family: 'Courier New', 'MS Gothic', monospace;
+  font-size: 13px;
+  line-height: 1.05;
+  color: rgba(220, 200, 255, 0.78);
+  text-shadow: 0 0 6px rgba(120, 90, 200, 0.55), 0 1px 2px rgba(0,0,0,0.55);
+  pointer-events: auto;
+  cursor: help;
+  white-space: pre;
+  letter-spacing: 0.5px;
+  animation: cat-building-rise 0.55s ease-out;
+  user-select: none;
+}
+.ascii-building:hover { color: rgba(255,235,180,0.95); }
+.ascii-building-tier-1 { color: rgba(200, 220, 200, 0.72); }
+.ascii-building-tier-2 {
+  color: rgba(220, 200, 255, 0.78);
+  text-shadow: 0 0 8px rgba(160, 120, 230, 0.55), 0 1px 2px rgba(0,0,0,0.6);
+}
+.ascii-building-tier-3 {
+  color: rgba(255, 215, 130, 0.85);
+  text-shadow: 0 0 10px rgba(255, 180, 80, 0.55), 0 0 18px rgba(255,140,40,0.3), 0 1px 2px rgba(0,0,0,0.7);
+}
+@keyframes cat-building-rise {
+  0%   { opacity: 0; transform: translateY(8px) scale(0.92); }
+  60%  { opacity: 1; transform: translateY(-2px) scale(1.04); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.ascii-farm {
+  position: absolute;
+  margin: 0;
+  z-index: 1;
+  font-family: 'Courier New', 'MS Gothic', monospace;
+  font-size: 14px;
+  line-height: 1;
+  color: #a8e84c;
+  text-shadow: 0 0 5px rgba(168, 232, 76, 0.55), 0 1px 1px rgba(0,0,0,0.6);
+  pointer-events: auto;
+  cursor: help;
+  white-space: pre;
+  letter-spacing: 2px;
+  user-select: none;
+  animation: cat-farm-fade-in 0.4s ease-out;
+}
+@keyframes cat-farm-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ============================================================== */
+/* ===== CAT STATE VISUALS ====================================== */
+/* ============================================================== */
+
+.ascii-cat-state-sleep .ascii-cat-face {
+  filter: brightness(0.7) saturate(0.6);
+  animation: cat-state-sleep-bob 3.2s ease-in-out infinite;
+}
+@keyframes cat-state-sleep-bob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-2px) rotate(2deg); }
+}
+
+.ascii-cat-state-meditate .ascii-cat-face {
+  filter: drop-shadow(0 0 8px rgba(180, 140, 255, 0.7)) brightness(1.05);
+  animation: cat-state-meditate-pulse 2.6s ease-in-out infinite;
+}
+@keyframes cat-state-meditate-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
+}
+
+.ascii-cat-state-dance .ascii-cat-face {
+  animation: cat-state-dance-shake 0.45s ease-in-out infinite;
+}
+@keyframes cat-state-dance-shake {
+  0%, 100% { transform: translateX(0) rotate(-4deg); }
+  50%      { transform: translateX(2px) rotate(5deg); }
+}
+
+.ascii-cat-state-play .ascii-cat-face {
+  animation: cat-state-play-bounce 0.6s ease-in-out infinite;
+}
+@keyframes cat-state-play-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-3px) scale(1.08); }
+}
+
+.ascii-cat-state-flee .ascii-cat-face {
+  filter: drop-shadow(0 0 6px rgba(255, 80, 80, 0.75)) brightness(1.2);
+  animation: cat-state-flee-tremble 0.16s linear infinite;
+}
+@keyframes cat-state-flee-tremble {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-1px); }
+  75%      { transform: translateX(1px); }
+}
+
+.ascii-cat-state-farm .ascii-cat-face,
+.ascii-cat-state-tend .ascii-cat-face {
+  filter: drop-shadow(0 0 5px rgba(168, 232, 76, 0.6));
+}
+.ascii-cat-state-build .ascii-cat-face {
+  filter: drop-shadow(0 0 5px rgba(255, 184, 108, 0.7));
+}
+.ascii-cat-state-follow .ascii-cat-face {
+  filter: drop-shadow(0 0 4px rgba(120, 200, 255, 0.55));
+}
+
+/* ============================================================== */
+/* ===== CHIMERA ROAMERS ======================================== */
+/* ============================================================== */
+
+.cat-chimera-roamer {
+  position: absolute;
+  z-index: 5;
+  text-align: center;
+  pointer-events: none;
+  filter: drop-shadow(0 0 10px rgba(155, 91, 255, 0.5));
+  animation: cat-chimera-roam-bob 2.8s ease-in-out infinite;
+  width: 50px;
+  user-select: none;
+}
+.cat-chimera-emoji {
+  font-size: 32px;
+  line-height: 1;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.55));
+}
+.cat-chimera-name {
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  color: rgba(255,255,255,0.65);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.85);
+  white-space: nowrap;
+  margin-top: 1px;
+}
+.cat-chimera-roamer.cat-chimera-leaving {
+  opacity: 0.65;
+  animation: cat-chimera-leaving-pulse 1.6s ease-in-out infinite;
+}
+@keyframes cat-chimera-roam-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+@keyframes cat-chimera-leaving-pulse {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+  50%      { transform: translateY(-3px) scale(0.95); opacity: 0.4; }
+}
