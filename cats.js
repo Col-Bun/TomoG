@@ -305,8 +305,16 @@ const LUCKY_CHANCE = 0.05;           // 5% per spawn
 
 // Cats cycle in and out: natural despawn after CAT_LIFESPAN_MS, with a short
 // fade-out animation handled by `.ascii-cat-despawning` in cats.css.
-const CAT_LIFESPAN_MS = 4 * 60 * 60 * 1000; // 4 hours
+const CAT_LIFESPAN_MS = 4 * 60 * 60 * 1000; // 4 hours (normal)
+// Rare cats (lucky / secret personalities) only stick around briefly — catch 'em fast!
+const CAT_RARE_LIFESPAN_MS = 30 * 60 * 1000; // 30 minutes max for rare cats
 const CAT_FADEOUT_MS  = 2500;
+
+// Helper: how long should this particular cat live?
+function lifespanFor(cat) {
+  const isRare = cat.lucky || (cat.personality && cat.personality.secret);
+  return isRare ? CAT_RARE_LIFESPAN_MS : CAT_LIFESPAN_MS;
+}
 
 // Wildly-skewed speed multiplier roll. Most cats are normal; tails are sparse
 // but *extreme*. Returns a multiplier applied on top of personality.speedMult.
@@ -492,10 +500,14 @@ function catAnimateTick(ts) {
     const c = catRuntime.roaming[i];
     if (!c.spawnTime) c.spawnTime = nowMs;   // backfill any pre-existing cats
     if (c.despawning) continue;
-    if (nowMs - c.spawnTime >= CAT_LIFESPAN_MS) {
+    const lifespan = lifespanFor(c);
+    if (nowMs - c.spawnTime >= lifespan) {
       c.despawning = true;
       if (c.el) c.el.classList.add('ascii-cat-despawning');
-      catLog('👋 ' + (c.face || '(=^・^=)') + ' #' + c.id + ' cycled out · 引退');
+      const reason = (c.lucky || (c.personality && c.personality.secret))
+        ? '(rare · 30min limit)'
+        : '引退';
+      catLog('👋 ' + (c.face || '(=^・^=)') + ' #' + c.id + ' cycled out · ' + reason);
       setTimeout(() => {
         const idx = catRuntime.roaming.indexOf(c);
         if (idx >= 0) catRuntime.roaming.splice(idx, 1);
@@ -1420,21 +1432,579 @@ function ensureCatSpawner() {
 
 // ---------- POMODORO HOOK ----------
 // Exposed globally so pomodoro.js can ping us on session complete.
-// One-line addition in pomodoro.js → see instructions.
 window.onPomodoroWorkComplete = function () {
-  // Always spawn on a pomodoro finish — bonus cat, even if tab not open.
-  // (If stage not mounted yet, nextId still advances; when user opens tab
-  // it'll seed fresh. We only attempt DOM spawn if stage is live.)
   if (catRuntime.stageEl) {
-    // Pomodoro-spawned cat has a slightly higher lucky chance (12%).
     const forceLucky = Math.random() < 0.12;
     makeCatEntity({ forceLucky });
   } else {
-    // Still advance the ID and roll lifetime stat so captures feel earned later
     getCatData().totalSpawnedEver++;
     catRuntime.nextId++;
     saveData();
   }
+};
+
+// ============================================================================
+// ===== ASCII WORLD =========================================================
+// A persistent, cat-developed ASCII world layered behind the cats.
+// Cats farm, build, and tend tiles. The world grows over time and persists in
+// data.cats.world, so progress survives reloads.
+// ============================================================================
+
+const ASCII_BUILDINGS = [
+  { id: 'cottage', name: '小屋', es: 'cabaña', tier: 1, art:
+    " _____\n" +
+    "|  口 |\n" +
+    "|_____|", w: 7, h: 3 },
+  { id: 'tower', name: '塔', es: 'torre', tier: 2, art:
+    "  /\\\n" +
+    " /口\\\n" +
+    " |  |\n" +
+    " |__|", w: 5, h: 4 },
+  { id: 'shrine', name: '社', es: 'santuario', tier: 2, art:
+    " _||_\n" +
+    "  ||\n" +
+    " /神\\\n" +
+    "‾‾‾‾‾", w: 6, h: 4 },
+  { id: 'gate', name: '門', es: 'portón', tier: 1, art:
+    "┏━━━┓\n" +
+    "┃   ┃\n" +
+    "┃   ┃", w: 5, h: 3 },
+  { id: 'well', name: '井戸', es: 'pozo', tier: 1, art:
+    "  __ \n" +
+    " (oo)\n" +
+    " |  |", w: 5, h: 3 },
+  { id: 'manor', name: '屋敷', es: 'mansión', tier: 3, art:
+    " ╔═══╗\n" +
+    " ║口口║\n" +
+    " ║口口║\n" +
+    "═╩═══╩═", w: 8, h: 4 },
+  { id: 'lighthouse', name: '灯台', es: 'faro', tier: 3, art:
+    "  ☼ \n" +
+    " ╱│╲\n" +
+    " │ │\n" +
+    " │ │\n" +
+    "╱___╲", w: 5, h: 5 },
+  { id: 'wallseg', name: '壁', es: 'muralla', tier: 1, art:
+    "▓▒▓▒▓▒▓", w: 7, h: 1 },
+  { id: 'pagoda', name: '塔閣', es: 'pagoda', tier: 3, art:
+    "  ▲\n" +
+    " ▲▲▲\n" +
+    "▲▲▲▲▲\n" +
+    " │口│", w: 5, h: 4 },
+  { id: 'campfire', name: '焚き火', es: 'fogata', tier: 1, art:
+    "  )\n" +
+    " ((\n" +
+    "  ))\n" +
+    "/| |\\", w: 5, h: 4 },
+];
+
+const ASCII_CROP_STAGES = [
+  { ch: ',', name: 'seedling',  ms: 60 * 1000 },
+  { ch: ';', name: 'sprout',    ms: 90 * 1000 },
+  { ch: '"', name: 'growing',   ms: 120 * 1000 },
+  { ch: '*', name: 'flowering', ms: 90 * 1000 },
+  { ch: '※', name: 'ripe',      ms: Infinity   },
+];
+function nextCropStage(idx) { return Math.min(ASCII_CROP_STAGES.length - 1, idx + 1); }
+
+// _el holds a DOM node — non-enumerable so JSON.stringify (saveData) ignores it.
+function attachWorldEl(obj, el) {
+  Object.defineProperty(obj, "_el", { value: el, writable: true, configurable: true, enumerable: false });
+}
+
+
+function getWorldData() {
+  const cd = getCatData();
+  if (!cd.world) {
+    cd.world = { buildings: [], farms: [], paths: [], seedCount: 0, harvested: 0 };
+    saveData();
+  }
+  if (!Array.isArray(cd.world.buildings)) cd.world.buildings = [];
+  if (!Array.isArray(cd.world.farms))     cd.world.farms = [];
+  return cd.world;
+}
+
+function renderAsciiBuilding(b) {
+  const stage = catRuntime.stageEl;
+  if (!stage) return null;
+  const el = document.createElement('pre');
+  el.className = 'ascii-building ascii-building-tier-' + (b.tier || 1);
+  el.style.left = b.x + 'px';
+  el.style.top  = b.y + 'px';
+  el.textContent = b.art;
+  el.title = b.name + ' (' + (b.es || '') + ') · built by #' + (b.builtBy || '?');
+  stage.appendChild(el);
+  return el;
+}
+
+function renderAsciiFarm(f) {
+  const stage = catRuntime.stageEl;
+  if (!stage) return null;
+  const el = document.createElement('pre');
+  el.className = 'ascii-farm';
+  el.style.left = f.x + 'px';
+  el.style.top  = f.y + 'px';
+  el.textContent = f.crops.map(c => ASCII_CROP_STAGES[c.stage].ch).join(' ');
+  el.title = '畑 · farm tended by #' + (f.tendedBy || '?');
+  stage.appendChild(el);
+  attachWorldEl(f, el);
+  return el;
+}
+
+function refreshFarmEl(f) {
+  if (!f._el) return;
+  f._el.textContent = f.crops.map(c => ASCII_CROP_STAGES[c.stage].ch).join(' ');
+}
+
+function hydrateAsciiWorld() {
+  const stage = catRuntime.stageEl;
+  if (!stage) return;
+  const w = getWorldData();
+  stage.querySelectorAll('.ascii-building, .ascii-farm').forEach(n => n.remove());
+  w.buildings.forEach(b => { attachWorldEl(b, renderAsciiBuilding(b)); });
+  w.farms.forEach(f => { renderAsciiFarm(f); });
+}
+
+function catPlantFarm(cat) {
+  const stage = catRuntime.stageEl;
+  if (!stage) return;
+  const W = stage.clientWidth || 600, H = stage.clientHeight || 320;
+  const w = getWorldData();
+  if (w.farms.length >= 6) return;
+  const cropCount = 3 + Math.floor(Math.random() * 3);
+  const x = Math.max(8, Math.min(W - cropCount * 14, cat.x + 18));
+  const y = Math.max(8, Math.min(H - 20, cat.y + 26));
+  const farm = {
+    x, y,
+    crops: Array.from({ length: cropCount }, () => ({
+      stage: 0, plantedAt: Date.now(), lastTickAt: Date.now(),
+    })),
+    tendedBy: cat.id, plantedAt: Date.now(),
+  };
+  w.farms.push(farm);
+  w.seedCount++;
+  saveData();
+  renderAsciiFarm(farm);
+  setCatBubble(cat, '種を撒くにゃ · ¡a sembrar!', 2000);
+  catLog('🌱 #' + cat.id + ' planted ' + cropCount + ' seeds');
+}
+
+function catTendFarm(cat, farm) {
+  if (!farm) return;
+  const idx = farm.crops.findIndex(c => c.stage < ASCII_CROP_STAGES.length - 1);
+  if (idx < 0) return;
+  farm.crops[idx].stage = nextCropStage(farm.crops[idx].stage);
+  farm.crops[idx].lastTickAt = Date.now();
+  refreshFarmEl(farm);
+  saveData();
+  setCatBubble(cat, ['手入れ中…','水やり','¡un poquito más!','育つにゃ'][Math.floor(Math.random()*4)], 1600);
+}
+
+function catHarvestFarm(cat, farm) {
+  if (!farm) return;
+  const ripeIdx = farm.crops.findIndex(c => c.stage >= ASCII_CROP_STAGES.length - 1);
+  if (ripeIdx < 0) return;
+  farm.crops[ripeIdx] = { stage: 0, plantedAt: Date.now(), lastTickAt: Date.now() };
+  refreshFarmEl(farm);
+  const w = getWorldData();
+  w.harvested++;
+  saveData();
+  const ing = catPick(CAT_INGREDIENTS);
+  const stage = catRuntime.stageEl;
+  if (stage) {
+    const el = document.createElement('div');
+    el.className = 'cat-drop';
+    el.style.left = (farm.x + ripeIdx * 14) + 'px';
+    el.style.top  = (farm.y - 14) + 'px';
+    el.textContent = ing.emoji;
+    el.title = 'Click to pick up: ' + ing.name + ' (harvested by #' + cat.id + ')';
+    el.addEventListener('click', () => pickupDrop({ kind: 'ingredient', id: ing.id, name: ing.name, emoji: ing.emoji, el }));
+    stage.appendChild(el);
+    catRuntime.drops.push({ kind: 'ingredient', id: ing.id, emoji: ing.emoji, name: ing.name, el });
+  }
+  setCatBubble(cat, '収穫だにゃ！ · ¡cosecha!', 2400);
+  catLog('🌾 #' + cat.id + ' harvested ' + ing.emoji + ' ' + ing.name);
+}
+
+function tickFarmGrowth(now) {
+  const w = getWorldData();
+  let dirty = false;
+  w.farms.forEach(f => {
+    let changed = false;
+    f.crops.forEach(c => {
+      if (c.stage >= ASCII_CROP_STAGES.length - 1) return;
+      const stageDur = ASCII_CROP_STAGES[c.stage].ms;
+      if (Date.now() - c.lastTickAt >= stageDur) {
+        c.stage = nextCropStage(c.stage);
+        c.lastTickAt = Date.now();
+        changed = true; dirty = true;
+      }
+    });
+    if (changed) refreshFarmEl(f);
+  });
+  if (dirty) saveData();
+}
+
+function nearestFarmWithin(cat, radius) {
+  const w = getWorldData();
+  let best = null, bestD = radius;
+  w.farms.forEach(f => {
+    const d = Math.hypot((f.x + 18) - cat.x, (f.y + 6) - cat.y);
+    if (d < bestD) { bestD = d; best = f; }
+  });
+  return best;
+}
+
+function catBuildAsciiBuilding(cat) {
+  const stage = catRuntime.stageEl;
+  if (!stage) return;
+  const W = stage.clientWidth || 600, H = stage.clientHeight || 320;
+  const w = getWorldData();
+  if (w.buildings.length >= 8) return;
+  const p = cat.personality || {};
+  let pool = ASCII_BUILDINGS;
+  if (p.id === 'king' || p.id === 'samurai')   pool = ASCII_BUILDINGS.filter(b => b.tier >= 2);
+  else if (p.id === 'mystic' || p.id === 'sage')    pool = ASCII_BUILDINGS.filter(b => ['shrine','pagoda','lighthouse','well'].includes(b.id));
+  else if (p.id === 'sloth')                        pool = ASCII_BUILDINGS.filter(b => b.tier === 1);
+  else if (p.id === 'merchant')                     pool = ASCII_BUILDINGS.filter(b => ['gate','wallseg','manor'].includes(b.id));
+  if (!pool.length) pool = ASCII_BUILDINGS;
+  const tpl = pool[Math.floor(Math.random() * pool.length)];
+  const px = Math.max(8, Math.min(W - tpl.w * 8 - 8, cat.x + 30));
+  const py = Math.max(8, Math.min(H - tpl.h * 14 - 8, cat.y + 30));
+  const b = {
+    id: tpl.id, name: tpl.name, es: tpl.es, art: tpl.art, tier: tpl.tier,
+    x: px, y: py, builtBy: cat.id, builtAt: Date.now(),
+  };
+  w.buildings.push(b);
+  saveData();
+  attachWorldEl(b, renderAsciiBuilding(b));
+  cat.buildCooldown = 60 * 8;
+  setCatBubble(cat, '建築完了！ · ¡terminé!', 2600);
+  catLog('🏗️ #' + cat.id + ' built ASCII ' + tpl.name + ' (' + tpl.es + ')');
+  catRuntime.structures.push({ ...b, label: '🏛', el: b._el });
+}
+
+// ============================================================================
+// ===== STATE MACHINE =======================================================
+// ============================================================================
+const CAT_STATES = ['roam','sleep','play','dance','meditate','farm','tend','build','flee','follow'];
+
+const PERSONALITY_STATE_BIAS = {
+  philosopher: { roam: 1, meditate: 6, sleep: 2, dance: 0.2 },
+  architect:   { roam: 1, build: 5, tend: 1, dance: 0.4 },
+  sloth:       { roam: 0.4, sleep: 8, meditate: 1, dance: 0.1 },
+  lover:       { roam: 1, dance: 4, follow: 4, play: 2 },
+  grifter:     { roam: 2, follow: 3, play: 1 },
+  mystic:      { roam: 1, meditate: 5, dance: 0.5 },
+  merchant:    { roam: 2, tend: 2, follow: 1, play: 0.5 },
+  samurai:     { roam: 2, meditate: 2, dance: 0.6 },
+  poet:        { roam: 1, meditate: 3, dance: 1, sleep: 1 },
+  adventurer:  { roam: 4, play: 2, follow: 1 },
+  kitten:      { roam: 1, play: 6, dance: 2, sleep: 1, follow: 2 },
+  sage:        { roam: 0.5, meditate: 5, build: 1 },
+  shadow:      { roam: 2, flee: 1, meditate: 1 },
+  king:        { roam: 1, dance: 1, build: 2, meditate: 1 },
+  chef:        { roam: 1, farm: 5, tend: 4, play: 0.5 },
+  bureaucrat:  { roam: 1, meditate: 2, build: 0.5, tend: 1 },
+};
+
+function pickWeightedState(cat) {
+  const id = cat.personality ? cat.personality.id : null;
+  const bias = PERSONALITY_STATE_BIAS[id] || { roam: 1 };
+  const total = Object.values(bias).reduce((s, v) => s + v, 0);
+  let r = Math.random() * total;
+  for (const k of Object.keys(bias)) {
+    r -= bias[k];
+    if (r <= 0) return k;
+  }
+  return 'roam';
+}
+
+function setCatState(cat, state, durMs) {
+  cat.state = state;
+  cat.stateUntil = performance.now() + (durMs || (5000 + Math.random() * 14000));
+  if (cat.el) {
+    CAT_STATES.forEach(s => cat.el.classList.remove('ascii-cat-state-' + s));
+    cat.el.classList.add('ascii-cat-state-' + state);
+    if (state === 'sleep') setCatBubble(cat, '…zzz…', 4000);
+    if (state === 'meditate') setCatBubble(cat, ['…','禅','…静か…','om…','…無'][Math.floor(Math.random()*5)], 3500);
+    if (state === 'dance') setCatBubble(cat, ['♪♬','la la la','にゃんにゃん','¡baila!'][Math.floor(Math.random()*4)], 2400);
+    if (state === 'play') setCatBubble(cat, ['遊ぼう！','¡juguemos!','うふふ','jeje'][Math.floor(Math.random()*4)], 2200);
+  }
+}
+
+function applyStateMotion(cat) {
+  const s = cat.state;
+  if (s === 'sleep') {
+    cat.vx *= 0.85; cat.vy *= 0.85;
+    return;
+  }
+  if (s === 'meditate') {
+    cat.vx *= 0.9; cat.vy *= 0.9;
+    cat.vx += (Math.random() - 0.5) * 0.005;
+    cat.vy += (Math.random() - 0.5) * 0.005;
+    return;
+  }
+  if (s === 'dance') {
+    const t = performance.now() / 180;
+    cat.vx = Math.cos(t + cat.id) * 0.45;
+    cat.vy = Math.sin(t * 1.3 + cat.id) * 0.35;
+    return;
+  }
+  if (s === 'play') {
+    if (Math.random() < 0.04) {
+      const a = Math.random() * Math.PI * 2;
+      const sp = 1.0 + Math.random() * 0.7;
+      cat.vx = Math.cos(a) * sp;
+      cat.vy = Math.sin(a) * sp;
+    }
+    return;
+  }
+  if (s === 'follow') {
+    const target = nearestCatWithin(cat, 200);
+    if (target) {
+      const dx = target.x - cat.x, dy = target.y - cat.y;
+      const d = Math.hypot(dx, dy) || 1;
+      const desire = 0.04;
+      cat.vx = cat.vx * (1 - desire) + (dx / d) * 0.6 * desire * 8;
+      cat.vy = cat.vy * (1 - desire) + (dy / d) * 0.6 * desire * 8;
+    }
+    return;
+  }
+  if (s === 'farm' || s === 'tend') {
+    const f = cat._farmTarget;
+    if (f) {
+      const tx = f.x + 18, ty = f.y + 6;
+      const dx = tx - cat.x, dy = ty - cat.y;
+      const d = Math.hypot(dx, dy) || 1;
+      cat.vx = (dx / d) * 0.5;
+      cat.vy = (dy / d) * 0.5;
+    }
+    return;
+  }
+}
+
+// ============================================================================
+// ===== CHIMERA / POKEMON ROAMERS ===========================================
+// ============================================================================
+const CHIMERA_ROAMER_INTERVAL_MS = 4 * 60 * 1000;
+const CHIMERA_ROAMER_MAX = 3;
+
+catRuntime.chimeraRoamers = [];
+
+function chimeraRoamerSourcePool() {
+  if (typeof CHIMERAS !== 'undefined' && CHIMERAS && CHIMERAS.length) return CHIMERAS;
+  return [{ id: 'voidcat', name: 'Voidcat', emoji: '🐲', tier: 'Common' }];
+}
+
+function spawnChimeraRoamer(opts) {
+  opts = opts || {};
+  const stage = catRuntime.stageEl;
+  if (!stage) return null;
+  if (catRuntime.chimeraRoamers.length >= CHIMERA_ROAMER_MAX) return null;
+  const pool = chimeraRoamerSourcePool();
+  const chimera = opts.chimera || pool[Math.floor(Math.random() * pool.length)];
+
+  const W = stage.clientWidth || 600, H = stage.clientHeight || 320;
+  const edges = [
+    { x: -40, y: 30 + Math.random() * (H - 60), vx: 0.6, vy: (Math.random() - 0.5) * 0.4 },
+    { x: W + 20, y: 30 + Math.random() * (H - 60), vx: -0.6, vy: (Math.random() - 0.5) * 0.4 },
+    { x: 30 + Math.random() * (W - 60), y: -40, vx: (Math.random() - 0.5) * 0.4, vy: 0.5 },
+    { x: 30 + Math.random() * (W - 60), y: H + 20, vx: (Math.random() - 0.5) * 0.4, vy: -0.5 },
+  ];
+  const edge = edges[Math.floor(Math.random() * edges.length)];
+
+  const el = document.createElement('div');
+  el.className = 'cat-chimera-roamer';
+  el.style.left = edge.x + 'px';
+  el.style.top  = edge.y + 'px';
+  el.innerHTML =
+    '<div class="cat-chimera-emoji">' + (chimera.emoji || '❓') + '</div>' +
+    '<div class="cat-chimera-name">' + (chimera.name || '???') + '</div>';
+  stage.appendChild(el);
+
+  const r = {
+    chimera, el,
+    x: edge.x, y: edge.y,
+    vx: edge.vx, vy: edge.vy,
+    spawnMs: performance.now(),
+    state: 'wander',
+    leaveAt: performance.now() + (60 + Math.random() * 60) * 1000,
+    lastInteractMs: 0,
+  };
+  catRuntime.chimeraRoamers.push(r);
+  catLog('🐾 ' + (chimera.emoji || '❓') + ' ' + (chimera.name || '???') + ' wandered onto the stage');
+  return r;
+}
+
+function despawnChimeraRoamer(r, reason) {
+  if (!r) return;
+  if (r.el && r.el.parentNode) r.el.parentNode.removeChild(r.el);
+  catRuntime.chimeraRoamers = catRuntime.chimeraRoamers.filter(x => x !== r);
+  catLog('💨 ' + (r.chimera.emoji || '❓') + ' ' + (r.chimera.name || '???') + ' left (' + (reason || 'wandered off') + ')');
+}
+
+function tickChimeraRoamers(now) {
+  if (!catRuntime.stageEl) return;
+  const stage = catRuntime.stageEl;
+  const W = stage.clientWidth || 600, H = stage.clientHeight || 320;
+
+  if (!catRuntime._lastChimeraSpawn) catRuntime._lastChimeraSpawn = now - CHIMERA_ROAMER_INTERVAL_MS * 0.7;
+  if (now - catRuntime._lastChimeraSpawn >= CHIMERA_ROAMER_INTERVAL_MS) {
+    catRuntime._lastChimeraSpawn = now;
+    if (Math.random() < 0.7) spawnChimeraRoamer();
+  }
+
+  catRuntime.chimeraRoamers.slice().forEach(r => {
+    if (r.state !== 'leaving' && now >= r.leaveAt) {
+      r.state = 'leaving';
+      const dxL = r.x, dxR = W - r.x, dyT = r.y, dyB = H - r.y;
+      const m = Math.min(dxL, dxR, dyT, dyB);
+      if      (m === dxL) { r.vx = -1.0; r.vy = (Math.random() - 0.5) * 0.4; }
+      else if (m === dxR) { r.vx =  1.0; r.vy = (Math.random() - 0.5) * 0.4; }
+      else if (m === dyT) { r.vx = (Math.random() - 0.5) * 0.4; r.vy = -0.9; }
+      else                { r.vx = (Math.random() - 0.5) * 0.4; r.vy =  0.9; }
+      catLog('👋 ' + (r.chimera.emoji || '❓') + ' is leaving the stage…');
+    }
+
+    r.x += r.vx * 1.6;
+    r.y += r.vy * 1.6;
+
+    if (r.state === 'wander' && Math.random() < 0.01) {
+      r.vx += (Math.random() - 0.5) * 0.3;
+      r.vy += (Math.random() - 0.5) * 0.3;
+      const sp = Math.hypot(r.vx, r.vy);
+      if (sp > 1.4) { r.vx = r.vx / sp * 1.0; r.vy = r.vy / sp * 1.0; }
+    }
+
+    if (r.x < -80 || r.x > W + 60 || r.y < -80 || r.y > H + 60) {
+      despawnChimeraRoamer(r, 'left the stage');
+      return;
+    }
+
+    if (r.el) {
+      r.el.style.left = r.x.toFixed(1) + 'px';
+      r.el.style.top  = r.y.toFixed(1) + 'px';
+      if (r.state === 'leaving') r.el.classList.add('cat-chimera-leaving');
+      else r.el.classList.remove('cat-chimera-leaving');
+    }
+
+    if (now - r.lastInteractMs < 4000) return;
+    let nearestCat = null, nearestD = 90;
+    catRuntime.roaming.forEach(c => {
+      const d = Math.hypot((c.x + 30) - (r.x + 24), (c.y + 25) - (r.y + 24));
+      if (d < nearestD) { nearestD = d; nearestCat = c; }
+    });
+    if (!nearestCat) return;
+    r.lastInteractMs = now;
+
+    const tier = (r.chimera.tier || 'Common');
+    const isHostile = tier === 'Rare' || tier === 'Epic' || tier === 'Legendary';
+    const action = isHostile && Math.random() < 0.45 ? 'spook' :
+                   Math.random() < 0.25 ? 'gift' :
+                   Math.random() < 0.4  ? 'chase' : 'greet';
+
+    if (action === 'spook') {
+      setCatState(nearestCat, 'flee', 4000 + Math.random() * 3000);
+      const dx = nearestCat.x - r.x, dy = nearestCat.y - r.y;
+      const d = Math.hypot(dx, dy) || 1;
+      nearestCat.vx = (dx / d) * 1.6;
+      nearestCat.vy = (dy / d) * 1.6;
+      setCatBubble(nearestCat, '!!!', 1800);
+      catLog('😱 ' + (r.chimera.emoji || '❓') + ' spooked #' + nearestCat.id);
+    } else if (action === 'gift') {
+      catDropMaterial(nearestCat);
+      setCatBubble(nearestCat, ['ありがと！','¡gracias!','贈り物だにゃ'][Math.floor(Math.random()*3)], 2200);
+      catLog('🎁 ' + (r.chimera.emoji || '❓') + ' gave a gift to #' + nearestCat.id);
+    } else if (action === 'chase') {
+      setCatState(nearestCat, 'flee', 2500);
+      catLog('🏃 ' + (r.chimera.emoji || '❓') + ' is chasing #' + nearestCat.id);
+    } else {
+      const lines = ['にゃ〜','¿qué tal?','こんにちは','¡hola!','喧嘩しない','tranqui'];
+      setCatBubble(nearestCat, catPick(lines), 1800);
+      catLog('💬 ' + (r.chimera.emoji || '❓') + ' greeted #' + nearestCat.id);
+    }
+  });
+}
+
+// ============================================================================
+// ===== STATE TICK + WIRING ================================================
+// ============================================================================
+function tickCatStateMachine(cat, now) {
+  if (cat.despawning) return;
+  if (!cat.state || now > (cat.stateUntil || 0)) {
+    const next = pickWeightedState(cat);
+    setCatState(cat, next);
+    cat._farmTarget = null;
+  }
+  const s = cat.state;
+  applyStateMotion(cat);
+
+  if (s === 'farm') {
+    if (!cat._farmTarget && Math.random() < 0.04) {
+      catPlantFarm(cat);
+      const farms = getWorldData().farms;
+      cat._farmTarget = farms[farms.length - 1];
+      setCatState(cat, 'tend', 8000 + Math.random() * 12000);
+    } else if (Math.random() < 0.005) {
+      setCatState(cat, 'roam');
+    }
+    return;
+  }
+
+  if (s === 'tend') {
+    let farm = cat._farmTarget;
+    if (!farm || !getWorldData().farms.includes(farm)) {
+      farm = nearestFarmWithin(cat, 1000);
+      cat._farmTarget = farm;
+    }
+    if (!farm) {
+      setCatState(cat, 'roam');
+      return;
+    }
+    const dist = Math.hypot((farm.x + 18) - cat.x, (farm.y + 6) - cat.y);
+    if (dist < 24 && Math.random() < 0.04) {
+      const ripe = farm.crops.find(c => c.stage >= ASCII_CROP_STAGES.length - 1);
+      if (ripe) catHarvestFarm(cat, farm);
+      else catTendFarm(cat, farm);
+    }
+    return;
+  }
+
+  if (s === 'build') {
+    if (cat.buildCooldown <= 0 && Math.random() < 0.012) {
+      catBuildAsciiBuilding(cat);
+      setCatState(cat, 'roam');
+    } else if (Math.random() < 0.008) {
+      setCatState(cat, 'roam');
+    }
+    return;
+  }
+}
+
+// Wrap catAnimateTick to also run the new systems
+const _origCatAnimateTick = catAnimateTick;
+catAnimateTick = function (ts) {
+  if (catRuntime.stageEl) {
+    catRuntime.roaming.forEach(c => tickCatStateMachine(c, ts));
+    tickFarmGrowth(ts);
+    tickChimeraRoamers(ts);
+  }
+  return _origCatAnimateTick(ts);
+};
+
+// Wrap renderCatsTab to hydrate the world on tab open
+const _origRenderCatsTab = renderCatsTab;
+renderCatsTab = function () {
+  _origRenderCatsTab();
+  setTimeout(() => hydrateAsciiWorld(), 0);
+};
+
+// Wrap catBuildStructure to occasionally build ASCII instead
+const _origCatBuildStructure = catBuildStructure;
+catBuildStructure = function (cat) {
+  if (Math.random() < 0.6) catBuildAsciiBuilding(cat);
+  else _origCatBuildStructure(cat);
 };
 
 // ---------- INIT ----------
